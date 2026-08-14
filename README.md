@@ -1,218 +1,136 @@
 # OpenSpec Practise
 
-🌐 [English Version](./README-en.md) | 🇨🇳 中文版
-
-本项目起源于"AI 原力注入"社区关于 AI 编程的深度探讨。针对社区提出的"利用 OpenSpec 实现 Spec 驱动开发"这一构想，本项目通过一个完整的实战案例，演示了 OpenSpec 规范在 AI 辅助编程中的具体应用。
-
-作为 OpenSpec 的学习与实践仓库，本项目提供了系统的文档分析、详细的使用手册及多语言示例，旨在帮助开发者深入理解并高效应用该规范。
+本项目是基于 **OpenSpec** 规范驱动开发 (Spec-Driven Development, SDD) 的实战案例库。它演示了如何通过“先定义规范，后编写代码”的流程，实现人与 AI 在复杂业务场景下的高效协作。
 
 ---
 
-**Star History**:
-
-## ![Star History Chart](https://api.star-history.com/svg?repos=ForceInjection/OpenSpec-practise&type=date&legend=top-left)
-
----
-
-## 项目结构
-
-本项目主要由以下五个核心模块构成：
-
-### 1. AI 工具配置
-
-通过 `openspec init --tools claude` 生成的 AI 协作命令与技能，位于 `.claude/`。
-
-- **`.claude/commands/opsx/`**: 斜杠命令定义（`/opsx:explore`、`/opsx:propose`、`/opsx:apply`、`/opsx:sync`、`/opsx:archive`）。
-- **`.claude/skills/`**: 对应的 AI 技能文件（SKILL.md），定义每步操作的详细指令。
-
-### 2. 文档
-
-存放 OpenSpec 的理论分析与实践指南，帮助理解规范背后的思想与工作流。
-
-- **[OpenSpec使用手册](docs/openspec-user-manual.md)**: OpenSpec 的完整使用手册，涵盖安装、初始化、文档规范、验证、最佳实践等内容。
-
-  > "OpenSpec 是一个**规范驱动开发（Spec-Driven Development, SDD）框架**，专为 AI 编程助手设计。它通过在编写代码之前先定义规范，确保人与 AI 对需求达成一致。" —— _OpenSpec 使用手册_
-
-  配套幻灯片：[旧版 PPT](docs/openspec-user-manual-v1.pptx) · [当前版 PPT](docs/openspec-user-manual-v2.pptx)
-
-- **[OpenSpec 实战指南](docs/openspec-practical-guide.md)**: OpenSpec 的具体落地实践指南。
-
-  > "OpenSpec 不仅仅是一套文档格式，更是一种 **Spec 驱动开发 (Spec-Driven Development)** 的工程实践。它主张'以规格为源'，确保代码与测试始终与设计保持一致。" —— _OpenSpec 实战指南_
-
-- **[OpenSpec 实战指南：AI 辅助软件工程全流程深度复盘](docs/openspec-ai-workflow-analysis.md)**: 深度解析 OpenSpec 在 AI 编程工作流中的角色与价值。
-  > "传统的开发模式是 **需求 -> 人 -> 代码**，而新的范式正在演变为 **意图 -> Spec (OpenSpec) -> AI -> 代码 & 验证**。" —— _OpenSpec AI 工作流程分析_
-
----
-
-### 3. 示例代码
-
-基于电商场景 (E-commerce) 的多语言最小化实现 (MVP)，展示 OpenSpec 规范如何驱动代码落地。
-
-- **`ecommerce-mini` (Node.js)**
-  - `src/domain`: 核心业务逻辑，纯净的领域层。
-  - `src/http`: API 接口实现。
-  - `src/services`: 业务服务层。
-  - `src/repo`: 内存数据存储。
-  - `src/persist`: 文件持久化存储。
-  - `__tests__`: 配套的测试用例（单元测试、集成测试、性能测试）。
-
-- **`ecommerce-mini-python` (Python)**
-  - `src/domain`: Pydantic 定义的领域模型。
-  - `src/services`: 业务服务层。
-  - `src/api`: FastAPI 实现的接口服务。
-  - `src/repo`: 内存数据存储。
-  - `tests`: Pytest 测试套件。
-
-### 4. OpenSpec 规范
-
-SDD 工作流的完整规范文件，统一存放于 `openspec/`。
-
-- **`openspec/config.yaml`**: 项目上下文配置（技术栈、约定规则、store/references 支持），自动注入每次 AI 规划请求。
-- **`openspec/specs/`**: 归档后的主规范（cart-management、catalog-management、order-management、payment、domain-model、error-handling）。
-- **`openspec/changes/archive/2025-01-27-v1-mvp/`**: MVP 版本的完整变更规范（已归档）。
-  - `proposal.md`: 变更提案（Why / What Changes / Capabilities）。
-  - `design.md`: 系统架构设计。
-  - `tasks.md`: 实施任务清单。
-  - `specs/domain-model/spec.md`: 核心领域模型规范。
-  - `specs/catalog-management/spec.md`: 商品管理规范。
-  - `specs/cart-management/spec.md`: 购物车管理规范。
-  - `specs/order-management/spec.md`: 订单管理规范。
-  - `specs/payment/spec.md`: 支付规范。
-  - `specs/error-handling/spec.md`: 错误处理规范。
-
-### 5. 测试数据
-
-示例项目使用的测试数据文件。
-
-- **`ecommerce/ecommerce-mini/data/`**: Node.js 版本的测试数据。
-  - `products.json`: 商品数据。
-  - `carts.json`: 购物车数据。
-  - `orders.json`: 订单数据。
-
----
-
-## 核心特性
-
-本项目基于 **OpenSpec v1.5.0**，演示了以下核心特性：
-
-- **探索优先（Explore First）**: `/opsx:explore` 作为思考伙伴，在编写任何规范或代码之前先调查代码库、权衡选项、澄清需求——零成本的低风险探索。
-- **规范驱动开发**: 先定义规范，再编写代码，确保 AI 与人对需求达成一致。
-- **流式迭代（Fluid Workflow）**: Propose → Apply → Archive 各阶段不再锁死。可随时回溯修改规范，explore 可穿插在任意阶段。
-- **双语言实现**: 使用相同的规范驱动 Node.js (零依赖) 和 Python (FastAPI + Pydantic) 两套实现。
-- **完整测试覆盖**: 单元测试、集成测试、性能测试。
-- **Stores (Beta)**: 支持跨仓库规划。将规划集中在一个独立的 store 仓库中，多个代码仓库通过 `references` 引用只读上下文。
-
----
-
-## DDD 到 OpenSpec 映射
-
-领域驱动设计（DDD）的战略洞察与 OpenSpec 的结构化规范相融合，构建了从领域模型到工程代码的高可靠衔接体系。下述 DDD 产出物向 OpenSpec 工作流转化的标准映射路径，均提炼自开源技能库项目 [domain-driven-design-skills](https://github.com/ForceInjection/domain-driven-design-skills)（详见 `ddd-openspec-mapping.md` 文档）。
-
-### 1. 战略对齐与目录映射
-
-在战略层面，通过将 DDD 的空间划分方法论引入 OpenSpec 的目录结构，可以实现设计与规格的天然对应。
-
-DDD 的“限界上下文”对应 OpenSpec 中 `specs/` 目录下的子领域目录。这种对齐方式确保了每一个 DDD 识别出的业务边界在工程规格中都有明确的归属。同时，通过在 `openspec/config.yaml` 中声明这种映射关系，可以为 AI Agent 提供全局的架构上下文。
-
-```yaml
-# openspec/config.yaml 示例：领域与限界上下文的映射配置
-context: |
-  ## 项目领域映射
-  本系统遵循 DDD 设计，核心限界上下文包括：
-  - 用户管理上下文
-  - 订单管理上下文
-  - 支付上下文
-```
-
-### 2. 战术落地与结构映射
-
-战术设计决定了代码实现的质量。OpenSpec 提供了一套结构化的表达方式，将 DDD 的构造块转化为可验证、可执行的任务序列。
-
-下表展示了 OpenSpec 核心组件与 DDD 产出物的具体映射关系：
-
-| OpenSpec 规范结构       | 对应的 DDD 产出物                                    | 描述与说明                                  |
-| :---------------------- | :--------------------------------------------------- | :------------------------------------------ |
-| **领域（Domain）**      | **限界上下文（Bounded Context）**                    | 一个领域目录对应一个限界上下文。            |
-| **需求（Requirement）** | **领域服务（Domain Service）** / **命令（Command）** | 描述一个核心业务功能或操作。                |
-| **场景（Scenario）**    | **聚合（Aggregate）行为**                            | 使用 Given/When/Then 格式精确描述聚合行为。 |
-| **技术设计（Design）**  | **应用服务（Application Service）**                  | 协调多个领域服务，管理事务与安全。          |
-| **实施任务（Tasks）**   | **战术设计待办列表**                                 | 将实体、值对象、仓储接口等具体实现任务化。  |
-
-### 3. 工作流驱动的生命周期
-
-OpenSpec v1.5.0 的工作流与 DDD 的迭代建模高度契合，特别强调探索优先和存量优先的重构能力。
-
-- **探索（Explore）**：使用 `/opsx:explore` 以零成本调查代码库、对比方案、澄清需求。DDD 的「战略风暴」可在探索阶段自然展开。
-- **提案（Propose）**：使用 `/opsx:propose` 初始化变更，通过 `openspec instructions` 动态获取模板和上下文，沉淀领域建模结论。
-- **实施（Apply）**：利用 AI 依据规范进行代码实现与自动化验证，可随时回溯修改规范，不锁死阶段。
-- **同步（Sync）**：归档前将增量 spec 变更合并至主规范目录。
-- **归档（Archive）**：通过 `openspec archive` 将变更移至 `changes/archive/`，确保领域知识的单一事实来源。
+🚀 **核心亮点**
+- **规范驱动 (SDD)**：通过 Proposal → Design → Specs → Tasks 的标准路径，确保需求无歧义落地
+- **多端实现**：同一套 OpenSpec 规范，同时驱动 Node.js、Python 和 Vue 3 三套代码实现
+- **AI 原生协作**：深度集成 `/opsx` 斜杠命令，适配 Claude Code、Cursor 等 20+ AI 编程助手
 
 ---
 
 ## 快速开始
 
-### Node.js 示例
+### 1. 前置准备
+确保你的开发环境满足以下要求：
+- **Node.js**: v20.19.0 或更高版本
+- **Python**: v3.10 或更高版本 (用于运行 Python 示例)
 
-进入 `ecommerce/ecommerce-mini` 目录：
-
+### 2. 安装 OpenSpec
+OpenSpec 工具链用于管理变更、验证文档以及同步规范。
 ```bash
-# 安装依赖 (虽然本项目无外部依赖，但建议保持此习惯)
-npm install
+# 全局安装 OpenSpec CLI
+npm install -g @fission-ai/openspec@latest
 
-# 运行测试 (使用 Node.js 内置测试运行器)
+# 验证安装
+openspec --version
+```
+
+### 3. 初始化项目 (针对 AI 工具)
+如果你是第一次在此仓库中使用 AI 助手（如 Trae 或 Claude Code），请运行以下命令生成协作技能：
+```bash
+# 为 Trae 生成 /opsx 指令集 (推荐)
+openspec init --tools trae
+
+# 或者为 Claude Code 生成
+openspec init --tools claude
+```
+
+---
+
+## 运行示例应用
+
+本项目包含一个完整的电商 MVP，分为三个模块：
+
+### 📦 Node.js 后端 (`ecommerce-mini`)
+零依赖的纯净实现，支持内存存储与文件持久化。
+```bash
+cd ecommerce/ecommerce-mini
+
+# 运行测试
 npm test
 
-# 启动开发服务 (内存存储，默认监听 3000 端口)
+# 启动开发服务器 (端口 3000, 内存存储)
 npm start
 
-# 启动生产服务 (文件持久化、鉴权，默认监听 3002 端口)
+# 启动生产模式 (端口 3002, 文件持久化 + JWT 鉴权)
 npm run start:prod
 ```
 
-### Python 示例
-
-进入 `ecommerce/ecommerce-mini-python` 目录：
-
+### 🐍 Python 后端 (`ecommerce-mini-python`)
+基于 FastAPI 和 Pydantic 的高性能实现。
 ```bash
+cd ecommerce/ecommerce-mini-python
+
 # 安装依赖
 pip install -r requirements.txt
 
 # 运行测试
 pytest
 
-# 启动服务 (默认监听 8000 端口)
+# 启动服务 (端口 8000)
 python -m uvicorn src.api.server:app --reload
+```
+
+### 🎨 Vue 前端 (`ecommerce-mini-frontend`)
+现代扁平化风格的单屏 UI 界面。
+```bash
+cd ecommerce/ecommerce-mini-frontend
+
+# 安装依赖
+npm install
+
+# 启动开发环境 (端口 5173)
+npm run dev
 ```
 
 ---
 
-## 学习路径
+## SDD 工作流指南
 
-推荐按以下顺序学习：
+在本仓库中，推荐使用 `/opsx` 斜杠命令驱动开发任务。
 
-1. **入门**: 阅读 [OpenSpec使用手册](docs/openspec-user-manual.md)，了解 OpenSpec 的基本概念和使用方法。
-2. **实践**: 阅读 [OpenSpec 实战指南](docs/openspec-practical-guide.md)，理解如何在实际项目中应用。
-3. **深入**: 阅读 [OpenSpec 实战指南：AI 辅助软件工程全流程深度复盘](docs/openspec-ai-workflow-analysis.md)，了解 AI 协作的最佳实践。
-4. **动手**: 运行 `ecommerce/ecommerce-mini` 和 `ecommerce/ecommerce-mini-python`，体验规范驱动开发。两个实现均为同一套 OpenSpec 规范的产物。
-5. **实践 v1.5.0 工作流**: 查看 `openspec/changes/archive/2026-07-08-add-product-get-by-id/`，这是用 v1.5.0 完整工作流（Explore → Propose → Apply → Sync → Archive）新增的「按 ID 查询单个商品」功能。对比该 change 中的 proposal/design/specs/tasks 与最终代码改动（`server.js`、`server.py`），理解 SDD 从规范到实现的完整链路。
-6. **实践 v1.7.0 工作流**: 阅读 [v1.7.0 工作流实践文档](docs/openspec-v1.7.0-workflow-practice.md)，这是用完整工作流（Explore → Propose → **Update** → Apply → Sync → Archive）新增的「商品搜索与价格排序」功能，重点演示了 `/opsx:update` 如何在实施中修订规划文档并保持 artifacts 一致性。产物见 `openspec/changes/archive/2026-07-28-add-product-search/`。
-7. **研究**: 查看 `openspec/changes/archive/2025-01-27-v1-mvp/` 下的 MVP 规范文件，了解一个完整系统的规范如何从零构建。
+| 指令 | 阶段 | 描述 |
+| :--- | :--- | :--- |
+| `/opsx:explore` | **探索** | 在动工前，让 AI 调查代码库、对比方案、澄清需求 |
+| `/opsx:propose <name>` | **提案** | 初始化一个新的变更，自动生成结构化的规划文档 |
+| `/opsx:apply` | **实施** | 让 AI 依据规划文档（Tasks）逐步编写代码并验证 |
+| `/opsx:sync` | **同步** | 归档前，将当前的增量规范同步至主规范目录 |
+| `/opsx:archive` | **归档** | 完成变更后，将记录移至 `openspec/changes/archive/` |
 
 ---
 
-## 配套 AI 技能
+## 项目结构
 
-为了在实际开发中更高效地落地 OpenSpec 规范，本项目推荐搭配专用的 AI 助手技能进行协作。
+```text
+ project/
+ ├── openspec/                # OpenSpec 核心规范目录
+ │   ├── config.yaml          # 项目上下文配置（技术栈、规则、Store）
+ │   ├── specs/               # 归档后的主规范（单一事实来源）
+ │   └── changes/             # 活跃中的变更与归档记录
+ ├── ecommerce/               # 示例应用实现
+ │   ├── ecommerce-mini/      # Node.js 版本
+ │   ├── ecommerce-mini-python/ # Python 版本
+ │   └── ecommerce-mini-frontend/ # Vue 3 前端版本
+ ├── learning-sdd/            # 核心文档（手册、指南、分析）
+ └── .trae/                   # Trae 专属 AI 技能与斜杠命令 (同样支持 .cursor, .claude 等)
+ ```
 
-- **[OpenSpec Assistant](https://github.com/ForceInjection/awesome-skills/tree/main/skills/openspec-assistant)**: 这是一个专为执行 OpenSpec 规范驱动开发 (SDD) 而设计的 AI 技能。它涵盖了意图对齐、规范生成、代码实现与自动化验证的完整生命周期。同时支持架构师 (编写与评审 Spec) 、开发者 (编写代码) 和 QA (编写测试) 等多角色协同工作，并原生支持本项目的 `/opsx` 指令体系。
+---
+
+## 学习资源
+
+1.  **入门**: [OpenSpec 使用手册](learning-sdd/openspec-user-manual.md) — 了解基本概念与 CLI 用法
+2.  **实战**: [OpenSpec 实战指南](learning-sdd/openspec-practical-guide.md) — 掌握 SDD 工程实践
+3.  **进阶**: [AI 辅助软件工程全流程复盘](learning-sdd/openspec-ai-workflow-analysis.md) — 深入 AI 协作的最佳实践
+4.  **演进**: [v1.7.0 工作流实践](learning-sdd/openspec-v1.7.0-workflow-practice.md) — 学习如何处理需求迭代
 
 ---
 
 ## 相关链接
 
-- [CHANGELOG](./CHANGELOG.md) — 本项目跟随 OpenSpec 版本的演进记录
 - [OpenSpec 官方仓库](https://github.com/Fission-AI/OpenSpec)
-- [OpenSpec 官方文档](https://github.com/Fission-AI/OpenSpec/tree/main/docs)
-- [npm 包](https://www.npmjs.com/package/@fission-ai/openspec)
-- [DDD 技能库在线项目](https://github.com/ForceInjection/domain-driven-design-skills)
+- [DDD 技能库](https://github.com/ForceInjection/domain-driven-design-skills)
+- [CHANGELOG](./CHANGELOG.md)
