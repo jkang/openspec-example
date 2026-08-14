@@ -17,9 +17,9 @@ context: |
   存储: 开发环境使用内存 Map, 生产环境使用基于文件的 JSON 持久化 (仅限 Node.js)。
   API: 基于原生 Node.js http 模块 / FastAPI 的 RESTful JSON 接口。
   代码路径:
-    - examples/ecommerce-mini/ (Node.js)
-    - examples/ecommerce-mini-python/ (Python)
-    - examples/ecommerce-mini-frontend/ (Vue 前端)
+    - ecommerce/ecommerce-mini/ (Node.js)
+    - ecommerce/ecommerce-mini-python/ (Python)
+    - ecommerce/ecommerce-mini-frontend/ (Vue 前端)
 
 rules:
   proposal:

@@ -16,7 +16,7 @@ openspec/                      # Root OpenSpec configuration for this project
 .claude/                       # OpenSpec native AI commands and skills (v1.5.0)
   commands/opsx/               #   /opsx:propose, /opsx:apply, /opsx:archive, /opsx:explore, /opsx:sync
   skills/                      #   Corresponding skill definitions (SKILL.md)
-examples/
+ecommerce/
   ecommerce-mini/              # Node.js implementation (v20+, zero npm deps, native http)
     src/domain/                #   Entity type definitions (JSDoc) + pure domain logic
     src/services/              #   Use-case orchestration (CartService, CatalogService, OrderService)
@@ -63,7 +63,7 @@ Key design decisions:
 
 ## Common Commands
 
-### Node.js (`examples/ecommerce-mini/`)
+### Node.js (`ecommerce/ecommerce-mini/`)
 
 ```bash
 npm test              # Run all tests (node:test runner — unit + integration + performance)
@@ -71,7 +71,7 @@ npm start             # Dev server on port 3000 (in-memory storage, mock auth)
 npm run start:prod    # Prod server on port 3002 (file persistence + JWT auth)
 ```
 
-### Python (`examples/ecommerce-mini-python/`)
+### Python (`ecommerce/ecommerce-mini-python/`)
 
 ```bash
 pip install -r requirements.txt   # Install FastAPI, Pydantic, pytest, httpx, uvicorn
@@ -79,7 +79,7 @@ pytest                            # Run test suite (smoke + out-of-stock)
 python -m uvicorn src.api.server:app --reload   # Dev server on port 8000
 ```
 
-### Vue Frontend (`examples/ecommerce-mini-frontend/`)
+### Vue Frontend (`ecommerce/ecommerce-mini-frontend/`)
 
 ```bash
 npm install           # Install dependencies

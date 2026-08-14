@@ -84,7 +84,7 @@ Complete specification files demonstrating the SDD workflow, unified under `open
 
 Test data files used by the example projects.
 
-- **`examples/ecommerce-mini/data/`**: Test data for the Node.js version.
+- **`ecommerce/ecommerce-mini/data/`**: Test data for the Node.js version.
   - `products.json`: Product data.
   - `carts.json`: Cart data.
   - `orders.json`: Order data.
@@ -154,7 +154,7 @@ OpenSpec v1.5.0's workflow highly aligns with DDD's iterative modeling, with spe
 
 ### Node.js Example
 
-Navigate to the `examples/ecommerce-mini` directory:
+Navigate to the `ecommerce/ecommerce-mini` directory:
 
 ```bash
 # Install dependencies (no external dependencies in this project, but good practice)
@@ -172,7 +172,7 @@ npm run start:prod
 
 ### Python Example
 
-Navigate to the `examples/ecommerce-mini-python` directory:
+Navigate to the `ecommerce/ecommerce-mini-python` directory:
 
 ```bash
 # Install dependencies
