@@ -8,7 +8,7 @@ import { OrderService } from '../services/order.js'
 // Adapter for Repo interface using FileStore
 class FileRepoAdapter {
     constructor(filename, keyField = 'id') {
-        this.store = new FileStore(path.resolve(process.cwd(), 'examples/ecommerce-mini/data', filename))
+        this.store = new FileStore(path.resolve(process.cwd(), 'ecommerce/ecommerce-mini/data', filename))
         this.keyField = keyField
     }
     

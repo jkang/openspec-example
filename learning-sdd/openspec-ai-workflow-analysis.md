@@ -2,15 +2,52 @@
 
 ## 1. 引言：软件工程的新范式
 
-在 AI 辅助编程（AI-Assisted Programming）日益普及的今天，开发者面临的核心挑战已从“如何写代码”转变为“如何与 AI 协作以获得确定性的结果”。传统的开发模式是 **需求 -> 人 -> 代码**，而新的范式正在演变为 **意图 -> Spec (OpenSpec) -> AI -> 代码 & 验证**。
+在 AI 辅助编程（AI-Assisted Programming）日益普及的今天，开发者面临的核心挑战已从“如何写代码”转变为“如何与 AI 协作以获得确定性的结果”。传统的开发模式是 **需求 -> 人 -> 代码**，而 OpenSpec v1.5.0 倡导的新范式正在演变为：**意图 -> Explore (探索) -> Propose (提案) -> 原型 (Prototype) -> Spec (规范) -> Apply (实现) -> Sync (同步) -> Archive (归档)**。
 
-本文以一个 **小型电商系统** 的从零构建到生产级演进为例，深度复盘基于 OpenSpec 的 AI 协同开发全流程。我们将展示 OpenSpec 如何作为“人机通用语言”，贯穿架构设计、系统实现、测试验证与迭代演进的每一个环节，确保 AI 生成的代码可控、可信、可维护。
+```mermaid
+graph TD
+    A[意图 Intent] --> B(Explore 探索与调研)
+    B --> C{决策确认?}
+    C -- 否 --> B
+    C -- 是 --> D(Propose 提案与设计)
+    D --> E(生成原型 Prototype)
+    E --> F{视觉/交互确认?}
+    F -- 否 --> D
+    F -- 是 --> G(Spec 规格定义)
+    G --> H(Apply 实现与生成)
+    H --> I(Validate 自动化验证)
+    I --> J{符合规格?}
+    J -- 否 --> H
+    J -- 是 --> K(Sync 规格同步)
+    K --> L(Archive 归档)
+```
+
+本文以一个 **小型电商系统** 的从零构建到生产级演进为例，深度复盘基于 OpenSpec v1.5.0 的 AI 协同开发全流程。我们将展示 OpenSpec 如何作为“人机通用语言”，贯穿从调研到归档的每一个环节，确保 AI 生成的代码可控、可信、可维护。
 
 ---
 
 ## 2. 完整迭代流程复盘（Node.js 版）
 
-### 2.1 阶段一：意图对齐与规格生成 (Intent to Spec)
+### 2.0 阶段零：探索与调研 (Explore First)
+
+**用户输入**:
+
+> `/opsx:explore` "我想做一个电商 MVP，目前项目里已经有哪些基础能力？如果我要加一个购物车功能，该怎么设计？"
+
+**AI 思考与动作**:
+
+在 v1.5.0 中，`Explore` 是推荐的起始点。AI 不会立即创建文件，而是充当“零成本的头脑风暴伙伴”：
+
+1.  **代码库调研**: AI 扫描现有代码，发现已有的商品目录结构。
+2.  **方案对比**: AI 提出是在 `ecommerce-mini` 下扩展还是新建目录的优劣。
+3.  **架构草图**: 在对话中给出初步的组件交互图。
+
+**价值分析**:
+
+-   **消除偏差**: 在正式写提案前对齐技术路径，避免方向性错误。
+-   **无痛实验**: 开发者可以反复询问“如果...会怎样”，直到找到最佳方案。
+
+### 2.1 阶段一：意图对齐、原型确认与规格生成 (Intent to Spec)
 
 **用户输入**:
 
@@ -18,20 +55,26 @@
 
 **AI 思考与动作**:
 
-在此阶段，AI 不急于编写具体代码，而是首先进行 **领域建模** 与 **规格定义**。这是 OpenSpec 方法论的核心——先想清楚，再动手。
+在此阶段，AI 不急于编写具体代码，而是首先进行 **领域建模**、**视觉原型设计** 与 **规格定义**。这是 OpenSpec 方法论的核心——先想清楚（并看清楚），再动手。AI 通过运行 `openspec instructions proposal --json` 动态获取当前项目的背景和约束。
 
-1. **架构设计**: AI 分析出电商系统的核心上下文：商品 (Catalog)、用户 (User)、购物车 (Cart)、订单 (Order)、支付 (Payment)；
-2. **边界划分**: 确定分层架构，将 HTTP 接口层、应用服务层与基础设施层（Repository）分离；
-3. **规格产出**: 在 `openspec/changes/archive/2025-01-27-v1-mvp/`（已归档）下生成了 `proposal.md`、`design.md`、`specs/` 及 `tasks.md`，明确了领域边界、SLO 指标和 API 契约，具体包括：
-   - **Proposal**: 目标是构建一个高可测、低延迟的电商 Demo。
-   - **Design**: 模块间的数据流向（用户 -> 购物车 -> 订单）。
-   - **Spec**: HTTP 接口的路由定义（如 `POST /api/orders`）、错误码规范（`OUT_OF_STOCK`）及非功能指标（p99 < 100ms）。
-4. **配套文章**: 后续基于这些规范文档，撰写了配套的实战指南文章 [openspec-practical-guide.md](./openspec-practical-guide.md)。
+1.  **架构设计**: AI 分析出电商系统的核心上下文：商品 (Catalog)、用户 (User)、购物车 (Cart)、订单 (Order)、支付 (Payment)；
+2.  **生成交互式原型 (New!)**: 
+    - AI 调用 `openspec-prototype` 技能，生成基于 Vue 3 + Tailwind CSS 的 `prototypes/*.html` 单文件原型。
+    - 原型遵循 **Modern Flat** 极简规范（1px 边框、无阴影、无渐变），并使用真实的公开资源图片而非 AI 生成图，确保视觉专业度。
+3.  **断点确认机制 (Checkpoint)**: 
+    - 流程在此处暂停。AI 通知用户预览原型：“*视觉效果和交互流程是否符合预期？*”
+    - 用户确认后，AI 才继续生成后续的 `design.md` 和 `tasks.md`。这确保了技术设计是建立在已达成共识的 UI/UX 基础之上的。
+4.  **规格产出**: 生成 `proposal.md`、`design.md`、`specs/` 及 `tasks.md`：
+    - **Proposal**: 明确变更的 Why 和系统能力边界。
+    - **Spec**: 此时的 Spec 不再只是文字，它通过 `<details>` 标签嵌入了原型代码，并将原型中的交互行为转化为 Gherkin (Given/When/Then) 场景。
+5.  **配套文章**: 后续基于这些规范文档，撰写了配套的实战指南文章 [openspec-practical-guide.md](./openspec-practical-guide.md)。
 
 **价值分析**:
 
-- **消除歧义**: 将模糊的“电商网站”转化为具体的 API 定义和 SLO 指标。
-- **结构化约束**: 强迫 AI 在写代码前思考模块边界，避免生成“大泥球”代码。
+-   **Schema 驱动**: 指令不再是硬编码的，AI 能根据 `config.yaml` 动态调整生成策略。
+-   **视觉对齐**: 解决了纯文本需求导致的“买家秀与卖家秀”偏差，通过原型让用户在写代码前就看到成品。
+-   **确定性契约**: 交互规则从原型中提取并沉淀到 Spec 中，成为前端实现的硬约束。
+-   **防止返工**: 确认断点有效避免了 AI 在错误的技术方向上生成大量垃圾代码和任务。
 
 ### 2.2 阶段二：规范驱动的实现生成 (Spec to Code)
 
@@ -90,6 +133,25 @@ AI 不仅仅生成功能代码，还生成了配套的测试脚本来验证代�
 - **架构韧性**: 良好的初始 Spec 设计使得后续引入复杂特性（如鉴权）时，业务逻辑层（Services）几乎无需改动。
 - **测试驱动**: 新的生产级测试脚本成为了新特性的验收标准。
 
+### 2.5 阶段五：同步与归档 (Sync & Archive)
+
+**用户输入**:
+
+> `/opsx:sync` -> `/opsx:archive`
+
+**AI 动作**:
+
+在 v1.5.0 中，归档流程更加严谨：
+
+1.  **规格同步 (Sync)**: AI 运行 `openspec sync`，将当前变更中的 Delta Specs（增量规格）同步回主规格库（`openspec/specs/`），确保全局规格是最新的。
+2.  **验证 (Verify)**: 在归档前，AI 可以运行 `/opsx:verify` 确保实现代码与最新的 Spec 契约 100% 匹配。
+3.  **正式归档 (Archive)**: 移动变更文档到 `archive/` 目录，清理工作区。
+
+**价值分析**:
+
+-   **主规格一致性**: 避免了“实现已上线但文档未更新”的常见问题。
+-   **知识沉淀**: 归档后的文档成为项目的“外部存储器”，为下一次迭代提供上下文。
+
 ---
 
 ## 3. 核心洞察：OpenSpec 在 AI 编程中的角色
@@ -123,10 +185,12 @@ AI 生成代码往往具有随机性。OpenSpec 定义的接口契约（Schema�
 
 ### 3.3 协作中间件
 
-- **人 -> AI**: 人通过 Spec 表达意图（“我要一个电商系统，p99 < 100ms”）。
-- **AI -> 人**: AI 生成 Spec 供人评审（“这样的接口设计可以吗？”）。
-- **AI -> 代码**: AI 基于 Spec 生成代码与测试。
-- **测试 -> 验证**: 测试结果反向验证 Spec 的达成情况。
+- **人 -> AI (Explore)**: 人通过模糊的需求表达意图，AI 协助澄清并完成前置调研。
+- **AI -> 人 (Propose)**: AI 基于调研结果生成交互式原型供人评审（“UI 风格和交互流程是这样吗？”）。
+- **人 -> AI (Approve)**: 人通过确认断点给出反馈或批准设计。
+- **AI -> 代码 (Apply)**: AI 基于已确认的原型和 Spec 生成代码与测试。
+- **测试 -> 验证 (Verify)**: 测试结果反向验证实现与规格的达成情况。
+- **AI -> 规格库 (Sync)**: 最终将经验证的变更同步回项目主规格。
 
 ---
 
@@ -340,10 +404,11 @@ examples/ecommerce-mini-python/tests/test_smoke.py ..           [100%]
 本案例展示了基于 OpenSpec 的 AI 开发并非简单的“提示词工程”，而是一套严谨的 **工程方法论**。它通过：
 
 1. **显式化** 用户的模糊意图；
-2. **结构化** 系统的设计规格；
-3. **自动化** 代码与测试的生成验证；
+2. **原型化** 视觉与交互共识，建立确认断点；
+3. **结构化** 系统的设计规格；
+4. **自动化** 代码与测试的生成验证；
 
-最终实现了从“玩具 Demo”到“生产级系统”的平滑演进。在未来的软件开发中，掌握这种 **Spec-Driven AI Collaboration** 模式，将是每一位工程师的核心竞争力。
+最终实现了从“视觉原型”到“生产级系统”的平滑演进。在未来的软件开发中，掌握这种 **Prototype-Driven SDD** 模式，将是每一位工程师的核心竞争力。
 
 ---
 
@@ -352,6 +417,7 @@ examples/ecommerce-mini-python/tests/test_smoke.py ..           [100%]
 > **快速导航**：想了解 CLI 命令细节？→ [OpenSpec 使用手册](./openspec-user-manual.md)　|　想了解规范如何落地为代码？→ [实战指南](./openspec-practical-guide.md)　|　想复盘 AI 协作过程？→ 本文档
 
 - OpenSpec CLI 参考: [OpenSpec 使用手册](./openspec-user-manual.md)（init、validate、archive 等命令详解）
+- 交互式原型目录: `openspec/changes/<change-name>/prototypes/`（Vue 3 + Tailwind CSS）
 - 原始 Spec 指南: [openspec-practical-guide.md](./openspec-practical-guide.md)
 - OpenSpec 项目配置: `openspec/config.yaml`（技术栈、架构约束与规则，自动注入每次 AI 规划请求）
 - OpenSpec 规范文件: `openspec/changes/archive/2025-01-27-v1-mvp/`（已归档）
