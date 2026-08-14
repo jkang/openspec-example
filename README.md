@@ -21,7 +21,7 @@
 ### 2. 安装 OpenSpec
 OpenSpec 工具链用于管理变更、验证文档以及同步规范。
 ```bash
-# 全局安装 OpenSpec
+# 全局安装 OpenSpec 命令行工具
 npm install -g @fission-ai/openspec@latest
 
 # 验证安装
