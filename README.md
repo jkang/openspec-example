@@ -21,7 +21,7 @@
 ### 2. 安装 OpenSpec
 OpenSpec 工具链用于管理变更、验证文档以及同步规范。
 ```bash
-# 全局安装 OpenSpec CLI
+# 全局安装 OpenSpec
 npm install -g @fission-ai/openspec@latest
 
 # 验证安装
@@ -34,8 +34,8 @@ openspec --version
 # 为 Trae 生成 /opsx 指令集 (推荐)
 openspec init --tools trae
 
-# 或者为 Claude Code 生成
-openspec init --tools claude
+# 或者为 codex 生成
+openspec init --tools codex
 ```
 
 ---
