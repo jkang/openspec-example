@@ -28,6 +28,71 @@
             background-color: #f8f9fa; /* Light gray background */
             color: #111827;
             -webkit-font-smoothing: antialiased;
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Styles */
+        .sidebar {
+            width: 260px;
+            background: #fff;
+            border-right: 1px solid #e5e7eb;
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            padding: 2rem 1.5rem;
+            flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 800;
+            font-size: 1.25rem;
+            margin-bottom: 2.5rem;
+            color: #111827;
+            display: flex;
+            items-center: center;
+            gap: 0.5rem;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            color: #4b5563;
+            font-size: 0.875rem;
+            font-weight: 500;
+            border-radius: 6px;
+            transition: all 0.2s;
+            margin-bottom: 0.25rem;
+        }
+
+        .nav-item:hover {
+            background: #f3f4f6;
+            color: #111827;
+        }
+
+        .nav-item.active {
+            background: #eff6ff;
+            color: #2563eb;
+        }
+
+        .nav-section-title {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin: 1.5rem 0 0.75rem 1rem;
+        }
+
+        main {
+            flex-grow: 1;
+            padding: 2.5rem 3rem;
+            max-width: 100%;
+            overflow-x: hidden;
         }
         
         .flat-btn {
@@ -42,6 +107,14 @@
             background: #374151;
         }
         
+        .card {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            margin-bottom: 1.5rem;
+        }
+        
         .agenda-grid {
             display: grid;
             grid-template-columns: 100px 1fr;
@@ -50,7 +123,7 @@
             padding: 2rem;
             margin-bottom: 1rem;
             border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #e5e7eb;
         }
         
         .tag {
@@ -97,7 +170,7 @@
             background: #fff;
             padding: 2rem;
             border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            border: 1px solid #e5e7eb;
             margin-bottom: 2rem;
             overflow-x: auto;
         }
@@ -148,11 +221,68 @@
         @keyframes dash {
             to { stroke-dashoffset: -1000; }
         }
+
+        /* Smooth scroll behavior */
+        html {
+            scroll-behavior: smooth;
+        }
     </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const navItems = document.querySelectorAll('.nav-item');
+            const sections = document.querySelectorAll('div[id], section[id]');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    const sectionHeight = section.clientHeight;
+                    if (pageYOffset >= (sectionTop - 100)) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navItems.forEach(item => {
+                    item.classList.remove('active');
+                    if (item.getAttribute('href').slice(1) === current) {
+                        item.classList.add('active');
+                    }
+                });
+            });
+        });
+    </script>
 </head>
-<body class="p-4 md:p-10 max-w-5xl mx-auto min-h-screen">
-    <!-- Header Section -->
-    <header class="card mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+<body class="min-h-screen">
+    <!-- Sidebar Navigation -->
+    <nav class="sidebar hidden lg:flex">
+        <div class="sidebar-logo">
+            <span class="text-blue-600">🚀</span> OpenSpec
+        </div>
+        
+        <div class="nav-section-title">Overview</div>
+        <a href="#goals" class="nav-item">工作坊目标</a>
+        <a href="#case" class="nav-item">实战案例</a>
+        <a href="#flow" class="nav-item">全景流程图</a>
+        
+        <div class="nav-section-title">Execution Steps</div>
+        <a href="#step1" class="nav-item">01 理论导入</a>
+        <a href="#step2" class="nav-item">02 环境准备</a>
+        <a href="#step3" class="nav-item">03 架构探索</a>
+        <a href="#step4" class="nav-item">04 产品规划</a>
+        <a href="#step5" class="nav-item">05 需求提案</a>
+        <a href="#step6" class="nav-item">06 规划审查</a>
+        <a href="#step7" class="nav-item">07 编码实现</a>
+        <a href="#step8" class="nav-item">08 迭代增强</a>
+        <a href="#step9" class="nav-item">09 资产沉淀</a>
+        
+        <div class="nav-section-title">Conclusion</div>
+        <a href="#step10" class="nav-item">成果演示与复盘</a>
+    </nav>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Header Section -->
+        <header class="mb-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
         <div>
             <div class="tag mb-4 inline-block bg-blue-100 text-blue-800">Workshop 2026</div>
             <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight text-gray-900 mb-2">
@@ -174,8 +304,8 @@
         </div>
     </header>
 
-    <!-- Goals Section -->
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
+        <!-- Goals Section -->
+        <div id="goals" class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
         <div class="card">
             <h2 class="text-xl font-bold text-gray-900 mb-4">🎯 工作坊目标</h2>
             <ul class="space-y-3 text-gray-600">
@@ -192,8 +322,8 @@
         </div>
     </div>
 
-    <!-- Case Study Context -->
-    <div class="card mb-12 border-l-4 border-blue-500">
+        <!-- Case Study Context -->
+        <div id="case" class="card mb-12 border-l-4 border-blue-500">
         <h2 class="text-2xl font-bold text-gray-900 mb-4">📦 本期实战案例：促销与优惠券系统</h2>
         <div class="grid md:grid-cols-2 gap-8">
             <div>
@@ -220,8 +350,8 @@
         </div>
     </div>
 
-    <!-- Flowchart Section -->
-    <div class="mb-12">
+        <!-- Flowchart Section -->
+        <div id="flow" class="mb-12">
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-2xl font-bold text-gray-900">SDD 流程全景图 (SDD Paradigm Flow)</h2>
             <span class="tag bg-blue-50 text-blue-600">新需求：优惠券系统</span>
@@ -234,12 +364,17 @@
             <div class="flow-arrow">→</div>
             <div class="flow-node">
                 <div class="node-box">Explore</div>
-                <div class="flow-label">架构分析</div>
+                <div class="flow-label">意图对齐</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">
+                <div class="node-box">Define</div>
+                <div class="flow-label">产品规划</div>
             </div>
             <div class="flow-arrow">→</div>
             <div class="flow-node">
                 <div class="node-box">Propose</div>
-                <div class="flow-label">变更提案</div>
+                <div class="flow-label">需求提案</div>
             </div>
             <div class="flow-arrow">→</div>
             <div class="flow-node">
@@ -280,7 +415,7 @@
         <div class="bg-blue-50 p-4 rounded-md border border-blue-100 flex items-start gap-3">
             <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <p class="text-sm text-blue-800 leading-relaxed">
-                <strong>需求穿梭路线：</strong> 用户意图 → <strong>Explore</strong> 定位 → <strong>Propose</strong> 提案与原型 → <strong>Spec/Plan</strong> 审查 → <strong>Apply</strong> 实现 V1 → 发现规范不足使用 <strong>Update</strong> 增量增强 → 最终 <strong>Sync</strong> 与 <strong>Archive</strong>。
+                <strong>需求穿梭路线：</strong> 用户意图 → <strong>Explore</strong> 定位 → <strong>Define</strong> 规划拆分 → <strong>Propose</strong> 提案与原型 → <strong>Spec/Plan</strong> 审查 → <strong>Apply</strong> 实现 → <strong>Update</strong> 增强 → <strong>Sync/Archive</strong> 归档。
             </p>
         </div>
     </div>
@@ -293,7 +428,7 @@
     
     <div class="space-y-4 mb-16">
         <!-- Step 1: Intro -->
-        <div class="agenda-grid">
+        <div id="step1" class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">01</span>
                 <span class="text-sm font-semibold text-gray-500">15 min</span>
@@ -309,7 +444,7 @@
         </div>
 
         <!-- Step 2: Environment -->
-        <div class="agenda-grid">
+        <div id="step2" class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">02</span>
                 <span class="text-sm font-semibold text-gray-500">10 min</span>
@@ -333,31 +468,50 @@
         </div>
 
         <!-- Step 3: Explore -->
-        <div class="agenda-grid">
+        <div id="step3" class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">03</span>
-                <span class="text-sm font-semibold text-gray-500">15 min</span>
+                <span class="text-sm font-semibold text-gray-500">10 min</span>
             </div>
             <div>
                 <div class="flex items-center gap-2 mb-3">
                     <h3 class="text-lg font-bold text-gray-900">Explore：意图对齐与方案探索</h3>
                     <span class="tag bg-blue-50 text-blue-600 py-0.5 px-2 text-[10px]">穿梭点：架构定位</span>
                 </div>
-                <p class="text-gray-600 mb-4">在动工前，让 AI 调查现有 `OrderService` 与 `CartService` 的耦合情况，寻找优惠券逻辑的最佳切入点。</p>
+                <p class="text-gray-600 mb-4">在动工前，让 AI 调查现有架构，寻找新功能的最佳切入点，形成初步技术方案。</p>
                 <div class="code-block mb-4">
                     <span class="text-blue-600 font-bold">/opsx:explore</span><br/>
-                    "我想在当前系统中加入优惠券功能。请分析 OrderService 的结算流程，建议是在 Cart 中处理优惠还是在 Order 创建时处理？并检查现有的数据模型是否支持扩展优惠金额字段。"
-                </div>
-                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 text-sm text-yellow-800">
-                    <strong>Review 要点：</strong> 方案是否破坏了现有的 `ecommerce-mini` 零依赖原则？是否考虑了分（Cents）为单位的精度问题？
+                    "我想在当前系统中加入优惠券功能。请分析结算流程，寻找最佳注入点。"
                 </div>
             </div>
         </div>
 
-        <!-- Step 4: Propose & Prototype -->
-        <div class="agenda-grid">
+        <!-- Step 4: Define -->
+        <div id="step4" class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">04</span>
+                <span class="text-sm font-semibold text-gray-500">15 min</span>
+            </div>
+            <div>
+                <div class="flex items-center gap-2 mb-3">
+                    <h3 class="text-lg font-bold text-gray-900">Define：产品规划与需求拆分</h3>
+                    <span class="tag bg-blue-50 text-blue-600 py-0.5 px-2 text-[10px]">穿梭点：规划评审</span>
+                </div>
+                <p class="text-gray-600 mb-4">针对较大变动，制定整体方案并将需求拆分为 Story 进入 `feature-list.json`。经过业务评审确认后，再针对每一条需求进入 Propose 流程。</p>
+                <div class="bg-gray-50 p-3 rounded-md border border-gray-200 text-xs text-gray-600">
+                    <p class="font-bold text-gray-900 mb-1">规划要点：</p>
+                    <ul class="list-disc ml-4 space-y-1">
+                        <li>Story 1: 基础折扣码核销（SAVE20）</li>
+                        <li>Story 2: 满减逻辑（满 200 减 30）</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: Propose & Prototype -->
+        <div id="step5" class="agenda-grid">
+            <div class="flex flex-col items-center justify-start pt-2">
+                <span class="step-num mb-1">05</span>
                 <span class="text-sm font-semibold text-gray-500">20 min</span>
             </div>
             <div>
@@ -367,44 +521,14 @@
                 </div>
                 <p class="text-gray-600 mb-4">正式发起变更，并要求 AI 生成可交互的 HTML 原型以确认 UI 效果。</p>
                 <div class="code-block mb-4">
-                    <span class="text-blue-600 font-bold">/opsx:propose coupon-system</span><br/>
-                    "为系统增加优惠券核销功能。要求：在购物车页面底部增加输入框，支持 SAVE20 (8折) 优惠码；结算页显示 '原价'、'优惠金额' 和 '实付金额'。请先提供一个交互原型。"
-                </div>
-                <div class="bg-blue-50 border-l-4 border-blue-400 p-3 text-sm text-blue-800">
-                    <strong>Review 要点 (Visual Gating)：</strong> 点击“应用优惠券”后，总价是否即时刷新？UI 是否符合“现代扁平化"审美（1px 边框、无阴影）？
-                </div>
-            </div>
-        </div>
-
-        <!-- Step 5: Spec -->
-        <div class="agenda-grid">
-            <div class="flex flex-col items-center justify-start pt-2">
-                <span class="step-num mb-1">05</span>
-                <span class="text-sm font-semibold text-gray-500">20 min</span>
-            </div>
-            <div>
-                <div class="flex items-center gap-2 mb-3">
-                    <h3 class="text-lg font-bold text-gray-900">Spec：规格审查</h3>
-                    <span class="tag bg-blue-50 text-blue-600 py-0.5 px-2 text-[10px]">穿梭点：规则量化审查</span>
-                </div>
-                <p class="text-gray-600 mb-4">审查并微调 AI 在 Propose 阶段自动生成的 `spec.md`。确保 Gherkin 场景精确覆盖了业务边界，人是最终的质量把关者。</p>
-                <div class="bg-gray-50 p-4 rounded-md border border-gray-200 text-sm mb-4">
-                    <p class="font-bold text-gray-900 mb-2">Scenario 示例：</p>
-                    <div class="text-gray-600 italic">
-                        Given 购物车总额为 10000 分<br/>
-                        When 输入优惠码 "SAVE20"<br/>
-                        Then 实付金额应更新为 8000 分<br/>
-                        And 优惠明细应显示 "折扣优惠: 2000 分"
-                    </div>
-                </div>
-                <div class="bg-green-50 border-l-4 border-green-400 p-3 text-sm text-green-800">
-                    <strong>Review 要点：</strong> 每个 Requirement 是否都有 Rationale？是否覆盖了“无效优惠码”和“未达门槛”的异常路径？
+                    <span class="text-blue-600 font-bold">/opsx:propose coupon-core</span><br/>
+                    "实施 Story 1：基础折扣码核销。要求在购物车底部增加输入框，支持 SAVE20。"
                 </div>
             </div>
         </div>
 
         <!-- Step 6: Plan -->
-        <div class="agenda-grid">
+        <div id="step6" class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">06</span>
                 <span class="text-sm font-semibold text-gray-500">10 min</span>
@@ -431,7 +555,7 @@
         </div>
 
         <!-- Step 7: Apply & Harness -->
-        <div class="agenda-grid">
+        <div id="step7" class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">07</span>
                 <span class="text-sm font-semibold text-gray-500">25 min</span>
@@ -455,7 +579,7 @@
         </div>
 
         <!-- Step 8: Update & Iteration -->
-        <div class="agenda-grid">
+        <div id="step8" class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">08</span>
                 <span class="text-sm font-semibold text-gray-500">25 min</span>
@@ -477,7 +601,7 @@
         </div>
 
         <!-- Step 9: Sync & Archive -->
-        <div class="agenda-grid">
+        <div id="step9" class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">09</span>
                 <span class="text-sm font-semibold text-gray-500">15 min</span>
@@ -500,7 +624,7 @@
         </div>
 
         <!-- Step 10: Demo & Retrospective -->
-        <div class="agenda-grid">
+        <div id="step10" class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">10</span>
                 <span class="text-sm font-semibold text-gray-500">25 min</span>
@@ -521,19 +645,32 @@
                         <h4 class="text-sm font-bold text-gray-900 mb-2">复盘总结</h4>
                         <div class="space-y-3">
                             <div>
-                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">SDD 核心价值</p>
-                                <ul class="text-xs text-gray-600 space-y-1">
-                                    <li>• AI 生成 vs 人类审查的效率提升感</li>
-                                    <li>• Spec 作为“唯一事实来源”在沟通中的作用</li>
-                                    <li>• 质量门禁 (Harness) 对交付信心的增强</li>
-                                </ul>
-                            </div>
-                            <div class="pt-2 border-t border-gray-100">
-                                <p class="text-[10px] font-bold text-blue-500 uppercase tracking-wider mb-1">真实项目迁移建议</p>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">真实项目迁移建议</p>
                                 <ul class="text-xs text-gray-600 space-y-1">
                                     <li>• <strong>业务上下文增强</strong>：需提供更完备的 Business Context 文档</li>
                                     <li>• <strong>领域划分与 Baseline</strong>：需明确业务领域边界及基线 Specs</li>
-                                    <li>• <strong>Skill 深度定制</strong>：针对原型设计等环节，需集成内部设计规范与组件库</li>
+                                    <li>• <strong>Skill 深度定制</strong>：针对原型设计等环节，集成内部设计规范与组件库</li>
+                                </ul>
+                            </div>
+                            <div class="pt-2 border-t border-gray-100">
+                                <p class="text-[10px] font-bold text-blue-500 uppercase tracking-wider mb-1">下一步学习建议</p>
+                                <ul class="text-xs text-gray-600 space-y-2">
+                                    <li>
+                                        <strong>1. 学习应用 Harness 实践</strong>
+                                        <div class="text-[10px] text-gray-500 mt-0.5">
+                                            - 完善 AGENTS.md, feature-list.json, progress.md<br/>
+                                            - 引入自动化测试（如基于 Cucumber 的 BDD 测试）<br/>
+                                            - 增加 Validate 节点：验证 Apply 后自动化测试是否真正运行并通过
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <strong>2. 强化产品规划节点</strong>
+                                        <div class="text-[10px] text-gray-500 mt-0.5">
+                                            - 在 Explore 后增加整体方案设计与需求拆分<br/>
+                                            - 拆分 Story 进入 feature-list 并经过业务评审<br/>
+                                            - 针对每条 Story 独立进入 Propose 流程实现精准交付
+                                        </div>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
@@ -582,9 +719,10 @@
         </div>
     </section>
 
-    <footer class="pt-8 pb-12 flex justify-between items-center text-sm text-gray-400 border-t border-gray-200">
-        <div class="font-medium">Spec Driven Development Practice</div>
-        <div>OpenSpec Framework v1.5.0</div>
-    </footer>
+        <footer class="pt-8 pb-12 flex justify-between items-center text-sm text-gray-400 border-t border-gray-200">
+            <div class="font-medium">Spec Driven Development Practice</div>
+            <div>OpenSpec Framework v1.5.0</div>
+        </footer>
+    </main>
 </body>
 </html>
