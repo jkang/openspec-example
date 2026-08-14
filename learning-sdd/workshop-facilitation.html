@@ -296,7 +296,7 @@
         <div class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">01</span>
-                <span class="text-sm font-semibold text-gray-500">20 min</span>
+                <span class="text-sm font-semibold text-gray-500">15 min</span>
             </div>
             <div>
                 <h3 class="text-lg font-bold text-gray-900 mb-3">理论导入：AI 协作新范式</h3>
@@ -312,7 +312,7 @@
         <div class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">02</span>
-                <span class="text-sm font-semibold text-gray-500">15 min</span>
+                <span class="text-sm font-semibold text-gray-500">10 min</span>
             </div>
             <div>
                 <h3 class="text-lg font-bold text-gray-900 mb-3">环境准备：Setup & Check</h3>
@@ -336,7 +336,7 @@
         <div class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">03</span>
-                <span class="text-sm font-semibold text-gray-500">20 min</span>
+                <span class="text-sm font-semibold text-gray-500">15 min</span>
             </div>
             <div>
                 <div class="flex items-center gap-2 mb-3">
@@ -358,7 +358,7 @@
         <div class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">04</span>
-                <span class="text-sm font-semibold text-gray-500">25 min</span>
+                <span class="text-sm font-semibold text-gray-500">20 min</span>
             </div>
             <div>
                 <div class="flex items-center gap-2 mb-3">
@@ -371,7 +371,7 @@
                     "为系统增加优惠券核销功能。要求：在购物车页面底部增加输入框，支持 SAVE20 (8折) 优惠码；结算页显示 '原价'、'优惠金额' 和 '实付金额'。请先提供一个交互原型。"
                 </div>
                 <div class="bg-blue-50 border-l-4 border-blue-400 p-3 text-sm text-blue-800">
-                    <strong>Review 要点 (Visual Gating)：</strong> 点击“应用优惠券”后，总价是否即时刷新？UI 是否符合“现代扁平化”审美（1px 边框、无阴影）？
+                    <strong>Review 要点 (Visual Gating)：</strong> 点击“应用优惠券”后，总价是否即时刷新？UI 是否符合“现代扁平化"审美（1px 边框、无阴影）？
                 </div>
             </div>
         </div>
@@ -380,7 +380,7 @@
         <div class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">05</span>
-                <span class="text-sm font-semibold text-gray-500">25 min</span>
+                <span class="text-sm font-semibold text-gray-500">20 min</span>
             </div>
             <div>
                 <div class="flex items-center gap-2 mb-3">
@@ -407,7 +407,7 @@
         <div class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">06</span>
-                <span class="text-sm font-semibold text-gray-500">15 min</span>
+                <span class="text-sm font-semibold text-gray-500">10 min</span>
             </div>
             <div>
                 <div class="flex items-center gap-2 mb-3">
@@ -434,7 +434,7 @@
         <div class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">07</span>
-                <span class="text-sm font-semibold text-gray-500">30 min</span>
+                <span class="text-sm font-semibold text-gray-500">25 min</span>
             </div>
             <div>
                 <div class="flex items-center gap-2 mb-3">
@@ -444,7 +444,7 @@
                 <p class="text-gray-600 mb-4">执行代码生成，并通过自动化测试验证交付质量。</p>
                 <div class="code-block mb-4">
                     <span class="text-blue-600 font-bold">/opsx:apply</span><br/>
-                    "请按计划实施优惠券功能。完成后，运行 npm test 并提供测试覆盖率报告，确保优惠计算逻辑无死角。"
+                    "请根据规范和计划执行代码实现，确保核心逻辑覆盖单元测试。"
                 </div>
                 <div class="bg-gray-900 text-brand p-3 rounded-md text-xs font-mono">
                     PASS src/services/order.spec.js<br/>
@@ -454,11 +454,33 @@
             </div>
         </div>
 
-        <!-- Step 8: Sync & Archive -->
+        <!-- Step 8: Update & Iteration -->
         <div class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">08</span>
-                <span class="text-sm font-semibold text-gray-500">10 min</span>
+                <span class="text-sm font-semibold text-gray-500">25 min</span>
+            </div>
+            <div>
+                <div class="flex items-center gap-2 mb-3">
+                    <h3 class="text-lg font-bold text-gray-900">Update：需求迭代与增量规划</h3>
+                    <span class="tag bg-blue-50 text-blue-600 py-0.5 px-2 text-[10px]">穿梭点：增量增强</span>
+                </div>
+                <p class="text-gray-600 mb-4">实现第一版后，发现之前的 Spec 不够全面（例如漏掉了优惠券叠加规则），使用 Update 指令进行增量更新。</p>
+                <div class="code-block mb-4">
+                    <span class="text-blue-600 font-bold">/opsx:update</span><br/>
+                    "在现有优惠券基础上增加『每满 200 减 30』的满减逻辑，并确保它能与折扣券叠加使用。请更新 Spec 和相关 Task。"
+                </div>
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 text-sm text-yellow-800">
+                    <strong>Review 要点：</strong> 观察 AI 如何在不破坏现有 `coupon-system` 结构的情况下，增量更新 `design.md` 和 `tasks.md`。
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 9: Sync & Archive -->
+        <div class="agenda-grid">
+            <div class="flex flex-col items-center justify-start pt-2">
+                <span class="step-num mb-1">09</span>
+                <span class="text-sm font-semibold text-gray-500">15 min</span>
             </div>
             <div>
                 <h3 class="text-lg font-bold text-gray-900 mb-3">Sync & Archive：资产沉淀</h3>
@@ -477,11 +499,11 @@
             </div>
         </div>
 
-        <!-- Step 9: Demo & Retrospective -->
+        <!-- Step 10: Demo & Retrospective -->
         <div class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
-                <span class="step-num mb-1">09</span>
-                <span class="text-sm font-semibold text-gray-500">20 min</span>
+                <span class="step-num mb-1">10</span>
+                <span class="text-sm font-semibold text-gray-500">25 min</span>
             </div>
             <div>
                 <h3 class="text-lg font-bold text-gray-900 mb-3">Demo & 复盘总结</h3>
@@ -496,12 +518,25 @@
                         </ul>
                     </div>
                     <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
-                        <h4 class="text-sm font-bold text-gray-900 mb-2">复盘要点</h4>
-                        <ul class="text-xs text-gray-600 space-y-1">
-                            <li>• AI 生成 vs 人类审查的效率提升感</li>
-                            <li>• Spec 作为“唯一事实来源”在沟通中的作用</li>
-                            <li>• 质量门禁 (Harness) 对交付信心的增强</li>
-                        </ul>
+                        <h4 class="text-sm font-bold text-gray-900 mb-2">复盘总结</h4>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">SDD 核心价值</p>
+                                <ul class="text-xs text-gray-600 space-y-1">
+                                    <li>• AI 生成 vs 人类审查的效率提升感</li>
+                                    <li>• Spec 作为“唯一事实来源”在沟通中的作用</li>
+                                    <li>• 质量门禁 (Harness) 对交付信心的增强</li>
+                                </ul>
+                            </div>
+                            <div class="pt-2 border-t border-gray-100">
+                                <p class="text-[10px] font-bold text-blue-500 uppercase tracking-wider mb-1">真实项目迁移建议</p>
+                                <ul class="text-xs text-gray-600 space-y-1">
+                                    <li>• <strong>业务上下文增强</strong>：需提供更完备的 Business Context 文档</li>
+                                    <li>• <strong>领域划分与 Baseline</strong>：需明确业务领域边界及基线 Specs</li>
+                                    <li>• <strong>Skill 深度定制</strong>：针对原型设计等环节，需集成内部设计规范与组件库</li>
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <div class="mt-6 flex gap-4">
@@ -523,6 +558,7 @@
                 <ul class="space-y-3 text-sm text-gray-600">
                     <li class="flex justify-between"><span>/opsx:explore</span> <span class="text-gray-400">探索/对齐</span></li>
                     <li class="flex justify-between"><span>/opsx:propose</span> <span class="text-gray-400">提案/原型</span></li>
+                    <li class="flex justify-between"><span>/opsx:update</span> <span class="text-gray-400">需求迭代</span></li>
                     <li class="flex justify-between"><span>/opsx:apply</span> <span class="text-gray-400">编码/测试</span></li>
                     <li class="flex justify-between"><span>/opsx:sync</span> <span class="text-gray-400">同步主干</span></li>
                     <li class="flex justify-between"><span>/opsx:archive</span> <span class="text-gray-400">沉淀归档</span></li>
