@@ -90,11 +90,63 @@
         }
         
         /* Utility classes for layout */
-        .card {
+        .flow-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
             background: #fff;
-            border-radius: 8px;
             padding: 2rem;
+            border-radius: 8px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+        .flow-node {
+            text-align: center;
+            flex: 1;
+            min-width: 100px;
+            position: relative;
+        }
+        .flow-node .node-box {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            padding: 0.75rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s;
+        }
+        .flow-node:hover .node-box {
+            border-color: #2563eb;
+            background: #eff6ff;
+        }
+        .flow-arrow {
+            color: #d1d5db;
+            padding: 0 0.5rem;
+            font-size: 1.25rem;
+        }
+        .flow-label {
+            font-size: 0.65rem;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .flow-node.active .node-box {
+            background: #111827;
+            color: #fff;
+            border-color: #111827;
+        }
+        .case-path {
+            stroke: #2563eb;
+            stroke-width: 2;
+            fill: none;
+            stroke-dasharray: 4;
+            animation: dash 20s linear infinite;
+        }
+        @keyframes dash {
+            to { stroke-dashoffset: -1000; }
         }
     </style>
 </head>
@@ -107,7 +159,7 @@
                 SDD 实战工作坊
             </h1>
             <p class="text-xl text-gray-500 font-medium">
-                3 小时从需求到交付
+                3 小时从需求到交付 (OpenSpec v1.5.0)
             </p>
         </div>
         <div class="flex gap-8 text-sm">
@@ -127,32 +179,32 @@
         <div class="card">
             <h2 class="text-xl font-bold text-gray-900 mb-4">🎯 工作坊目标</h2>
             <ul class="space-y-3 text-gray-600">
-                <li class="flex items-start"><span class="text-blue-500 font-bold mr-3">01</span> 理解原型驱动开发与 Harness 质量门禁</li>
-                <li class="flex items-start"><span class="text-blue-500 font-bold mr-3">02</span> 掌握 OpenSpec 全链路交付流程</li>
-                <li class="flex items-start"><span class="text-blue-500 font-bold mr-3">03</span> 独立交付 Web 页面、功能或 API</li>
+                <li class="flex items-start"><span class="text-blue-500 font-bold mr-3">01</span> 理解意图驱动的全链路交付流程</li>
+                <li class="flex items-start"><span class="text-blue-500 font-bold mr-3">02</span> 掌握 OpenSpec v1.5.0 核心指令集</li>
+                <li class="flex items-start"><span class="text-blue-500 font-bold mr-3">03</span> 独立交付具备质量门禁的业务功能</li>
             </ul>
         </div>
         <div class="card bg-gray-900 text-white">
             <h2 class="text-xl font-bold mb-4 text-blue-400">💡 核心理念</h2>
             <p class="text-gray-300 leading-relaxed">
-                “以规格为源”，确保代码与测试始终与设计保持一致，解决传统开发中“文档落后于代码”的顽疾。AI 时代，Spec 是人与机器沟通的“共同语言”。
+                “以规格为源”，确保代码与测试始终与设计保持一致。OpenSpec 倡导的新范式：<strong>意图 -> 探索 -> 提案 -> 原型 -> 规范 -> 实现 -> 同步 -> 归档</strong>。
             </p>
         </div>
     </div>
 
     <!-- Case Study Context -->
     <div class="card mb-12 border-l-4 border-blue-500">
-        <h2 class="text-2xl font-bold text-gray-900 mb-4">📦 本期实战案例：微型电商系统演进</h2>
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">📦 本期实战案例：促销与优惠券系统</h2>
         <div class="grid md:grid-cols-2 gap-8">
             <div>
                 <p class="text-gray-600 mb-4 leading-relaxed">
-                    本项目 <code>ecommerce-mini</code> 已具备基础商品目录功能。本次任务是通过 SDD 流程为其添加<strong>“购物车”</strong>与<strong>“下单支付”</strong>的核心能力。
+                    本项目 <code>ecommerce-mini</code> 已具备商品目录、购物车与订单结算等基础功能。本次任务是通过 SDD 流程为其添加<strong>“促销与优惠券”</strong>的核心能力。
                 </p>
                 <div class="bg-gray-50 p-4 rounded-md text-sm text-gray-700">
                     <strong class="text-gray-900 block mb-2">技术栈限制：</strong>
                     <ul class="space-y-1">
-                        <li>• 后端: Node.js v20+, 零依赖, 原生 HTTP</li>
-                        <li>• 前端: Vue 3 + Tailwind (单文件组件)</li>
+                        <li>• 后端: Node.js v20+, 零依赖</li>
+                        <li>• 前端: Vue 3 + Tailwind</li>
                         <li>• 存储: 内存 Map / JSON 文件</li>
                     </ul>
                 </div>
@@ -160,160 +212,299 @@
             <div>
                 <h4 class="font-bold text-gray-900 mb-3">新需求挑战：</h4>
                 <ul class="space-y-3 text-sm text-gray-600">
-                    <li class="flex items-start"><span class="tag bg-blue-100 text-blue-800 mr-2 shrink-0">需求 1</span> 购物车功能：添加商品、修改数量、最大数限制(99)。</li>
-                    <li class="flex items-start"><span class="tag bg-blue-100 text-blue-800 mr-2 shrink-0">需求 2</span> 订单核心：购物车结算生成订单，原子扣减库存。</li>
-                    <li class="flex items-start"><span class="tag bg-blue-100 text-blue-800 mr-2 shrink-0">需求 3</span> 质量要求：核心接口 p99 < 100ms，需自动化测试证据。</li>
+                    <li class="flex items-start"><span class="tag bg-blue-100 text-blue-800 mr-2 shrink-0">需求 1</span> 优惠券核销：支持在购物车输入优惠券码，校验有效性与门槛。</li>
+                    <li class="flex items-start"><span class="tag bg-blue-100 text-blue-800 mr-2 shrink-0">需求 2</span> 动态计价：结算时自动应用折扣，展示优惠明细。</li>
+                    <li class="flex items-start"><span class="tag bg-blue-100 text-blue-800 mr-2 shrink-0">需求 3</span> 质量要求：核心逻辑 100% 单元测试覆盖。</li>
                 </ul>
             </div>
         </div>
     </div>
 
+    <!-- Flowchart Section -->
+    <div class="mb-12">
+        <div class="flex items-center justify-between mb-6">
+            <h2 class="text-2xl font-bold text-gray-900">SDD 流程全景图 (SDD Paradigm Flow)</h2>
+            <span class="tag bg-blue-50 text-blue-600">新需求：优惠券系统</span>
+        </div>
+        <div class="flow-container">
+            <div class="flow-node">
+                <div class="node-box">意图 (Intent)</div>
+                <div class="flow-label">增加优惠券</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">
+                <div class="node-box">Explore</div>
+                <div class="flow-label">架构分析</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">
+                <div class="node-box">Propose</div>
+                <div class="flow-label">变更提案</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">
+                <div class="node-box">Prototype</div>
+                <div class="flow-label">UI 验收</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">
+                <div class="node-box">Spec</div>
+                <div class="flow-label">规格审查</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">
+                <div class="node-box">Plan</div>
+                <div class="flow-label">规划审查</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">
+                <div class="node-box">Apply</div>
+                <div class="flow-label">编码实现</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">
+                <div class="node-box">Update</div>
+                <div class="flow-label">迭代增强</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">
+                <div class="node-box">Sync</div>
+                <div class="flow-label">主干同步</div>
+            </div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-node">
+                <div class="node-box">Archive</div>
+                <div class="flow-label">归档沉淀</div>
+            </div>
+        </div>
+        <div class="bg-blue-50 p-4 rounded-md border border-blue-100 flex items-start gap-3">
+            <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <p class="text-sm text-blue-800 leading-relaxed">
+                <strong>需求穿梭路线：</strong> 用户意图 → <strong>Explore</strong> 定位 → <strong>Propose</strong> 提案与原型 → <strong>Spec/Plan</strong> 审查 → <strong>Apply</strong> 实现 V1 → 发现规范不足使用 <strong>Update</strong> 增量增强 → 最终 <strong>Sync</strong> 与 <strong>Archive</strong>。
+            </p>
+        </div>
+    </div>
+
     <!-- Agenda Section -->
     <div class="flex items-center justify-between mb-6">
-        <h2 id="agenda" class="text-2xl font-bold text-gray-900">议程与引导 (Timeline)</h2>
-        <span class="text-sm text-gray-500">总计 180 分钟</span>
+        <h2 id="agenda" class="text-2xl font-bold text-gray-900">实战演练 (Execution Workflow)</h2>
+        <span class="text-sm text-gray-500">遵循 OpenSpec v1.5.0 范式</span>
     </div>
     
     <div class="space-y-4 mb-16">
-        <!-- Step 1 -->
+        <!-- Step 1: Intro -->
         <div class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">01</span>
-                <span class="text-sm font-semibold text-gray-500">30 min</span>
+                <span class="text-sm font-semibold text-gray-500">20 min</span>
             </div>
             <div>
-                <h3 class="text-lg font-bold text-gray-900 mb-3">理论导入：AI 研发新范式</h3>
-                <p class="text-gray-600 mb-4">深入理解 AI 研发新范式、SDD (Spec-Driven Development)、原型驱动开发以及 Harness 质量门禁的核心理念与流程全景图。</p>
+                <h3 class="text-lg font-bold text-gray-900 mb-3">理论导入：AI 协作新范式</h3>
+                <p class="text-gray-600 mb-4">从“人写代码”转向“人把关规范”。理解 SDD 如何通过确定性的流程消除需求偏差。</p>
                 <div class="flex flex-wrap gap-3">
-                    <a href="file:///Users/superkkk/MyCoding/OpenSpec-practice/learning-sdd/SDD%20%E5%85%A5%E9%97%A8%E8%AE%B2%E8%A7%A3%EF%BC%9A%E8%A7%84%E6%A0%BC%E9%A9%B1%E5%8A%A8%E5%BC%80%E5%8F%91.pptx" class="tag hover:bg-blue-200 transition-colors">📊 SDD 入门讲解 (PPT)</a>
-                    <a href="file:///Users/superkkk/MyCoding/OpenSpec-practice/learning-sdd/openspec-user-manual.md" class="tag hover:bg-blue-200 transition-colors">📘 OpenSpec 用户手册</a>
                     <a href="file:///Users/superkkk/MyCoding/OpenSpec-practice/learning-sdd/openspec-ai-workflow-analysis.md" class="tag hover:bg-blue-200 transition-colors">🧠 AI 工作流深度复盘</a>
+                    <a href="file:///Users/superkkk/MyCoding/OpenSpec-practice/learning-sdd/openspec-user-manual.md" class="tag hover:bg-blue-200 transition-colors">📘 OpenSpec 用户手册</a>
                 </div>
             </div>
         </div>
 
-        <!-- Step 2 -->
+        <!-- Step 2: Environment -->
         <div class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">02</span>
                 <span class="text-sm font-semibold text-gray-500">15 min</span>
             </div>
             <div>
-                <h3 class="text-lg font-bold text-gray-900 mb-3">环境准备：熟悉“武器库”</h3>
-                <p class="text-gray-600 mb-4">熟悉项目代码仓与 SDD 脚手架，了解预置的 Skills 和常用命令，完成分组与角色分工。</p>
-                <div class="bg-gray-50 border border-gray-200 p-4 rounded-md mb-4">
-                    <p class="text-sm font-semibold text-gray-900 mb-2">角色分工：</p>
-                    <ul class="text-sm text-gray-600 space-y-1">
-                        <li>• <span class="font-bold text-blue-600">PM 实习生</span>：负责维护 Proposal & Spec，进行原型验收</li>
-                        <li>• <span class="font-bold text-blue-600">Dev 实习生</span>：负责 Plan & Apply，确保代码通过质量门禁</li>
-                    </ul>
+                <h3 class="text-lg font-bold text-gray-900 mb-3">环境准备：Setup & Check</h3>
+                <p class="text-gray-600 mb-4">依据 <a href="file:///Users/superkkk/MyCoding/OpenSpec-practice/README.md" class="link-underlined">README.md</a> 完成工具链初始化与环境检查。</p>
+                <div class="code-block text-sm space-y-2">
+                    <div><span class="text-gray-400"># 1. 安装 OpenSpec 命令行工具</span><br/>npm install -g @fission-ai/openspec@latest</div>
+                    <div><span class="text-gray-400"># 2. 为 Trae/Cursor 生成 AI 协作技能</span><br/>openspec init --tools trae</div>
+                    <div><span class="text-gray-400"># 3. 验证基础依赖</span><br/>node -v <span class="text-gray-400"># 应 >= v20.19.0</span><br/>python --version <span class="text-gray-400"># 应 >= v3.10</span></div>
                 </div>
-                <div class="code-block text-sm">
-                    <span class="text-gray-400"># 验证本地环境</span><br/>
-                    node -v <span class="text-gray-400"># v20+</span><br/>
-                    python --version <span class="text-gray-400"># 3.10+</span><br/>
-                    openspec --version
+                <div class="mt-4 bg-gray-50 p-3 rounded-md border border-gray-200">
+                    <p class="text-xs font-bold text-gray-900 mb-1">Review 要点：</p>
+                    <ul class="text-xs text-gray-600 list-disc ml-4">
+                        <li>确认 `openspec --version` 能正确返回版本号</li>
+                        <li>确认 `.trae/skills/` 目录下已生成对应的技能定义文件</li>
+                    </ul>
                 </div>
             </div>
         </div>
 
-        <!-- Step 3 -->
+        <!-- Step 3: Explore -->
         <div class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">03</span>
-                <span class="text-sm font-semibold text-gray-500">25 min</span>
+                <span class="text-sm font-semibold text-gray-500">20 min</span>
             </div>
             <div>
-                <h3 class="text-lg font-bold text-gray-900 mb-3">需求理解 & 原型设计</h3>
-                <p class="text-gray-600 mb-4">收到需求 → Brainstorm 发散 → 用 HTML 快速画出可交互原型 → 输出 <code>proposal.md</code></p>
-                <div class="code-block mb-4">
-                    <span class="text-blue-600 font-bold">/opsx:propose</span><br/>
-                    "构建一个小型电商网站 MVP，包含购物车功能，支持添加商品、修改数量，限制最大加购数(99)。"
+                <div class="flex items-center gap-2 mb-3">
+                    <h3 class="text-lg font-bold text-gray-900">Explore：意图对齐与方案探索</h3>
+                    <span class="tag bg-blue-50 text-blue-600 py-0.5 px-2 text-[10px]">穿梭点：架构定位</span>
                 </div>
-                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 text-sm text-yellow-800 rounded-r-md">
-                    <strong>⚠️ 关键断点 (Checkpoint)：</strong> AI 生成原型后，PM 必须进行视觉确认：“交互流向和界面效果是否符合预期？”
+                <p class="text-gray-600 mb-4">在动工前，让 AI 调查现有 `OrderService` 与 `CartService` 的耦合情况，寻找优惠券逻辑的最佳切入点。</p>
+                <div class="code-block mb-4">
+                    <span class="text-blue-600 font-bold">/opsx:explore</span><br/>
+                    "我想在当前系统中加入优惠券功能。请分析 OrderService 的结算流程，建议是在 Cart 中处理优惠还是在 Order 创建时处理？并检查现有的数据模型是否支持扩展优惠金额字段。"
+                </div>
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 text-sm text-yellow-800">
+                    <strong>Review 要点：</strong> 方案是否破坏了现有的 `ecommerce-mini` 零依赖原则？是否考虑了分（Cents）为单位的精度问题？
                 </div>
             </div>
         </div>
 
-        <!-- Step 4 -->
+        <!-- Step 4: Propose & Prototype -->
         <div class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">04</span>
-                <span class="text-sm font-semibold text-gray-500">30 min</span>
+                <span class="text-sm font-semibold text-gray-500">25 min</span>
             </div>
             <div>
-                <h3 class="text-lg font-bold text-gray-900 mb-3">需求规格化 (Spec Definition)</h3>
-                <p class="text-gray-600 mb-4">基于原型将需求结构化，输出 <code>spec.md</code>，明确功能需求、验收标准与交互细节，通过组内 Spec Review。</p>
-                <div class="bg-gray-50 p-4 rounded-md mb-4 border border-gray-200">
-                    <p class="text-sm font-semibold text-gray-900 mb-2">Spec 核心要素：</p>
-                    <ul class="text-sm text-gray-600 space-y-1">
-                        <li>• 必须包含 Delta Header (ADDED/MODIFIED)</li>
-                        <li>• 必须定义 <strong>Requirement</strong>，并标注 Priority 和 Rationale</li>
-                        <li>• 必须使用 <strong>Given/When/Then</strong> (Gherkin) 格式编写 Scenario</li>
-                    </ul>
+                <div class="flex items-center gap-2 mb-3">
+                    <h3 class="text-lg font-bold text-gray-900">Propose & Prototype：提案与原型</h3>
+                    <span class="tag bg-blue-50 text-blue-600 py-0.5 px-2 text-[10px]">穿梭点：视觉对齐</span>
                 </div>
-                <div class="code-block text-sm flex justify-between items-center">
-                    <span><span class="text-blue-600 font-bold">openspec validate</span> &lt;change-name&gt;</span>
-                    <span class="text-gray-500 text-xs">执行格式强制校验</span>
+                <p class="text-gray-600 mb-4">正式发起变更，并要求 AI 生成可交互的 HTML 原型以确认 UI 效果。</p>
+                <div class="code-block mb-4">
+                    <span class="text-blue-600 font-bold">/opsx:propose coupon-system</span><br/>
+                    "为系统增加优惠券核销功能。要求：在购物车页面底部增加输入框，支持 SAVE20 (8折) 优惠码；结算页显示 '原价'、'优惠金额' 和 '实付金额'。请先提供一个交互原型。"
+                </div>
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-3 text-sm text-blue-800">
+                    <strong>Review 要点 (Visual Gating)：</strong> 点击“应用优惠券”后，总价是否即时刷新？UI 是否符合“现代扁平化”审美（1px 边框、无阴影）？
                 </div>
             </div>
         </div>
 
-        <!-- Step 5 -->
+        <!-- Step 5: Spec -->
         <div class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
                 <span class="step-num mb-1">05</span>
                 <span class="text-sm font-semibold text-gray-500">25 min</span>
             </div>
             <div>
-                <h3 class="text-lg font-bold text-gray-900 mb-3">技术规划 (Tech Planning)</h3>
-                <p class="text-gray-600 mb-4">基于 Spec 拆解技术实现计划，输出 <code>plan.md</code>，细化 Task 列表与依赖关系，确认技术可行性。</p>
-                <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
-                    <p class="text-sm font-semibold text-gray-900 mb-2">Dev Checklist：</p>
-                    <ul class="text-sm text-gray-600 space-y-1">
-                        <li>[ ] 每个 Requirement 是否都有对应的技术 Task？</li>
-                        <li>[ ] 是否考虑了数据存储（内存 Map / JSON 文件）的更新？</li>
-                        <li>[ ] 是否明确了自动化测试的实现方式？</li>
+                <div class="flex items-center gap-2 mb-3">
+                    <h3 class="text-lg font-bold text-gray-900">Spec：规格审查</h3>
+                    <span class="tag bg-blue-50 text-blue-600 py-0.5 px-2 text-[10px]">穿梭点：规则量化审查</span>
+                </div>
+                <p class="text-gray-600 mb-4">审查并微调 AI 在 Propose 阶段自动生成的 `spec.md`。确保 Gherkin 场景精确覆盖了业务边界，人是最终的质量把关者。</p>
+                <div class="bg-gray-50 p-4 rounded-md border border-gray-200 text-sm mb-4">
+                    <p class="font-bold text-gray-900 mb-2">Scenario 示例：</p>
+                    <div class="text-gray-600 italic">
+                        Given 购物车总额为 10000 分<br/>
+                        When 输入优惠码 "SAVE20"<br/>
+                        Then 实付金额应更新为 8000 分<br/>
+                        And 优惠明细应显示 "折扣优惠: 2000 分"
+                    </div>
+                </div>
+                <div class="bg-green-50 border-l-4 border-green-400 p-3 text-sm text-green-800">
+                    <strong>Review 要点：</strong> 每个 Requirement 是否都有 Rationale？是否覆盖了“无效优惠码”和“未达门槛”的异常路径？
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 6: Plan -->
+        <div class="agenda-grid">
+            <div class="flex flex-col items-center justify-start pt-2">
+                <span class="step-num mb-1">06</span>
+                <span class="text-sm font-semibold text-gray-500">15 min</span>
+            </div>
+            <div>
+                <div class="flex items-center gap-2 mb-3">
+                    <h3 class="text-lg font-bold text-gray-900">Plan：规划审查</h3>
+                    <span class="tag bg-blue-50 text-blue-600 py-0.5 px-2 text-[10px]">穿梭点：路径对齐审查</span>
+                </div>
+                <p class="text-gray-600 mb-4">审查 AI 自动生成的 `tasks.md`。确保技术路径与 `spec.md` 中的需求 100% 匹配，特别是数据结构的修改建议。</p>
+                <div class="code-block text-xs mb-4">
+                    - [ ] 在 src/domain/types.js 中增加 Coupon 类型定义<br/>
+                    - [ ] 修改 src/services/order.js，在 createOrder 中注入优惠计算拦截器<br/>
+                    - [ ] 在 __tests__/unit.spec.js 中增加优惠计价的数学准确性测试
+                </div>
+                <div class="bg-gray-50 p-3 rounded-md border border-gray-200">
+                    <p class="text-xs font-bold text-gray-900 mb-1">Review 要点：</p>
+                    <ul class="text-xs text-gray-600 list-disc ml-4">
+                        <li>每个 Requirement 是否都有对应的技术 Task？</li>
+                        <li>是否考虑了数据存储（内存 Map / JSON 文件）的更新？</li>
                     </ul>
                 </div>
             </div>
         </div>
 
-        <!-- Step 6 -->
+        <!-- Step 7: Apply & Harness -->
         <div class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
-                <span class="step-num mb-1">06</span>
-                <span class="text-sm font-semibold text-gray-500">20 min</span>
+                <span class="step-num mb-1">07</span>
+                <span class="text-sm font-semibold text-gray-500">30 min</span>
             </div>
             <div>
-                <h3 class="text-lg font-bold text-gray-900 mb-3">代码实现 & 测试 (Apply & Harness)</h3>
-                <p class="text-gray-600 mb-4">按 Plan 逐步编码实现，产品实习生实时验收，完成核心功能开发并通过 Harness 自测。</p>
+                <div class="flex items-center gap-2 mb-3">
+                    <h3 class="text-lg font-bold text-gray-900">Apply & Harness：实现与质量门禁</h3>
+                    <span class="tag bg-blue-50 text-blue-600 py-0.5 px-2 text-[10px]">穿梭点：确定性交付</span>
+                </div>
+                <p class="text-gray-600 mb-4">执行代码生成，并通过自动化测试验证交付质量。</p>
                 <div class="code-block mb-4">
                     <span class="text-blue-600 font-bold">/opsx:apply</span><br/>
-                    "请根据规范和计划执行代码实现，确保核心逻辑覆盖单元测试。"
+                    "请按计划实施优惠券功能。完成后，运行 npm test 并提供测试覆盖率报告，确保优惠计算逻辑无死角。"
                 </div>
-                <div class="text-sm text-gray-600">
-                    <strong class="text-gray-900">Harness 质量门禁验证：</strong>
-                    <div class="flex flex-wrap gap-4 mt-2">
-                        <span class="flex items-center bg-green-50 px-2 py-1 rounded text-green-700 border border-green-200"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> npm test (逻辑校验)</span>
-                        <span class="flex items-center bg-green-50 px-2 py-1 rounded text-green-700 border border-green-200"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> p99 < 100ms (性能指标)</span>
-                        <span class="flex items-center bg-green-50 px-2 py-1 rounded text-green-700 border border-green-200"><svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 原型 1:1 比对 (UI 验收)</span>
-                    </div>
+                <div class="bg-gray-900 text-brand p-3 rounded-md text-xs font-mono">
+                    PASS src/services/order.spec.js<br/>
+                    ✓ should apply 20% discount for SAVE20 (12ms)<br/>
+                    ✓ should reject expired coupons (5ms)
                 </div>
             </div>
         </div>
 
-        <!-- Step 7 -->
+        <!-- Step 8: Sync & Archive -->
         <div class="agenda-grid">
             <div class="flex flex-col items-center justify-start pt-2">
-                <span class="step-num mb-1">07</span>
-                <span class="text-sm font-semibold text-gray-500">25 min</span>
+                <span class="step-num mb-1">08</span>
+                <span class="text-sm font-semibold text-gray-500">10 min</span>
             </div>
             <div>
-                <h3 class="text-lg font-bold text-gray-900 mb-3">Demo & 复盘</h3>
-                <p class="text-gray-600 mb-4">各组演示成果，讲师引导复盘 SDD 全流程中的关键体会与落地建议。演示如何通过 <code>/opsx:sync</code> 和 <code>/opsx:archive</code> 完成资产沉淀。</p>
-                <div class="flex gap-4">
+                <h3 class="text-lg font-bold text-gray-900 mb-3">Sync & Archive：资产沉淀</h3>
+                <p class="text-gray-600 mb-4">将变更同步至主规范，并归档开发记录，确保团队知识库持续演进。</p>
+                <div class="flex flex-col gap-2">
+                    <div class="code-block text-sm"><span class="text-blue-600 font-bold">/opsx:sync</span> <span class="text-gray-400"># 将增量同步到 root specs/</span></div>
+                    <div class="code-block text-sm"><span class="text-blue-600 font-bold">/opsx:archive</span> <span class="text-gray-400"># 移动到 archive 目录</span></div>
+                </div>
+                <div class="mt-4 bg-gray-50 p-3 rounded-md border border-gray-200">
+                    <p class="text-xs font-bold text-gray-900 mb-1">Review 要点：</p>
+                    <ul class="text-xs text-gray-600 list-disc ml-4">
+                        <li>确认 `openspec/specs/` 下出现了新的 `promotion-management` 目录</li>
+                        <li>确认 `openspec/changes/` 下的活跃变更已清空</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 9: Demo & Retrospective -->
+        <div class="agenda-grid">
+            <div class="flex flex-col items-center justify-start pt-2">
+                <span class="step-num mb-1">09</span>
+                <span class="text-sm font-semibold text-gray-500">20 min</span>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-gray-900 mb-3">Demo & 复盘总结</h3>
+                <p class="text-gray-600 mb-4">展示最终交付的功能，分享在 SDD 流程中“人机协作”的体会，总结 OpenSpec v1.5.0 的核心价值。</p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-blue-50 p-4 rounded-md border border-blue-100">
+                        <h4 class="text-sm font-bold text-blue-900 mb-2">成果演示</h4>
+                        <ul class="text-xs text-blue-800 space-y-1">
+                            <li>• 购物车输入 SAVE20 后的即时价格变动</li>
+                            <li>• 结算生成的订单中包含准确的优惠金额明细</li>
+                            <li>• 自动化测试报告与 100% 覆盖率证据</li>
+                        </ul>
+                    </div>
+                    <div class="bg-gray-50 p-4 rounded-md border border-gray-200">
+                        <h4 class="text-sm font-bold text-gray-900 mb-2">复盘要点</h4>
+                        <ul class="text-xs text-gray-600 space-y-1">
+                            <li>• AI 生成 vs 人类审查的效率提升感</li>
+                            <li>• Spec 作为“唯一事实来源”在沟通中的作用</li>
+                            <li>• 质量门禁 (Harness) 对交付信心的增强</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mt-6 flex gap-4">
                     <a href="file:///Users/superkkk/MyCoding/OpenSpec-practice/learning-sdd/openspec-practical-guide.md" class="link-underlined text-sm font-medium flex items-center">
                         <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
                         回顾《OpenSpec 实战指南》
@@ -325,40 +516,38 @@
 
     <!-- Quick Commands Cheat Sheet -->
     <section class="mb-12">
-        <h2 class="text-xl font-bold text-gray-900 mb-6">速查表 (Cheat Sheet)</h2>
+        <h2 class="text-xl font-bold text-gray-900 mb-6">SDD 工具箱 (SDD Toolbox)</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="card p-6">
                 <h4 class="font-bold text-gray-900 mb-4 border-b border-gray-100 pb-2">Slash Commands</h4>
                 <ul class="space-y-3 text-sm text-gray-600">
-                    <li class="flex justify-between"><span>/opsx:explore</span> <span class="text-gray-400">思考/调查</span></li>
-                    <li class="flex justify-between"><span>/opsx:propose</span> <span class="text-gray-400">创建变更</span></li>
-                    <li class="flex justify-between"><span>/opsx:apply</span> <span class="text-gray-400">执行开发</span></li>
-                    <li class="flex justify-between"><span>/opsx:archive</span> <span class="text-gray-400">归档沉淀</span></li>
+                    <li class="flex justify-between"><span>/opsx:explore</span> <span class="text-gray-400">探索/对齐</span></li>
+                    <li class="flex justify-between"><span>/opsx:propose</span> <span class="text-gray-400">提案/原型</span></li>
+                    <li class="flex justify-between"><span>/opsx:apply</span> <span class="text-gray-400">编码/测试</span></li>
+                    <li class="flex justify-between"><span>/opsx:sync</span> <span class="text-gray-400">同步主干</span></li>
+                    <li class="flex justify-between"><span>/opsx:archive</span> <span class="text-gray-400">沉淀归档</span></li>
                 </ul>
             </div>
             <div class="card p-6">
-                <h4 class="font-bold text-gray-900 mb-4 border-b border-gray-100 pb-2">CLI Essentials</h4>
+                <h4 class="font-bold text-gray-900 mb-4 border-b border-gray-100 pb-2">Verification</h4>
                 <ul class="space-y-3 text-sm text-gray-600">
-                    <li class="flex justify-between"><span>openspec init</span> <span class="text-gray-400">初始化</span></li>
-                    <li class="flex justify-between"><span>openspec validate</span> <span class="text-gray-400">结构校验</span></li>
-                    <li class="flex justify-between"><span>openspec list</span> <span class="text-gray-400">查看变更</span></li>
-                    <li class="flex justify-between"><span>openspec archive</span> <span class="text-gray-400">命令行归档</span></li>
+                    <li class="flex justify-between"><span>openspec validate</span> <span class="text-gray-400">格式检查</span></li>
+                    <li class="flex justify-between"><span>npm test</span> <span class="text-gray-400">逻辑闭环</span></li>
+                    <li class="flex justify-between"><span>Open Preview</span> <span class="text-gray-400">原型验收</span></li>
                 </ul>
             </div>
             <div class="card p-6">
-                <h4 class="font-bold text-gray-900 mb-4 border-b border-gray-100 pb-2">Project Scripts</h4>
+                <h4 class="font-bold text-gray-900 mb-4 border-b border-gray-100 pb-2">Role Rules</h4>
                 <ul class="space-y-3 text-sm text-gray-600">
-                    <li class="flex justify-between"><span>npm start</span> <span class="text-gray-400">Node 服务</span></li>
-                    <li class="flex justify-between"><span>npm test</span> <span class="text-gray-400">Node 测试</span></li>
-                    <li class="flex justify-between"><span>pytest</span> <span class="text-gray-400">Python 测试</span></li>
-                    <li class="flex justify-between"><span>npm run dev</span> <span class="text-gray-400">Frontend</span></li>
+                    <li><span class="font-bold text-blue-600">PM</span>: 负责 Spec/原型验收</li>
+                    <li><span class="font-bold text-blue-600">Dev</span>: 负责 Plan/门禁验证</li>
                 </ul>
             </div>
         </div>
     </section>
 
     <footer class="pt-8 pb-12 flex justify-between items-center text-sm text-gray-400 border-t border-gray-200">
-        <div class="font-medium">Spec Driven Future</div>
+        <div class="font-medium">Spec Driven Development Practice</div>
         <div>OpenSpec Framework v1.5.0</div>
     </footer>
 </body>
