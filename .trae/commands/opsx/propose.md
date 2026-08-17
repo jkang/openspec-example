@@ -99,13 +99,15 @@ When the user is ready to implement, they must start the apply workflow explicit
       - Apply `context` and `rules` as constraints - but do NOT copy them into the file
       - Show brief progress: "Created <artifact-id>"
 
-   b. **Interactive Prototype Validation Checkpoint**
-      - After generating `prototype` and `specs`, BUT BEFORE generating `design` and `tasks`, you MUST pause the workflow.
-      - Invoke the `NotifyUser` or `AskUserQuestion` tool to prompt the user:
-        > "原型设计 (prototypes/) 和交互规范 (specs/) 已生成。请通过浏览器或 OpenPreview 查看并验证。是否确认并继续生成技术设计 (design.md)？"
-      - Wait for the user's explicit approval.
-      - If the user requests changes, update the prototype and specs accordingly, and ask for approval again.
-      - ONLY proceed to step (c) after the user explicitly approves.
+   b. **Interactive Prototype Validation Checkpoint (Mandatory HITL)**
+      - After generating `prototype` and `specs`, you **MUST IMMEDIATELY STOP** all automated artifact generation.
+      - Invoke the `AskUserQuestion` tool to create a hard break for human review:
+        - **Question**: "原型 (idea.md, prototypes/) 和行为规范 (specs/) 已生成。请务必查看并验证 UI 交互与业务逻辑是否符合预期。"
+        - **Options**:
+          - "Approved": "确认无误，继续生成技术设计 (design.md)"
+          - "Request Changes": "需要修改，我将在输入框提供反馈"
+      - **DO NOT** proceed to generate `design.md` or `tasks.md` until the user selects "Approved".
+      - This is a critical Human-In-The-Loop (HITL) point to prevent wasted engineering effort on unverified designs.
 
    c. **Continue until every artifact in the required set exists (not just `apply.requires`)**
       - After creating each artifact, re-run `openspec status --change "<name>" --json`

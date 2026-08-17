@@ -92,25 +92,63 @@
               </div>
               <div class="flex justify-between items-end">
                 <span class="text-xs font-semibold">¥{{ (item.priceCents * item.quantity / 100).toFixed(2) }}</span>
-                <span class="text-[10px] text-slate-400 text-right">x {{ item.quantity }}</span>
+                <div class="flex items-center border border-slate-200 bg-white">
+                  <button @click="removeFromCart(item.id)" class="w-6 h-6 flex items-center justify-center text-xs hover:bg-slate-50 border-r border-slate-200">-</button>
+                  <span class="w-8 text-[10px] text-center font-medium">{{ item.quantity }}</span>
+                  <button @click="addToCart(item)" class="w-6 h-6 flex items-center justify-center text-xs hover:bg-slate-50 border-l border-slate-200">+</button>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="p-6 border-t border-slate-200 space-y-4">
-          <div class="space-y-2 pt-2 border-t border-slate-100">
-            <div class="flex justify-between items-end pt-2">
-              <span class="text-xs text-slate-500 font-medium">总计</span>
-              <span class="font-bold text-lg">¥{{ (cartTotalPrice / 100).toFixed(2) }}</span>
+        <div class="p-6 border-t border-slate-200 space-y-6 bg-slate-50/50">
+          <!-- 优惠券选择章节 -->
+          <div class="space-y-3">
+            <h3 class="text-[10px] font-bold uppercase tracking-widest text-slate-400">选择优惠券</h3>
+            <div class="space-y-2">
+              <button 
+                v-for="coupon in coupons" 
+                :key="coupon.id"
+                @click="toggleCoupon(coupon.id)"
+                :disabled="isCouponDisabled(coupon)"
+                :class="[
+                  'w-full text-left p-3 border transition-all duration-200 flex flex-col gap-1',
+                  selectedCouponId === coupon.id 
+                    ? 'border-slate-900 bg-slate-900 text-white' 
+                    : 'border-slate-200 bg-white text-slate-900 hover:border-slate-400',
+                  isCouponDisabled(coupon) ? 'opacity-40 cursor-not-allowed grayscale' : 'cursor-pointer'
+                ]"
+              >
+                <div class="flex justify-between items-center w-full">
+                  <span class="text-xs font-bold uppercase tracking-tight">{{ coupon.name }}</span>
+                  <span v-if="isCouponDisabled(coupon)" class="text-[8px] uppercase tracking-tighter opacity-70">差 ¥{{ ((coupon.threshold - cartTotalPrice) / 100).toFixed(2) }} 可用</span>
+                </div>
+                <p :class="['text-[10px]', selectedCouponId === coupon.id ? 'text-slate-300' : 'text-slate-500']">{{ coupon.description }}</p>
+              </button>
+            </div>
+          </div>
+
+          <div class="space-y-2 pt-4 border-t border-slate-200">
+            <div class="flex justify-between text-xs text-slate-500">
+              <span>商品总额</span>
+              <span>¥{{ (cartTotalPrice / 100).toFixed(2) }}</span>
+            </div>
+            <div v-if="couponDiscount > 0" class="flex justify-between text-xs text-red-500 font-medium">
+              <span>优惠减免</span>
+              <span>-¥{{ (couponDiscount / 100).toFixed(2) }}</span>
+            </div>
+            <div class="flex justify-between items-end pt-2 border-t border-slate-200">
+              <span class="text-xs text-slate-900 font-bold uppercase tracking-widest">最终总额</span>
+              <span class="font-bold text-xl">¥{{ (finalTotalPrice / 100).toFixed(2) }}</span>
             </div>
           </div>
           <button 
             @click="checkout"
             :disabled="isProcessing || cart.length === 0"
-            class="w-full py-3 bg-slate-900 text-white text-xs font-bold tracking-[0.2em] uppercase hover:bg-slate-800 disabled:bg-slate-300 disabled:cursor-not-allowed transition-colors"
+            class="w-full py-4 bg-slate-900 text-white text-xs font-bold tracking-[0.3em] uppercase hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-all"
           >
-            {{ isProcessing ? '结算中...' : '结算' }}
+            {{ isProcessing ? 'Processing...' : 'Complete Checkout' }}
           </button>
         </div>
       </aside>
@@ -162,6 +200,13 @@ const isProcessing = ref(false)
 const isCheckoutSuccess = ref(false)
 const lastOrderId = ref('')
 
+// 优惠券数据
+const coupons = ref([
+  { id: 'newcomer', name: '新人 9 折券', type: 'rate', value: 0.1, threshold: 0, description: '无门槛立享 9 折' },
+  { id: 'threshold_100', name: '满 100 减 20', type: 'amount', value: 2000, threshold: 10000, description: '满 ¥100.00 可用' }
+])
+const selectedCouponId = ref(null)
+
 // 图片加载失败处理
 const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?auto=format&fit=crop&q=80&w=400'
 const handleImageError = (e) => {
@@ -202,6 +247,41 @@ const filteredProducts = computed(() => {
 // 购物车逻辑
 const cartTotalItems = computed(() => cart.value.reduce((total, item) => total + item.quantity, 0))
 const cartTotalPrice = computed(() => cart.value.reduce((total, item) => total + item.priceCents * item.quantity, 0))
+
+// 优惠券计算逻辑
+const selectedCoupon = computed(() => coupons.value.find(c => c.id === selectedCouponId.value))
+
+const couponDiscount = computed(() => {
+  if (!selectedCoupon.value) return 0
+  
+  // 校验门槛
+  if (cartTotalPrice.value < selectedCoupon.value.threshold) return 0
+  
+  if (selectedCoupon.value.type === 'rate') {
+    return Math.floor(cartTotalPrice.value * selectedCoupon.value.value)
+  } else {
+    return selectedCoupon.value.value
+  }
+})
+
+const finalTotalPrice = computed(() => Math.max(0, cartTotalPrice.value - couponDiscount.value))
+
+// 优惠券可用性检查
+const isCouponDisabled = (coupon) => {
+  return cartTotalPrice.value < coupon.threshold
+}
+
+// 选择优惠券
+const toggleCoupon = (couponId) => {
+  if (selectedCouponId.value === couponId) {
+    selectedCouponId.value = null
+  } else {
+    const coupon = coupons.value.find(c => c.id === couponId)
+    if (!isCouponDisabled(coupon)) {
+      selectedCouponId.value = couponId
+    }
+  }
+}
 
 const addToCart = async (product) => {
   try {

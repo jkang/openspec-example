@@ -3,11 +3,11 @@ version: 1
 description: 包含交互式原型验证的 OpenSpec 工作流 - 探索 (explore) → 提案 (proposal) → 原型 (prototype) → 规范 (specs) → 设计 (design) → 任务 (tasks)
 artifacts:
   - id: explore
-    generates: idea.md
+    generates: ideas/idea.md
     description: 结构化探索文档，记录业务意图、设计思路及架构分析结论
     template: idea.md
     instruction: |
-      执行 `/opsx:explore` 流程，并按照结构化 5 步法记录结论：
+      执行 `/opsx:explore` 流程，并在变更目录下的 `ideas/idea.md` 中按照结构化 5 步法记录结论：
       1. **澄清业务意图**：目的、范围、具体业务要求。
       2. **业务设计思路**：逻辑流转、用户价值。
       3. **需求拆分建议**：是否需要分阶段实施。
@@ -22,7 +22,7 @@ artifacts:
     description: 概述变更内容的初始提案文档
     template: proposal.md
     instruction: |
-      创建提案文档，明确说明为什么需要进行此项变更。本提案必须基于 `idea.md` 中的结论。
+      创建提案文档，明确说明为什么需要进行此项变更。本提案必须基于 `ideas/idea.md` 中的结论。
 
       章节结构：
       - **Why (背景原因)**: 用 1-2 句话说明要解决的问题或抓住的机遇。这解决了什么问题？为什么现在要做？
@@ -160,6 +160,8 @@ artifacts:
     instruction: |
       创建技术设计文档，解释如何 (HOW) 实现此次变更。
 
+      **强制要求 (Pre-requisite)**：必须在 `idea.md`、`prototype.html` 和 `specs/*.md` 均已通过用户 review 确认后方可开始。本设计必须与确认后的原型 and 行为规范完全一致。
+
       何时需要包含 design.md（仅在符合以下情况时创建）：
       - 跨模块变更（涉及多个服务/模块）或新的架构模式
       - 引入新的外部依赖，或进行重大的数据模型变更
@@ -182,6 +184,7 @@ artifacts:
       优秀的设计文档会解释技术决策背后的“原因 (why)”。
     requires:
       - proposal
+      - specs
 
   - id: tasks
     generates: tasks.md

@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>优惠券集成原型 - Minimal Store</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+        * { border-radius: 0 !important; }
+    </style>
+</head>
+<body class="bg-white text-slate-900 font-sans antialiased">
+    <div id="app" class="h-screen flex flex-col overflow-hidden">
+        <!-- 顶部导航 -->
+        <header class="h-16 flex-shrink-0 border-b border-slate-200 flex items-center justify-between px-8 bg-white z-10">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-slate-900 flex items-center justify-center text-white text-xs font-bold">M</div>
+                <h1 class="text-lg font-semibold tracking-tight uppercase">Minimal Store</h1>
+            </div>
+            <div class="flex items-center gap-6 text-sm font-medium">
+                <div class="relative py-1 px-2 border border-slate-200">
+                    BAG ({{ cartTotalItems }})
+                </div>
+            </div>
+        </header>
+
+        <!-- 主内容区 -->
+        <main class="flex-1 flex overflow-hidden">
+            <!-- 左侧模拟商品 -->
+            <section class="flex-1 overflow-y-auto p-8 bg-slate-50 scrollbar-hide">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-4xl mx-auto">
+                    <div v-for="product in products" :key="product.id" class="bg-white border border-slate-200 p-6 flex flex-col gap-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-medium text-slate-900">{{ product.name }}</h3>
+                                <p class="text-xs text-slate-500 mt-1">{{ product.description }}</p>
+                            </div>
+                            <span class="font-semibold text-sm">¥{{ (product.priceCents / 100).toFixed(2) }}</span>
+                        </div>
+                        <div class="flex items-center gap-4">
+                            <button @click="updateQty(product.id, -1)" class="w-8 h-8 border border-slate-200 flex items-center justify-center hover:bg-slate-50">-</button>
+                            <span class="text-sm font-mono">{{ getQty(product.id) }}</span>
+                            <button @click="updateQty(product.id, 1)" class="w-8 h-8 border border-slate-200 flex items-center justify-center hover:bg-slate-50">+</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 右侧结算侧边栏 -->
+            <aside class="w-80 flex-shrink-0 bg-white border-l border-slate-200 flex flex-col">
+                <div class="p-6 border-b border-slate-200">
+                    <h2 class="font-semibold tracking-tight uppercase text-xs">Summary</h2>
+                </div>
+
+                <div class="flex-1 overflow-y-auto p-6 space-y-8 scrollbar-hide">
+                    <!-- 优惠券选择章节 -->
+                    <section class="space-y-4">
+                        <h3 class="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em]">Select Coupon</h3>
+                        <div class="space-y-2">
+                            <button 
+                                v-for="coupon in coupons" 
+                                :key="coupon.id"
+                                @click="toggleCoupon(coupon.id)"
+                                :disabled="isCouponDisabled(coupon)"
+                                :class="[
+                                    'w-full text-left p-3 border transition-all duration-200 flex flex-col gap-1',
+                                    selectedCouponId === coupon.id 
+                                        ? 'border-slate-900 bg-slate-900 text-white' 
+                                        : 'border-slate-200 bg-white text-slate-900 hover:border-slate-400',
+                                    isCouponDisabled(coupon) ? 'opacity-40 cursor-not-allowed grayscale' : 'cursor-pointer'
+                                ]"
+                            >
+                                <div class="flex justify-between items-center w-full">
+                                    <span class="text-xs font-bold uppercase tracking-tight">{{ coupon.name }}</span>
+                                    <span v-if="isCouponDisabled(coupon)" class="text-[8px] uppercase tracking-tighter opacity-70">
+                                        差 ¥{{ ((coupon.threshold - cartTotalPrice) / 100).toFixed(2) }} 可用
+                                    </span>
+                                </div>
+                                <p :class="['text-[10px]', selectedCouponId === coupon.id ? 'text-slate-300' : 'text-slate-500']">
+                                    {{ coupon.description }}
+                                </p>
+                            </button>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- 金额统计 -->
+                <div class="p-6 border-t border-slate-200 space-y-4 bg-slate-50/50">
+                    <div class="space-y-2 text-xs">
+                        <div class="flex justify-between text-slate-500">
+                            <span>商品总计</span>
+                            <span>¥{{ (cartTotalPrice / 100).toFixed(2) }}</span>
+                        </div>
+                        <div v-if="discountCents > 0" class="flex justify-between text-red-500 font-medium">
+                            <span>优惠减免</span>
+                            <span>-¥{{ (discountCents / 100).toFixed(2) }}</span>
+                        </div>
+                    </div>
+                    <div class="pt-4 border-t border-slate-200 flex justify-between items-end">
+                        <span class="text-xs font-bold uppercase">Total</span>
+                        <span class="text-xl font-black">¥{{ (finalTotalPrice / 100).toFixed(2) }}</span>
+                    </div>
+                    <button class="w-full py-3 bg-slate-900 text-white text-xs font-bold tracking-[0.2em] uppercase hover:bg-slate-800 transition-colors">
+                        Checkout
+                    </button>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+
+        createApp({
+            setup() {
+                const products = ref([
+                    { id: '1', name: '极简机械键盘', description: '84键紧凑布局', priceCents: 29900 },
+                    { id: '2', name: '无线办公鼠标', description: '静音按键', priceCents: 8900 }
+                ]);
+
+                const cart = ref([
+                    { productId: '1', quantity: 1 }
+                ]);
+
+                const coupons = ref([
+                    { id: 'cp_1', name: '新人 9 折券', type: 'PERCENTAGE', value: 90, threshold: 0, description: '全场通用，无门槛' },
+                    { id: 'cp_2', name: '满 100 减 20', type: 'FLAT', value: 2000, threshold: 10000, description: '满 ¥100.00 可用' }
+                ]);
+
+                const selectedCouponId = ref(null);
+
+                const cartTotalItems = computed(() => cart.value.reduce((sum, item) => sum + item.quantity, 0));
+                
+                const cartTotalPrice = computed(() => {
+                    return cart.value.reduce((sum, item) => {
+                        const product = products.value.find(p => p.id === item.productId);
+                        return sum + (product.priceCents * item.quantity);
+                    }, 0);
+                });
+
+                const isCouponDisabled = (coupon) => {
+                    return cartTotalPrice.value < coupon.threshold;
+                };
+
+                const toggleCoupon = (id) => {
+                    if (selectedCouponId.value === id) {
+                        selectedCouponId.value = null;
+                    } else {
+                        selectedCouponId.value = id;
+                    }
+                };
+
+                const discountCents = computed(() => {
+                    if (!selectedCouponId.value) return 0;
+                    const coupon = coupons.value.find(c => c.id === selectedCouponId.value);
+                    if (!coupon || isCouponDisabled(coupon)) return 0;
+
+                    if (coupon.type === 'FLAT') {
+                        return coupon.value;
+                    } else if (coupon.type === 'PERCENTAGE') {
+                        return Math.round(cartTotalPrice.value * (1 - coupon.value / 100));
+                    }
+                    return 0;
+                });
+
+                const finalTotalPrice = computed(() => Math.max(0, cartTotalPrice.value - discountCents.value));
+
+                const getQty = (id) => cart.value.find(item => item.productId === id)?.quantity || 0;
+                
+                const updateQty = (id, delta) => {
+                    const item = cart.value.find(i => i.productId === id);
+                    if (item) {
+                        item.quantity = Math.max(0, item.quantity + delta);
+                        // 如果当前选中的优惠券因为数量减少而不达门槛，自动取消选中
+                        if (selectedCouponId.value) {
+                            const coupon = coupons.value.find(c => c.id === selectedCouponId.value);
+                            if (coupon && cartTotalPrice.value < coupon.threshold) {
+                                selectedCouponId.value = null;
+                            }
+                        }
+                    } else if (delta > 0) {
+                        cart.value.push({ productId: id, quantity: 1 });
+                    }
+                };
+
+                return {
+                    products, cart, coupons, selectedCouponId,
+                    cartTotalItems, cartTotalPrice, isCouponDisabled,
+                    toggleCoupon, discountCents, finalTotalPrice,
+                    getQty, updateQty
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
