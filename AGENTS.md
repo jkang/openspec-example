@@ -97,7 +97,7 @@ The SDD workflow uses these slash commands (available in `.claude/commands/opsx/
 4. **Sync** (`/opsx:sync`): 🆕 Synchronize delta specs back to main specs before archiving.
 5. **Archive** (`/opsx:archive`): Archive completed changes to `openspec/changes/archive/YYYY-MM-DD-<name>/`.
 
-### v1.5.0 Key Changes
+### v1.8.0 Key Changes
 
 - **Stores (beta)**: Standalone planning repos for cross-repo features. Managed via `openspec store setup/register/list/doctor/remove`. Config supports `store:` and `references:` fields.
 - **Fluid workflow**: Actions on a change can be invoked anytime — not phase-locked. Explore can hand off to propose, apply can suggest artifact updates, etc.

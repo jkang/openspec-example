@@ -199,7 +199,7 @@ openspec --help
 
 ### 2.4 配置 Shell 自动补全（可选）
 
-自 v1.5.0 起，为了避免在某些终端（如 PowerShell）中出现编码问题，Shell 自动补全功能改为**手动开启（Opt-in）**。
+自 v1.8.0 起，为了避免在某些终端（如 PowerShell）中出现编码问题，Shell 自动补全功能改为**手动开启（Opt-in）**。
 
 如果你希望在终端中使用 `openspec` 的命令补全，可以运行以下命令生成并安装补全脚本（支持 bash、zsh、fish 等）：
 
@@ -245,7 +245,7 @@ openspec init
 
 使用空格键选择，回车键确认。
 
-> **Claude Code 用户提示**：如果你使用的是 Claude Code，请选择 **Claude Code**。OpenSpec v1.5.0 对 Claude Code 提供原生支持，会自动在 `.claude/commands/opsx/` 和 `.claude/skills/` 目录生成对应的命令和 Skills 文件。
+> **Claude Code 用户提示**：如果你使用的是 Claude Code，请选择 **Claude Code**。OpenSpec v1.8.0 对 Claude Code 提供原生支持，会自动在 `.claude/commands/opsx/` 和 `.claude/skills/` 目录生成对应的命令 and Skills 文件。
 
 ### 3.3 非交互模式
 
@@ -876,7 +876,7 @@ openspec show <change-name> --json --deltas-only
 openspec status --change <change-name>
 ```
 
-> **提示**：自 v1.5.0 起，如果当前不存在任何变更，`openspec status` 命令会优雅地退出（提示无变更），而不再抛出致命错误。
+> **提示**：自 v1.8.0 起，如果当前不存在任何变更，`openspec status` 命令会优雅地退出（提示无变更），而不再抛出致命错误。
 
 输出示例：
 
@@ -1155,7 +1155,7 @@ OpenSpec 1.0+ 引入了全新的 OPSX 工作流，替换了旧版的阶段锁定
 > - `/openspec:apply` → `/opsx:apply`
 > - `/openspec:archive` → `/opsx:archive`
 
-**v1.5.0 新特性**：
+**v1.8.0 新特性**：
 
 - **Explore First（探索优先）**：通过 `/opsx:explore` 命令在不确定方案时先进入探索模式，系统性思考问题、调查代码库，明确后再提案，避免盲目开发。
 - **Fluid Workflow（流式迭代）**：强化文档随时可编辑、无阶段锁定的迭代体验，支持在实现过程中自由调整规划文档，真正实现「流动而非僵化」。
@@ -1314,4 +1314,4 @@ OpenSpec 强调“外部可观察行为”，但这不仅限于前端界面的�
 
 _文档版本: 2.3_
 _最后更新: 2026-07-08_
-_基于 v1.5.0 更新：迁移至 Claude Code，新增 Explore First / Fluid Workflow / Stores 特性_
+_基于 v1.8.0 更新：迁移至 Trae/Claude Code，新增 Explore First / Fluid Workflow / Stores 特性_
