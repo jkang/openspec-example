@@ -1,5 +1,5 @@
 ---
-name: "OPSX: Prototype"
+name: "Prototype"
 description: "生成或更新 OpenSpec 交互式原型。调用 openspec-prototype 技能进行设计。"
 allowed-tools: Bash(openspec:*)
 ---
