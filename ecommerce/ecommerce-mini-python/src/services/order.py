@@ -19,8 +19,7 @@ class OrderService:
         order_items = []
         total_cents = 0
 
-        # 2. Validate and Calculate
-        # Note: Ideally should lock resources. This is a simplified sequential check.
+        # 2. Validate and Calculate Total
         for item in cart.items:
             product = self.catalog.get_product(item.product_id)
             if not product:
@@ -39,7 +38,6 @@ class OrderService:
         for item in cart.items:
             product = self.catalog.get_product(item.product_id)
             product.stock -= item.quantity
-            # Since objects are mutable references in memory repo, save is implicit but good practice
             self.catalog.repo.save(product.id, product)
 
         # 4. Create Order
@@ -57,7 +55,4 @@ class OrderService:
         return order
 
     def checkout(self, user_id: str) -> Order:
-        """
-        结算入口，处理从购物车到订单的转换流程。
-        """
         return self.create_order(user_id)

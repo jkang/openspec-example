@@ -322,11 +322,11 @@
 
         <!-- Case Study Context -->
         <div id="case" class="card mb-12 border-l-4 border-blue-500">
-        <h2 class="text-2xl font-bold text-gray-900 mb-4">📦 本期实战案例：促销与优惠券系统</h2>
+        <h2 class="text-2xl font-bold text-gray-900 mb-4">📦 本期实战案例：电商结算流程优化</h2>
         <div class="grid md:grid-cols-2 gap-8">
             <div>
                 <p class="text-gray-600 mb-4 leading-relaxed">
-                    本项目 <code>ecommerce-mini</code> 已具备商品目录、购物车与订单结算等基础功能。本次任务是通过 SDD 流程为其添加<strong>“促销与优惠券”</strong>的核心能力。
+                    本项目 <code>ecommerce-mini</code> 已具备商品目录、购物车与订单结算等基础功能。本次任务是通过 SDD 流程为其添加<strong>“结算成功 UI 与状态追踪”</strong>的核心能力。
                 </p>
                 <div class="bg-gray-50 p-4 rounded-md text-sm text-gray-700">
                     <strong class="text-gray-900 block mb-2">技术栈限制：</strong>
@@ -340,8 +340,8 @@
             <div>
                 <h4 class="font-bold text-gray-900 mb-3">新需求挑战：</h4>
                 <ul class="space-y-3 text-sm text-gray-600">
-                    <li class="flex items-start"><span class="tag bg-blue-100 text-blue-800 mr-2 shrink-0">需求 1</span> 优惠券核销：支持在购物车输入优惠券码，校验有效性与门槛。</li>
-                    <li class="flex items-start"><span class="tag bg-blue-100 text-blue-800 mr-2 shrink-0">需求 2</span> 动态计价：结算时自动应用折扣，展示优惠明细。</li>
+                    <li class="flex items-start"><span class="tag bg-blue-100 text-blue-800 mr-2 shrink-0">需求 1</span> 成功模态框：下单成功后展示订单号与感谢信息。</li>
+                    <li class="flex items-start"><span class="tag bg-blue-100 text-blue-800 mr-2 shrink-0">需求 2</span> 状态闭环：确保后端订单生成与前端购物车清空的原子性。</li>
                     <li class="flex items-start"><span class="tag bg-blue-100 text-blue-800 mr-2 shrink-0">需求 3</span> 质量要求：核心逻辑 100% 单元测试覆盖。</li>
                 </ul>
             </div>
@@ -352,12 +352,12 @@
         <div id="flow" class="mb-12">
         <div class="flex items-center justify-between mb-6">
             <h2 class="text-2xl font-bold text-gray-900">SDD 流程全景图 (SDD Paradigm Flow)</h2>
-            <span class="tag bg-blue-50 text-blue-600">新需求：优惠券系统</span>
+            <span class="tag bg-blue-50 text-blue-600">新需求：结算成功 UI</span>
         </div>
         <div class="flow-container">
             <div class="flow-node">
                 <div class="node-box">意图 (Intent)</div>
-                <div class="flow-label">增加优惠券</div>
+                <div class="flow-label">优化结算体验</div>
             </div>
             <div class="flow-arrow">→</div>
             <div class="flow-node">
@@ -411,7 +411,6 @@
             </div>
         </div>
         <div class="bg-blue-50 p-4 rounded-md border border-blue-100 flex items-start gap-3">
-            <svg class="w-5 h-5 text-blue-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             <p class="text-sm text-blue-800 leading-relaxed">
                 <strong>需求穿梭路线：</strong> 用户意图 → <strong>Explore</strong> 定位 → <strong>Define</strong> 规划拆分 → <strong>Propose</strong> 提案与原型 → <strong>Spec/Plan</strong> 审查 → <strong>Apply</strong> 实现 → <strong>Update</strong> 增强 → <strong>Sync/Archive</strong> 归档。
             </p>
@@ -479,7 +478,7 @@
                 <p class="text-gray-600 mb-4">在动工前，让 AI 调查现有架构，寻找新功能的最佳切入点，形成初步技术方案。</p>
                 <div class="code-block mb-4">
                     <span class="text-blue-600 font-bold">/opsx:explore</span><br/>
-                    "我想在当前系统中加入优惠券功能。请分析结算流程，寻找最佳注入点。"
+                    "我想优化结算流程，增加成功后的 UI 反馈。请分析现有流程。"
                 </div>
             </div>
         </div>
@@ -499,8 +498,8 @@
                 <div class="bg-gray-50 p-3 rounded-md border border-gray-200 text-xs text-gray-600">
                     <p class="font-bold text-gray-900 mb-1">规划要点：</p>
                     <ul class="list-disc ml-4 space-y-1">
-                        <li>Story 1: 基础折扣码核销（SAVE20）</li>
-                        <li>Story 2: 满减逻辑（满 200 减 30）</li>
+                        <li>Story 1: 成功模态框 UI 实现</li>
+                        <li>Story 2: 后端订单状态与购物车联动</li>
                     </ul>
                 </div>
             </div>
@@ -519,8 +518,8 @@
                 </div>
                 <p class="text-gray-600 mb-4">正式发起变更，并要求 AI 生成可交互的 HTML 原型以确认 UI 效果。</p>
                 <div class="code-block mb-4">
-                    <span class="text-blue-600 font-bold">/opsx:propose coupon-core</span><br/>
-                    "实施 Story 1：基础折扣码核销。要求在购物车底部增加输入框，支持 SAVE20。"
+                    <span class="text-blue-600 font-bold">/opsx:propose checkout-success-ui</span><br/>
+                    "实施 Story 1：结算成功模态框。要求展示订单号、总价及继续购物按钮。"
                 </div>
             </div>
         </div>
@@ -587,13 +586,13 @@
                     <h3 class="text-lg font-bold text-gray-900">Update：需求迭代与增量规划</h3>
                     <span class="tag bg-blue-50 text-blue-600 py-0.5 px-2 text-[10px]">穿梭点：增量增强</span>
                 </div>
-                <p class="text-gray-600 mb-4">实现第一版后，发现之前的 Spec 不够全面（例如漏掉了优惠券叠加规则），使用 Update 指令进行增量更新。</p>
+                <p class="text-gray-600 mb-4">实现第一版后，发现之前的 Spec 不够全面（例如漏掉了订单追踪链接），使用 Update 指令进行增量更新。</p>
                 <div class="code-block mb-4">
                     <span class="text-blue-600 font-bold">/opsx:update</span><br/>
-                    "在现有优惠券基础上增加『每满 200 减 30』的满减逻辑，并确保它能与折扣券叠加使用。请更新 Spec 和相关 Task。"
+                    "在结算成功页增加『查看订单详情』链接，并确保该链接指向正确的订单 ID。请更新 Spec 和相关 Task。"
                 </div>
                 <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 text-sm text-yellow-800">
-                    <strong>Review 要点：</strong> 观察 AI 如何在不破坏现有 `coupon-system` 结构的情况下，增量更新 `design.md` 和 `tasks.md`。
+                    <strong>Review 要点：</strong> 观察 AI 如何在不破坏现有结构的情况下，增量更新 `design.md` 和 `tasks.md`。
                 </div>
             </div>
         </div>
@@ -614,7 +613,7 @@
                 <div class="mt-4 bg-gray-50 p-3 rounded-md border border-gray-200">
                     <p class="text-xs font-bold text-gray-900 mb-1">Review 要点：</p>
                     <ul class="text-xs text-gray-600 list-disc ml-4">
-                        <li>确认 `openspec/specs/` 下出现了新的 `promotion-management` 目录</li>
+                        <li>确认 `openspec/specs/` 下出现了新的 `checkout-management` 目录</li>
                         <li>确认 `openspec/changes/` 下的活跃变更已清空</li>
                     </ul>
                 </div>
@@ -634,8 +633,8 @@
                     <div class="bg-blue-50 p-4 rounded-md border border-blue-100">
                         <h4 class="text-sm font-bold text-blue-900 mb-2">成果演示</h4>
                         <ul class="text-xs text-blue-800 space-y-1">
-                            <li>• 购物车输入 SAVE20 后的即时价格变动</li>
-                            <li>• 结算生成的订单中包含准确的优惠金额明细</li>
+                            <li>• 结算成功后的即时 UI 反馈</li>
+                            <li>• 后端订单生成与购物车状态同步</li>
                             <li>• 自动化测试报告与 100% 覆盖率证据</li>
                         </ul>
                     </div>
@@ -675,10 +674,9 @@
                     </div>
                 </div>
                 <div class="mt-6 flex gap-4">
-                    <a href="file:///Users/superkkk/MyCoding/OpenSpec-practice/learning-sdd/openspec-practical-guide.md" class="link-underlined text-sm font-medium flex items-center">
-                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                        回顾《OpenSpec 实战指南》
-                    </a>
+                    <div class="flex items-center text-xs text-gray-500">
+                        BOOK
+                    </div>
                 </div>
             </div>
         </div>

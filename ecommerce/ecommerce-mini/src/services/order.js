@@ -52,7 +52,6 @@ export class OrderService {
   }
 
   checkout(userId) {
-    // 结算逻辑目前与创建订单一致，但在 SDD 流程中作为独立入口，方便未来扩展预校验逻辑
     return this.createOrder(userId)
   }
 }

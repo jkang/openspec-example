@@ -32,12 +32,21 @@ description: "生成符合 Modern Flat 规范的交互式企业级 Vue 3 原型�
 - **引用方式**: 使用高质量的公开 URL 链接（例如 `https://images.unsplash.com/photo-...`）。
 - **视觉匹配**: 选择背景干净、主体突出、符合极简主义审美的产品摄影图，以匹配“现代扁平化”整体风格。
 
+### 5. 业务真实性与一致性
+- **全中文交互**: 所有的 UI 文本、按钮标签、提示信息以及示例数据必须使用**中文**。
+- **使用真实种子数据**: 严禁生成虚假的英文测试数据。必须先读取项目中已有的种子数据（如 `ecommerce/ecommerce-mini/data/products.json`）作为原型的数据来源，确保与主系统业务逻辑一致。
+- **风格高度对齐**: 必须深度对齐主系统 [App.vue](file:///Users/superkkk/MyCoding/OpenSpec-practice/ecommerce/ecommerce-mini-frontend/src/App.vue) 的视觉风格：
+    - 使用 `font-sans` 字体。
+    - 严格遵循 `slate-900` 作为主色调，`slate-50` 作为背景色，`slate-200` 作为边框色。
+    - 保持紧凑的布局结构，顶部导航栏高度固定为 `h-16`。
+
 ## 任务执行指南
 
-1. **读取上下文**: 在生成原型前，必须阅读 `proposal.md` 以确保功能覆盖完整。
+1. **读取上下文**: 在生成原型前，必须阅读 `proposal.md` 以及项目现有的种子数据文件。
 2. **生成 HTML**: 
    - 包含完整的 Tailwind 配置（颜色、边框宽度等）。
    - 编写具备响应式状态的 Vue 应用代码。
    - 实现关键交互逻辑（点击、切换、过滤）。
-3. **输出路径**: 默认输出到 `prototypes/<capability-path>.html`。
-4. **嵌入规范**: 生成后，将代码块以 `<details>` 标签形式提供，以便后续步骤嵌入 `spec.md`。
+3. **样式校验**: 检查生成代码是否包含任何圆角、阴影或装饰性 Emoji，确保视觉上与主系统无异。
+4. **输出路径**: 默认输出到 `prototypes/<capability-path>.html`。
+5. **嵌入规范**: 生成后，将代码块以 `<details>` 标签形式提供，以便后续步骤嵌入 `spec.md`。
