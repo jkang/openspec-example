@@ -89,7 +89,7 @@ OpenSpec 1.0+ 引入了 OPSX 工作流，实现了**动态指令体系**——AI
 
 OPSX 工作流与旧版的最大区别在于：**动作而非阶段**。可以在任意时刻编辑任意文档，不存在阶段锁定。
 
-**v1.5.0 新特性**：
+**v1.8.0 新特性**：
 
 - **Explore First（探索优先）**：`/opsx:explore` 作为推荐的起点。在不确定方案时，先进入探索模式调查代码库、对比选项、澄清需求——零成本的思考阶段，避免盲目开发。详见本指南第 6 章的真实探索过程复盘。
 - **Fluid Workflow（流式迭代）**：强化「流动而非僵化」的核心理念。所有规划文档可在实现过程中随时调整，不存在阶段锁。发现设计问题？直接编辑对应文档即可，AI 会自动感知变更。
@@ -546,7 +546,7 @@ OpenSpec-practise/
 │   │   ├── payment/spec.md
 │   │   ├── domain-model/spec.md
 │   │   ├── error-handling/spec.md
-│   │   └── product-query/spec.md    <-- v1.5.0 新增：按 ID 查询商品
+│   │   └── product-query/spec.md    <-- v1.8.0 新增：按 ID 查询商品
 │   └── changes/                     <-- 变更目录
 │       ├── archive/                 <-- 已归档变更
 │       │   ├── 2025-01-27-v1-mvp/   <-- MVP 变更规范（已归档）
@@ -561,7 +561,7 @@ OpenSpec-practise/
 │       │   │       ├── payment/spec.md
 │       │   │       ├── domain-model/spec.md
 │       │   │       └── error-handling/spec.md
-│       │   └── 2026-07-08-add-product-get-by-id/  <-- v1.5.0 工作流实践
+│       │   └── 2026-07-08-add-product-get-by-id/  <-- v1.8.0 工作流实践
 ├── examples/
 │   ├── ecommerce-mini/              <-- Node.js Implementation
 │   │   └── src/
