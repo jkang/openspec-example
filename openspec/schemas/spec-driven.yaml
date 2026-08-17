@@ -1,13 +1,28 @@
 name: spec-driven
 version: 1
-description: 包含交互式原型验证的 OpenSpec 工作流 - 提案 (proposal) → 原型 (prototype) → 规范 (specs) → 设计 (design) → 任务 (tasks)
+description: 包含交互式原型验证的 OpenSpec 工作流 - 探索 (explore) → 提案 (proposal) → 原型 (prototype) → 规范 (specs) → 设计 (design) → 任务 (tasks)
 artifacts:
+  - id: explore
+    generates: idea.md
+    description: 结构化探索文档，记录业务意图、设计思路及架构分析结论
+    template: idea.md
+    instruction: |
+      执行 `/opsx:explore` 流程，并按照结构化 5 步法记录结论：
+      1. **澄清业务意图**：目的、范围、具体业务要求。
+      2. **业务设计思路**：逻辑流转、用户价值。
+      3. **需求拆分建议**：是否需要分阶段实施。
+      4. **架构影响分析**：现有架构改动点、技术挑战。
+      5. **确认结论**：用户已确认的最终意图。
+
+      该文档是后续所有产物的源头。
+    requires: []
+
   - id: proposal
     generates: proposal.md
     description: 概述变更内容的初始提案文档
     template: proposal.md
     instruction: |
-      创建提案文档，明确说明为什么需要进行此项变更。
+      创建提案文档，明确说明为什么需要进行此项变更。本提案必须基于 `idea.md` 中的结论。
 
       章节结构：
       - **Why (背景原因)**: 用 1-2 句话说明要解决的问题或抓住的机遇。这解决了什么问题？为什么现在要做？
@@ -26,7 +41,8 @@ artifacts:
       保持简明扼要（1-2 页）。重点关注“为什么要做 (why)”，而不是“怎么做 (how)” - 具体的实现细节应放在 design.md 中。
 
       这是整个流程的基础 - 后续的 specs、design 和 tasks 都将以此为基础。
-    requires: []
+    requires:
+      - explore
 
   - id: prototype
     generates: "prototypes/**/*.html"
