@@ -208,12 +208,16 @@ const addToCart = async (product) => {
     const response = await fetch('http://localhost:8000/api/cart/items', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ productId: String(product.id), quantity: 1 })
+      body: JSON.stringify({ 
+        userId: 'user_dev',
+        productId: String(product.id), 
+        quantity: 1 
+      })
     })
 
     if (!response.ok) {
       const err = await response.json()
-      throw new Error(err.message || '同步失败')
+      throw new Error(err.detail || err.message || '同步失败')
     }
 
     const existingItem = cart.value.find(item => item.id === product.id)
@@ -263,7 +267,7 @@ const checkout = async () => {
       cart.value = []
     } else {
       const error = await response.json()
-      alert(`结算失败: ${error.message || '未知错误'}`)
+      alert(`结算失败: ${error.detail || error.message || '未知错误'}`)
     }
   } catch (e) {
     alert(`网络错误: ${e.message}`)
