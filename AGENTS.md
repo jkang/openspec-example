@@ -4,7 +4,7 @@ This file provides guidance to AI Agents when working with code in this reposito
 
 ## Project Overview
 
-This is **OpenSpec Practise** — a learning and demonstration repository for **Spec-Driven Development (SDD)** using the OpenSpec framework (v1.5.0). It contains a minimal e-commerce system implemented in Node.js, Python, and Vue, all driven by OpenSpec specifications. The core idea: define specifications first (proposal → design → specs → tasks), then write code, ensuring humans and AI share the same understanding of requirements.
+This is **OpenSpec Practise** — a learning and demonstration repository for **Spec-Driven Development (SDD)** using the OpenSpec framework (v1.8.0). It contains a minimal e-commerce system implemented in Node.js, Python, and Vue, all driven by OpenSpec specifications. The core idea: define specifications first (proposal → design → specs → tasks), then write code, ensuring humans and AI share the same understanding of requirements.
 
 ## Repository Architecture
 
@@ -13,7 +13,7 @@ docs/                          # Chinese documentation (manuals, guides, analysi
 docs-en/                       # English documentation (same content, translated)
 openspec/                      # Root OpenSpec configuration for this project
   config.yaml                  #   Project context, rules, schema definition
-.claude/                       # OpenSpec native AI commands and skills (v1.5.0)
+.claude/                       # OpenSpec native AI commands and skills (v1.8.0)
   commands/opsx/               #   /opsx:propose, /opsx:apply, /opsx:archive, /opsx:explore, /opsx:sync
   skills/                      #   Corresponding skill definitions (SKILL.md)
 ecommerce/
@@ -36,7 +36,7 @@ ecommerce/
     src/main.js                #   App entry point
     package.json               #   Project dependencies and scripts
   openspec/                    # Root: specifications driving all implementations
-    config.yaml                #   Project context, rules, store/references support (v1.5.0)
+    config.yaml                #   Project context, rules, store/references support (v1.8.0)
     specs/                     #   Master specs: cart/catalog/order/payment/domain-model/error-handling
     changes/                   #   Active changes
     changes/archive/           #   Archived: 2025-01-27-v1-mvp (proposal/design/specs/tasks)

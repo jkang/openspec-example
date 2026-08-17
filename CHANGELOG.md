@@ -2,6 +2,20 @@
 
 本项目跟随 OpenSpec（[Fission-AI/OpenSpec](https://github.com/Fission-AI/OpenSpec)）版本演进的实践记录。
 
+## v1.8.0 (2026-08-17)
+
+OpenSpec v1.8.0 是目前的稳定版本，核心变化：
+
+- **工作流闭环** — 确立了「意图 -> Explore -> Propose -> 原型 -> Update -> Spec -> Apply -> Sync -> Archive」的完整 SDD 范式
+- **文档体系整合** — 所有的升级指南与工作流实践均已对齐至 v1.8.0，移除了旧版本的碎片化文档
+- **Trae 指令优化** — 优化了 `/opsx` 指令在 Trae 中的显示效果，移除了冗余的前缀
+
+本仓库跟进：
+
+- 全量文档升级至 v1.8.0，统一视觉与术语规范
+- 移除旧版 `v1.5.0` 和 `v1.7.0` 的升级与实践文档，合并为最新的 `v1.8.0` 系列
+- 详细复盘见 [v1.8.0 工作流实践文档](learning-sdd/openspec-v1.8.0-workflow-practice.md) 和 [v1.8.0 升级解读](learning-sdd/openspec-v1.8.0-upgrade.md)
+
 ## v1.7.0 (2026-07-28)
 
 OpenSpec v1.7.0 是一个中型迭代（91 commits），核心变化：
@@ -34,7 +48,7 @@ OpenSpec v1.7.0 是一个中型迭代（91 commits），核心变化：
 5. **Sync** — 智能合并到主 spec：MODIFIED 保留未提及内容，ADDED 新增 Requirement
 6. **Archive** — 一致性验证后归档至 `changes/archive/2026-07-28-add-product-search/`
 
-实践产物：`openspec/specs/catalog-management/spec.md` 更新为 4 个 Requirement、11 个 Scenario。详细复盘见 [v1.7.0 工作流实践文档](docs/openspec-v1.7.0-workflow-practice.md)。
+实践产物：`openspec/specs/catalog-management/spec.md` 更新为 4 个 Requirement、11 个 Scenario。详细复盘见 [v1.8.0 工作流实践文档](learning-sdd/openspec-v1.8.0-workflow-practice.md)。
 
 ## v1.6.0 (2026-07-10)
 
@@ -53,7 +67,7 @@ OpenSpec v1.6.0 是一个小型迭代，核心变化：
 
 ## v1.5.0 (2026-06-28)
 
-OpenSpec v1.5.0 是三个版本积累的重大更新。详见 [升级解读文章](docs/openspec-v1.5.0-upgrade.md)。
+OpenSpec v1.5.0 是三个版本积累的重大更新。详见 [升级解读文章](learning-sdd/openspec-v1.8.0-upgrade.md)。
 
 三大变革：
 

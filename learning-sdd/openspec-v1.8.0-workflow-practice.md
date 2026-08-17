@@ -1,23 +1,44 @@
-# 用 /opsx:update 完善需求：OpenSpec v1.7.0 完整工作流实践
+# 用 /opsx:update 完善需求：OpenSpec v1.8.0 完整工作流实践
 
-OpenSpec v1.6.0 引入了 **`/opsx:update`** 技能——在变更实施过程中修订规划文档，保持 proposal/specs/design/tasks 的一致性；v1.7.0 将其纳入 core profile 完整工作流并全面优化了模板。本文通过一个真实案例「商品搜索与价格排序」，演示完整工作流（Explore → Propose → **Update** → Apply → Sync → Archive）的端到端实践。
+OpenSpec v1.8.0 深度集成了 **`/opsx:update`** 技能——在变更实施过程中修订规划文档，保持 proposal/specs/design/tasks 的一致性。本文通过一个真实案例「商品搜索与价格排序」，演示完整工作流（意图 -> Explore -> Propose -> 原型 -> Update -> Spec -> Apply -> Sync -> Archive）的端到端实践。
 
 > **前置条件**：`/opsx:update` 属于 core profile。运行 `openspec update` 后，若提示 "missing 1 core workflow: update"，执行 `openspec config profile core` 即可启用。
 
-## 一、背景：v1.5.0 时代的缺口
+## 一、背景：旧版本的缺口
 
-在 v1.5.0 的工作流中（[三大变革解读](./openspec-v1.5.0-upgrade.md)），Fluid Workflow 允许随时编辑文档，但 AI 需要被明确告知"现在要改规划"，且改动后各 artifacts 之间的连贯性无法自动保证——改了一个文档，其他文档可能不同步。
+在早期版本的工作流中（[三大变革解读](./openspec-v1.8.0-upgrade.md)），Fluid Workflow 允许随时编辑文档，但 AI 需要被明确告知"现在要改规划"，且改动后各 artifacts 之间的连贯性无法自动保证——改了一个文档，其他文档可能不同步。
 
-v1.6.0 引入的 `/opsx:update` 填补了这个缺口，v1.7.0 将其纳入默认工作流。它的职责是**修订既有 change 的规划文档并保持它们彼此一致**，且明确不修改代码。这改变了实践方式：**需求可以在实施前、实施中随时演进，而不用担心规划文档失去同步**。
+v1.8.0 强化了 `/opsx:update` 填补了这个缺口。它的职责是**修订既有 change 的规划文档并保持它们彼此一致**，且明确不修改代码。这改变了实践方式：**需求可以在实施前、实施中随时演进，而不用担心规划文档失去同步**。
 
 ```text
-v1.5.0:  explore → propose → apply → sync → archive
+旧版本:  意图 -> Explore -> Propose -> 原型 -> Spec -> Apply -> Sync -> Archive
                                           ↑
                             文档修订靠手动编辑，一致性无保证
 
-v1.6.0+: explore → propose → update → apply → sync → archive
+v1.8.0: 意图 -> Explore -> Propose -> 原型 -> Update (修订) -> Spec -> Apply -> Sync -> Archive
                            ↑
                标准化修订流程，保持 artifacts 一致性
+
+```mermaid
+graph TD
+    A[意图 Intent] --> B(Explore 探索与调研)
+    B --> C{决策确认?}
+    C -- 否 --> B
+    C -- 是 --> D(Propose 提案与设计)
+    D --> E(生成原型 Prototype)
+    E --> F{视觉/交互确认?}
+    F -- 否 --> D
+    F -- 是 --> G(Spec 规格定义)
+    G --> H{需要修订规划?}
+    H -- 是 --> U(Update 智能修订)
+    U --> G
+    H -- 否 --> I(Apply 实现与生成)
+    I --> J(Validate 自动化验证)
+    J --> K{符合规格?}
+    K -- 否 --> I
+    K -- 是 --> L(Sync 规格同步)
+    L --> M(Archive 归档)
+```
 ```
 
 ---
@@ -125,7 +146,7 @@ openspec/changes/archive/2026-07-28-add-product-search/
 
 ### 3.1 /opsx:update 的价值
 
-对比 v1.5.0 的手动编辑，update 流程带来三个变化：
+对比早期版本的手动编辑，update 流程带来三个变化：
 
 1. **一致性保证**：修订一个 artifact 后，自动检查其他 artifacts 是否需要同步修改（"编辑方向是任意的——改后面的也可能需要改前面的"）
 2. **ADDED/MODIFIED 决策显式化**：新关注点用 ADDED，行为变更用 MODIFIED——这个判断直接影响 archive 的质量
@@ -133,7 +154,7 @@ openspec/changes/archive/2026-07-28-add-product-search/
 
 ### 3.2 版本演进的价值
 
-从 v1.5.0 到 v1.7.0，OpenSpec 补上了工作流中最薄弱的环节。v1.5.0 解决了"AI 动态理解项目"（Schema 驱动），v1.6.0 引入 update 技能并在 v1.7.0 纳入默认工作流，解决了"规划文档持续演进"。两者结合，让 Spec-Driven Development 真正适配了**迭代开发**——需求不是一次定死的，而是与实现一起生长的。
+从早期版本到 v1.8.0，OpenSpec 补上了工作流中最薄弱的环节。v1.8.0 解决了"AI 动态理解项目"（Schema 驱动）和"规划文档持续演进"（Update 特性）。两者结合，让 Spec-Driven Development 真正适配了**迭代开发**——需求不是一次定死的，而是与实现一起生长的。
 
 ---
 

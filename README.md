@@ -125,7 +125,7 @@ npm run dev
 1.  **入门**: [OpenSpec 使用手册](learning-sdd/openspec-user-manual.md) — 了解基本概念与 CLI 用法
 2.  **实战**: [OpenSpec 实战指南](learning-sdd/openspec-practical-guide.md) — 掌握 SDD 工程实践
 3.  **进阶**: [AI 辅助软件工程全流程复盘](learning-sdd/openspec-ai-workflow-analysis.md) — 深入 AI 协作的最佳实践
-4.  **演进**: [v1.7.0 工作流实践](learning-sdd/openspec-v1.7.0-workflow-practice.md) — 学习如何处理需求迭代
+4.  **演进**: [v1.8.0 工作流实践](learning-sdd/openspec-v1.8.0-workflow-practice.md) — 学习如何处理需求迭代
 
 ---
 
