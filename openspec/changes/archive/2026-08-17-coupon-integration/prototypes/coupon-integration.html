@@ -126,8 +126,8 @@
                 ]);
 
                 const coupons = ref([
-                    { id: 'cp_1', name: '新人 9 折券', type: 'PERCENTAGE', value: 90, threshold: 0, description: '全场通用，无门槛' },
-                    { id: 'cp_2', name: '满 100 减 20', type: 'FLAT', value: 2000, threshold: 10000, description: '满 ¥100.00 可用' }
+                    { id: 'cp_1', name: '满 50 减 10', type: 'FLAT', value: 1000, threshold: 5000, description: '全场通用，满 ¥50.00 可用' },
+                    { id: 'cp_2', name: '满 100 减 20', type: 'FLAT', value: 2000, threshold: 10000, description: '全场通用，满 ¥100.00 可用' }
                 ]);
 
                 const selectedCouponId = ref(null);
@@ -149,7 +149,10 @@
                     if (selectedCouponId.value === id) {
                         selectedCouponId.value = null;
                     } else {
-                        selectedCouponId.value = id;
+                        const coupon = coupons.value.find(c => c.id === id);
+                        if (!isCouponDisabled(coupon)) {
+                            selectedCouponId.value = id;
+                        }
                     }
                 };
 
@@ -160,8 +163,6 @@
 
                     if (coupon.type === 'FLAT') {
                         return coupon.value;
-                    } else if (coupon.type === 'PERCENTAGE') {
-                        return Math.round(cartTotalPrice.value * (1 - coupon.value / 100));
                     }
                     return 0;
                 });

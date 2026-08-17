@@ -1,14 +1,19 @@
 import http from 'http'
-import { ProductRepo, CartRepo, OrderRepo } from '../repo/memoryRepo.js'
+import fs from 'fs'
+import path from 'path'
+import { ProductRepo, CartRepo, OrderRepo, CouponRepo } from '../repo/memoryRepo.js'
 import { CatalogService } from '../services/catalog.js'
 import { CartService } from '../services/cart.js'
 import { OrderService } from '../services/order.js'
+import { CouponService } from '../services/coupon.js'
 
 const productRepo = new ProductRepo()
 const cartRepo = new CartRepo()
 const orderRepo = new OrderRepo()
+const couponRepo = new CouponRepo()
 
-// 注入初始商品数据，确保与前端同步
+// 注入初始商品数据
+// ... (initialProducts logic)
 const initialProducts = [
   { 
     id: '1', name: '极简机械键盘', description: '84键紧凑布局，红轴', priceCents: 29900, stock: 99,
@@ -37,9 +42,17 @@ const initialProducts = [
 ]
 initialProducts.forEach(p => productRepo.save(p))
 
+// 注入初始优惠券数据
+const couponsPath = path.join(process.cwd(), 'data/coupons.json')
+if (fs.existsSync(couponsPath)) {
+  const coupons = JSON.parse(fs.readFileSync(couponsPath, 'utf8'))
+  coupons.forEach(c => couponRepo.save(c))
+}
+
 const catalogService = new CatalogService(productRepo)
 const cartService = new CartService(cartRepo, productRepo)
-const orderService = new OrderService(cartRepo, orderRepo, productRepo)
+const couponService = new CouponService(couponRepo)
+const orderService = new OrderService(cartRepo, orderRepo, productRepo, couponService)
 
 const readJson = async (req) => {
   return new Promise((resolve, reject) => {
@@ -121,17 +134,20 @@ export function createServer() {
 
       if (pathname === '/api/orders' && req.method === 'POST') {
         const body = await readJson(req)
-        // Mock user ID for dev if not provided
         const userId = body.userId || 'user_dev'
-        const order = orderService.createOrder(userId)
+        const order = orderService.createOrder(userId, body.couponId)
         return sendJson(res, 201, order)
       }
 
       if (pathname === '/api/checkout' && req.method === 'POST') {
         const body = await readJson(req)
         const userId = body.userId || 'user_dev'
-        const order = orderService.checkout(userId)
+        const order = orderService.checkout(userId, body.couponId)
         return sendJson(res, 200, order)
+      }
+
+      if (pathname === '/api/coupons' && req.method === 'GET') {
+        return sendJson(res, 200, couponService.list())
       }
       
       if (pathname.startsWith('/api/orders/') && req.method === 'GET') {
@@ -150,6 +166,12 @@ export function createServer() {
         return sendError(res, 'OUT_OF_STOCK', '库存不足', 409)
       if (e.message === 'PRODUCT_NOT_FOUND')
         return sendError(res, 'PRODUCT_NOT_FOUND', '商品不存在', 404)
+      if (e.message === 'COUPON_NOT_FOUND')
+        return sendError(res, 'COUPON_NOT_FOUND', '优惠券不存在', 404)
+      if (e.message === 'COUPON_ALREADY_USED')
+        return sendError(res, 'COUPON_ALREADY_USED', '优惠券已使用', 400)
+      if (e.message === 'COUPON_THRESHOLD_NOT_MET')
+        return sendError(res, 'COUPON_THRESHOLD_NOT_MET', '未达优惠券使用门槛', 400)
         
       console.error(e)
       sendError(res, 'INTERNAL_ERROR', e.message, 500)

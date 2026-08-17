@@ -43,3 +43,21 @@ export class OrderRepo {
     return this.orders.get(id)
   }
 }
+
+export class CouponRepo {
+  constructor() {
+    this.coupons = new Map()
+  }
+
+  save(coupon) {
+    this.coupons.set(coupon.id, coupon)
+  }
+
+  findById(id) {
+    return this.coupons.get(id)
+  }
+
+  findAll() {
+    return Array.from(this.coupons.values())
+  }
+}

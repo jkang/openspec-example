@@ -26,4 +26,14 @@ class Order(BaseModel):
     id: str
     status: Literal["PENDING_PAYMENT", "PAID"]
     total_cents: int = Field(..., ge=0, alias="totalCents")
+    discount_cents: int = Field(0, ge=0, alias="discountCents")
+    coupon_id: Optional[str] = Field(None, alias="couponId")
     items: List[OrderItem]
+
+class Coupon(BaseModel):
+    id: str
+    name: str
+    type: Literal["FIXED"]
+    value_cents: int = Field(..., ge=0, alias="valueCents")
+    threshold_cents: int = Field(..., ge=0, alias="thresholdCents")
+    status: Literal["UNUSED", "USED"]

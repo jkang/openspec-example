@@ -32,6 +32,18 @@
  * @property {string} id
  * @property {"PENDING_PAYMENT" | "PAID"} status
  * @property {number} totalCents
+ * @property {number} discountCents
+ * @property {string} [couponId]
  * @property {OrderItem[]} items
  * @property {string} userId
+ */
+
+/**
+ * @typedef {Object} Coupon
+ * @property {string} id
+ * @property {string} name
+ * @property {"FIXED"} type
+ * @property {number} valueCents
+ * @property {number} thresholdCents
+ * @property {"UNUSED" | "USED"} status
  */

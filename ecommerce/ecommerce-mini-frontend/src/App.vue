@@ -122,7 +122,8 @@
               >
                 <div class="flex justify-between items-center w-full">
                   <span class="text-xs font-bold uppercase tracking-tight">{{ coupon.name }}</span>
-                  <span v-if="isCouponDisabled(coupon)" class="text-[8px] uppercase tracking-tighter opacity-70">差 ¥{{ ((coupon.threshold - cartTotalPrice) / 100).toFixed(2) }} 可用</span>
+                  <span v-if="coupon.status === 'USED'" class="text-[8px] uppercase tracking-tighter opacity-70">已使用</span>
+                  <span v-else-if="isCouponDisabled(coupon)" class="text-[8px] uppercase tracking-tighter opacity-70">差 ¥{{ ((coupon.thresholdCents - cartTotalPrice) / 100).toFixed(2) }} 可用</span>
                 </div>
                 <p :class="['text-[10px]', selectedCouponId === coupon.id ? 'text-slate-300' : 'text-slate-500']">{{ coupon.description }}</p>
               </button>
@@ -201,10 +202,7 @@ const isCheckoutSuccess = ref(false)
 const lastOrderId = ref('')
 
 // 优惠券数据
-const coupons = ref([
-  { id: 'newcomer', name: '新人 9 折券', type: 'rate', value: 0.1, threshold: 0, description: '无门槛立享 9 折' },
-  { id: 'threshold_100', name: '满 100 减 20', type: 'amount', value: 2000, threshold: 10000, description: '满 ¥100.00 可用' }
-])
+const coupons = ref([])
 const selectedCouponId = ref(null)
 
 // 图片加载失败处理
@@ -234,6 +232,23 @@ const fetchProducts = async () => {
   }
 }
 
+// 获取优惠券列表
+const fetchCoupons = async () => {
+  try {
+    const response = await fetch('http://localhost:8000/api/coupons')
+    if (response.ok) {
+      coupons.value = await response.json()
+    }
+  } catch (e) {
+    console.error('获取优惠券失败:', e)
+    // 降级使用初始数据
+    coupons.value = [
+      { id: 'FLAT10', name: '满 50 减 10', type: 'FIXED', valueCents: 1000, thresholdCents: 5000, description: '满 ¥50.00 可用' },
+      { id: 'FLAT20', name: '满 100 减 20', type: 'FIXED', valueCents: 2000, thresholdCents: 10000, description: '满 ¥100.00 可用' }
+    ]
+  }
+}
+
 // 搜索过滤逻辑
 const filteredProducts = computed(() => {
   if (!searchQuery.value.trim()) return products.value
@@ -255,20 +270,16 @@ const couponDiscount = computed(() => {
   if (!selectedCoupon.value) return 0
   
   // 校验门槛
-  if (cartTotalPrice.value < selectedCoupon.value.threshold) return 0
+  if (cartTotalPrice.value < selectedCoupon.value.thresholdCents) return 0
   
-  if (selectedCoupon.value.type === 'rate') {
-    return Math.floor(cartTotalPrice.value * selectedCoupon.value.value)
-  } else {
-    return selectedCoupon.value.value
-  }
+  return selectedCoupon.value.valueCents
 })
 
 const finalTotalPrice = computed(() => Math.max(0, cartTotalPrice.value - couponDiscount.value))
 
 // 优惠券可用性检查
 const isCouponDisabled = (coupon) => {
-  return cartTotalPrice.value < coupon.threshold
+  return cartTotalPrice.value < coupon.thresholdCents || coupon.status === 'USED'
 }
 
 // 选择优惠券
@@ -337,7 +348,10 @@ const checkout = async () => {
     const response = await fetch('http://localhost:8000/api/checkout', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ userId: 'user_dev' })
+      body: JSON.stringify({ 
+        userId: 'user_dev',
+        couponId: selectedCouponId.value 
+      })
     })
 
     if (response.ok) {
@@ -361,7 +375,10 @@ const resetCheckoutState = () => {
   lastOrderId.value = ''
 }
 
-onMounted(fetchProducts)
+onMounted(() => {
+  fetchProducts()
+  fetchCoupons()
+})
 </script>
 
 <style>
