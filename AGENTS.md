@@ -87,7 +87,7 @@ npm run dev           # Start Vite dev server on port 5173
 npm run build         # Build for production
 ```
 
-## OpenSpec SDD Workflow (v1.5.0)
+## OpenSpec SDD Workflow (v1.8.0)
 
 The SDD workflow uses these slash commands (available in `.claude/commands/opsx/`):
 
