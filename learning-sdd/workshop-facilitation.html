@@ -274,6 +274,7 @@
         <a href="#step7" class="nav-item">07 Update：需求迭代与增量规划</a>
         <a href="#step8" class="nav-item">08 Sync & Archive：资产沉淀</a>
         <a href="#step9" class="nav-item">09 Demo & 复盘总结</a>
+        <a href="#step10" class="nav-item">10 知识点总结</a>
     </nav>
 
     <!-- Main Content -->
@@ -406,7 +407,7 @@
         </div>
         <div class="bg-blue-50 p-4 rounded-md border border-blue-100 flex items-start gap-3">
             <p class="text-sm text-blue-800 leading-relaxed">
-            <strong>核心路径：</strong> 用户意图 → <strong>Explore</strong> 定位 → <strong>Propose</strong> 提案与原型 → <strong>Spec/Plan</strong> 审查 → <strong>Apply</strong> 实现 → <strong>Update</strong> 增强 → <strong>Sync/Archive</strong> 归档。
+            <strong>核心路径：</strong> 用户意图 → <strong>Explore</strong> 定位 → <strong>Propose</strong> 提案与原型 → <strong>Spec/Plan</strong> 审查 → <strong>Apply</strong> 实现 → <strong>Update</strong> 增强 → <strong>Sync/Archive</strong> 归档 → <strong>Demo/Summary</strong> 闭环。
         </p>
         </div>
     </div>
@@ -654,6 +655,64 @@
                 <div class="mt-6 flex gap-4">
                     <div class="flex items-center text-xs text-gray-500">
                         BOOK
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 10: Knowledge Summary -->
+        <div id="step10" class="agenda-grid">
+            <div class="flex flex-col items-center justify-start pt-2">
+                <span class="step-num mb-1">10</span>
+                <span class="text-sm font-semibold text-gray-500">20 min</span>
+            </div>
+            <div>
+                <h3 class="text-lg font-bold text-gray-900 mb-3">知识点总结</h3>
+                <p class="text-gray-600 mb-6">引导学员进行深度思考与知识内化，巩固 SDD 核心理念。</p>
+                
+                <div class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="card p-4 border-l-4 border-blue-500 bg-gray-50">
+                            <h4 class="font-bold text-gray-900 text-sm mb-3">🧠 核心概念辨析</h4>
+                            <ul class="text-xs text-gray-600 space-y-3">
+                                <li>
+                                    <strong class="text-gray-900 block mb-1">1) 什么是 SDD？</strong>
+                                    Spec-Driven Development，即规格驱动开发。核心是以规格（Spec）为单一真理源，驱动提案、设计、实现与测试的闭环。
+                                </li>
+                                <li>
+                                    <strong class="text-gray-900 block mb-1">2) 为什么需要 SDD？</strong>
+                                    解决 AI 协作中的“幻觉”与“需求漂移”；通过强制性的规格审查提升代码质量；实现人机高效协作的确定性流程。
+                                </li>
+                                <li>
+                                    <strong class="text-gray-900 block mb-1">3) SDD 与直接 vibe coding 的区别？</strong>
+                                    Vibe coding 依赖直觉直接写代码；SDD 遵循 Explore-Propose-Plan-Apply 范式，确保“先想清楚再动手”，有据可查。
+                                </li>
+                            </ul>
+                        </div>
+                        
+                        <div class="card p-4 border-l-4 border-brand bg-gray-50">
+                            <h4 class="font-bold text-gray-900 text-sm mb-3">🛠️ OpenSpec 实践落地</h4>
+                            <ul class="text-xs text-gray-600 space-y-3">
+                                <li>
+                                    <strong class="text-gray-900 block mb-1">4) OpenSpec 是什么？目录结构可变吗？</strong>
+                                    它是 SDD 的标准化实现框架。目录结构（如 <code>openspec/specs</code>）应遵循标准以保持工具链兼容，但具体内容可根据项目灵活定制。
+                                </li>
+                                <li>
+                                    <strong class="text-gray-900 block mb-1">5) 支持 SDD 的关键目录/文件？</strong>
+                                    <code>openspec/config.yaml</code> (全局配置), <code>specs/</code> (主规范), <code>changes/</code> (活跃变更), 以及 <code>idea.md</code> (探索源头)。
+                                </li>
+                                <li>
+                                    <strong class="text-gray-900 block mb-1">6) 引入实际项目需调整哪些文件？</strong>
+                                    通常需调整 <code>config.yaml</code> (项目背景), <code>AGENTS.md</code> (AI 领域知识), 以及根据需要定制 <code>.trae/skills</code> 指令。
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="bg-blue-50 p-4 rounded-md border border-blue-100">
+                        <p class="text-xs text-blue-800 leading-relaxed">
+                            <strong>💡 专家提示：</strong> SDD 不仅是工具的使用，更是一种“规格即资产”的思维转型。在实际项目中，从小功能点切入，逐步建立团队的 Spec 基线。
+                        </p>
                     </div>
                 </div>
             </div>
