@@ -84,12 +84,12 @@ graph TD
 
 **AI 动作**:
 
-基于已确定的 Spec，AI 生成了 `examples/ecommerce-mini` 下的完整代码结构。
+基于已确定的 Spec，AI 生成了 `ecommerce/ecommerce-mini` 下的完整代码结构。
 
-1. **领域层 (Domain)**: 定义纯粹的类型定义 (JSDoc) [types.js](../examples/ecommerce-mini/src/domain/types.js)，无任何外部依赖。
-2. **基础设施层 (Infra)**: 实现了内存版的 [memoryRepo.js](../examples/ecommerce-mini/src/repo/memoryRepo.js)，符合接口隔离原则。
-3. **服务层 (Service)**: 实现了 [order.js](../examples/ecommerce-mini/src/services/order.js) 等核心逻辑，负责编排领域对象。
-4. **接口层 (Interface)**: 实现了 [server.js](../examples/ecommerce-mini/src/http/server.js)，处理 HTTP 协议解析与错误映射。
+1. **领域层 (Domain)**: 定义纯粹的类型定义 (JSDoc) [types.js](../ecommerce/ecommerce-mini/src/domain/types.js)，无任何外部依赖。
+2. **基础设施层 (Infra)**: 实现了内存版的 [memoryRepo.js](../ecommerce/ecommerce-mini/src/repo/memoryRepo.js)，符合接口隔离原则。
+3. **服务层 (Service)**: 实现了 [order.js](../ecommerce/ecommerce-mini/src/services/order.js) 等核心逻辑，负责编排领域对象。
+4. **接口层 (Interface)**: 实现了 [server.js](../ecommerce/ecommerce-mini/src/http/server.js)，处理 HTTP 协议解析与错误映射。
 
 **价值分析**:
 
@@ -104,9 +104,9 @@ graph TD
 
 AI 不仅仅生成功能代码，还生成了配套的测试脚本来验证代码行为符合预期。
 
-1. **集成测试 (E2E)**: [integration.spec.js](../examples/ecommerce-mini/__tests__/integration.spec.js) 模拟了用户从"上架商品"到"下单成功（PENDING_PAYMENT）"的全链路操作，验证业务逻辑闭环。
-2. **性能基线**: [performance.spec.js](../examples/ecommerce-mini/__tests__/performance.spec.js) 测量了接口的 p50/p99 延迟，确保满足 Spec 中的性能指标（输出 p99 < 100ms）。
-3. **单元测试**: [unit.spec.js](../examples/ecommerce-mini/__tests__/unit.spec.js) 覆盖了库存扣减等边界情况。
+1. **集成测试 (E2E)**: [integration.spec.js](../ecommerce/ecommerce-mini/__tests__/integration.spec.js) 模拟了用户从"上架商品"到"下单成功（PENDING_PAYMENT）"的全链路操作，验证业务逻辑闭环。
+2. **性能基线**: [performance.spec.js](../ecommerce/ecommerce-mini/__tests__/performance.spec.js) 测量了接口的 p50/p99 延迟，确保满足 Spec 中的性能指标（输出 p99 < 100ms）。
+3. **单元测试**: [unit.spec.js](../ecommerce/ecommerce-mini/__tests__/unit.spec.js) 覆盖了库存扣减等边界情况。
 
 **价值分析**:
 
@@ -123,8 +123,8 @@ AI 不仅仅生成功能代码，还生成了配套的测试脚本来验证代�
 
 这是 AI 协同开发中最精彩的部分——**增量演进**。AI 并没有推翻重写，而是基于现有的 Spec 架构进行扩展。
 
-1. **持久化扩展**: 引入 [fileStore.js](../examples/ecommerce-mini/src/persist/fileStore.js) 替换内存 Repo，接口契约保持不变。
-2. **鉴权与安全**: 在 [server.prod.js](../examples/ecommerce-mini/src/http/server.prod.js) 中增加了 `Bearer Token` 鉴权中间件（简化实现；完整 HMAC 签名逻辑可在此处扩展）。
+1. **持久化扩展**: 引入 [fileStore.js](../ecommerce/ecommerce-mini/src/persist/fileStore.js) 替换内存 Repo，接口契约保持不变。
+2. **鉴权与安全**: 在 [server.prod.js](../ecommerce/ecommerce-mini/src/http/server.prod.js) 中增加了 `Bearer Token` 鉴权中间件（简化实现；完整 HMAC 签名逻辑可在此处扩展）。
 3. **幂等性设计**: 在接口层预留了 `Idempotency-Key` 请求头解析入口（stub，完整去重逻辑可接入 Redis 或内存缓存实现）。
 4. **可观测性**: 集成了 Metrics 埋点，并在测试脚本中验证了指标收集。
 
@@ -215,7 +215,7 @@ OpenSpec 的核心价值之一是 **语言无关性 (Language Agnostic)**。为�
 > 请基于此 Spec，使用 Python 的 Pydantic 库定义 Domain Models。
 > 要求：
 >
-> 1. 文件路径：[src/domain/models.py](../examples/ecommerce-mini-python/src/domain/models.py)
+> 1. 文件路径：[src/domain/models.py](../ecommerce/ecommerce-mini-python/src/domain/models.py)
 > 2. 严格遵循 Spec 中的字段类型和约束（如 non-negative）。
 > 3. 不包含任何业务逻辑，仅定义数据结构。
 
@@ -262,7 +262,7 @@ _注：通过 `alias` 实现了 Python 命名规范（snake_case）与 API 契�
 
 **User Prompt**:
 
-> 请基于 [src/domain/models.py](../examples/ecommerce-mini-python/src/domain/models.py) 和 [design.md](../openspec/changes/archive/2025-01-27-v1-mvp/design.md)，实现 Service 层。（注：v1-mvp 已归档）
+> 请基于 [src/domain/models.py](../ecommerce/ecommerce-mini-python/src/domain/models.py) 和 [design.md](../openspec/changes/archive/2025-01-27-v1-mvp/design.md)，实现 Service 层。（注：v1-mvp 已归档）
 > 包含三个服务：
 >
 > 1. `CatalogService`: 处理库存扣减（原子性模拟）。
@@ -352,7 +352,7 @@ _注：此处为示例简洁采用字符串比较；生产环境建议定义 `Ou
 
 **User Prompt**:
 
-> 请编写 [tests/test_smoke.py](../examples/ecommerce-mini-python/tests/test_smoke.py)，使用 `pytest` 模拟用户行为。
+> 请编写 [tests/test_smoke.py](../ecommerce/ecommerce-mini-python/tests/test_smoke.py)，使用 `pytest` 模拟用户行为。
 > 测试场景：
 >
 > 1. 正常下单流程：加购 -> 下单 -> 验库存。
@@ -389,9 +389,9 @@ def test_out_of_stock():
 **执行结果**:
 
 ```bash
-$ pytest examples/ecommerce-mini-python/tests/test_smoke.py
+$ pytest ecommerce/ecommerce-mini-python/tests/test_smoke.py
 ...
-examples/ecommerce-mini-python/tests/test_smoke.py ..           [100%]
+ecommerce/ecommerce-mini-python/tests/test_smoke.py ..           [100%]
 ==================== 2 passed in 0.35s ====================
 ```
 
@@ -429,7 +429,7 @@ examples/ecommerce-mini-python/tests/test_smoke.py ..           [100%]
   - `specs/payment/spec.md`: 支付规范
   - `specs/domain-model/spec.md`: 领域模型规范
   - `specs/error-handling/spec.md`: 错误处理规范
-- Node.js 基础实现: `examples/ecommerce-mini/src/{domain,repo,services,http}`
-- Python 复刻实现: `examples/ecommerce-mini-python/src/{domain,services,api}`
-- 验证脚本: `examples/ecommerce-mini/__tests__/` 及 `examples/ecommerce-mini-python/tests/`
+- Node.js 基础实现: `ecommerce/ecommerce-mini/src/{domain,repo,services,http}`
+- Python 复刻实现: `ecommerce/ecommerce-mini-python/src/{domain,services,api}`
+- 验证脚本: `ecommerce/ecommerce-mini/__tests__/` 及 `ecommerce/ecommerce-mini-python/tests/`
 - 演示文稿: [OpenSpec 使用手册](./openspec-user-manual.pptx)（适合培训与分享）

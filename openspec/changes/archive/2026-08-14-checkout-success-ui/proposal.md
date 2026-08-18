@@ -16,5 +16,5 @@
 
 ## Impact
 
-- **Affected Area**: `examples/ecommerce-mini-frontend/src/App.vue` 中的结算逻辑。
+- **Affected Area**: `ecommerce/ecommerce-mini-frontend/src/App.vue` 中的结算逻辑。
 - **User Experience**: 提升结算完成后的仪式感和品牌一致性。

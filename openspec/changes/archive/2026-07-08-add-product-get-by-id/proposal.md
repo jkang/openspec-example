@@ -21,7 +21,7 @@
 
 ## Impact
 
-- **受影响代码**: `examples/ecommerce-mini/src/http/server.js`、`examples/ecommerce-mini-python/src/api/server.py`
-- **新增测试**: `examples/ecommerce-mini/__tests__/unit.spec.js`、`examples/ecommerce-mini-python/tests/test_smoke.py`
+- **受影响代码**: `ecommerce/ecommerce-mini/src/http/server.js`、`ecommerce/ecommerce-mini-python/src/api/server.py`
+- **新增测试**: `ecommerce/ecommerce-mini/__tests__/unit.spec.js`、`ecommerce/ecommerce-mini-python/tests/test_smoke.py`
 - **新增 API**: `GET /api/products/:id`（两个实现）
 - **依赖**: 无新增依赖，利用现有的 service 层方法

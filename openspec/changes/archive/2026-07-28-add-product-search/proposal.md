@@ -21,7 +21,7 @@
 
 ## Impact
 
-- **受影响代码**: `examples/ecommerce-mini/src/http/server.js`、`examples/ecommerce-mini/src/services/catalog.js`、`examples/ecommerce-mini-python/src/api/server.py`、`examples/ecommerce-mini-python/src/services/catalog.py`
+- **受影响代码**: `ecommerce/ecommerce-mini/src/http/server.js`、`ecommerce/ecommerce-mini/src/services/catalog.js`、`ecommerce/ecommerce-mini-python/src/api/server.py`、`ecommerce/ecommerce-mini-python/src/services/catalog.py`
 - **API 变更**: `GET /api/products?name=<keyword>&sort=price_asc|price_desc`（新增可选参数，向后兼容）
 - **测试**: 双实现各添加搜索与排序场景测试
 - **依赖**: 无新增依赖

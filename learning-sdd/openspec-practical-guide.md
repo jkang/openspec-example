@@ -121,7 +121,7 @@ OpenSpec 的迭代流程围绕着“规格优先”展开，但并不强制要�
 
 ### 3.2 规格初始化
 
-使用 CLI 快速初始化项目结构（如果你直接使用 `examples/ecommerce-mini` 源码，此步骤已完成，可跳过）：
+使用 CLI 快速初始化项目结构（如果你直接使用 `ecommerce/ecommerce-mini` 源码，此步骤已完成，可跳过）：
 
 ```bash
 openspec init --tools none
@@ -562,7 +562,7 @@ OpenSpec-practise/
 │       │   │       ├── domain-model/spec.md
 │       │   │       └── error-handling/spec.md
 │       │   └── 2026-07-08-add-product-get-by-id/  <-- v1.8.0 工作流实践
-├── examples/
+├── ecommerce/
 │   ├── ecommerce-mini/              <-- Node.js Implementation
 │   │   └── src/
 │   │       ├── domain/types.js      <-- 对应 Spec 中的 Data Models
@@ -709,7 +709,7 @@ test("calculateTotal sums up item prices", () => {
 模拟真实用户路径，验证模块间协作。
 
 - 流程：注册 -> 登录 -> 浏览 -> 加购 -> 下单 -> 支付。
-- 运行方式：`node --test examples/ecommerce-mini/__tests__/integration.spec.js`
+- 运行方式：`node --test ecommerce/ecommerce-mini/__tests__/integration.spec.js`
 
 ### 11.3 性能基线 (`performance.spec.js`)
 
@@ -736,10 +736,10 @@ test("calculateTotal sums up item prices", () => {
 
 ```bash
 # 启动服务
-node examples/ecommerce-mini/src/http/server.js
+node ecommerce/ecommerce-mini/src/http/server.js
 
 # 在另一个终端运行测试套件
-node --test examples/ecommerce-mini/__tests__/
+node --test ecommerce/ecommerce-mini/__tests__/
 ```
 
 ### 12.3 运行生产版服务
@@ -748,7 +748,7 @@ node --test examples/ecommerce-mini/__tests__/
 
 ```bash
 # 启动生产服务 (Port 3002)
-node examples/ecommerce-mini/src/http/server.prod.js
+node ecommerce/ecommerce-mini/src/http/server.prod.js
 ```
 
 ---
