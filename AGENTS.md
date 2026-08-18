@@ -10,9 +10,12 @@
 在编写任何代码或提出方案之前，你**必须**查阅相关的治理文档：
 
 - **[SDD 工作流 SOP](docs/sops/sdd-workflow.md)**: `/opsx:` 指令的使用规则、5步探索法以及 HITL（人机协同）检查点。**开始任务前必读**。
-- **[前端开发规范](FRONTEND.md)**: 严格的 UI 约束（扁平化设计、无圆角、slate 色系、真实数据）。
-- **[后端架构指南](ARCHITECTURE.md)**: 适用于 Node.js 和 Python 的四层架构设计 (HTTP -> Service -> Domain -> Repo)。
-- **[质量与评估标准](QUALITY_SCORE.md)**: 端到端 (E2E) 验证要求以及 "Start with 50%-ready" 理念。
+- **[产品感与业务导向](docs/PRODUCT_SENSE.md)**: AI 决策准则、目标用户画像，确保构建“可视即价值”的极简电商。
+- **[UI 验证闭环 SOP](docs/sops/ui-validation-loop.md)**: 前端开发完成后，如何通过浏览器验证视觉约束的标准化流程。
+- **[前端开发规范](docs/FRONTEND.md)**: 严格的 UI 约束（扁平化设计、无圆角、slate 色系、真实数据）。
+- **[后端架构指南](docs/ARCHITECTURE.md)**: 适用于 Node.js 和 Python 的四层架构设计 (HTTP -> Service -> Domain -> Repo)。
+- **[质量与评估标准](docs/QUALITY_SCORE.md)**: 端到端 (E2E) 验证要求以及“代码即规范”的质量底线。
+- **[技术债追踪](docs/tech-debt-tracker.md)**: 记录为了快速打通主链路而做出的架构妥协。
 
 ## 🗂️ 唯一事实来源 (Single Source of Truth)
 
