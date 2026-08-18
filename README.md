@@ -65,9 +65,13 @@
 ### 1. 环境准备
 
 ```bash
-# 安装 OpenSpec 命令行工具
+# 安装 OpenSpec 命令行工具 (CLI)
 npm install -g @fission-ai/openspec@latest
 ```
+
+> 💡 **概念澄清**：
+> - **OpenSpec CLI**：通过上述命令安装的全局工具，是 SDD 流程的“**底层引擎**”，负责处理变更管理、逻辑解析等核心任务。
+> - **Trae Commands**：位于项目 `.trae/` 目录下的 Markdown 文件，是 AI 的“**操作指南**”，告诉 AI 如何正确调用 CLI 来协助你完成工作。
 
 > 💡 **提示**：本项目已预置 `.trae/`、`.cursor/` 及 `.claude/` 协作技能，**无需手动初始化**。若您在其他环境使用，可运行 `openspec init --tools trae` 重新生成。
 
