@@ -46,7 +46,7 @@
 | **`ecommerce/`** | **系统实现** | **验证场所**。查看同一套规格如何驱动 Node.js, Python 和 Vue 3 的多端实现。 |
 | ├── `ecommerce-mini-frontend/` | 前端界面 | 验收 UI/UX 是否符合“现代扁平化”视觉规范。 |
 | ├── `ecommerce-mini-python/` | 高性能后端 | 验证核心计价、核销逻辑的严谨性。 |
-| **`learning-sdd/`** | **知识库** | **充电站**。包含工作坊手册、实战指南和 AI 协作流程分析。 |
+| **`learning-sdd/`** | **知识库** | **充电站**。包含 [入门工作坊手册](file:///Users/superkkk/MyCoding/OpenSpec-practice/learning-sdd/workshop-facilitation.html)、实战指南和 AI 协作流程分析。 |
 
 ---
 
@@ -63,13 +63,13 @@
 ## 🛠️ 快速开始：开启你的第一个需求之旅
 
 ### 1. 环境准备
+
 ```bash
 # 安装 OpenSpec 命令行工具
 npm install -g @fission-ai/openspec@latest
-
-# 初始化 AI 协作指令 (推荐使用 Trae)
-openspec init --tools trae
 ```
+
+> 💡 **提示**：本项目已预置 `.trae/`、`.cursor/` 及 `.claude/` 协作技能，**无需手动初始化**。若您在其他环境使用，可运行 `openspec init --tools trae` 重新生成。
 
 ### 2. 发起一个探索
 在 Trae 或 Cursor 的 AI 侧边栏输入：
@@ -84,7 +84,7 @@ openspec init --tools trae
 
 - **实战手册**: [SDD 入门工作坊引导手册](file:///Users/superkkk/MyCoding/OpenSpec-practice/learning-sdd/workshop-facilitation.html) — 3 小时快速上手流程。
 - **进阶指南**: [OpenSpec 实战指南](file:///Users/superkkk/MyCoding/OpenSpec-practice/learning-sdd/openspec-practical-guide.md) — 深度理解 SDD 工程实践。
-- **复盘分析**: [AI 协作全流程深度复盘](file:///Users/superkkk/MyCoding/OpenSpec-practice/learning-sdd/openspec-ai-workflow-analysis.md) — 学习如何写出完美的 Prompt。
+- **复盘分析**: [AI 协作全流程深度复盘](file:///Users/superkkk/MyCoding/OpenSpec-practice/learning-sdd/openspec-ai-workflow-analysis.md) — 学习应用实例，如何使用这个框架通过提示实现需求。
 
 ---
 
