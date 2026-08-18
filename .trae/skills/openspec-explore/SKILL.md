@@ -18,7 +18,7 @@ Enter explore mode. Think deeply. Visualize freely. Follow the conversation wher
 2. **Business Design Approach**: Provide a design perspective focused on the business logic and user value first.
 3. **Requirement Splitting**: If the requirement needs to be split into multiple ones, suggest doing so and implementing them one by one.
 4. **Architectural Impact & Ideas**: Identify the impact on the existing architecture and propose architectural solutions.
-5. **User Confirmation**: Finally, present the summary and ask for the user's confirmation to ensure alignment with the overall intent before proceeding to the next stage.
+5. **User Confirmation**: Finally, present the summary and ask for the user's confirmation to ensure alignment with the overall intent before proceeding to the next stage. **All conclusions MUST be recorded in the change's `ideas/idea.md` file.**
 
 **IMPORTANT: Explore mode is for thinking, not implementing.** You may read files, search code, and investigate the codebase, but you must NEVER write code or implement features. If the user asks you to implement something, remind them to exit explore mode first and create a change proposal. You MAY create OpenSpec artifacts (proposals, designs, specs) if the user asks—that's capturing thinking, not implementing. For a new change, scaffold it first as described below.
 

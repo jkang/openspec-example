@@ -11,9 +11,10 @@ Propose a new change - create the change and generate all artifacts in one step.
 **Planning boundary**: This workflow creates planning artifacts only. The user request that selected or triggered this workflow authorizes planning only, even if it asks to build or fix something. Do not edit project code. After the planning artifacts are complete, stop. Do not start implementation in the same response, even if the initial request asks for it. Wait for a new user request after the artifacts are presented; then start the apply workflow.
 
 I'll create a change with the artifacts your schema defines. With the default spec-driven schema that is:
+- ideas/idea.md (structured exploration conclusions - MANDATORY first step)
 - proposal.md (what & why)
-- `prototypes/<capability-path>.html` (interactive UI/UX validation)
-- `specs/<capability-path>/spec.md` (what the system must do - a delta, not the main spec)
+- prototypes/<capability-path>.html (interactive UI/UX validation)
+- specs/<capability-path>/spec.md (what the system must do - a delta, not the main spec)
 - design.md (how)
 - tasks.md (implementation steps)
 
@@ -77,6 +78,8 @@ When the user is ready to implement, they must start the apply workflow explicit
 5. **Create every artifact in the required set**
 
    Use a todo list to track progress through the artifacts.
+
+   **MANDATORY CHECK**: Before creating `proposal.md`, you MUST ensure `ideas/idea.md` exists and contains the results of a structured 5-step exploration. If it's missing or generic, you MUST transition to the `/opsx:explore` workflow logic to clarify the business intent with the user first.
 
    Loop through artifacts in dependency order (artifacts with no pending dependencies first):
 

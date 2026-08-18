@@ -15,8 +15,10 @@ Propose a new change - create the change and generate all artifacts in one step.
 **Planning boundary**: This workflow creates planning artifacts only. The user request that selected or triggered this workflow authorizes planning only, even if it asks to build or fix something. Do not edit project code. After the planning artifacts are complete, stop. Do not start implementation in the same response, even if the initial request asks for it. Wait for a new user request after the artifacts are presented; then start the apply workflow.
 
 I'll create a change with the artifacts your schema defines. With the default spec-driven schema that is:
+- ideas/idea.md (structured exploration conclusions - MANDATORY first step)
 - proposal.md (what & why)
-- `specs/<capability-path>/spec.md` (what the system must do - a delta, not the main spec)
+- prototypes/<capability-path>.html (interactive UI/UX validation)
+- specs/<capability-path>/spec.md (what the system must do - a delta, not the main spec)
 - design.md (how)
 - tasks.md (implementation steps)
 
@@ -81,6 +83,8 @@ When the user is ready to implement, they must start the apply workflow explicit
 
    Use a todo list to track progress through the artifacts.
 
+   **MANDATORY CHECK**: Before creating `proposal.md`, you MUST ensure `ideas/idea.md` exists and contains the results of a structured 5-step exploration. If it's missing or generic, you MUST transition to the `openspec-explore` skill logic to clarify the business intent with the user first.
+
    Loop through artifacts in dependency order (artifacts with no pending dependencies first):
 
    a. **For each artifact that is `ready` (dependencies satisfied)**:
@@ -102,7 +106,17 @@ When the user is ready to implement, they must start the apply workflow explicit
       - Apply `context` and `rules` as constraints - but do NOT copy them into the file
       - Show brief progress: "Created <artifact-id>"
 
-   b. **Continue until every artifact in the required set exists (not just `apply.requires`)**
+   b. **Interactive Prototype Validation Checkpoint (Mandatory HITL)**
+      - After generating `prototype` and `specs`, you **MUST IMMEDIATELY STOP** all automated artifact generation.
+      - Invoke the `AskUserQuestion` tool to create a hard break for human review:
+        - **Question**: "原型 (idea.md, prototypes/) 和行为规范 (specs/) 已生成。请务必查看并验证 UI 交互与业务逻辑是否符合预期。"
+        - **Options**:
+          - "Approved": "确认无误，继续生成技术设计 (design.md)"
+          - "Request Changes": "需要修改，我将在输入框提供反馈"
+      - **DO NOT** proceed to generate `design.md` or `tasks.md` until the user selects "Approved".
+      - This is a critical Human-In-The-Loop (HITL) point to prevent wasted engineering effort on unverified designs.
+
+   c. **Continue until every artifact in the required set exists (not just `apply.requires`)**
       - After creating each artifact, re-run `openspec status --change "<name>" --json`
       - The required set is `applyRequires` plus every artifact reachable from those by following the `requires` edges in `status --json` - walk them transitively (spec-driven closes over proposal, specs, design, tasks). Leave artifacts outside that set alone
       - `status` is file-existence only, so an `applyRequires` artifact reading `done` does NOT mean its dependencies exist - writing `tasks.md` early marks `tasks` done while `specs` was never written. Use each artifact's `requires` edges, not its `status`, to build the required set: a `done` artifact still lists what it depends on
