@@ -1,108 +1,38 @@
-# AGENTS.md
+# AGENTS.md (Agent 引导入口)
 
-This file provides guidance to AI Agents when working with code in this repository.
+本文件为在此代码库中工作的 AI Agent 提供高层级的指导与路由。
+我们践行 **规格驱动开发 (Spec-Driven Development, SDD)** 并严格遵循 **Harness Engineering (驾驭工程)** 原则。
 
-## Project Overview
+黄金法则：**不要依赖聊天上下文；必须以代码库作为“唯一事实来源”。**
 
-This is **OpenSpec Practise** — a learning and demonstration repository for **Spec-Driven Development (SDD)** using the OpenSpec framework (v1.8.0). It contains a minimal e-commerce system implemented in Node.js, Python, and Vue, all driven by OpenSpec specifications. The core idea: define specifications first (proposal → design → specs → tasks), then write code, ensuring humans and AI share the same understanding of requirements.
+## 📚 治理与深链接 (Governance & Deep Links)
 
-## Repository Architecture
+在编写任何代码或提出方案之前，你**必须**查阅相关的治理文档：
 
-```text
-docs/                          # Chinese documentation (manuals, guides, analysis)
-docs-en/                       # English documentation (same content, translated)
-openspec/                      # Root OpenSpec configuration for this project
-  config.yaml                  #   Project context, rules, schema definition
-.claude/                       # OpenSpec native AI commands and skills (v1.8.0)
-  commands/opsx/               #   /opsx:propose, /opsx:apply, /opsx:archive, /opsx:explore, /opsx:sync
-  skills/                      #   Corresponding skill definitions (SKILL.md)
-ecommerce/
-  ecommerce-mini/              # Node.js implementation (v20+, zero npm deps, native http)
-    src/domain/                #   Entity type definitions (JSDoc) + pure domain logic
-    src/services/              #   Use-case orchestration (CartService, CatalogService, OrderService)
-    src/http/                  #   HTTP layer — server.js (dev), server.prod.js (prod with JWT + file persistence)
-    src/repo/                  #   In-memory Map-based repositories
-    src/persist/               #   File-based JSON persistence (FileStore)
-    __tests__/                 #   unit.spec.js (service-level), integration.spec.js (E2E), performance.spec.js
-    data/                      #   Seed data: products.json, carts.json, orders.json
-  ecommerce-mini-python/       # Python implementation (FastAPI + Pydantic)
-    src/domain/models.py       #   Pydantic models (Product, Cart, Order, CartItem, OrderItem)
-    src/services/              #   Business logic (cart.py, catalog.py, order.py)
-    src/api/server.py          #   FastAPI app with all endpoints
-    src/repo/memory.py         #   Generic MemoryRepo[T]
-    tests/test_smoke.py        #   Pytest smoke/integration tests via TestClient
-  ecommerce-mini-frontend/     # Vue implementation (Vite + Vue 3)
-    src/App.vue                #   Main UI component (Single-screen, flat design)
-    src/main.js                #   App entry point
-    package.json               #   Project dependencies and scripts
-  openspec/                    # Root: specifications driving all implementations
-    config.yaml                #   Project context, rules, store/references support (v1.8.0)
-    specs/                     #   Master specs: cart/catalog/order/payment/domain-model/error-handling
-    changes/                   #   Active changes
-    changes/archive/           #   Archived: 2025-01-27-v1-mvp (proposal/design/specs/tasks)
-```
+- **[SDD 工作流 SOP](docs/sops/sdd-workflow.md)**: `/opsx:` 指令的使用规则、5步探索法以及 HITL（人机协同）检查点。**开始任务前必读**。
+- **[前端开发规范](FRONTEND.md)**: 严格的 UI 约束（扁平化设计、无圆角、slate 色系、真实数据）。
+- **[后端架构指南](ARCHITECTURE.md)**: 适用于 Node.js 和 Python 的四层架构设计 (HTTP -> Service -> Domain -> Repo)。
+- **[质量与评估标准](QUALITY_SCORE.md)**: 端到端 (E2E) 验证要求以及 "Start with 50%-ready" 理念。
 
-## Layered Architecture
+## 🗂️ 唯一事实来源 (Single Source of Truth)
 
-The project follows a consistent architecture across stacks:
+本项目由 OpenSpec (v1.8.0) 框架进行治理。
+所有的需求、设计和任务都与代码一起进行版本控制：
 
-- **Backend**: Four-layer (HTTP -> Service -> Domain -> Repository) with strict dependency direction.
-- **Frontend**: Component-based architecture using Vue 3 Composition API.
+- `openspec/changes/ideas/`: 通过 `/opsx:explore` 产生的原始想法。
+- `openspec/changes/`: 活跃的执行计划 (提案 Proposal、设计 Design、任务 Tasks、原型 Prototypes)。
+- `openspec/changes/archive/`: 已完成并归档的执行计划。
+- `openspec/specs/`: 主产品规格说明 (Gherkin 格式)。
 
-| Stack      | Directory                   | Responsibility                                                                                       |
-| ---------- | --------------------------- | ---------------------------------------------------------------------------------------------------- |
-| Node.js    | `src/http/`, `src/services/`| Native HTTP server, zero-dependency domain logic, file-based persistence.                             |
-| Python     | `src/api/`, `src/services/` | FastAPI-based REST API, Pydantic models, in-memory repository.                                        |
-| Vue (Web)  | `src/App.vue`               | Minimalist flat UI, component-level state, single-screen layout.                                      |
+## 🚀 启动与初始化 (Init & Start)
 
-Key design decisions:
-
-- All prices in **integer cents** (`priceCents`) to avoid floating-point issues.
-- UI adheres to **modern flat aesthetic**: 1px borders, solid backgrounds, no gradients/shadows.
-- Single-screen display layout for frontend components.
-
-## Common Commands
-
-### Node.js (`ecommerce/ecommerce-mini/`)
+本项目采用多模块架构，统一通过 `init.sh` 脚本进行环境启动与验证。
+严禁手动逐个切换目录执行命令，请使用以下标准入口：
 
 ```bash
-npm test              # Run all tests (node:test runner — unit + integration + performance)
-npm start             # Dev server on port 3000 (in-memory storage, mock auth)
-npm run start:prod    # Prod server on port 3002 (file persistence + JWT auth)
+./init.sh              # 查看帮助菜单与架构概览
+./init.sh vue:start    # 启动 Vue 前端
+./init.sh node:start   # 启动 Node.js 后端
+./init.sh python:start # 启动 Python 后端
+./init.sh test:all     # 运行全站后端的测试
 ```
-
-### Python (`ecommerce/ecommerce-mini-python/`)
-
-```bash
-pip install -r requirements.txt   # Install FastAPI, Pydantic, pytest, httpx, uvicorn
-pytest                            # Run test suite (smoke + out-of-stock)
-python -m uvicorn src.api.server:app --reload   # Dev server on port 8000
-```
-
-### Vue Frontend (`ecommerce/ecommerce-mini-frontend/`)
-
-```bash
-npm install           # Install dependencies
-npm run dev           # Start Vite dev server on port 5173
-npm run build         # Build for production
-```
-
-## OpenSpec SDD Workflow (v1.8.0)
-
-The SDD workflow uses these slash commands (available in `.claude/commands/opsx/`):
-
-1. **Explore** (`/opsx:explore`): Think through ideas, investigate the codebase, weigh options — before any artifact exists. A no-stakes thinking partner.
-2. **Propose** (`/opsx:propose <name>`): Create the change via `openspec new change` + `openspec instructions` CLI pattern. Generates proposal.md, design.md, tasks.md with schema-driven instructions.
-3. **Apply** (`/opsx:apply`): Implement tasks using `openspec instructions apply --json` for dynamic context. Works through task checklist, marking `- [ ]` → `- [x]`.
-4. **Sync** (`/opsx:sync`): 🆕 Synchronize delta specs back to main specs before archiving.
-5. **Archive** (`/opsx:archive`): Archive completed changes to `openspec/changes/archive/YYYY-MM-DD-<name>/`.
-
-### v1.8.0 Key Changes
-
-- **Stores (beta)**: Standalone planning repos for cross-repo features. Managed via `openspec store setup/register/list/doctor/remove`. Config supports `store:` and `references:` fields.
-- **Fluid workflow**: Actions on a change can be invoked anytime — not phase-locked. Explore can hand off to propose, apply can suggest artifact updates, etc.
-- **Schema-driven artifacts**: Artifacts are defined by `schema.yaml`, not hardcoded. CLI provides instructions per artifact type via `openspec instructions <artifact-id>`.
-
-Specs use **Given/When/Then** (Gherkin) format for scenarios. Every requirement includes a **Priority** (P0/P1/P2) and **Rationale**. Normative language uses SHALL or MUST.
-
-The AI tooling is generated by `openspec init --tools claude` and updated via `openspec update`.
