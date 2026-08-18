@@ -1,0 +1,14 @@
+{
+  "name": "openspec-practice-e2e",
+  "version": "1.0.0",
+  "description": "Global E2E BDD tests using Cucumber and Playwright",
+  "scripts": {
+    "test": "cucumber-js",
+    "test:e2e": "cucumber-js"
+  },
+  "devDependencies": {
+    "@cucumber/cucumber": "^10.0.0",
+    "@playwright/test": "^1.40.0",
+    "chai": "^4.3.10"
+  }
+}

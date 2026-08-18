@@ -17,6 +17,7 @@
 ### 2. 提案阶段 (Propose)
 - **指令**: `/opsx:propose <name>`
 - **目标**: 根据 `idea.md` 生成变更提案，包含原型、设计、规格和任务。
+- **BDD 测试分层防腐**: 在生成 `spec.md` 时，必须为每个 Gherkin Scenario 打上测试标签 (`@unit`, `@api`, 或 `@e2e`)，严格遵循[自动化测试策略](../TESTING_STRATEGY.md)。
 - **强制约束 (Hard Constraint) - HITL 检查点**:
   - 在生成 Prototype (交互式 UI 原型) 和 Specs 后，**必须触发强制 HITL (Human-In-The-Loop) 检查点**（例如通过 AskUserQuestion 工具）。
   - 必须获得用户的显式授权后，方可继续生成 Design 和 Tasks 阶段产物。
@@ -27,6 +28,7 @@
 - **目标**: 基于生成的 `tasks.md` 逐项实施代码变更。
 - **工作流**: 
   - 动态读取 `tasks.md` 中的复选框，完成一项则将 `- [ ]` 标记为 `- [x]`。
+  - **测试驱动实现 (TDD/BDD)**: 必须严格按照 `spec.md` 上的标签 (`@unit`, `@api`, `@e2e`) 编写对应的测试代码。对于 `@e2e` 任务，必须在全局 `e2e-tests/` 目录中完成 Cucumber 步骤。
   - **质量要求**: Apply 阶段必须包含全链路验证 (E2E) 任务块，严禁在未调通跨端交互的情况下关闭任务。
 
 ### 4. 同步阶段 (Sync)
@@ -36,8 +38,9 @@
 
 ### 5. 归档阶段 (Archive)
 - **指令**: `/opsx:archive`
-- **目标**: 将已完成的变更移至归档目录。
+- **目标**: 将已完成的变更（包含测试）移至归档目录。
 - **流程**:
+  - **全局 BDD 测试门禁**: 归档前必须运行 `init.sh e2e:run`，确保全局 Cucumber 测试通过。
   - 归档操作前必须确保已经触发过 `sync`，否则拒绝归档。
   - **技术债清理与登记**: 在归档前，必须检视本次变更中是否引入了技术债（如临时绕过鉴权、硬编码数据等）。如果是，需在变更文档中或通过提交新任务来跟踪这些技术债，禁止隐式留存。
   - 移动路径: `openspec/changes/<name>/` -> `openspec/changes/archive/YYYY-MM-DD-<name>/`。

@@ -31,6 +31,10 @@ function show_help() {
     echo "  vue:install     - 安装前端依赖"
     echo "  vue:start       - 启动 Vite 开发服务器 (端口 5173)"
     echo ""
+    echo "  --- BDD & E2E Tests ---"
+    echo "  e2e:install     - 安装全局 BDD 与 Playwright 环境"
+    echo "  e2e:run         - 运行全局 Cucumber E2E 测试"
+    echo ""
     echo "  --- 全局 (Global) ---"
     echo "  test:all        - 运行所有后端的测试"
     echo "========================================================"
@@ -72,6 +76,14 @@ case "$1" in
     vue:start)
         echo "-> 启动 Vue 开发服务器..."
         cd ecommerce/ecommerce-mini-frontend && npm run dev
+        ;;
+    e2e:install)
+        echo "-> 初始化 BDD 测试环境..."
+        cd e2e-tests && npm install
+        ;;
+    e2e:run)
+        echo "-> 运行全局 Cucumber E2E 测试..."
+        cd e2e-tests && npm run test:e2e
         ;;
     test:all)
         echo "-> 运行所有测试..."
