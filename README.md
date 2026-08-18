@@ -1,136 +1,94 @@
-# OpenSpec Practise
+# OpenSpec Practise: 产品经理的 SDD 演练场
 
-本项目是基于 **OpenSpec** 规范驱动开发 (Spec-Driven Development, SDD) 的实战案例库。它演示了如何通过“先定义规范，后编写代码”的流程，实现人与 AI 在复杂业务场景下的高效协作。
-
----
-
-🚀 **核心亮点**
-- **规范驱动 (SDD)**：通过 Proposal → Design → Specs → Tasks 的标准路径，确保需求无歧义落地
-- **多端实现**：同一套 OpenSpec 规范，同时驱动 Node.js、Python 和 Vue 3 三套代码实现
-- **AI 原生协作**：深度集成 `/opsx` 斜杠命令，适配 Claude Code、Cursor 等 20+ AI 编程助手
+本项目基于 [openspec-practice](https://github.com/Fission-AI/openspec-practice) 进行二次开发与增强。我们在原有的基础上，针对 **需求分析 (Requirement Analysis)** 阶段引入了专门的 AI Skills 与指令集，使其更贴合产品经理的实际工作流。
 
 ---
 
-## 快速开始
+## 🚀 为什么 PM 需要学习 SDD？
 
-### 1. 前置准备
-确保你的开发环境满足以下要求：
-- **Node.js**: v20.19.0 或更高版本
-- **Python**: v3.10 或更高版本 (用于运行 Python 示例)
+在 AI 编程时代，PM 的核心竞争力正在从“写 PRD”转向“定义规格”。
+- **消除幻觉**：通过结构化的规格约束 AI，防止代码实现偏离业务逻辑。
+- **快速验证**：利用 `/opsx:propose` 瞬间生成可交互原型，在写代码前完成 UI/UX 验收。
+- **单一事实来源**：`openspec/specs` 目录下始终保持最新的业务逻辑描述，彻底解决文档与代码脱节的问题。
+- **确定性交付**：通过 Gherkin (Given/When/Then) 场景定义，确保每个需求都有对应的自动化测试闭环。
 
-### 2. 安装 OpenSpec
-OpenSpec 工具链用于管理变更、验证文档以及同步规范。
+## 🛠️ 核心增强：需求分析 Skills & Commands
+
+本项目不仅是一个代码演示，更是一个 **AI 协作技能库**。我们特别加强了需求分析环节：
+- **`opsx:explore` (需求深度探索)**：集成“5 步法探索”Skill，自动生成结构化的业务意图分析，避免需求二义性。
+- **`opsx:propose` (增强型提案)**：在生成规范的同时，自动注入业务价值（Rationale）与优先级（Priority）分析。
+- **UI 原型联动**：新增 `opsx:prototype` 指令，支持快速生成基于 Tailwind 的高保真交互原型，实现“可视即验收”。
+
+---
+
+## 🔄 需求到代码的完整实践 (SDD Flow)
+
+本项目遵循 OpenSpec v1.8.0 倡导的 **“意图驱动”** 全链路流程：
+
+1.  **意图 (Intent)**：PM 产生一个业务想法（如：增加优惠券功能）。
+2.  **探索 (Explore)**：使用 `/opsx:explore` 执行 **5 步法探索**（澄清意图、设计思路、需求拆分、架构影响、用户确认），产出 `idea.md`。
+3.  **提案 (Propose)**：执行 `/opsx:propose`。AI 自动生成 `proposal.md`（目标）、`design.md`（方案）和可交互的 **HTML 原型**。
+4.  **规范 (Spec)**：PM 审查规格文档。确保业务规则（如：优惠券不能叠加、需满足门槛）被准确描述。
+5.  **规划 (Plan)**：审查 `tasks.md`。确保技术路径与业务需求 100% 对齐。
+6.  **实施 (Apply)**：执行 `/opsx:apply`。AI 自动编写代码并运行单元测试、集成测试，确保质量门禁通过。
+7.  **归档 (Archive)**：执行 `/opsx:archive`。将变更记录沉淀到 `archive/`，并将最新规范同步至主干。
+
+---
+
+## 📂 目录导航：你的控制台
+
+| 目录 | 作用 | PM 关注点 |
+| :--- | :--- | :--- |
+| **`openspec/`** | **需求中心** | **核心入口**。在这里定义规则、查看历史变更、管理业务逻辑基线。 |
+| ├── `specs/` | 业务事实来源 | 系统当前的所有功能规格。这是你与研发沟通的“标准语言”。 |
+| ├── `changes/` | 变更工作区 | 正在进行的需求迭代。包含每个需求的提案、原型和任务清单。 |
+| ├── `ideas/` | 创意孵化区 | 存储 `/opsx:explore` 产出的 `idea.md`，记录最初的业务构思。 |
+| **`ecommerce/`** | **系统实现** | **验证场所**。查看同一套规格如何驱动 Node.js, Python 和 Vue 3 的多端实现。 |
+| ├── `ecommerce-mini-frontend/` | 前端界面 | 验收 UI/UX 是否符合“现代扁平化”视觉规范。 |
+| ├── `ecommerce-mini-python/` | 高性能后端 | 验证核心计价、核销逻辑的严谨性。 |
+| **`learning-sdd/`** | **知识库** | **充电站**。包含工作坊手册、实战指南和 AI 协作流程分析。 |
+
+---
+
+## 🤝 角色分工：人机协作新范式
+
+在 SDD 实践中，人与 AI 的职责发生了转变：
+
+- **PM (Owner)**：负责 **“输入与验收”**。定义业务意图，审查 `proposal.md` 和 `spec.md`，验收可交互原型。
+- **AI (Pilot)**：负责 **“生成与转换”**。基于 PM 意图生成文档、原型、代码和测试。
+- **Dev (Guardian)**：负责 **“路径与门禁”**。审查 `design.md` 和 `tasks.md` 的技术可行性，确保测试 100% 通过。
+
+---
+
+## 🛠️ 快速开始：开启你的第一个需求之旅
+
+### 1. 环境准备
 ```bash
-# 全局安装 OpenSpec 命令行工具
+# 安装 OpenSpec 命令行工具
 npm install -g @fission-ai/openspec@latest
 
-# 验证安装
-openspec --version
-```
-
-### 3. 初始化项目 (针对 AI 工具)
-如果你是第一次在此仓库中使用 AI 助手（如 Trae 或 Claude Code），请运行以下命令生成协作技能：
-```bash
-# 为 Trae 生成 /opsx 指令集 (推荐)
+# 初始化 AI 协作指令 (推荐使用 Trae)
 openspec init --tools trae
-
-# 或者为 codex 生成
-openspec init --tools codex
 ```
 
----
+### 2. 发起一个探索
+在 Trae 或 Cursor 的 AI 侧边栏输入：
+> `/opsx:explore "我想给电商系统加一个‘积分商城’，用户可以用消费积分兑换商品。请帮我分析现有架构并给出 5 步法方案。"`
 
-## 运行示例应用
-
-本项目包含一个完整的电商 MVP，分为三个模块：
-
-### 📦 Node.js 后端 (`ecommerce-mini`)
-零依赖的纯净实现，支持内存存储与文件持久化。
-```bash
-cd ecommerce/ecommerce-mini
-
-# 运行测试
-npm test
-
-# 启动开发服务器 (端口 3000, 内存存储)
-npm start
-
-# 启动生产模式 (端口 3002, 文件持久化 + JWT 鉴权)
-npm run start:prod
-```
-
-### 🐍 Python 后端 (`ecommerce-mini-python`)
-基于 FastAPI 和 Pydantic 的高性能实现。
-```bash
-cd ecommerce/ecommerce-mini-python
-
-# 安装依赖
-pip install -r requirements.txt
-
-# 运行测试
-pytest
-
-# 启动服务 (端口 8000)
-python -m uvicorn src.api.server:app --reload
-```
-
-### 🎨 Vue 前端 (`ecommerce-mini-frontend`)
-现代扁平化风格的单屏 UI 界面。
-```bash
-cd ecommerce/ecommerce-mini-frontend
-
-# 安装依赖
-npm install
-
-# 启动开发环境 (端口 5173)
-npm run dev
-```
+### 3. 查看原型与规格
+随后使用 `/opsx:propose`，你将在 `openspec/changes/` 目录下看到新生成的原型文件和规格说明。
 
 ---
 
-## SDD 工作流指南
+## 📚 学习资源
 
-在本仓库中，推荐使用 `/opsx` 斜杠命令驱动开发任务。
-
-| 指令 | 阶段 | 描述 |
-| :--- | :--- | :--- |
-| `/opsx:explore` | **探索** | 在动工前，让 AI 调查代码库、对比方案、澄清需求 |
-| `/opsx:propose <name>` | **提案** | 初始化一个新的变更，自动生成结构化的规划文档 |
-| `/opsx:apply` | **实施** | 让 AI 依据规划文档（Tasks）逐步编写代码并验证 |
-| `/opsx:sync` | **同步** | 归档前，将当前的增量规范同步至主规范目录 |
-| `/opsx:archive` | **归档** | 完成变更后，将记录移至 `openspec/changes/archive/` |
+- **实战手册**: [SDD 入门工作坊引导手册](file:///Users/superkkk/MyCoding/OpenSpec-practice/learning-sdd/workshop-facilitation.html) — 3 小时快速上手流程。
+- **进阶指南**: [OpenSpec 实战指南](file:///Users/superkkk/MyCoding/OpenSpec-practice/learning-sdd/openspec-practical-guide.md) — 深度理解 SDD 工程实践。
+- **复盘分析**: [AI 协作全流程深度复盘](file:///Users/superkkk/MyCoding/OpenSpec-practice/learning-sdd/openspec-ai-workflow-analysis.md) — 学习如何写出完美的 Prompt。
 
 ---
 
-## 项目结构
+## 🔗 链接
 
-```text
- project/
- ├── openspec/                # OpenSpec 核心规范目录
- │   ├── config.yaml          # 项目上下文配置（技术栈、规则、Store）
- │   ├── specs/               # 归档后的主规范（单一事实来源）
- │   └── changes/             # 活跃中的变更与归档记录
- ├── ecommerce/               # 示例应用实现
- │   ├── ecommerce-mini/      # Node.js 版本
- │   ├── ecommerce-mini-python/ # Python 版本
- │   └── ecommerce-mini-frontend/ # Vue 3 前端版本
- ├── learning-sdd/            # 核心文档（手册、指南、分析）
- └── .trae/                   # Trae 专属 AI 技能与斜杠命令 (同样支持 .cursor, .claude 等)
- ```
-
----
-
-## 学习资源
-
-1.  **入门**: [OpenSpec 使用手册](learning-sdd/openspec-user-manual.md) — 了解基本概念与 CLI 用法
-2.  **实战**: [OpenSpec 实战指南](learning-sdd/openspec-practical-guide.md) — 掌握 SDD 工程实践
-3.  **进阶**: [AI 辅助软件工程全流程复盘](learning-sdd/openspec-ai-workflow-analysis.md) — 深入 AI 协作的最佳实践
-4.  **演进**: [v1.8.0 工作流实践](learning-sdd/openspec-v1.8.0-workflow-practice.md) — 学习如何处理需求迭代
-
----
-
-## 相关链接
-
-- [OpenSpec 官方仓库](https://github.com/Fission-AI/OpenSpec)
-- [DDD 技能库](https://github.com/ForceInjection/domain-driven-design-skills)
+- [OpenSpec 官方文档](https://github.com/Fission-AI/OpenSpec)
 - [CHANGELOG](./CHANGELOG.md)
