@@ -92,7 +92,7 @@ graph TD
 - **强制约束 (Hard Constraint)**:
   - 必须基于 `idea.md` 的任务类型明确后续路径。
   - 对于 Epic 类型，生成提案后应停止，等待拆分。
-  - 对于其他类型，引导用户进入下一步（`/opsx:prototype` 或 `/opsx:spec-design`）。
+  - 对于其他类型，引导用户进入下一步（涉及 UI 走 `/opsx:prototype`，否则走 `/opsx:story`，随后再进入 `/opsx:spec-design`）。
   
 ### 3. 原型验证阶段 (Prototype) - 可选
 - **指令**: `/opsx:prototype <name>`
@@ -114,7 +114,7 @@ graph TD
 - **目标**: 一口气生成 `specs`、`design.md` 和 `tasks.md`。
 - **BDD 测试分层防腐**: 在生成 `spec.md` 时，必须为每个 Gherkin Scenario 打上测试标签 (`@unit`, `@api`, 或 `@e2e`)，严格遵循[自动化测试策略](../TESTING_STRATEGY.md)。
 - **强制约束 (Hard Constraint)**:
-  - 必须参考已确认的 `proposal.md`、`story.md` 和 `prototype.html` (若有)。
+  - 必须参考已确认的 `proposal.md` 和 `prototype.html` (若有)。如果存在 `story.md`，必须确保 specs 与其 E2E 验收标准一致。
   - 生成的任务清单必须包含 E2E 验证步骤。
 
 ### 6. 应用阶段 (Apply)

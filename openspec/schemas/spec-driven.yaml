@@ -1,6 +1,6 @@
 name: spec-driven
 version: 1
-description: 包含交互式原型验证的 OpenSpec 工作流 - 探索 (explore) → 提案 (proposal) → 原型 (prototype) → 规范 (specs) → 设计 (design) → 任务 (tasks)
+description: 包含交互式原型验证的 OpenSpec 工作流 - 探索 (explore) → 提案 (proposal) → 原型 (prototype) → 业务评审 (story) → 规范 (specs) → 设计 (design) → 任务 (tasks)
 artifacts:
   - id: explore
     generates: ideas/idea.md
@@ -13,7 +13,7 @@ artifacts:
       在变更目录下的 `ideas/idea.md` 中记录以下结论：
       1. **澄清业务意图**：目的、范围、具体业务要求。
       2. **业务设计思路**：逻辑流转、用户价值。
-      3. **任务类型与后续策略**：必须与用户确认这是 Epic, Feature, Bug Fix 还是 Tech Debt，并制定对应的流程策略。
+      3. **任务类型与后续策略**：必须与用户确认这是 Epic, Story, Bug Fix 还是 Tech Debt，并制定对应的流程策略。
       4. **需求拆分建议**：是否需要分阶段实施。
       5. **架构影响分析**：现有架构改动点、技术挑战。
       6. **确认结论**：用户已确认的最终意图。
@@ -73,9 +73,12 @@ artifacts:
     instruction: |
       调用 `openspec-story` 技能生成业务评审 Story 文档。
       
-      **强制要求**：
+      **流程分支控制**：
+      - 如果任务类型是 Tech Debt，通常跳过此阶段。
       - 如果涉及前端 UI 变更，必须在 `prototype.html` 已生成并确认后执行。
-      - 该文档是业务评审的核心，必须包含端到端的验收标准 (Given/When/Then)。
+
+      **内容要求**：
+      - 该文档用于业务评审，必须包含端到端的验收标准 (Given/When/Then)。
     requires:
       - proposal
 
@@ -92,7 +95,7 @@ artifacts:
       - 如果任务类型是 Tech Debt 且无外部行为变更，通常在 `.openspec.yaml` 中设置 `skip_specs: true` 并跳过此阶段。
       - 如果任务类型是 Bug Fix，规范重点在于使用 `MODIFIED Requirements` 修正现有行为的描述。
       - **重要**：如果该能力涉及 UI 变更，你必须先参考已生成的 `prototype.html`，提取交互场景并将其嵌入规范中。
-      - **重要**：必须参考已确认的 `story.md`，确保模块规范与 E2E 验收标准保持一致。
+      - **重要**：如果任务类型不是 Tech Debt，必须参考已确认的 `story.md`，确保模块规范与 E2E 验收标准保持一致。
 
       优秀的规范内容应包含：
       - 用户或下游系统所依赖的可观察行为
@@ -122,7 +125,7 @@ artifacts:
       - 如果涉及前端变更，你必须从 `prototype.html` 中提取交互逻辑，并使用 `<details>` 标签将原型代码完整嵌入规范。
 
     requires:
-      - story
+      - proposal
 
   - id: design
     generates: design.md
@@ -131,7 +134,7 @@ artifacts:
     instruction: |
       创建技术设计文档，解释如何 (HOW) 实现此次变更。
 
-      **强制要求**：必须在 `proposal.md`、`story.md`、`prototype.html` (若涉及UI) 和 `specs/*.md` (若涉及行为变更) 均已准备就绪后方可开始。
+      **强制要求**：必须在 `proposal.md`、`prototype.html` (若涉及UI) 和 `specs/*.md` (若涉及行为变更) 均已准备就绪后方可开始。
 
       何时需要包含 design.md：
       - 跨模块变更、引入新依赖、或重大数据模型变更。
