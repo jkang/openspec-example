@@ -9,7 +9,7 @@
 
 在编写任何代码或提出方案之前，你**必须**查阅相关的治理文档：
 
-- **[SDD 工作流 SOP](docs/sops/sdd-workflow.md)**: `/opsx:` 指令的使用规则、6步探索法、HITL（人机协同）检查点以及**四大任务类型 (Epic/Feature/Bug Fix/Tech Debt) 的分支策略**。**开始任务前必读**。
+- **[SDD 工作流 SOP](docs/sops/sdd-workflow.md)**: `/opsx:` 指令的使用规则、6步探索法、HITL（人机协同）检查点以及**四大任务类型 (Epic/Feature/Bug Fix/Tech Debt) 的分支策略**与闭环更新 (Update/Sync/Archive) 机制。**开始任务前必读**。
 - **[产品路线图](docs/ROADMAP.md)**: 高阶业务规划，明确当前项目所处阶段，指导 Explore 探索的边界。
 - **[产品感与业务导向](docs/PRODUCT_SENSE.md)**: AI 决策准则、目标用户画像，确保构建“可视即价值”的极简电商。
 - **[UI 验证闭环 SOP](docs/sops/ui-validation-loop.md)**: 前端开发完成后，如何通过浏览器验证视觉约束的标准化流程。
@@ -23,6 +23,7 @@
 本项目由 OpenSpec (v1.8.0) 框架进行治理。
 所有的需求、设计和任务都与代码一起进行版本控制：
 
+- `openspec/schemas/spec-driven.yaml`: **[Schema 优先]** 定义了所有制品的生成指令和格式约束，是工作流的最底层事实来源。
 - `openspec/changes/ideas/`: 通过 `/opsx:explore` 产生的原始想法。
 - `openspec/changes/`: 活跃的执行计划 (提案 Proposal、设计 Design、任务 Tasks、原型 Prototypes)。
 - `openspec/changes/archive/`: 已完成并归档的执行计划。

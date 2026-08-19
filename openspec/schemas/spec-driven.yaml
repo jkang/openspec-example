@@ -1,4 +1,4 @@
-liu'cname: spec-driven
+name: spec-driven
 version: 1
 description: 包含交互式原型验证的 OpenSpec 工作流 - 探索 (explore) → 提案 (proposal) → 原型 (prototype) → 规范 (specs) → 设计 (design) → 任务 (tasks)
 artifacts:
