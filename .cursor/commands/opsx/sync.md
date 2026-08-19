@@ -113,17 +113,23 @@ This is an **agent-driven** operation - you will read delta specs and directly e
         (this is what `openspec archive` does; it warns and moves on)
 
    d. **Create new main spec** if capability doesn't exist yet:
-      - Create `<planningHome.root>/openspec/specs/<capability>/spec.md`
+      - Create `<planningHome.root>/openspec/specs/<capability-path>/spec.md`
       - Add Purpose section: copy the delta's `## Purpose` body verbatim when it has one
-        (this is what `openspec archive` does); only write a brief TBD placeholder when it does not
-      - Add Requirements section with the ADDED requirements
+        - Add Requirements section with the ADDED requirements
       - Follow the **Main Spec Format Reference** below
 
-5. **Show summary**
+5. **Baseline Sync (回流业务基线)**
+
+   在完成 Spec 同步后，你必须执行业务基线回流：
+   - **调用辅助技能**: 依次调用 `baseline/` 下的技能更新 Journey, Story Map, Process Flow 和 Domain Model。
+   - **自动化渲染**: 所有回流完成后，调用 `openspec-baseline-render` 刷新可视化文档。
+
+6. **Show summary**
 
    After applying all changes, summarize:
    - Which capabilities were updated
    - What changes were made (requirements added/modified/removed/renamed)
+   - **Baseline Updates**: 哪些业务基线文档已完成回流，以及 HTML 视图的刷新状态。
    - Any new main spec left with a TBD Purpose placeholder, so it gets written
      now rather than lingering
 

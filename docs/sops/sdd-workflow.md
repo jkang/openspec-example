@@ -13,6 +13,12 @@
   - **目标**: 维护 `docs/PRODUCT_SENSE.md`，明确 Elevator Pitch 和产品原则。
 - **指令**: `/opsx:product-planning`
   - **目标**: 维护 `docs/ROADMAP.md`，执行每月滚动计划。
+- **业务基线管理 (Auxiliary Baseline Commands)**:
+  - **指令**: `/opsx:baseline/journey` - 维护 `docs/baseline/HIGH_LEVEL_JOURNEY.md`。
+  - **指令**: `/opsx:baseline/story-map` - 维护 `docs/baseline/STORY_MAP.md`。
+  - **指令**: `/opsx:baseline/process-flow` - 维护 `docs/baseline/CORE_BUSINESS_PROCESS_FLOW.md`。
+  - **指令**: `/opsx:baseline/domain-model` - 维护 `docs/baseline/DOMAIN_MODEL.md` (Event-Storming 视角)。
+  - **指令**: `/opsx:baseline/render` - 将上述 Markdown 基线渲染为 HTML。
 - **强制约束**:
   - 规划层产物是全局上下文，将自动注入所有后续指令。
   - 必须包含“未来 +1, +2 个月”的滚动预测。
@@ -131,7 +137,11 @@ graph TD
 
 ### 8. 同步阶段 (Sync)
 - **指令**: `/opsx:sync`
-- **目标**: 在归档前，将增量规格 (delta specs) 同步合并入主规格 (main specs)。
+- **目标**: 在归档前，将增量规格 (delta specs) 同步合并入主规格 (main specs)，并同步回流业务基线 (Baseline Sync)。
+- **核心动作**:
+  1. **Spec Sync**: 将 `openspec/changes/<name>/specs/` 下的变更同步至 `openspec/specs/`。
+  2. **Baseline Sync**: 自动调用辅助技能，将 `story.md`、`design.md` 等沉淀的认知回流至 `docs/baseline/` 下的 4 份基线文档。
+  3. **Auto Render**: 同步完成后自动执行渲染，刷新 `docs/baseline/` 下的可视化文档。
 
 ### 9. 归档阶段 (Archive)
 - **指令**: `/opsx:archive`

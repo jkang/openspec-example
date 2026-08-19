@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>High Level Journey - OpenSpec Baseline</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            50: '#f8fafc',
+                            200: '#e2e8f0',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #f8fafc; font-family: sans-serif; }
+        .prose { max-width: 64rem; margin: 0 auto; padding: 2rem; background: white; border: 1px solid #e2e8f0; }
+        * { border-radius: 0 !important; box-shadow: none !important; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { border: 1px solid #e2e8f0; padding: 0.5rem; text-align: left; }
+        th { background-color: #f8fafc; }
+        pre { background: #f8fafc; padding: 1rem; border: 1px solid #e2e8f0; overflow-x: auto; }
+        .mermaid { margin: 2rem 0; display: flex; justify-content: center; }
+    </style>
+</head>
+<body class="p-8">
+    <div class="mb-8 flex items-center justify-between max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold text-slate-900 border-l-4 border-slate-900 pl-4">High Level Journey</h1>
+        <a href="index.html" class="text-sm text-slate-500 hover:text-slate-900">返回基线列表</a>
+    </div>
+    
+    <article id="content" class="prose border border-slate-200 p-8 bg-white">
+        <!-- Content will be rendered here -->
+    </article>
+
+    <script>
+        const markdown = `# High-level Journey 基线
+
+## Purpose
+描述用户和运营人员在系统中的端到端核心旅程，作为业务逻辑全景的顶层视图。
+
+## 核心旅程地图
+
+### 1. 买家：从浏览到下单成功
+- **Entry**: 进入商城首页
+- **Steps**:
+  1. 浏览商品目录
+  2. 查看商品详情
+  3. 加入购物车
+  4. 领券与应用优惠
+  5. 提交订单并结算
+- **Success**: 看到订单成功页面
+
+### 2. 运营：从商品上架到营销配置
+- **Entry**: 登录管理后台
+- **Steps**:
+  1. 发布新商品
+  2. 管理库存数量
+  3. 配置优惠券规则
+  4. 发放优惠券
+- **Success**: C 端用户可看到并使用新资源
+
+---
+*Last Updated: 2026-08-19*
+`;
+        
+        // Custom renderer to handle mermaid blocks
+        const renderer = new marked.Renderer();
+        const originalCode = renderer.code.bind(renderer);
+        renderer.code = function(code, language, escaped) {
+            if (language === 'mermaid') {
+                return `<div class="mermaid">${code}</div>`;
+            }
+            return originalCode(code, language, escaped);
+        };
+
+        document.getElementById('content').innerHTML = marked.parse(markdown, { renderer: renderer });
+        
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
+</body>
+</html>

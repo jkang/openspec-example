@@ -154,11 +154,22 @@ This is an **agent-driven** operation - you will read delta specs and directly e
    Run `openspec validate --specs` with the same selected-root flags used earlier.
    If validation fails, report the problems and do not claim the sync succeeded.
 
-6. **Show summary**
+6. **Baseline Sync (回流业务基线)**
+
+   在完成 Spec 同步后，你必须执行业务基线回流，将变更中的业务认知沉淀到全局规划层：
+   - **调用辅助技能**: 依次调用 `baseline/` 子目录下的辅助技能：
+     - `openspec-baseline-journey`: 根据 `story.md` 更新旅程基线。
+     - `openspec-baseline-story-map`: 根据 `verify.md` 更新 Story Map 实现状态。
+     - `openspec-baseline-process-flow`: 根据 `design.md` 和状态变更更新流程基线。
+     - `openspec-baseline-domain-model`: 根据 `specs/domain-model/spec.md` 更新领域模型（Event-Storming 视角）。
+   - **自动化渲染**: 所有基线回流完成后，调用 `openspec-baseline-render` 刷新 `docs/baseline/` 下的可视化文档。
+
+7. **Show summary**
 
    After applying all changes, summarize:
    - Which capabilities were updated
    - What changes were made (requirements added/modified/removed/renamed)
+   - **Baseline Updates**: 哪些业务基线文档已完成回流，以及 HTML 视图的刷新状态。
    - Any new main spec left with a TBD Purpose placeholder, so it gets written
      now rather than lingering
    - Any capability retired, naming the deleted `spec.md`, its Purpose, and

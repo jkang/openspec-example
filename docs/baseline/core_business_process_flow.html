@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Core Business Process Flow - OpenSpec Baseline</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            50: '#f8fafc',
+                            200: '#e2e8f0',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #f8fafc; font-family: sans-serif; }
+        .prose { max-width: 64rem; margin: 0 auto; padding: 2rem; background: white; border: 1px solid #e2e8f0; }
+        * { border-radius: 0 !important; box-shadow: none !important; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { border: 1px solid #e2e8f0; padding: 0.5rem; text-align: left; }
+        th { background-color: #f8fafc; }
+        pre { background: #f8fafc; padding: 1rem; border: 1px solid #e2e8f0; overflow-x: auto; }
+        .mermaid { margin: 2rem 0; display: flex; justify-content: center; }
+    </style>
+</head>
+<body class="p-8">
+    <div class="mb-8 flex items-center justify-between max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold text-slate-900 border-l-4 border-slate-900 pl-4">Core Business Process Flow</h1>
+        <a href="index.html" class="text-sm text-slate-500 hover:text-slate-900">返回基线列表</a>
+    </div>
+    
+    <article id="content" class="prose border border-slate-200 p-8 bg-white">
+        <!-- Content will be rendered here -->
+    </article>
+
+    <script>
+        const markdown = `# Core Business Process Flow 基线
+
+## Purpose
+描述跨角色、跨模块的核心业务流程与状态流转逻辑。
+
+## 核心流程定义
+
+### 1. 交易订单流转图 (Order Lifecycle)
+\`\`\`mermaid
+graph TD
+    A[购物车结算] --> B{有无优惠?}
+    B -->|有| C[应用最优券]
+    B -->|无| D[直接计算总价]
+    C --> E[生成 PENDING 订单]
+    D --> E[生成 PENDING 订单]
+    E --> F[模拟支付确认]
+    F --> G[状态变更为 PAID]
+    G --> H[扣减商品库存]
+\`\`\`
+
+### 2. 优惠券生命周期 (Coupon Lifecycle)
+- **Draft**: 后台创建，尚未生效
+- **Active**: 已发布，用户可领取
+- **Used**: 用户已核销，关联具体订单
+- **Expired**: 超过有效期，不可使用
+
+---
+*Last Updated: 2026-08-19*
+`;
+        
+        // Custom renderer to handle mermaid blocks
+        const renderer = new marked.Renderer();
+        const originalCode = renderer.code.bind(renderer);
+        renderer.code = function(code, language, escaped) {
+            if (language === 'mermaid') {
+                return `<div class="mermaid">${code}</div>`;
+            }
+            return originalCode(code, language, escaped);
+        };
+
+        document.getElementById('content').innerHTML = marked.parse(markdown, { renderer: renderer });
+        
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
+</body>
+</html>

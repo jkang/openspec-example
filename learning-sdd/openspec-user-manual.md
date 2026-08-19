@@ -316,6 +316,20 @@ your-project/
 | `changes/`    | 存放活跃的变更提案                             | 必需     |
 | `specs/`      | 存放已归档的规范                               | 可选     |
 
+### 3.6 业务基线治理 (Baseline Governance)
+
+自 v2.0+ 起，OpenSpec 引入了结构化的业务基线体系，用于沉淀跨变更的长期业务知识。这些文档位于 `docs/baseline/` 目录下，并提供可视化 HTML 视图。
+
+| 基线文档 | 核心职责 | 事实源 |
+| :--- | :--- | :--- |
+| `HIGH_LEVEL_JOURNEY.md` | 记录用户与运营人员的端到端核心旅程 | `story.md` + 原型 |
+| `STORY_MAP.md` | 追踪 Story 在各发布阶段的实现状态 | `verify.md` + 任务清单 |
+| `CORE_BUSINESS_PROCESS_FLOW.md` | 记录核心业务流程与状态机流转 (Mermaid) | `design.md` + 状态规范 |
+| `DOMAIN_MODEL.md` | 基于 Event-Storming 视角的领域模型全景 | `specs/domain-model/` |
+
+**基线回流 (Baseline Sync)**:
+业务基线不是手动维护的，而是在执行 `/opsx:sync` 时，AI 自动从当前 Change 的认知中提取增量并回流至基线文档，最后自动渲染为 HTML 视图。
+
 > **与旧版的区别**：v2.0 起，项目上下文统一写入 `openspec/config.yaml` 的 `context:` 字段，并引入了 `docs/PRODUCT_SENSE.md` 和 `docs/ROADMAP.md` 作为全局规划护栏。
 
 **config.yaml 结构示例**：
@@ -963,7 +977,19 @@ openspec [options] <command>
 
 > **注意**：`--json` 是各命令的独立选项，不是全局选项。例如 `openspec show <name> --json` 或 `openspec validate --json`。
 
-### 7.6 命令速查
+### 7.6 业务基线辅助指令 (Baseline Auxiliary)
+
+这些指令位于子目录 `baseline/` 下，用于手动干预或查看业务基线。
+
+| 命令 | 说明 |
+| :--- | :--- |
+| `/opsx:baseline/journey` | 手动更新旅程基线 |
+| `/opsx:baseline/story-map` | 手动更新 Story Map 状态 |
+| `/opsx:baseline/process-flow` | 手动更新流程流转基线 |
+| `/opsx:baseline/domain-model` | 手动更新领域模型基线 |
+| `/opsx:baseline/render` | 渲染基线 Markdown 为同目录 HTML 视图 |
+
+### 7.7 命令速查
 
 常用命令快速参考：
 

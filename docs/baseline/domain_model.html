@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domain Model - OpenSpec Baseline</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            50: '#f8fafc',
+                            200: '#e2e8f0',
+                            900: '#0f172a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { background-color: #f8fafc; font-family: sans-serif; }
+        .prose { max-width: 64rem; margin: 0 auto; padding: 2rem; background: white; border: 1px solid #e2e8f0; }
+        * { border-radius: 0 !important; box-shadow: none !important; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
+        th, td { border: 1px solid #e2e8f0; padding: 0.5rem; text-align: left; }
+        th { background-color: #f8fafc; }
+        pre { background: #f8fafc; padding: 1rem; border: 1px solid #e2e8f0; overflow-x: auto; }
+        .mermaid { margin: 2rem 0; display: flex; justify-content: center; }
+    </style>
+</head>
+<body class="p-8">
+    <div class="mb-8 flex items-center justify-between max-w-4xl mx-auto">
+        <h1 class="text-2xl font-bold text-slate-900 border-l-4 border-slate-900 pl-4">Domain Model</h1>
+        <a href="index.html" class="text-sm text-slate-500 hover:text-slate-900">返回基线列表</a>
+    </div>
+    
+    <article id="content" class="prose border border-slate-200 p-8 bg-white">
+        <!-- Content will be rendered here -->
+    </article>
+
+    <script>
+        const markdown = `# Domain Model 基线 (Event-Storming 视角)
+
+## Purpose
+基于 DDD 与 Event-Storming 描述系统领域模型，包括关键事件、命令、策略与上下文关系。
+
+## 1. Event Storming 全景
+
+### 关键 Domain Events (领域事件)
+- \`ProductCreated\`: 商品已创建
+- \`ItemAddedToCart\`: 商品已加入购物车
+- \`CouponApplied\`: 优惠券已应用
+- \`OrderPlaced\`: 订单已提交
+- \`PaymentConfirmed\`: 支付已确认
+
+### 核心 Commands (指令)
+- \`CreateProduct\`: 创建商品
+- \`AddToCart\`: 加入购物车
+- \`ApplyCoupon\`: 使用优惠券
+- \`PlaceOrder\`: 提交订单
+
+## 2. Bounded Contexts (限额上下文)
+
+- **Catalog (商品目录)**: 负责商品信息与库存状态。
+- **Cart (购物车)**: 负责用户挑选过程的临时存储。
+- **Order (订单)**: 交易核心，负责状态流转与财务结算。
+- **Coupon (优惠券)**: 营销引擎，负责规则校验与减免计算。
+
+## 3. 核心 Aggregate 与 Entity
+
+### Order Aggregate
+- **Root Entity**: Order (id, status, actualPaidCents)
+- **Entities**: OrderItem (productId, priceCents, quantity)
+- **Value Objects**: Price (amount, currency)
+
+### Catalog Aggregate
+- **Root Entity**: Product (id, name, priceCents, stock)
+
+---
+*Last Updated: 2026-08-19*
+`;
+        
+        // Custom renderer to handle mermaid blocks
+        const renderer = new marked.Renderer();
+        const originalCode = renderer.code.bind(renderer);
+        renderer.code = function(code, language, escaped) {
+            if (language === 'mermaid') {
+                return `<div class="mermaid">${code}</div>`;
+            }
+            return originalCode(code, language, escaped);
+        };
+
+        document.getElementById('content').innerHTML = marked.parse(markdown, { renderer: renderer });
+        
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+    </script>
+</body>
+</html>
