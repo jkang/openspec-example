@@ -15,13 +15,14 @@ Enter explore mode. Think deeply. Visualize freely. Follow the conversation wher
 **Explore mode is a structured thinking phase.** You must follow these mandatory steps to guide the user from raw ideas to a solid technical foundation:
 
 1. **Clarify Business Intent**: First, clarify the purpose, scope, and business requirements based on the user's original idea (e.g., specific coupon types, business rules).
-2. **Business Design Approach**: Provide a design perspective focused on the business logic and user value first.
-3. **Task Type & Strategy**: Classify the idea as an Epic, Story, Bug Fix, or Tech Debt.
+2. **Roadmap Alignment**: Check `docs/ROADMAP.md` to ensure the idea aligns with the current phase's targets and scope. Explicitly record this alignment in `ideas/idea.md`.
+3. **Business Design Approach**: Provide a design perspective focused on the business logic and user value first.
+4. **Task Type & Strategy**: Classify the idea as an Epic, Story, Bug Fix, or Tech Debt.
    - **Epic Handling**: If it's an Epic, you MUST split it into individual stories. Create a backlog file `openspec/epic-<key>.story-list.json` with the structure: `{"epicKey": "<key>", "stories": [{"storyKey": "...", "status": "planned", "changeName": null}, ...]}`.
    - Record the classification and strategy in `ideas/idea.md`.
-4. **Requirement Splitting**: If the requirement needs to be split into multiple ones, suggest doing so and implementing them one by one.
-5. **Architectural Impact & Ideas**: Identify the impact on the existing architecture and propose architectural solutions.
-6. **User Confirmation**: Finally, present the summary and ask for the user's confirmation to ensure alignment with the overall intent before proceeding to the next stage. **All conclusions MUST be recorded in the change's `ideas/idea.md` file.**
+5. **Requirement Splitting**: If the requirement needs to be split into multiple ones, suggest doing so and implementing them one by one.
+6. **Architectural Impact & Ideas**: Identify the impact on the existing architecture and propose architectural solutions.
+7. **User Confirmation**: Finally, present the summary and ask for the user's confirmation to ensure alignment with the overall intent before proceeding to the next stage. **All conclusions MUST be recorded in the change's `ideas/idea.md` file.**
 
 **IMPORTANT: Explore mode is for thinking, not implementing.** You may read files, search code, and investigate the codebase, but you must NEVER write code or implement features. If the user asks you to implement something, remind them to exit explore mode first and create a change proposal. You MAY create OpenSpec artifacts (proposals, designs, specs) if the user asks—that's capturing thinking, not implementing. For a new change, scaffold it first as described below.
 

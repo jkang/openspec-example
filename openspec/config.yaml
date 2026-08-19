@@ -14,6 +14,7 @@ context: |
   项目: ecommerce-mini - 一个展示 OpenSpec 规范驱动开发 (SDD) 的极简电商系统。
   治理文档 (唯一事实来源):
     - 流程 SOP: docs/sops/sdd-workflow.md (分支流转与指令规范)
+    - 产品感: docs/PRODUCT_SENSE.md (Elevator Pitch 与业务导向)
     - 产品路线图: docs/ROADMAP.md (当前阶段目标与 Explore 边界)
     - 前端规范: docs/FRONTEND.md (极简 UI 约束与浏览器验证闭环)
     - 后端架构: docs/ARCHITECTURE.md (Node.js/Python 四层架构设计)
@@ -32,6 +33,8 @@ rules:
   explore:
     - 必须严格遵循 docs/sops/sdd-workflow.md 中的“结构化 6 步法”
     - 必须确认任务类型 (Epic/Story/Bug Fix/Tech Debt)
+    - 必须在 ideas/idea.md 中显式写一段“与当前阶段目标对齐说明”，引用 docs/ROADMAP.md
+    - 必须确保功能建议符合 docs/PRODUCT_SENSE.md 中的 Elevator Pitch 和产品原则
     - 对于 Epic 类型，必须在 openspec/ 目录下创建 epic-<key>.story-list.json
     - 必须输出 ideas/idea.md 作为后续提案的唯一源头
   proposal:

@@ -6,19 +6,35 @@
 
 项目统一使用 `/opsx:` 前缀指令（由 Trae 技能提供）。
 
+### 0. 规划层 (Planning Layer) - 全局治理
+在进入具体的变更开发前，必须明确产品感与路线图。
+
+- **指令**: `/opsx:product-sense`
+  - **目标**: 维护 `docs/PRODUCT_SENSE.md`，明确 Elevator Pitch 和产品原则。
+- **指令**: `/opsx:product-planning`
+  - **目标**: 维护 `docs/ROADMAP.md`，执行每月滚动计划。
+- **强制约束**:
+  - 规划层产物是全局上下文，将自动注入所有后续指令。
+  - 必须包含“未来 +1, +2 个月”的滚动预测。
+
 ### SDD 动态分支工作流 (Workflow Branching)
 为确保各类型任务的遵循性，OpenSpec 流程根据任务类型 (Task Type) 进行动态分支。请所有参与项目的 AI Agent **严格根据下方流程图中的条件分支**执行必须步骤和可选步骤：
 
 ```mermaid
 graph TD
-    Start((Explore 阶段)) --> Type{确认任务类型}
+    %% 规划层 (Planning Layer)
+    Sense[Product Sense /opsx:product-sense] --> Plan[Roadmap Planning /opsx:product-planning]
+    Plan --> Context((上下文注入 config.yaml))
+
+    %% 交付层 (Delivery Layer)
+    Context --> Start((Explore 阶段))
+    Start --> Type{确认任务类型}
 
     %% Epic 分支
     Type -->|Epic 大块需求| Epic_Split[拆解为具体 Story]
     Epic_Split --> Epic_Backlog[生成 openspec/epic-KEY.story-list.json]
-    Epic_Backlog --> Epic_Roadmap[更新 Roadmap]
-    Epic_Roadmap --> End_Epic((结束探索，等待 Story 启动))
-
+    Epic_Backlog --> Plan
+    
     %% Story 分支
     Type -->|Story 具体功能| F_Prop[Proposal 提案 /opsx:propose]
     F_Prop --> F_Proto[Prototype UI原型 /opsx:prototype]
@@ -63,6 +79,7 @@ graph TD
 - **强制约束 (Hard Constraint)**:
   - 必须严格遵循“结构化 6 步法”。
   - **任务类型确认 (Task Classification)**: 必须确认是 Epic, Story, Bug Fix 还是 Tech Debt。
+  - **规划对齐 (Roadmap Alignment)**: 在 `ideas/idea.md` 中必须显式写一段“与当前阶段目标对齐说明”，引用 `docs/ROADMAP.md` 中的目标。
   - **Epic 治理**: 如果是 Epic，必须在 `openspec/` 目录下创建一个 `epic-<key>.story-list.json` 文件作为执行队列。
   - **唯一输出**: 必须生成 `ideas/idea.md` (相对于变更目录) 作为后续提案的唯一源头。
   - 不得在没有 `ideas/idea.md` 的情况下跳过此阶段进入提案。
