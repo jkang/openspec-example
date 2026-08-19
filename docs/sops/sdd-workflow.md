@@ -19,26 +19,26 @@ graph TD
     Epic_Roadmap --> End_Epic((结束探索，暂不开发))
 
     %% Feature 分支
-    Type -->|Feature 具体功能| F_Prop[Proposal 提案]
-    F_Prop --> F_Proto[Prototype UI原型]
-    F_Proto --> F_Spec[Specs 行为规范]
+    Type -->|Feature 具体功能| F_Prop[Proposal 提案 /opsx:propose]
+    F_Prop --> F_Proto[Prototype UI原型 /opsx:prototype]
+    F_Proto --> F_Spec[Specs 行为规范 /opsx:spec-design]
     F_Spec --> F_Des[Design 技术设计]
     F_Des --> Tasks[Tasks 任务清单]
 
     %% Bug Fix 分支
-    Type -->|Bug Fix 缺陷修复| B_Prop[Proposal 提案]
+    Type -->|Bug Fix 缺陷修复| B_Prop[Proposal 提案 /opsx:propose]
     B_Prop --> B_UI{涉及 UI 变更?}
     B_UI -->|是| F_Proto
-    B_UI -->|否| B_Spec[Specs 仅修正现有场景]
+    B_UI -->|否| B_Spec[Specs 仅修正现有场景 /opsx:spec-design]
     B_Spec --> B_Des[Design 根本原因分析 RCA]
     B_Des --> Tasks
 
     %% Tech Debt 分支
-    Type -->|Tech Debt 技术债| T_Prop[Proposal 提案]
+    Type -->|Tech Debt 技术债| T_Prop[Proposal 提案 /opsx:propose]
     T_Prop --> T_Spec{有外部行为变更?}
     T_Spec -->|是| F_Spec
     T_Spec -->|否| T_Skip[配置 skip_specs: true]
-    T_Skip --> T_Des[Design 重构与架构方案]
+    T_Skip --> T_Des[Design 重构与架构方案 /opsx:spec-design]
     T_Des --> Tasks
 
     Tasks --> Apply((Apply 实施阶段))
@@ -67,38 +67,50 @@ graph TD
 
 ### 2. 提案阶段 (Propose)
 - **指令**: `/opsx:propose <name>`
-- **目标**: 根据 `idea.md` 生成变更提案，包含原型、设计、规格和任务。
-- **BDD 测试分层防腐**: 在生成 `spec.md` 时，必须为每个 Gherkin Scenario 打上测试标签 (`@unit`, `@api`, 或 `@e2e`)，严格遵循[自动化测试策略](../TESTING_STRATEGY.md)。
-- **强制约束 (Hard Constraint) - HITL 检查点**:
-  - 在生成 Prototype (交互式 UI 原型) 和 Specs 后，**必须触发强制 HITL (Human-In-The-Loop) 检查点**（例如通过 AskUserQuestion 工具）。
-  - 必须获得用户的显式授权后，方可继续生成 Design 和 Tasks 阶段产物。
-  - **事实来源**: Prototype 必须作为 UI 规范的“唯一事实来源”，相关交互场景必须提取至 Specs 中。
+- **目标**: 根据 `idea.md` 生成变更提案 `proposal.md`。
+- **强制约束 (Hard Constraint)**:
+  - 必须基于 `idea.md` 的任务类型明确后续路径。
+  - 对于 Epic 类型，生成提案后应停止，等待拆分。
+  - 对于其他类型，引导用户进入下一步（`/opsx:prototype` 或 `/opsx:spec-design`）。
 
-### 3. 应用阶段 (Apply)
+### 3. 原型验证阶段 (Prototype) - 可选
+- **指令**: `/opsx:prototype <name>`
+- **目标**: 为 Feature 或涉及 UI 的 Bug Fix 生成交互式 HTML 原型。
+- **强制约束 (Hard Constraint) - HITL 检查点**:
+  - 生成原型后，必须通过 `AskUserQuestion` 获取人类确认。
+  - 原型是 UI 逻辑的唯一事实来源，确认后方可进入下一步。
+
+### 4. 规范与设计阶段 (Spec-Design)
+- **指令**: `/opsx:spec-design <name>`
+- **目标**: 一口气生成 `specs`、`design.md` 和 `tasks.md`。
+- **BDD 测试分层防腐**: 在生成 `spec.md` 时，必须为每个 Gherkin Scenario 打上测试标签 (`@unit`, `@api`, 或 `@e2e`)，严格遵循[自动化测试策略](../TESTING_STRATEGY.md)。
+- **强制约束 (Hard Constraint)**:
+  - 必须参考已确认的 `proposal.md` 和 `prototype.html` (若有)。
+  - 生成的任务清单必须包含 E2E 验证步骤。
+
+### 5. 应用阶段 (Apply)
 - **指令**: `/opsx:apply`
 - **目标**: 基于生成的 `tasks.md` 逐项实施代码变更。
 - **工作流**: 
   - 动态读取 `tasks.md` 中的复选框，完成一项则将 `- [ ]` 标记为 `- [x]`。
   - **测试驱动实现 (TDD/BDD)**: 必须严格按照 `spec.md` 上的标签 (`@unit`, `@api`, `@e2e`) 编写对应的测试代码。对于 `@e2e` 任务，必须在全局 `e2e-tests/` 目录中完成 Cucumber 步骤。
-  - **质量要求**: Apply 阶段必须包含全链路验证 (E2E) 任务块，严禁在未调通跨端交互的情况下关闭任务。
 
-### 4. 更新阶段 (Update) - 可选
+### 6. 更新阶段 (Update) - 可选
 - **指令**: `/opsx:update`
-- **目标**: 在实施过程中，如果发现原计划不合理，修正相关的 Specs、Design 或 Tasks。
-- **约束**: 禁止直接修改代码以绕过规格，必须先更新规格再写代码。
+- **目标**: 当实施过程中发现需要修改规划（如 specs 或 design）时使用。
+- **原则**: 先修改规格/设计，通过验证后，再继续 `/opsx:apply`。
 
-### 5. 同步阶段 (Sync)
+### 7. 同步阶段 (Sync)
 - **指令**: `/opsx:sync`
 - **目标**: 在归档前，将增量规格 (delta specs) 同步合并入主规格 (main specs)。
-- **逻辑约束**: 确保在同步过程中正确初始化主规格中的 `Purpose` 字段。
 
-### 6. 归档阶段 (Archive)
+### 8. 归档阶段 (Archive)
 - **指令**: `/opsx:archive`
 - **目标**: 将已完成的变更（包含测试）移至归档目录。
 - **流程**:
   - **全局 BDD 测试门禁**: 归档前必须运行 `init.sh e2e:run`，确保全局 Cucumber 测试通过。
-  - 归档操作前必须确保已经触发过 `sync`，否则拒绝归档。
-  - **技术债清理与登记**: 在归档前，必须检视本次变更中是否引入了技术债（如临时绕过鉴权、硬编码数据等）。如果是，需在变更文档中或通过提交新任务来跟踪这些技术债，禁止隐式留存。
+  - 归档前必须确保已经完成过 `sync`。
+  - **技术债登记**: 登记本次变更遗留的技术债。
   - 移动路径: `openspec/changes/<name>/` -> `openspec/changes/archive/YYYY-MM-DD-<name>/`。
 
 ## 异常处理与防漂移

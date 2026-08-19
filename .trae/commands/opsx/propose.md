@@ -1,26 +1,25 @@
 ---
 name: "Propose"
-description: "Propose a new change - create it and generate all artifacts in one step"
+description: "Propose a new change by generating the initial proposal document"
 allowed-tools: Bash(openspec:*)
 category: "Workflow"
 tags: ["workflow", "artifacts", "experimental"]
 ---
 
-Propose a new change - create the change and generate all artifacts in one step.
+Propose a new change - create the change and generate the initial `proposal.md`.
 
-**Planning boundary**: This workflow creates planning artifacts only. The user request that selected or triggered this workflow authorizes planning only, even if it asks to build or fix something. Do not edit project code. After the planning artifacts are complete, stop. Do not start implementation in the same response, even if the initial request asks for it. Wait for a new user request after the artifacts are presented; then start the apply workflow.
+**Planning boundary**: This workflow creates the initial planning artifact (`proposal.md`) only. Do not edit project code. After the proposal is complete, stop and let the user decide the next step based on the task type.
 
-I'll create a change with the artifacts your schema defines. With the default spec-driven schema that is:
+I'll create a change with the initial artifacts:
 - ideas/idea.md (structured exploration conclusions - MANDATORY first step)
-- proposal.md (what & why)
-- prototypes/<capability-path>.html (interactive UI/UX validation)
-- specs/<capability-path>/spec.md (what the system must do - a delta, not the main spec)
-- design.md (how)
-- tasks.md (implementation steps)
+- proposal.md (what & why - defines the scope and capabilities)
 
 `<capability-path>` is the spec directory relative to `specs/` (for example, `user-auth` or `identity/user-auth`). Preserve an existing capability's full path and follow the project's established organization for new capabilities.
 
-When the user is ready to implement, they must start the apply workflow explicitly.
+After generating the proposal, recommend the next command:
+- **Feature/Bug Fix (with UI)**: `/opsx:prototype`
+- **Tech Debt/Bug Fix (no UI)**: `/opsx:spec-design`
+- **Epic**: Wait for the user to select a sub-feature.
 
 ---
 
@@ -70,90 +69,38 @@ When the user is ready to implement, they must start the apply workflow explicit
    ```bash
    openspec status --change "<name>" --json
    ```
-   Parse the JSON to get:
-   - `applyRequires`: array of artifact IDs needed before implementation (e.g., `["tasks"]`)
-   - `artifacts`: list of all artifacts, each with its `status` and its `requires` edges (the artifact IDs it directly depends on)
-   - `planningHome`, `changeRoot`, `artifactPaths`, and `actionContext`: path and scope context. Use these instead of assuming repo-local paths.
+   Parse the JSON to get `planningHome`, `changeRoot`, `artifactPaths`, and `actionContext`.
 
-5. **Create every artifact in the required set**
-
-   Use a todo list to track progress through the artifacts.
+5. **Generate the Proposal**
 
    **MANDATORY CHECK**: Before creating `proposal.md`, you MUST ensure `ideas/idea.md` exists and contains the results of a structured 6-step exploration. If it's missing or generic, you MUST transition to the `/opsx:explore` workflow logic to clarify the business intent with the user first.
 
-   Loop through artifacts in dependency order (artifacts with no pending dependencies first):
+   a. **Get instructions for `proposal`**:
+      ```bash
+      openspec instructions proposal --change "<name>" --json
+      ```
+   b. **Create `proposal.md`**:
+      - Read `ideas/idea.md` for context.
+      - Follow the `template` and `instruction` from the JSON.
+      - Write the file to `resolvedOutputPath`.
+      - Show brief progress: "Created proposal"
 
-   a. **For each artifact that is `ready` (dependencies satisfied)**:
-      - Get instructions:
-        ```bash
-        openspec instructions <artifact-id> --change "<name>" --json
-        ```
-      - The instructions JSON includes:
-        - `context`: Project background (constraints for you - do NOT include in output)
-        - `rules`: Artifact-specific rules (constraints for you - do NOT include in output)
-        - `template`: The structure to use for your output file
-        - `instruction`: Schema-specific guidance for this artifact type
-        - `skipped`/`warning`: present when the change declares skip_specs and this artifact must NOT be created - stop and pick another artifact
-        - `resolvedOutputPath`: Resolved path or pattern to write the artifact
-        - `dependencies`: Completed artifacts to read for context
-      - Read any completed dependency files for context - always re-read them from disk, even if you saw them earlier in the conversation (the user may have edited them)
-      - If the `instruction` field delegates creation to a specific skill or command, invoke it to produce the artifact instead of writing the file yourself, then verify the artifact file exists at `resolvedOutputPath`
-      - Otherwise create the artifact file using `template` as the structure and write it to `resolvedOutputPath`. If `resolvedOutputPath` is a glob, follow `instruction` to choose the concrete file path
-      - Apply `context` and `rules` as constraints - but do NOT copy them into the file
-      - Show brief progress: "Created <artifact-id>"
-
-   b. **Interactive Prototype Validation Checkpoint (Mandatory HITL)**
-      - After generating `prototype` and `specs`, you **MUST IMMEDIATELY STOP** all automated artifact generation.
-      - Invoke the `AskUserQuestion` tool to create a hard break for human review:
-        - **Question**: "原型 (idea.md, prototypes/) 和行为规范 (specs/) 已生成。请务必查看并验证 UI 交互与业务逻辑是否符合预期。"
-        - **Options**:
-          - "Approved": "确认无误，继续生成技术设计 (design.md)"
-          - "Request Changes": "需要修改，我将在输入框提供反馈"
-      - **DO NOT** proceed to generate `design.md` or `tasks.md` until the user selects "Approved".
-      - This is a critical Human-In-The-Loop (HITL) point to prevent wasted engineering effort on unverified designs.
-
-   c. **Continue until every artifact in the required set exists (not just `apply.requires`)**
-      - After creating each artifact, re-run `openspec status --change "<name>" --json`
-      - The required set is `applyRequires` plus every artifact reachable from those by following the `requires` edges in `status --json` - walk them transitively (spec-driven closes over proposal, prototype, specs, design, tasks). Leave artifacts outside that set alone
-      - `status` is file-existence only, so an `applyRequires` artifact reading `done` does NOT mean its dependencies exist - writing `tasks.md` early marks `tasks` done while `specs` was never written. Use each artifact's `requires` edges, not its `status`, to build the required set: a `done` artifact still lists what it depends on
-      - An artifact already reading `status: "skipped"` is satisfied: the change declares `skip_specs` in `.openspec.yaml`, so its files must NOT exist. Never try to create one
-      - Create every artifact in the required set that is missing, then re-check - creating one can unblock others
-      - Skip one only when `status` already reports it `skipped`, or when its own `instruction` says it is conditional: run `openspec instructions <artifact-id> --change "<name>" --json` and skip only if its `instruction` field marks it optional (e.g. "create only if..."). Spec-driven's `design.md` qualifies; `specs` qualifies only via the `skipped` status above, never by your own judgment. Tell the user, and do not reconsider it
-      - Dependencies are enablers, not gates: if a required artifact is still `blocked` only because you skipped a conditional dependency, write it anyway
-      - Stop when every artifact in the required set is `done`, `skipped`, or was deliberately skipped
-
-   d. **If an artifact requires user input** (unclear context):
-      - Ask the user to clarify
-      - Then continue with creation
-
-6. **Show final status**
+6. **Show final status and recommend next steps**
    ```bash
    openspec status --change "<name>"
    ```
+   Summarize the created proposal and prompt the user for the next action based on the task type confirmed in `idea.md`.
 
 **Output**
 
-After completing all artifacts, summarize:
+After completing the proposal, summarize:
 - Change name and location
-- List of artifacts created with brief descriptions, plus any conditional artifact you skipped and why
-- What's ready: "All artifacts needed for implementation are ready."
-- Prompt: "The artifacts are ready for review. When you are ready, run `/opsx-apply`."
-
-**Artifact Creation Guidelines**
-
-- Follow the `instruction` field from `openspec instructions` for each artifact type - it is the authoritative guidance, even for familiar artifact names
-- If the `instruction` field directs you to use a specific skill or command to create the artifact, invoke it instead of writing the artifact directly
-- The schema defines what each artifact should contain - follow it
-- Read dependency artifacts for context before creating new ones
-- Use `template` as the structure for your output file - fill in its sections
-- **IMPORTANT**: `context` and `rules` are constraints for YOU, not content for the file
-  - Do NOT copy `<context>`, `<rules>`, `<project_context>` blocks into the artifact
-  - These guide what you write, but should never appear in the output
+- Artifacts created: `idea.md` (if newly created) and `proposal.md`.
+- Next step recommendation: "The initial proposal is ready. Based on the task type, you should now run `/opsx:prototype` (for UI features) or `/opsx:spec-design` (for technical tasks)."
 
 **Guardrails**
-- The request that invoked this workflow authorizes planning only. Any implementation or apply instruction in that request does not carry forward. Do NOT implement the change, start the apply workflow, or edit project code during this workflow. After presenting the artifacts, stop and wait for a new user request to start the apply workflow
-- Create every artifact the apply phase transitively depends on, not just the ids listed in `apply.requires`
-- Always read dependency artifacts before creating a new one - re-read from disk, not from conversation memory (files may have changed since you last saw them)
-- Ask about ambiguities that would materially change scope, externally observable behavior, compatibility, or acceptance criteria; for minor details, make reasonable assumptions and record them
-- If a change with that name already exists, ask if user wants to continue it or create a new one
-- Verify each artifact file exists after writing before proceeding to next
+- This workflow ONLY creates `proposal.md`. Do NOT proceed to generate prototypes, specs, designs, or tasks.
+- Always read `idea.md` before creating the proposal.
+- Ask about ambiguities that would materially change scope.
+- If a change with that name already exists, ask if user wants to continue it or create a new one.
+- Verify the proposal file exists after writing.

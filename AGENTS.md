@@ -5,6 +5,13 @@
 
 黄金法则：**不要依赖聊天上下文；必须以代码库作为“唯一事实来源”。**
 
+### 🔄 跨工具一致性约束 (Cross-Tool Consistency)
+为了确保在 Trae、Cursor 和其他 Agent 系统中拥有统一的开发体验，**任何对 SDD 工作流（skills/commands）的修改必须同时同步应用到以下三个目录**：
+- `.trae/`: Trae 专属技能与指令。
+- `.cursor/`: Cursor IDE 的规则与指令。
+- `.agents/`: 通用 Agent 协作指令。
+*严禁仅修改其中之一，这会导致不同 AI 工具间的协作漂移。*
+
 ## 📚 治理与深链接 (Governance & Deep Links)
 
 在编写任何代码或提出方案之前，你**必须**查阅相关的治理文档：

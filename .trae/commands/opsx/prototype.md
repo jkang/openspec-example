@@ -1,27 +1,41 @@
 ---
 name: "Prototype"
-description: "生成或更新 OpenSpec 交互式原型。调用 openspec-prototype 技能进行设计。"
+description: "Generate an interactive UI/UX prototype for the change"
 allowed-tools: Bash(openspec:*)
+category: "Workflow"
+tags: ["workflow", "ui", "prototype"]
 ---
 
-Propose or update an interactive OpenSpec prototype.
+Generate an interactive UI/UX prototype for a change.
 
-**Workflow**
+**Planning boundary**: This workflow creates the interactive prototype only. Do not edit project code. After the prototype is generated, you **MUST** stop and ask for human verification (HITL).
 
-1. **确定变更上下文**
-   - 运行 `openspec status --json` 获取当前活跃的变更。
-   - 如果没有活跃变更，要求用户先运行 `/opsx:propose` 或指定变更名称。
+I'll create the prototype artifact:
+- prototypes/<capability-path>.html (interactive UI/UX validation)
 
-2. **获取原型指令**
-   - 运行 `openspec instructions prototype --change "<name>" --json` 获取生成原型的具体要求和模板。
+---
 
-3. **调用原型技能**
-   - 调用 `openspec-prototype` 技能，基于 `proposal.md` 和指令要求生成 `prototypes/<capability-path>.html`。
-   - 确保生成的原型符合“现代扁平化 (Modern Flat)”规范：1px 边框、纯色背景、无阴影、单屏紧凑布局。
+**Store selection:** If a registered store was selected, continue using it by appending `--store <id>` to every OpenSpec command.
 
-4. **验证与确认**
-   - 生成后，通知用户进行预览。
-   - 询问用户是否需要进一步调整。
+**Input**: The argument after `/opsx:prototype` is the change name (kebab-case).
 
-5. **同步到规范 (可选)**
-   - 如果原型已确认，建议用户更新 `specs/spec.md` 以嵌入最新的原型代码和交互场景。
+**Steps**
+
+1. **Verify pre-requisites**
+   - Ensure `proposal.md` exists.
+   - Read `ideas/idea.md` to confirm task type.
+
+2. **Generate the Prototype**
+   - Get instructions: `openspec instructions prototype --change "<name>" --json`
+   - Create `prototype.html` following the instructions.
+   - Show progress: "Generated UI prototype."
+
+3. **Mandatory HITL Verification**
+   - Use `AskUserQuestion` to confirm with the user.
+   - Do NOT proceed to other artifacts.
+
+4. **Summarize and Recommend Next Step**
+   - Recommend `/opsx:spec-design`.
+
+**Output**
+Summarize the results and recommend the next action.

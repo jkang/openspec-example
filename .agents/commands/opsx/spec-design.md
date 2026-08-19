@@ -1,0 +1,41 @@
+---
+name: "Spec-Design"
+description: "Generate specs, technical design, and implementation tasks"
+allowed-tools: Bash(openspec:*)
+category: "Workflow"
+tags: ["workflow", "specs", "design", "tasks"]
+---
+
+Generate behavioral specifications, technical design, and implementation tasks for a change.
+
+**Planning boundary**: This workflow creates planning artifacts only. Do not edit project code.
+
+I'll create the following artifacts:
+- specs/<capability-path>/spec.md
+- design.md
+- tasks.md
+
+---
+
+**Store selection:** If a registered store was selected, continue using it by appending `--store <id>` to every OpenSpec command.
+
+**Input**: The argument after `/opsx:spec-design` is the change name (kebab-case).
+
+**Steps**
+
+1. **Verify pre-requisites**
+   - Ensure `proposal.md` exists.
+   - If UI-related, ensure approved `prototype.html` exists.
+
+2. **Generate Specs, Design, and Tasks**
+   - Loop through `specs`, `design`, and `tasks`.
+   - Get instructions for each: `openspec instructions <artifact-id> --change "<name>" --json`
+   - Create the artifact following the template and instructions.
+   - Show progress: "Created <artifact-id>."
+
+3. **Final Status Check**
+   - `openspec status --change "<name>"`
+   - Confirm planning is complete.
+
+**Output**
+Summarize the results and prompt for `/opsx:apply`.
