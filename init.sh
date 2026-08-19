@@ -64,11 +64,11 @@ case "$1" in
         ;;
     python:start)
         echo "-> 启动 Python 开发服务器..."
-        cd ecommerce/ecommerce-mini-python && python -m uvicorn src.api.server:app --reload
+        cd ecommerce/ecommerce-mini-python && PYTHONPATH=. python3 -m uvicorn src.api.server:app --reload
         ;;
     python:test)
         echo "-> 运行 Python 测试..."
-        cd ecommerce/ecommerce-mini-python && pytest
+        cd ecommerce/ecommerce-mini-python && PYTHONPATH=. python3 -m pytest
         ;;
     vue:install)
         echo "-> 初始化 Vue 前端模块..."
@@ -88,7 +88,12 @@ case "$1" in
         ;;
     e2e:run)
         echo "-> 运行全局 Cucumber E2E 测试..."
-        cd e2e-tests && npm run test:e2e
+        cd e2e-tests
+        if [ ! -x node_modules/.bin/cucumber-js ]; then
+            echo "-> 缺少 cucumber-js 请先运行 ./init.sh e2e:install"
+            exit 1
+        fi
+        npm run test:e2e
         ;;
     test:all)
         echo "-> 运行所有测试..."
