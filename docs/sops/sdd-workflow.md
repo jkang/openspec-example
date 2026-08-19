@@ -38,7 +38,8 @@ graph TD
     %% Story 分支
     Type -->|Story 具体功能| F_Prop[Proposal 提案 /opsx:propose]
     F_Prop --> F_Proto[Prototype UI原型 /opsx:prototype]
-    F_Proto --> F_Spec[Specs 行为规范 /opsx:spec-design]
+    F_Proto --> F_Story[Story 业务评审 /opsx:story]
+    F_Story --> F_Spec[Specs 行为规范 /opsx:spec-design]
     F_Spec --> F_Des[Design 技术设计]
     F_Des --> Tasks[Tasks 任务清单]
 
@@ -46,7 +47,8 @@ graph TD
     Type -->|Bug Fix 缺陷修复| B_Prop[Proposal 提案 /opsx:propose]
     B_Prop --> B_UI{涉及 UI 变更?}
     B_UI -->|是| F_Proto
-    B_UI -->|否| B_Spec[Specs 仅修正现有场景 /opsx:spec-design]
+    B_UI -->|否| B_Story[Story 业务评审 /opsx:story]
+    B_Story --> B_Spec[Specs 仅修正现有场景 /opsx:spec-design]
     B_Spec --> B_Des[Design 根本原因分析 RCA]
     B_Des --> Tasks
 
@@ -99,31 +101,39 @@ graph TD
   - 生成原型后，必须通过 `AskUserQuestion` 获取人类确认。
   - 原型是 UI 逻辑的唯一事实来源，确认后方可进入下一步。
 
-### 4. 规范与设计阶段 (Spec-Design)
+### 4. 业务评审阶段 (Story)
+- **指令**: `/opsx:story <name>`
+- **目标**: 生成端到端的验收文档 `story.md`。
+- **强制约束 (Hard Constraint)**:
+  - **时机**: 必须在提案之后执行；若涉及 UI，必须在原型确认后执行。
+  - **内容**: 必须包含跨模块的 E2E 旅程及业务规则表。
+  - **HITL 检查点**: 生成后必须由用户确认验收标准，方可进入模块规格设计。
+
+### 5. 规范与设计阶段 (Spec-Design)
 - **指令**: `/opsx:spec-design <name>`
 - **目标**: 一口气生成 `specs`、`design.md` 和 `tasks.md`。
 - **BDD 测试分层防腐**: 在生成 `spec.md` 时，必须为每个 Gherkin Scenario 打上测试标签 (`@unit`, `@api`, 或 `@e2e`)，严格遵循[自动化测试策略](../TESTING_STRATEGY.md)。
 - **强制约束 (Hard Constraint)**:
-  - 必须参考已确认的 `proposal.md` 和 `prototype.html` (若有)。
+  - 必须参考已确认的 `proposal.md`、`story.md` 和 `prototype.html` (若有)。
   - 生成的任务清单必须包含 E2E 验证步骤。
 
-### 5. 应用阶段 (Apply)
+### 6. 应用阶段 (Apply)
 - **指令**: `/opsx:apply`
 - **目标**: 基于生成的 `tasks.md` 逐项实施代码变更。
 - **工作流**: 
   - 动态读取 `tasks.md` 中的复选框，完成一项则将 `- [ ]` 标记为 `- [x]`。
   - **测试驱动实现 (TDD/BDD)**: 必须严格按照 `spec.md` 上的标签 (`@unit`, `@api`, `@e2e`) 编写对应的测试代码。对于 `@e2e` 任务，必须在全局 `e2e-tests/` 目录中完成 Cucumber 步骤。
 
-### 6. 更新阶段 (Update) - 可选
+### 7. 更新阶段 (Update) - 可选
 - **指令**: `/opsx:update`
 - **目标**: 当实施过程中发现需要修改规划（如 specs 或 design）时使用。
 - **原则**: 先修改规格/设计，通过验证后，再继续 `/opsx:apply`。
 
-### 7. 同步阶段 (Sync)
+### 8. 同步阶段 (Sync)
 - **指令**: `/opsx:sync`
 - **目标**: 在归档前，将增量规格 (delta specs) 同步合并入主规格 (main specs)。
 
-### 8. 归档阶段 (Archive)
+### 9. 归档阶段 (Archive)
 - **指令**: `/opsx:archive`
 - **目标**: 将已完成的变更（包含测试）移至归档目录。
 - **流程**:

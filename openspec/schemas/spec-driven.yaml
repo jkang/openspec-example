@@ -66,6 +66,19 @@ artifacts:
     requires:
       - proposal
 
+  - id: story
+    generates: story.md
+    description: 业务评审文档，包含 E2E 验收标准与用户场景
+    template: story.md
+    instruction: |
+      调用 `openspec-story` 技能生成业务评审 Story 文档。
+      
+      **强制要求**：
+      - 如果涉及前端 UI 变更，必须在 `prototype.html` 已生成并确认后执行。
+      - 该文档是业务评审的核心，必须包含端到端的验收标准 (Given/When/Then)。
+    requires:
+      - proposal
+
   - id: specs
     generates: "specs/**/*.md"
     description: 针对此次变更的详细行为规范
@@ -79,6 +92,7 @@ artifacts:
       - 如果任务类型是 Tech Debt 且无外部行为变更，通常在 `.openspec.yaml` 中设置 `skip_specs: true` 并跳过此阶段。
       - 如果任务类型是 Bug Fix，规范重点在于使用 `MODIFIED Requirements` 修正现有行为的描述。
       - **重要**：如果该能力涉及 UI 变更，你必须先参考已生成的 `prototype.html`，提取交互场景并将其嵌入规范中。
+      - **重要**：必须参考已确认的 `story.md`，确保模块规范与 E2E 验收标准保持一致。
 
       优秀的规范内容应包含：
       - 用户或下游系统所依赖的可观察行为
@@ -108,7 +122,7 @@ artifacts:
       - 如果涉及前端变更，你必须从 `prototype.html` 中提取交互逻辑，并使用 `<details>` 标签将原型代码完整嵌入规范。
 
     requires:
-      - proposal
+      - story
 
   - id: design
     generates: design.md
@@ -117,7 +131,7 @@ artifacts:
     instruction: |
       创建技术设计文档，解释如何 (HOW) 实现此次变更。
 
-      **强制要求**：必须在 `proposal.md`、`prototype.html` (若涉及UI) 和 `specs/*.md` (若涉及行为变更) 均已准备就绪后方可开始。
+      **强制要求**：必须在 `proposal.md`、`story.md`、`prototype.html` (若涉及UI) 和 `specs/*.md` (若涉及行为变更) 均已准备就绪后方可开始。
 
       何时需要包含 design.md：
       - 跨模块变更、引入新依赖、或重大数据模型变更。

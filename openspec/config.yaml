@@ -37,10 +37,17 @@ rules:
     - 数据要求：严禁使用空洞模板（foo/test），必须填充真实的业务数据示例
     - 交互界面：必须完全使用中文
     - 技术实现：使用 Vue 3 (CDN) + Tailwind CSS (CDN) 的可交互 HTML
+  story:
+    - 必须作为业务评审的 Single Source of Truth
+    - 如果涉及 UI 变更，必须在 prototype.html 确认后生成，并显式链接原型
+    - 验收标准必须覆盖端到端 (E2E) 旅程，使用 Given/When/Then 格式
+    - 必须包含业务规则表 (Business Rules)
+    - 必须链接到 proposal.md 及其对应的 capability specs
   specs:
     - 所有场景使用 Given/When/Then (Gherkin) 格式
     - 必须从 prototype.html 中提取交互逻辑记录为 Scenario
     - 必须按照 docs/TESTING_STRATEGY.md 打上测试标签 (@unit, @api, @e2e)
+    - 必须与 story.md 定义的 E2E 旅程保持逻辑一致
     - 规范性需求语言使用 SHALL 或 MUST
   design:
     - 包含架构图 (Mermaid 或 ASCII)

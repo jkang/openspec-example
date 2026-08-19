@@ -16,7 +16,7 @@
 
 在编写任何代码或提出方案之前，你**必须**查阅相关的治理文档：
 
-- **[SDD 工作流 SOP](docs/sops/sdd-workflow.md)**: `/opsx:` 指令的使用规则（含 `/opsx:product-sense` 与 `/opsx:product-planning` 规划指令）、6步探索法、HITL（人机协同）检查点以及**四大任务类型 (Epic/Story/Bug Fix/Tech Debt) 的分支策略**与闭环更新 (Update/Sync/Archive) 机制。**开始任务前必读**。
+- **[SDD 工作流 SOP](docs/sops/sdd-workflow.md)**: `/opsx:` 指令的使用规则（含 `/opsx:product-sense`, `/opsx:product-planning`, `/opsx:story` 业务评审指令）、6步探索法、HITL（人机协同）检查点以及**四大任务类型 (Epic/Story/Bug Fix/Tech Debt) 的分支策略**与闭环更新 (Update/Sync/Archive) 机制。**开始任务前必读**。
 - **[产品路线图](docs/ROADMAP.md)**: 高阶业务规划，明确当前项目所处阶段，指导 Explore 探索的边界。
 - **[产品感与业务导向](docs/PRODUCT_SENSE.md)**: AI 决策准则、目标用户画像，确保构建“可视即价值”的极简电商。
 - **[前端开发规范与验证闭环](docs/FRONTEND.md)**: 包含极简 UI 约束（无圆角、slate 色系、真实数据），以及通过浏览器验证视觉约束的闭环 SOP。
