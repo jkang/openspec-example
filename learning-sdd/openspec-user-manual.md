@@ -293,17 +293,16 @@ your-project/
 │   ├── config.yaml               # 项目配置（技术栈、约定规则等，注入 AI 请求）
 │   ├── changes/                  # 变更提案目录（每个功能/变更一个文件夹）
 │   └── specs/                    # 主规范目录（已归档的规范）
-├── .claude/                       # Claude Code 专属目录（示例）
-│   ├── commands/opsx/            # /opsx 斜杠命令（供 IDE 直接调用）
+├── .trae/                        # Trae 专属目录
+│   ├── commands/opsx/            # /opsx 斜杠命令
+│   │   ├── planning/             # 规划层指令 (product-sense, product-planning)
 │   │   ├── propose.md
 │   │   ├── explore.md
-│   │   ├── apply.md
-│   │   └── archive.md
-│   └── skills/                   # Agent Skills（AI 自动检测并加载）
-│       ├── openspec-propose/SKILL.md
-│       ├── openspec-explore/SKILL.md
-│       ├── openspec-apply-change/SKILL.md
-│       └── openspec-archive-change/SKILL.md
+│   │   └── ...
+│   └── skills/                   # Agent Skills
+│       ├── planning/             # 规划层技能
+│       ├── openspec-propose/
+│       └── ...
 └── ... (项目其他文件)
 ```
 
@@ -1312,6 +1311,6 @@ OpenSpec 强调“外部可观察行为”，但这不仅限于前端界面的�
 
 ---
 
-_文档版本: 2.3_
-_最后更新: 2026-07-08_
-_基于 v1.8.0 更新：迁移至 Trae/Claude Code，新增 Explore First / Fluid Workflow / Stores 特性_
+_文档版本: 3.0_
+_最后更新: 2026-08-19_
+_基于 v2.0 更新：引入 Planning Layer (规划层)，支持 Product Sense 与 Rolling Roadmap 滚动治理_

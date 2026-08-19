@@ -26,9 +26,11 @@
 
 ## 🗂️ 唯一事实来源 (Single Source of Truth)
 
-本项目由 OpenSpec (v1.8.0) 框架进行治理。
+本项目由 OpenSpec (v2.0) 框架进行治理。
 所有的需求、设计和任务都与代码一起进行版本控制：
 
+- `docs/PRODUCT_SENSE.md`: **[全局规划]** 定义产品灵魂、痛点及竞争优势。
+- `docs/ROADMAP.md`: **[全局规划]** 定义滚动路线图、阶段边界及当前 Baseline。
 - `openspec/schemas/spec-driven.yaml`: **[Schema 优先]** 定义了所有制品的生成指令和格式约束，是工作流的最底层事实来源。
 - `openspec/changes/ideas/`: 通过 `/opsx:explore` 产生的原始想法。
 - `openspec/changes/`: 活跃的执行计划 (提案 Proposal、设计 Design、任务 Tasks、原型 Prototypes)。

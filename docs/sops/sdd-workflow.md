@@ -1,4 +1,4 @@
-# OpenSpec SDD Workflow SOP (v1.8.0)
+# OpenSpec SDD Workflow SOP (v2.0)
 
 本文档定义了 OpenSpec-Practice 项目的规格驱动开发 (Spec-Driven Development, SDD) 标准操作程序。所有参与此项目的 AI Agent 必须严格遵循本流程。
 
