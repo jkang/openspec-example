@@ -2,26 +2,55 @@
 
 ## 1. 引言：软件工程的新范式
 
-在 AI 辅助编程（AI-Assisted Programming）日益普及的今天，开发者面临的核心挑战已从“如何写代码”转变为“如何与 AI 协作以获得确定性的结果”。传统的开发模式是 **需求 -> 人 -> 代码**，而 OpenSpec v2.0 倡导的新范式正在演变为：**规划层 (Planning Layer) -> Explore (探索) -> Propose (提案) -> 原型 (Prototype) -> Spec (规范) -> Apply (实现) -> Sync (同步) -> Archive (归档)**。
+在 AI 辅助编程（AI-Assisted Programming）日益普及的今天，开发者面临的核心挑战已从“如何写代码”转变为“如何与 AI 协作以获得确定性的结果”。传统的开发模式是 **需求 -> 人 -> 代码**，而 OpenSpec v2.0 倡导的新范式正在演变为一套“可分支的规格驱动闭环”：以规划层作为护栏，在探索阶段完成任务类型识别，然后按不同任务类型进入提案、原型、业务评审、规格与设计、实施、验证与归档的闭环
+
+本图与 [sdd-workflow.md](file:///Users/superkkk/MyCoding/OpenSpec-practice/docs/sops/sdd-workflow.md#L20-L68) 的 SDD 动态分支工作流保持一致
 
 ```mermaid
 graph TD
-    Sense[Product Sense /opsx:product-sense] --> Plan[Roadmap Planning /opsx:product-planning]
-    Plan --> Context((上下文注入 config.yaml))
-    Context --> B(Explore 探索与路线图对齐)
-    B --> C{决策确认?}
-    C -- 否 --> B
-    C -- 是 --> D(Propose 提案与设计)
-    D --> E(生成原型 Prototype)
-    E --> F{视觉/交互确认?}
-    F -- 否 --> D
-    F -- 是 --> G(Spec 规格定义)
-    G --> H(Apply 实现与生成)
-    H --> I(Validate 自动化验证)
-    I --> J{符合规格?}
-    J -- 否 --> H
-    J -- 是 --> K(Sync 规格同步)
-    K --> L(Archive 归档)
+    A[产品感 /opsx:product-sense] --> B[路线图规划 /opsx:product-planning]
+    B --> C((上下文注入 config.yaml))
+
+    C --> D((探索阶段 /opsx:explore))
+    D --> E{确认任务类型}
+
+    E -->|史诗| F[拆解为多个功能条目]
+    F --> G[生成 openspec/epic-KEY.story-list.json]
+    G --> H[提案 /opsx:propose]
+
+    E -->|功能| H
+    H --> I{涉及 UI 变更?}
+    I -->|是| J[原型 /opsx:prototype]
+    J --> K{视觉/交互确认?}
+    K -->|否| J
+    K -->|是| L[业务故事评审 /opsx:story]
+    I -->|否| L
+    L --> M[规格与设计与任务清单 /opsx:spec-design]
+
+    E -->|缺陷修复| N[提案 /opsx:propose]
+    N --> O{涉及 UI 变更?}
+    O -->|是| J
+    O -->|否| P[规格与设计与任务清单（含根因分析） /opsx:spec-design]
+    K -->|是| P
+
+    E -->|技术债| Q[提案 /opsx:propose]
+    Q --> R{有外部行为变更?}
+    R -->|是| M
+    R -->|否| S[配置 skip_specs: true]
+    S --> T[设计与任务清单 /opsx:spec-design]
+
+    M --> U((实施阶段 /opsx:apply))
+    P --> U
+    T --> U
+
+    U --> V((验证门禁))
+    V --> W{需要更新规划?}
+    W -->|是| X[更新规划 /opsx:update]
+    X --> U
+    W -->|否| Y[同步规格 /opsx:sync]
+
+    Y --> Z[归档 /opsx:archive]
+    Z --> AA((完成))
 ```
 
 本文以一个 **小型电商系统** 的从零构建到生产级演进为例，深度复盘基于 OpenSpec v2.0 的 AI 协同开发全流程。我们将展示 OpenSpec 如何作为“治理驱动的桥梁”，确保每一个变更都长在产品规划的护栏内。

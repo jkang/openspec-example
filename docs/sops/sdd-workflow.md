@@ -17,62 +17,57 @@
   - 规划层产物是全局上下文，将自动注入所有后续指令。
   - 必须包含“未来 +1, +2 个月”的滚动预测。
 
-### SDD 动态分支工作流 (Workflow Branching)
-为确保各类型任务的遵循性，OpenSpec 流程根据任务类型 (Task Type) 进行动态分支。请所有参与项目的 AI Agent **严格根据下方流程图中的条件分支**执行必须步骤和可选步骤：
+### SDD 动态分支工作流
+为确保各类型任务的遵循性，OpenSpec 流程根据任务类型进行动态分支。请所有参与项目的 AI Agent **严格根据下方流程图中的条件分支**执行必须步骤和可选步骤：
 
 ```mermaid
 graph TD
-    %% 规划层 (Planning Layer)
-    Sense[Product Sense /opsx:product-sense] --> Plan[Roadmap Planning /opsx:product-planning]
-    Plan --> Context((上下文注入 config.yaml))
+    A[产品感 /opsx:product-sense] --> B[路线图规划 /opsx:product-planning]
+    B --> C((上下文注入 config.yaml))
 
-    %% 交付层 (Delivery Layer)
-    Context --> Start((Explore 阶段))
-    Start --> Type{确认任务类型}
+    C --> D((探索阶段 /opsx:explore))
+    D --> E{确认任务类型}
 
-    %% Epic 分支
-    Type -->|Epic 大块需求| Epic_Split[拆解为具体 Story]
-    Epic_Split --> Epic_Backlog[生成 openspec/epic-KEY.story-list.json]
-    Epic_Backlog --> Plan
-    
-    %% Story 分支
-    Type -->|Story 具体功能| F_Prop[Proposal 提案 /opsx:propose]
-    F_Prop --> F_Proto[Prototype UI原型 /opsx:prototype]
-    F_Proto --> F_Story[Story 业务评审 /opsx:story]
-    F_Story --> F_Spec[Specs 行为规范 /opsx:spec-design]
-    F_Spec --> F_Des[Design 技术设计]
-    F_Des --> Tasks[Tasks 任务清单]
+    E -->|史诗| EP1[拆解为多个功能条目]
+    EP1 --> EP2[生成 openspec/epic-KEY.story-list.json]
+    EP2 --> EP3((等待启动具体功能条目))
 
-    %% Bug Fix 分支
-    Type -->|Bug Fix 缺陷修复| B_Prop[Proposal 提案 /opsx:propose]
-    B_Prop --> B_UI{涉及 UI 变更?}
-    B_UI -->|是| F_Proto
-    B_UI -->|否| B_Story[Story 业务评审 /opsx:story]
-    B_Story --> B_Spec[Specs 仅修正现有场景 /opsx:spec-design]
-    B_Spec --> B_Des[Design 根本原因分析 RCA]
-    B_Des --> Tasks
+    E -->|功能| F1[提案 /opsx:propose]
+    F1 --> F2{涉及 UI 变更?}
+    F2 -->|是| F3[原型 /opsx:prototype]
+    F3 --> F4{视觉/交互确认?}
+    F4 -->|否| F3
+    F4 -->|是| F5[业务故事评审 /opsx:story]
+    F2 -->|否| F5
+    F5 --> F6[规格与设计与任务清单 /opsx:spec-design]
 
-    %% Tech Debt 分支
-    Type -->|Tech Debt 技术债| T_Prop[Proposal 提案 /opsx:propose]
-    T_Prop --> T_Spec{有外部行为变更?}
-    T_Spec -->|是| F_Spec
-    T_Spec -->|否| T_Skip[配置 skip_specs: true]
-    T_Skip --> T_Des[Design 重构与架构方案 /opsx:spec-design]
-    T_Des --> Tasks
+    E -->|缺陷修复| B1[提案 /opsx:propose]
+    B1 --> B2{涉及 UI 变更?}
+    B2 -->|是| B3[原型 /opsx:prototype]
+    B3 --> B4{视觉/交互确认?}
+    B4 -->|否| B3
+    B4 -->|是| B5[规格与设计与任务清单（含根因分析） /opsx:spec-design]
+    B2 -->|否| B5
 
-    Tasks --> Apply((Apply 实施阶段))
-    
-    Apply --> Update_Opt{需要修改计划?}
-    Update_Opt -->|是| Update[Update 更新规划]
-    Update --> Apply
-    Update_Opt -->|否| Sync[Sync 同步规格]
-    
-    Sync --> Archive[Archive 归档]
-    Archive --> Done((完成))
-    
-    classDef mandatory fill:#e1f5fe,stroke:#333,stroke-width:2px;
-    classDef optional fill:#fff3e0,stroke:#333,stroke-width:1px,stroke-dasharray: 5 5;
-    class F_Proto,B_UI,T_Spec,T_Skip,Update_Opt,Update optional;
+    E -->|技术债| T1[提案 /opsx:propose]
+    T1 --> T2{有外部行为变更?}
+    T2 -->|是| T3[规格与设计与任务清单 /opsx:spec-design]
+    T2 -->|否| T4[配置 skip_specs: true]
+    T4 --> T5[设计与任务清单 /opsx:spec-design]
+
+    F6 --> U((实施阶段 /opsx:apply))
+    B5 --> U
+    T3 --> U
+    T5 --> U
+
+    U --> V((验证门禁))
+    V --> W{需要更新规划?}
+    W -->|是| X[更新规划 /opsx:update]
+    X --> U
+    W -->|否| Y[同步规格 /opsx:sync]
+
+    Y --> Z[归档 /opsx:archive]
+    Z --> AA((完成))
 ```
 
 ### 1. 探索阶段 (Explore)
@@ -80,9 +75,9 @@ graph TD
 - **目标**: 在没有任何制品前，通过对话澄清需求，探索代码库，权衡方案。
 - **强制约束 (Hard Constraint)**:
   - 必须严格遵循“结构化 6 步法”。
-  - **任务类型确认 (Task Classification)**: 必须确认是 Epic, Story, Bug Fix 还是 Tech Debt。
+  - **任务类型确认 (Task Classification)**: 必须确认是史诗、功能、缺陷修复还是技术债。
   - **规划对齐 (Roadmap Alignment)**: 在 `ideas/idea.md` 中必须显式写一段“与当前阶段目标对齐说明”，引用 `docs/ROADMAP.md` 中的目标。
-  - **Epic 治理**: 如果是 Epic，必须在 `openspec/` 目录下创建一个 `epic-<key>.story-list.json` 文件作为执行队列。
+  - **史诗治理**: 如果是史诗，必须在 `openspec/` 目录下创建一个 `epic-<key>.story-list.json` 文件作为执行队列。
   - **唯一输出**: 必须生成 `ideas/idea.md` (相对于变更目录) 作为后续提案的唯一源头。
   - 不得在没有 `ideas/idea.md` 的情况下跳过此阶段进入提案。
   
@@ -91,12 +86,14 @@ graph TD
 - **目标**: 根据 `idea.md` 生成变更提案 `proposal.md`。
 - **强制约束 (Hard Constraint)**:
   - 必须基于 `idea.md` 的任务类型明确后续路径。
-  - 对于 Epic 类型，生成提案后应停止，等待拆分。
-  - 对于其他类型，引导用户进入下一步（涉及 UI 走 `/opsx:prototype`，否则走 `/opsx:story`，随后再进入 `/opsx:spec-design`）。
+  - 对于史诗类型，生成提案后应停止，等待拆分。
+  - 对于功能类型，引导用户进入下一步（涉及 UI 先 `/opsx:prototype` 并完成确认，再 `/opsx:story`，随后进入 `/opsx:spec-design`；不涉及 UI 则直接 `/opsx:story`，随后进入 `/opsx:spec-design`）。
+  - 对于缺陷修复类型，引导用户进入下一步（涉及 UI 先 `/opsx:prototype` 并完成确认，随后进入 `/opsx:spec-design`；不涉及 UI 则直接进入 `/opsx:spec-design`，并在设计中包含根因分析）。
+  - 对于技术债类型，引导用户进入下一步（若有外部行为变更则进入 `/opsx:spec-design`；若无外部行为变更则配置 `skip_specs: true`，生成设计与任务清单后再进入 `/opsx:apply`）。
   
 ### 3. 原型验证阶段 (Prototype) - 可选
 - **指令**: `/opsx:prototype <name>`
-- **目标**: 为 Story 或涉及 UI 的 Bug Fix 生成交互式 HTML 原型。
+- **目标**: 为功能或涉及 UI 变更的缺陷修复生成交互式 HTML 原型。
 - **强制约束 (Hard Constraint) - HITL 检查点**:
   - 生成原型后，必须通过 `AskUserQuestion` 获取人类确认。
   - 原型是 UI 逻辑的唯一事实来源，确认后方可进入下一步。
