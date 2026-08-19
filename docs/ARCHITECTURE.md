@@ -12,7 +12,7 @@
 | --- | --- | --- |
 | **HTTP Layer** | 处理路由、HTTP 请求解析、鉴权、返回 JSON 响应。 | 只能调用 Service，严禁直接调用 Repo 或 Domain 逻辑。 |
 | **Service Layer** | 业务用例编排 (Use-case orchestration)，如 CartService, CatalogService。 | 调用 Domain 模型进行计算，调用 Repo 进行持久化。 |
-| **Domain Layer** | 纯业务逻辑、实体定义、状态流转规则。 | **零外部依赖**。不依赖 HTTP，不依赖数据库，不包含 IO 操作。 |
+15→| **Domain Layer** | 纯业务逻辑、实体定义、状态流转规则。 | **零外部依赖**。不依赖 HTTP，不依赖数据库，不包含 IO 操作。其认知基线应与 [DOMAIN_MODEL.md](file:///Users/superkkk/MyCoding/OpenSpec-practice/docs/baseline/DOMAIN_MODEL.md) 保持一致。 |
 | **Repository Layer** | 数据的存取实现（内存或文件）。 | 仅实现数据接口，不包含业务判断。 |
 
 ## 2. 核心设计决策 (Key Design Decisions)
