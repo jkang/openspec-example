@@ -35,15 +35,17 @@ OpenSpec v2.0 引入了**规划层 (Planning Layer)**，将产品感定义与路
 
 执行 `/opsx:spec-design`。一口气生成 `spec.md`、`design.md` 和 `tasks.md`。
 - **v2.0 优化**：对于技术债任务，此步骤可配置为跳过 `specs`；但对于本例，AI 严格按 BDD 标签生成场景。
+- **业务基线同步**：在 `spec-design` 阶段，AI 会初步分析领域模型，为后续 `sync` 回流 [DOMAIN_MODEL.md](file:///Users/superkkk/MyCoding/OpenSpec-practice/docs/baseline/DOMAIN_MODEL.md) 做准备。
 
 ### 2.5 Apply：治理驱动的实现
 
 执行 `/opsx:apply`。AI 逐项完成任务，并受到 `config.yaml` 中定义的质量门禁约束。
 
-### 2.6 Sync & Archive：路线图的回馈
+### 2.6 Sync & Archive：路线图与基线的回馈
 
-归档前执行 `/opsx:sync` 合并规格。最后执行 `/opsx:archive`：
-- **v2.0 联动**：归档成功后，AI 会提醒用户运行 `/opsx:product-planning` 来刷新 `ROADMAP.md` 的当前 Baseline，标志着该功能已正式进入系统基线。
+归档前执行 `/opsx:sync` 合并规格：
+- **v2.0 联动**：执行 `sync` 不仅会合并规格，还会自动将 `story.md` 和 `design.md` 中的认知回写到 `docs/baseline/` 下的 4 份基线文档，并刷新 HTML 视图。
+- **Roadmap 刷新**：归档成功后，AI 会提醒用户运行 `/opsx:product-planning` 来刷新 `ROADMAP.md` 的当前 Baseline，标志着该功能已正式进入系统基线。
 
 ## 三、实践总结：v2.0 的价值
 

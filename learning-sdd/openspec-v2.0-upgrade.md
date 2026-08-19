@@ -47,7 +47,7 @@ v2.0 强化了人类在关键节点的控制力，尤其是在 UI/UX 层面：
 升级到 v2.0 不仅仅是工具的更新，更是**协作契约**的升级：
 
 1.  **初始化规划层**：执行 `/opsx:product-sense` 和 `/opsx:product-planning` 补齐文档。
-2.  **更新 Config**：在 `openspec/config.yaml` 中注入规划层文档引用。
+2.  **更新 Config**：在 `openspec/config.yaml` 中注入规划层文档引用（如 `docs/SOPS/SDD_WORKFLOW.md`）。
 3.  **同步三端**：确保 `.trae/`、`.cursor/` 和 `.agents/` 目录下的规则同步刷新。
 
 v2.0 的目标是让 AI 成为一个**懂业务、守边界、高保真**的专业伙伴，彻底告别“需求漂移”时代。

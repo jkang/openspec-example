@@ -112,7 +112,7 @@ npm install -g @fission-ai/openspec@latest
 - **实战手册**: [SDD 入门工作坊引导手册](./learning-sdd/workshop-facilitation.html) — 3 小时快速上手流程。
 - **版本升级**: [从 v1.8.0 升级到 v2.0](./learning-sdd/openspec-v2.0-upgrade.md) — 深度解析规划层与治理变革。
 - **流程实践**: [v2.0 完整工作流实战案例](./learning-sdd/openspec-v2.0-workflow-practice.md) — 以商品搜索为例演示全链路协作。
-- **进阶指南**: [OpenSpec 实战指南](./learning-sdd/openspec-practical-guide.md) — 深度理解 SDD 工程实践。
+- **进阶指南**: [OpenSpec 综合手册](./learning-sdd/openspec-user-manual.md) — 深度理解 SDD 工程实践与实战案例。
 - **复盘分析**: [AI 协作全流程深度复盘](./learning-sdd/openspec-ai-workflow-analysis.md) — 学习应用实例，如何使用这个框架通过提示实现需求。
 
 ---

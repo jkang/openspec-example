@@ -16,7 +16,7 @@
 
 在编写任何代码或提出方案之前，你**必须**查阅相关的治理文档：
 
-- **[SDD 工作流 SOP](docs/sops/sdd-workflow.md)**: `/opsx:` 指令的使用规则（含 `/opsx:product-sense`, `/opsx:product-planning`, `/opsx:story` 业务评审指令）、6步探索法、HITL（人机协同）检查点以及**四大任务类型 (Epic/Story/Bug Fix/Tech Debt) 的分支策略**与**业务基线同步 (Baseline Sync)** 机制。**开始任务前必读**。
+- **[SDD 工作流 SOP](docs/SOPS/SDD_WORKFLOW.md)**: `/opsx:` 指令的使用规则（含 `/opsx:product-sense`, `/opsx:product-planning`, `/opsx:story` 业务评审指令）、6步探索法、HITL（人机协同）检查点以及**四大任务类型 (Epic/Story/Bug Fix/Tech Debt) 的分支策略**与**业务基线同步 (Baseline Sync)** 机制。**开始任务前必读**。
 - **[业务基线治理]**: 包含 `HIGH_LEVEL_JOURNEY.md` (用户旅程)、`STORY_MAP.md` (Story 矩阵)、`CORE_BUSINESS_PROCESS_FLOW.md` (流程图) 和 `DOMAIN_MODEL.md` (Event-Storming 模型)。**位于 `docs/baseline/`**。
 - **[产品路线图](docs/ROADMAP.md)**: 高阶业务规划，明确当前项目所处阶段，指导 Explore 探索的边界。
 - **[产品感与业务导向](docs/PRODUCT_SENSE.md)**: AI 决策准则、目标用户画像，确保构建“可视即价值”的极简电商。

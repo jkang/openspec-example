@@ -4,7 +4,7 @@
 
 在 AI 辅助编程（AI-Assisted Programming）日益普及的今天，开发者面临的核心挑战已从“如何写代码”转变为“如何与 AI 协作以获得确定性的结果”。传统的开发模式是 **需求 -> 人 -> 代码**，而 OpenSpec v2.0 倡导的新范式正在演变为一套“可分支的规格驱动闭环”：以规划层作为护栏，在探索阶段完成任务类型识别，然后按不同任务类型进入提案、原型、业务评审、规格与设计、实施、验证与归档的闭环
 
-本图与 [sdd-workflow.md](file:///Users/superkkk/MyCoding/OpenSpec-practice/docs/sops/sdd-workflow.md#L20-L68) 的 SDD 动态分支工作流保持一致
+本图与 [SDD_WORKFLOW.md](file:///Users/superkkk/MyCoding/OpenSpec-practice/docs/SOPS/SDD_WORKFLOW.md#L20-L68) 的 SDD 动态分支工作流保持一致
 
 ```mermaid
 graph TD
@@ -98,7 +98,7 @@ graph TD
 4.  **规格产出**: 生成 `proposal.md`、`design.md`、`specs/` 及 `tasks.md`：
     - **Proposal**: 明确变更的 Why 和系统能力边界。
     - **Spec**: 此时的 Spec 不再只是文字，它通过 `<details>` 标签嵌入了原型代码，并将原型中的交互行为转化为 Gherkin (Given/When/Then) 场景。
-5.  **配套文章**: 后续基于这些规范文档，撰写了配套的实战指南文章 [openspec-practical-guide.md](./openspec-practical-guide.md)。
+5.  **配套文章**: 后续基于这些规范文档，撰写了配套的实战指南，已合并入 [OpenSpec 使用手册](./openspec-user-manual.md)。
 
 **价值分析**:
 
@@ -446,11 +446,11 @@ ecommerce/ecommerce-mini-python/tests/test_smoke.py ..           [100%]
 
 ## 附录：项目资产清单
 
-> **快速导航**：想了解 CLI 命令细节？→ [OpenSpec 使用手册](./openspec-user-manual.md)　|　想了解规范如何落地为代码？→ [实战指南](./openspec-practical-guide.md)　|　想复盘 AI 协作过程？→ 本文档
+> **快速导航**：想了解 CLI 命令细节与实战案例？→ [OpenSpec 使用手册](./openspec-user-manual.md)　|　想复盘 AI 协作过程？→ 本文档
 
 - OpenSpec CLI 参考: [OpenSpec 使用手册](./openspec-user-manual.md)（init、validate、archive 等命令详解）
 - 交互式原型目录: `openspec/changes/<change-name>/prototypes/`（Vue 3 + Tailwind CSS）
-- 原始 Spec 指南: [openspec-practical-guide.md](./openspec-practical-guide.md)
+- 综合使用手册与实战案例: [openspec-user-manual.md](./openspec-user-manual.md)
 - OpenSpec 项目配置: `openspec/config.yaml`（技术栈、架构约束与规则，自动注入每次 AI 规划请求）
 - OpenSpec 规范文件: `openspec/changes/archive/2025-01-27-v1-mvp/`（已归档）
   - `proposal.md`: 变更提案

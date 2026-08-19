@@ -109,4 +109,4 @@ cd e2e-tests && npm run test:e2e
 
 1. **环境初始化**: 创建 `e2e-tests` 目录，安装 `@cucumber/cucumber` 和 `playwright`。
 2. **打通第一个 Spec**: 选取 `openspec/specs/cart-management/spec.md`，将其中的场景提取为 `.feature`，并编写对应的 `steps.js`，跑通 Playwright 链路。
-3. **更新 Harness 文档**: 修改 `QUALITY_SCORE.md` 和 `docs/sops/sdd-workflow.md`，将 BDD 测试通过作为 Archive 的硬性前置条件。
+3.112→3. **更新 Harness 文档**: 修改 `QUALITY_SCORE.md` 和 `docs/SOPS/SDD_WORKFLOW.md`，将 BDD 测试通过作为 Archive 的硬性前置条件。

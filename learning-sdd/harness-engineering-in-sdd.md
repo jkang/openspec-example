@@ -28,7 +28,7 @@ OpenSpec 框架本身就是极佳的 Harness 实践工具，它填补了“需�
 
 | 护栏类型 | 职责范围 | 实现载体 |
 | :--- | :--- | :--- |
-| **工程护栏 (Harness)** | 规定 **怎么写 (How)**。解决代码风格、架构分层、UI 审美、测试验证标准。 | `docs/ARCHITECTURE.md`, `docs/FRONTEND.md`, `docs/sops/ui-validation-loop.md` |
+31→| **工程护栏 (Harness)** | 规定 **怎么写 (How)**。解决代码风格、架构分层、UI 审美、测试验证标准。 | `docs/ARCHITECTURE.md`, `docs/FRONTEND.md` |
 | **业务护栏 (OpenSpec)** | 规定 **写什么 (What)**。解决业务规则、需求状态、执行步骤。 | `openspec/specs/`, `openspec/changes/`, `tasks.md` |
 
 ## 4. 总结：最佳实践范式
