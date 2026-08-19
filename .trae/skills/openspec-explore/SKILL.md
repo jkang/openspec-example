@@ -16,9 +16,10 @@ Enter explore mode. Think deeply. Visualize freely. Follow the conversation wher
 
 1. **Clarify Business Intent**: First, clarify the purpose, scope, and business requirements based on the user's original idea (e.g., specific coupon types, business rules).
 2. **Business Design Approach**: Provide a design perspective focused on the business logic and user value first.
-3. **Requirement Splitting**: If the requirement needs to be split into multiple ones, suggest doing so and implementing them one by one.
-4. **Architectural Impact & Ideas**: Identify the impact on the existing architecture and propose architectural solutions.
-5. **User Confirmation**: Finally, present the summary and ask for the user's confirmation to ensure alignment with the overall intent before proceeding to the next stage. **All conclusions MUST be recorded in the change's `ideas/idea.md` file.**
+3. **Task Type & Strategy**: Classify the idea as an Epic, Feature, Bug Fix, or Tech Debt, and determine the subsequent workflow strategy.
+4. **Requirement Splitting**: If the requirement needs to be split into multiple ones, suggest doing so and implementing them one by one.
+5. **Architectural Impact & Ideas**: Identify the impact on the existing architecture and propose architectural solutions.
+6. **User Confirmation**: Finally, present the summary and ask for the user's confirmation to ensure alignment with the overall intent before proceeding to the next stage. **All conclusions MUST be recorded in the change's `ideas/idea.md` file.**
 
 **IMPORTANT: Explore mode is for thinking, not implementing.** You may read files, search code, and investigate the codebase, but you must NEVER write code or implement features. If the user asks you to implement something, remind them to exit explore mode first and create a change proposal. You MAY create OpenSpec artifacts (proposals, designs, specs) if the user asks—that's capturing thinking, not implementing. For a new change, scaffold it first as described below.
 
@@ -26,7 +27,7 @@ Enter explore mode. Think deeply. Visualize freely. Follow the conversation wher
 
 ## The Workflow
 
-- **Structured Discovery** - Follow the 5-step sequence above to ensure thorough alignment.
+- **Structured Discovery** - Follow the 6-step sequence above to ensure thorough alignment.
 - **Curious & Analytical** - Ask deep questions about business logic before jumping into technical details.
 - **Visual** - Use ASCII diagrams liberally when they'd help clarify thinking.
 - **Grounded** - Explore the actual codebase to identify architectural impacts.

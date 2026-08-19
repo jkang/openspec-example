@@ -83,7 +83,7 @@ When the user is ready to implement, they must start the apply workflow explicit
 
    Use a todo list to track progress through the artifacts.
 
-   **MANDATORY CHECK**: Before creating `proposal.md`, you MUST ensure `ideas/idea.md` exists and contains the results of a structured 5-step exploration. If it's missing or generic, you MUST transition to the `openspec-explore` skill logic to clarify the business intent with the user first.
+   **MANDATORY CHECK**: Before creating `proposal.md`, you MUST ensure `ideas/idea.md` exists and contains the results of a structured 6-step exploration. If it's missing or generic, you MUST transition to the `openspec-explore` skill logic to clarify the business intent with the user first.
 
    Loop through artifacts in dependency order (artifacts with no pending dependencies first):
 

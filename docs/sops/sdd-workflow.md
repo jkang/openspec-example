@@ -10,7 +10,12 @@
 - **指令**: `/opsx:explore`
 - **目标**: 在没有任何制品前，通过对话澄清需求，探索代码库，权衡方案。
 - **强制约束 (Hard Constraint)**:
-  - 必须严格遵循“结构化 5 步法”。
+  - 必须严格遵循“结构化 6 步法”。
+  - **任务类型确认 (Task Classification)**: 在探索过程中，必须与用户确认该 idea 属于以下哪种类型，并据此决定后续的实施策略：
+    1. **Epic (大块模糊需求)**: 如“优惠券结算”。策略：拆分为多个具体的 Feature 级 idea，可能需要更新产品路线图 (Roadmap)，不直接进入 Proposal。
+    2. **Feature (具体功能修改)**: 如“结算成功提示 UI 优化”。策略：标准的完整 SDD 流程 (Proposal -> Prototype -> Specs -> Design -> Tasks)。
+    3. **Bug Fix (缺陷修复)**: 如“结算时总是展示 server failure”。策略：若无 UI 变更则跳过 Prototype，Specs 仅关注受影响的场景修改，Design 聚焦于根本原因分析 (Root Cause Analysis)。
+    4. **Tech Debt (技术债/纯技术任务)**: 如“补充 e2e 测试”或“纯后端重构”。策略：跳过 Prototype，通常在 `.openspec.yaml` 中设置 `skip_specs: true` (因无外部行为变更)，Design 聚焦于重构方案。
   - **唯一输出**: 必须生成 `openspec/changes/ideas/idea.md` 作为后续提案的唯一源头。
   - 不得在没有 `idea.md` 的情况下跳过此阶段进入提案。
 

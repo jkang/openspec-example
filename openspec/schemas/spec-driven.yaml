@@ -1,4 +1,4 @@
-name: spec-driven
+liu'cname: spec-driven
 version: 1
 description: 包含交互式原型验证的 OpenSpec 工作流 - 探索 (explore) → 提案 (proposal) → 原型 (prototype) → 规范 (specs) → 设计 (design) → 任务 (tasks)
 artifacts:
@@ -7,15 +7,16 @@ artifacts:
     description: 结构化探索文档，记录业务意图、设计思路及架构分析结论
     template: idea.md
     instruction: |
-      你必须执行 `/opsx:explore` 流程，通过“结构化 5 步法”与用户达成共识。
+      你必须执行 `/opsx:explore` 流程，通过“结构化 6 步法”与用户达成共识。
       严禁跳过探索阶段直接进入提案。
       
       在变更目录下的 `ideas/idea.md` 中记录以下结论：
       1. **澄清业务意图**：目的、范围、具体业务要求。
       2. **业务设计思路**：逻辑流转、用户价值。
-      3. **需求拆分建议**：是否需要分阶段实施。
-      4. **架构影响分析**：现有架构改动点、技术挑战。
-      5. **确认结论**：用户已确认的最终意图。
+      3. **任务类型与后续策略**：必须与用户确认这是 Epic, Feature, Bug Fix 还是 Tech Debt，并制定对应的流程策略。
+      4. **需求拆分建议**：是否需要分阶段实施。
+      5. **架构影响分析**：现有架构改动点、技术挑战。
+      6. **确认结论**：用户已确认的最终意图。
 
       该文档是后续所有产物的源头，未完成此文档前不得开始 `proposal`。
     requires: []
@@ -28,6 +29,7 @@ artifacts:
       创建提案文档，明确说明为什么需要进行此项变更。
       
       **强制要求**：本提案必须基于已确认的 `ideas/idea.md` 中的结论。如果你发现 `idea.md` 缺失或内容不完整，请立即停止并引导用户执行 `/opsx:explore`。
+      **流程分支控制**：检查 `idea.md` 中的“任务类型”。如果是 Epic，则提案应聚焦于拆解后的子功能；如果是 Bug Fix 或 Tech Debt，请在提案中明确说明后续可能跳过原型 (Prototype) 并在 `.openspec.yaml` 中标记 `skip_specs: true`（若适用）。
 
       章节结构：
       - **Why (背景原因)**: 用 1-2 句话说明要解决的问题或抓住的机遇。这解决了什么问题？为什么现在要做？
@@ -58,9 +60,9 @@ artifacts:
       
       在进入技术设计阶段之前，该原型将作为 UI/UX 设计的唯一事实来源 (Single Source of Truth)。
       
-      为每个涉及前端变更的能力创建一个 HTML 文件：
-      - 输出路径使用 `prototypes/<capability-path>.html`。
-      - 如果该能力不需要前端变更，请在工作流中明确说明，并跳过生成 HTML。
+      **流程分支控制**：
+      - 如果 `idea.md` 中的任务类型是 Tech Debt，或是不涉及前端 UI 变更的 Bug Fix，请在工作流中明确说明，并直接跳过生成 HTML 原型。
+      - 为每个涉及前端变更的能力创建一个 HTML 文件：输出路径使用 `prototypes/<capability-path>.html`。
     requires:
       - proposal
 
@@ -72,6 +74,10 @@ artifacts:
       创建规范文件，明确定义系统应该做什么 (WHAT)。
 
       规范 (spec) 是一份行为契约，而不是实现计划。
+      
+      **流程分支控制**：
+      - 如果任务类型是 Tech Debt 且无外部行为变更，通常在 `.openspec.yaml` 中设置 `skip_specs: true` 并跳过此阶段。
+      - 如果任务类型是 Bug Fix，规范重点在于使用 `MODIFIED Requirements` 修正现有行为的描述，不需要写长篇大论的新功能。
 
       优秀的规范内容应包含：
       - 用户或下游系统所依赖的可观察行为
@@ -166,12 +172,14 @@ artifacts:
     instruction: |
       创建技术设计文档，解释如何 (HOW) 实现此次变更。
 
-      **强制要求 (Pre-requisite)**：必须在 `idea.md`、`prototype.html` 和 `specs/*.md` 均已通过用户 review 确认后方可开始。本设计必须与确认后的原型 and 行为规范完全一致。
+      **强制要求 (Pre-requisite)**：必须在 `idea.md`、`prototype.html` (若有) 和 `specs/*.md` (若有) 均已通过用户 review 确认后方可开始。本设计必须与确认后的原型 and 行为规范完全一致。
 
       何时需要包含 design.md（仅在符合以下情况时创建）：
       - 跨模块变更（涉及多个服务/模块）或新的架构模式
       - 引入新的外部依赖，或进行重大的数据模型变更
       - 涉及安全性、性能优化或复杂的迁移工作
+      - **Bug Fix**: 需要进行根本原因分析 (Root Cause Analysis) 和制定修复方案。
+      - **Tech Debt**: 需要详细说明重构方案、依赖升级策略等。
       - 存在模糊性，在编写代码前先做技术决策会有所帮助
 
       章节结构：
