@@ -1,0 +1,23 @@
+{
+  "epicKey": "advanced-coupon-system",
+  "title": "完善优惠券结算与运营落地",
+  "description": "升级优惠券系统，支持折扣券、最优推荐算法，并提供 B 端极简运营能力。注：退款逻辑已移至下一阶段。",
+  "stories": [
+    {
+      "id": "story-coupon-engine-upgrade",
+      "title": "智能结算引擎升级",
+      "description": "实现折扣券 (PERCENTAGE) 算法及订单自动推荐最优券逻辑。",
+      "status": "in_progress",
+      "changeName": "story-coupon-engine-upgrade",
+      "priority": "high"
+    },
+    {
+      "id": "story-coupon-admin-panel",
+      "title": "B 端极简运营后台",
+      "description": "实现优惠券规则配置界面及手动单人发券功能。",
+      "status": "planned",
+      "priority": "medium"
+    }
+  ],
+  "updatedAt": "2026-08-19T14:40:00Z"
+}

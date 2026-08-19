@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>结算确认 - 极简电商</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        /* 强制执行 FRONTEND.md 规范 */
+        * {
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+        body {
+            background-color: #f8fafc; /* slate-50 */
+            color: #0f172a; /* slate-900 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .border-slate-200 {
+            border-color: #e2e8f0;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div id="app" class="flex min-h-screen">
+        <!-- 左侧导航栏 -->
+        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col">
+            <div class="h-16 flex items-center px-6 border-b border-slate-200">
+                <h1 class="text-xl font-bold tracking-tight">极简电商 ADMIN</h1>
+            </div>
+            <nav class="flex-1 py-4">
+                <div class="px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">交易管理</div>
+                <a href="#" class="flex items-center px-6 py-3 border-l-4 border-slate-900 bg-slate-50 text-slate-900 font-medium">
+                    结算确认
+                </a>
+                <a href="#" class="flex items-center px-6 py-3 border-l-4 border-transparent text-slate-600 hover:bg-slate-50 transition-colors">
+                    订单列表
+                </a>
+                <div class="mt-8 px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">营销中心</div>
+                <a href="#" class="flex items-center px-6 py-3 border-l-4 border-transparent text-slate-600 hover:bg-slate-50 transition-colors">
+                    优惠券管理
+                </a>
+            </nav>
+        </aside>
+
+        <!-- 右侧内容区 -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <!-- 顶部栏 -->
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0">
+                <div class="text-slate-600">当前路径: <span class="text-slate-900 font-medium">购物车 / 结算确认</span></div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-slate-500">运营专员: 张三</span>
+                </div>
+            </header>
+
+            <!-- 核心内容 -->
+            <div class="flex-1 overflow-y-auto p-8">
+                <div class="max-w-4xl mx-auto space-y-8">
+                    
+                    <!-- 章节: 订单明细 -->
+                    <section class="bg-white border border-slate-200 p-8">
+                        <h2 class="text-lg font-bold mb-6 border-b border-slate-200 pb-4">订单商品明细</h2>
+                        <div class="space-y-4">
+                            <div v-for="item in cartItems" :key="item.id" class="flex justify-between items-center py-2">
+                                <div class="flex items-center space-x-4">
+                                    <div class="w-16 h-16 bg-slate-100 border border-slate-200 flex items-center justify-center text-xs text-slate-400">IMG</div>
+                                    <div>
+                                        <div class="font-medium">{{ item.name }}</div>
+                                        <div class="text-sm text-slate-500">数量: {{ item.quantity }}</div>
+                                    </div>
+                                </div>
+                                <div class="font-mono text-lg">¥{{ (item.priceCents * item.quantity / 100).toFixed(2) }}</div>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- 章节: 优惠券选择 (智能推荐展示) -->
+                    <section class="bg-white border border-slate-200 p-8">
+                        <div class="flex justify-between items-center mb-6 border-b border-slate-200 pb-4">
+                            <h2 class="text-lg font-bold">可用优惠券</h2>
+                            <span class="text-sm bg-slate-900 text-white px-2 py-1">已自动选择最优方案</span>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div v-for="coupon in coupons" 
+                                 :key="coupon.id" 
+                                 :class="['border p-4 transition-all cursor-pointer relative', 
+                                          selectedCouponId === coupon.id ? 'border-slate-900 bg-slate-50' : 'border-slate-200 hover:border-slate-400']"
+                                 @click="selectCoupon(coupon.id)">
+                                
+                                <div class="flex justify-between items-start">
+                                    <div>
+                                        <div class="font-bold text-lg" :class="selectedCouponId === coupon.id ? 'text-slate-900' : 'text-slate-600'">
+                                            {{ coupon.name }}
+                                        </div>
+                                        <div class="text-xs text-slate-500 mt-1">门槛: 满 ¥{{ coupon.minSpendCents / 100 }} 可用</div>
+                                    </div>
+                                    <div class="font-mono text-xl font-black text-slate-900">
+                                        {{ coupon.type === 'FLAT' ? '¥' + (coupon.value / 100) : (coupon.value) + '折' }}
+                                    </div>
+                                </div>
+
+                                <div v-if="selectedCouponId === coupon.id" class="mt-4 text-xs font-bold text-slate-900 flex items-center">
+                                    <span class="mr-1">●</span> 当前最优: 预计减免 ¥{{ calculateDiscount(coupon).toFixed(2) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 p-4 bg-slate-50 border border-slate-200 text-sm text-slate-600">
+                            规则提示: 每次订单仅限使用一张优惠券，系统已为您自动匹配减免金额最大的优惠方案。
+                        </div>
+                    </section>
+
+                    <!-- 结算栏 -->
+                    <section class="bg-white border border-slate-200 p-8">
+                        <div class="space-y-4">
+                            <div class="flex justify-between text-slate-600">
+                                <span>商品总价</span>
+                                <span class="font-mono text-lg">¥{{ (totalCents / 100).toFixed(2) }}</span>
+                            </div>
+                            <div class="flex justify-between text-slate-600">
+                                <span>优惠减免</span>
+                                <span class="font-mono text-lg text-red-600">- ¥{{ (finalDiscountCents / 100).toFixed(2) }}</span>
+                            </div>
+                            <div class="border-t border-slate-200 pt-6 flex justify-between items-end">
+                                <span class="text-xl font-bold">实际支付金额</span>
+                                <div class="text-right">
+                                    <div class="text-3xl font-black font-mono text-slate-900">¥{{ (actualPaidCents / 100).toFixed(2) }}</div>
+                                    <div class="text-xs text-slate-400 mt-1">已包含所有税费与运费</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-8">
+                            <button class="w-full bg-slate-900 text-white py-4 font-bold text-lg hover:bg-slate-800 transition-colors">
+                                确认下单并支付
+                            </button>
+                        </div>
+                    </section>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const { createApp, ref, computed, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                // 真实业务数据示例
+                const cartItems = ref([
+                    { id: 1, name: 'MacBook Pro 14英寸 (M3芯片)', priceCents: 1499900, quantity: 1 },
+                    { id: 2, name: 'Apple Magic Mouse (黑色)', priceCents: 54900, quantity: 1 }
+                ]);
+
+                const coupons = ref([
+                    { id: 'c1', name: '全场满减券', type: 'FLAT', value: 10000, minSpendCents: 100000 },
+                    { id: 'c2', name: '夏季数码折扣券', type: 'PERCENTAGE', value: 9, minSpendCents: 0 },
+                    { id: 'c3', name: '新人专享券', type: 'FLAT', value: 5000, minSpendCents: 50000 }
+                ]);
+
+                const selectedCouponId = ref(null);
+
+                const totalCents = computed(() => {
+                    return cartItems.value.reduce((sum, item) => sum + item.priceCents * item.quantity, 0);
+                });
+
+                const calculateDiscount = (coupon) => {
+                    if (totalCents.value < coupon.minSpendCents) return 0;
+                    
+                    if (coupon.type === 'FLAT') {
+                        return Math.min(totalCents.value, coupon.value) / 100;
+                    } else {
+                        // 折扣计算: 总价 * (1 - 折扣率/10)
+                        const discount = totalCents.value * (1 - coupon.value / 10);
+                        return Math.floor(discount) / 100;
+                    }
+                };
+
+                const findBestCoupon = () => {
+                    let bestId = null;
+                    let maxDiscount = -1;
+
+                    coupons.value.forEach(coupon => {
+                        const discount = calculateDiscount(coupon);
+                        if (discount > maxDiscount) {
+                            maxDiscount = discount;
+                            bestId = coupon.id;
+                        }
+                    });
+
+                    return bestId;
+                };
+
+                onMounted(() => {
+                    // 模拟智能推荐逻辑
+                    selectedCouponId.value = findBestCoupon();
+                });
+
+                const selectCoupon = (id) => {
+                    selectedCouponId.value = id;
+                };
+
+                const finalDiscountCents = computed(() => {
+                    const coupon = coupons.value.find(c => c.id === selectedCouponId.value);
+                    if (!coupon) return 0;
+                    return Math.floor(calculateDiscount(coupon) * 100);
+                });
+
+                const actualPaidCents = computed(() => {
+                    return Math.max(0, totalCents.value - finalDiscountCents.value);
+                });
+
+                return {
+                    cartItems,
+                    coupons,
+                    selectedCouponId,
+                    totalCents,
+                    finalDiscountCents,
+                    actualPaidCents,
+                    selectCoupon,
+                    calculateDiscount
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
