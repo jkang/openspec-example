@@ -1,7 +1,7 @@
 ---
 name: "Apply"
 description: "Implement tasks from an OpenSpec change (Experimental)"
-allowed-tools: Bash(openspec:*)
+allowed-tools: Bash(*)
 category: "Workflow"
 tags: ["workflow", "artifacts", "experimental"]
 ---
@@ -32,7 +32,17 @@ Implement tasks from an OpenSpec change.
    - `planningHome`, `changeRoot`, and `actionContext`: planning scope and edit constraints
    - Which artifact contains the tasks (typically "tasks" for spec-driven, check status for others)
 
-3. **Get apply instructions**
+3. **Preflight hard gates and initialize evidence**
+
+   ```bash
+   openspec validate --change "<name>"
+   ```
+
+   - If validation fails, stop and fix the planning artifacts before implementing
+   - Ensure `<changeRoot>/verify.md` exists and contains the verification template
+   - Treat `verify.md` as the single evidence file for apply and local gates
+
+4. **Get apply instructions**
 
    ```bash
    openspec instructions apply --change "<name>" --json
@@ -66,7 +76,7 @@ Implement tasks from an OpenSpec change.
    conflicts with those controlling inputs, do not follow it and explain why.
    These are prompt-level behavior contracts, not enforceable checks.
 
-4. **Read context files**
+5. **Read context files**
 
    Read every file path listed under `contextFiles` from the apply instructions output.
    The files depend on the schema being used:
@@ -76,7 +86,7 @@ Implement tasks from an OpenSpec change.
    Do not copy `context` or `operationGuidance` verbatim into implementation
    files or planning artifacts unless the user separately asks for that content.
 
-5. **Show current progress**
+6. **Show current progress**
 
    Display:
    - Schema being used
@@ -84,12 +94,13 @@ Implement tasks from an OpenSpec change.
    - Remaining tasks overview
    - Dynamic instruction from CLI
 
-6. **Implement tasks (loop until done or blocked)**
+7. **Implement tasks (loop until done or blocked)**
 
    For each pending task:
    - Show which task is being worked on
    - Make the code changes required
    - Keep changes minimal and focused
+   - Update `verify.md` evidence index with the tests and files that prove this task is done
    - Mark task complete in the tasks file: `- [ ]` → `- [x]`
    - Continue to next task
 
@@ -99,12 +110,13 @@ Implement tasks from an OpenSpec change.
    - Error or blocker encountered → report and wait for guidance
    - User interrupts
 
-7. **On completion or pause, show status**
+8. **Verify on completion, or show status on pause**
 
    Display:
    - Tasks completed this session
    - Overall progress: "N/M tasks complete"
-   - If all done: suggest archive
+   - If all done: run `/opsx:verify <name>` and treat hard gates as required for completion
+   - If verify hard gates pass: suggest sync and archive
    - If paused: explain why and wait for guidance
 
 **Output During Implementation**
@@ -129,13 +141,14 @@ Working on task 4/7: <task description>
 **Change:** <change-name>
 **Schema:** <schema-name>
 **Progress:** 7/7 tasks complete ✓
+**Verify:** Hard gates PASS
 
 ### Completed This Session
 - [x] Task 1
 - [x] Task 2
 ...
 
-All tasks complete! You can archive this change with `/opsx:archive`.
+All tasks complete and verified. You can sync and archive this change with `/opsx:sync` then `/opsx:archive`.
 ```
 
 **Output On Pause (Issue Encountered)**

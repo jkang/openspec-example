@@ -1,7 +1,7 @@
 ---
 name: openspec-apply-change
 description: Implement tasks from an OpenSpec change. Use when the user wants to start implementing, continue implementation, or work through tasks.
-allowed-tools: Bash(openspec:*)
+allowed-tools: Bash(*)
 license: MIT
 compatibility: Requires openspec CLI.
 metadata:
@@ -36,7 +36,17 @@ Implement tasks from an OpenSpec change.
    - `planningHome`, `changeRoot`, and `actionContext`: planning scope and edit constraints
    - Which artifact contains the tasks (typically "tasks" for spec-driven, check status for others)
 
-3. **Get apply instructions**
+3. **Preflight hard gates and initialize evidence**
+
+   ```bash
+   openspec validate --change "<name>"
+   ```
+
+   - If validation fails, stop and fix the planning artifacts before implementing
+   - Ensure `<changeRoot>/verify.md` exists and contains a gate list for this change
+   - Treat `verify.md` as the single evidence file for apply and local gates
+
+4. **Get apply instructions**
 
    ```bash
    openspec instructions apply --change "<name>" --json
@@ -70,7 +80,7 @@ Implement tasks from an OpenSpec change.
    conflicts with those controlling inputs, do not follow it and explain why.
    These are prompt-level behavior contracts, not enforceable checks.
 
-4. **Read context files**
+5. **Read context files**
 
    Read every file path listed under `contextFiles` from the apply instructions output.
    The files depend on the schema being used:
@@ -80,7 +90,7 @@ Implement tasks from an OpenSpec change.
    Do not copy `context` or `operationGuidance` verbatim into implementation
    files or planning artifacts unless the user separately asks for that content.
 
-5. **Show current progress**
+6. **Show current progress**
 
    Display:
    - Schema being used
@@ -88,12 +98,13 @@ Implement tasks from an OpenSpec change.
    - Remaining tasks overview
    - Dynamic instruction from CLI
 
-6. **Implement tasks (loop until done or blocked)**
+7. **Implement tasks (loop until done or blocked)**
 
    For each pending task:
    - Show which task is being worked on
    - Make the code changes required
    - Keep changes minimal and focused
+   - Update `verify.md` evidence index with the tests and files that prove this task is done
    - Mark task complete in the tasks file: `- [ ]` → `- [x]`
    - Continue to next task
 
@@ -104,12 +115,13 @@ Implement tasks from an OpenSpec change.
    - Error or blocker encountered → report and wait for guidance
    - User interrupts
 
-7. **On completion or pause, show status**
+8. **Verify on completion, or show status on pause**
 
    Display:
    - Tasks completed this session
    - Overall progress: "N/M tasks complete"
-   - If all done: suggest archive
+   - If all done: run the local hard gates and update `verify.md`
+   - If verify hard gates pass: suggest sync and archive
    - If paused: explain why and wait for guidance
 
 **Output During Implementation**
@@ -166,6 +178,8 @@ What would you like to do?
 **Guardrails**
 - Keep going through tasks until done or blocked
 - Always read context files before starting (from the apply instructions output)
+- Always run `openspec validate --change "<name>"` before implementing
+- Only consider apply complete when local hard gates are PASS and `verify.md` is updated
 - If task is ambiguous, pause and ask before implementing
 - If implementation reveals issues, pause and suggest artifact updates
 - Keep code changes minimal and scoped to each task

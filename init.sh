@@ -30,6 +30,7 @@ function show_help() {
     echo "  --- Vue Frontend ---"
     echo "  vue:install     - 安装前端依赖"
     echo "  vue:start       - 启动 Vite 开发服务器 (端口 5173)"
+    echo "  vue:build       - 构建前端产物"
     echo ""
     echo "  --- BDD & E2E Tests ---"
     echo "  e2e:install     - 安装全局 BDD 与 Playwright 环境"
@@ -76,6 +77,10 @@ case "$1" in
     vue:start)
         echo "-> 启动 Vue 开发服务器..."
         cd ecommerce/ecommerce-mini-frontend && npm run dev
+        ;;
+    vue:build)
+        echo "-> 构建 Vue 前端产物..."
+        cd ecommerce/ecommerce-mini-frontend && npm run build
         ;;
     e2e:install)
         echo "-> 初始化 BDD 测试环境..."
