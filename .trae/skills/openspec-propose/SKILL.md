@@ -36,10 +36,10 @@ After generating the proposal, summarize the task type and recommend the next co
 1. **Understand the request and clarify material ambiguity**
 
    **Epic Backlog Awareness**:
-   - Before starting, check for any `openspec/epic-*.feature-list.json`.
-   - If a list exists, check for the first `planned` feature.
-   - If found, advise the user to start that specific feature.
-   - If a change is being created for a feature in the list, update its status to `in_progress` and record the `changeName` in the JSON.
+    - Before starting, check for any `openspec/epic-*.story-list.json`.
+    - If a list exists, check for the first `planned` story.
+    - If found, advise the user to start that specific story.
+    - If a change is being created for a story in the list, update its status to `in_progress` and record the `changeName` in the JSON.
 
    If no clear input is provided, ask the user (open-ended, no preset options):
    > "What change do you want to work on? Describe what you want to build or fix."

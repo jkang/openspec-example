@@ -12,11 +12,11 @@ Archive a completed change in the experimental workflow.
 
 **Epic Backlog Sync**:
 After a successful archive:
-1. Search all `openspec/epic-*.feature-list.json` for a feature matching the current `changeName`.
+1. Search all `openspec/epic-*.story-list.json` for a story matching the current `changeName`.
 2. If found, update its status to `done`.
-3. Check if all features in that list are `done`.
-4. If all are `done`, DELETE the `.feature-list.json` file.
-5. If there are remaining `planned` features, notify the user and suggest the next feature.
+3. Check if all stories in that list are `done`.
+4. If all are `done`, DELETE the `.story-list.json` file.
+5. If there are remaining `planned` stories, notify the user and suggest the next story.
 
 **Input**: Optionally specify a change name after `/opsx:archive` (e.g., `/opsx:archive add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 

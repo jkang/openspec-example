@@ -31,10 +31,10 @@ Archive a completed change in the experimental workflow.
    Include the schema used for each change if available.
    
    **Epic Backlog Sync**:
-   - After successful archiving, look for any `openspec/epic-*.feature-list.json` containing the archived `changeName`.
-   - Update the status of the matching feature to `done`.
-   - If all features in the list are `done`, delete the `.feature-list.json` file.
-   - If there are remaining `planned` features, notify the user and suggest the next one.
+    - After successful archiving, look for any `openspec/epic-*.story-list.json` containing the archived `changeName`.
+    - Update the status of the matching story to `done`.
+    - If all stories in the list are `done`, delete the `.story-list.json` file.
+    - If there are remaining `planned` stories, notify the user and suggest the next one.
    
    Always announce: "Using change: <name>" and how to override (e.g., `/opsx-archive <other>`).
 

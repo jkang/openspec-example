@@ -6,12 +6,13 @@ category: "Workflow"
 tags: ["workflow", "ui", "prototype"]
 ---
 
-Generate an interactive UI/UX prototype for a change.
+This workflow creates an interactive HTML prototype for the change to validate UI/UX before technical implementation.
 
-**Planning boundary**: This workflow creates the interactive prototype only. Do not edit project code. After the prototype is generated, you **MUST** stop and ask for human verification (HITL).
+**HITL Checkpoint**: After generating the prototype, you MUST ask the user to review and confirm it before proceeding to `/opsx:spec-design`.
 
-I'll create the prototype artifact:
-- prototypes/<capability-path>.html (interactive UI/UX validation)
+**Branching Logic**:
+- **Story/Bug Fix (with UI)**: Generate prototype.
+- **Tech Debt/Bug Fix (no UI)**: Skip this step.
 
 ---
 

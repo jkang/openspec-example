@@ -16,8 +16,8 @@ Enter explore mode. Think deeply. Visualize freely. Follow the conversation wher
 
 1. **Clarify Business Intent**: First, clarify the purpose, scope, and business requirements based on the user's original idea (e.g., specific coupon types, business rules).
 2. **Business Design Approach**: Provide a design perspective focused on the business logic and user value first.
-3. **Task Type & Strategy**: Classify the idea as an Epic, Feature, Bug Fix, or Tech Debt.
-   - **Epic Handling**: If it's an Epic, you MUST split it into individual features. Create a backlog file `openspec/epic-<key>.feature-list.json` with the structure: `{"epicKey": "<key>", "features": [{"featureKey": "...", "status": "planned", "changeName": null}, ...]}`.
+3. **Task Type & Strategy**: Classify the idea as an Epic, Story, Bug Fix, or Tech Debt.
+   - **Epic Handling**: If it's an Epic, you MUST split it into individual stories. Create a backlog file `openspec/epic-<key>.story-list.json` with the structure: `{"epicKey": "<key>", "stories": [{"storyKey": "...", "status": "planned", "changeName": null}, ...]}`.
    - Record the classification and strategy in `ideas/idea.md`.
 4. **Requirement Splitting**: If the requirement needs to be split into multiple ones, suggest doing so and implementing them one by one.
 5. **Architectural Impact & Ideas**: Identify the impact on the existing architecture and propose architectural solutions.

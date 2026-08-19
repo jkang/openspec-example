@@ -14,13 +14,13 @@ graph TD
     Start((Explore 阶段)) --> Type{确认任务类型}
 
     %% Epic 分支
-    Type -->|Epic 大块需求| Epic_Split[拆解为具体 Feature]
-    Epic_Split --> Epic_Backlog[生成 openspec/epic-KEY.feature-list.json]
+    Type -->|Epic 大块需求| Epic_Split[拆解为具体 Story]
+    Epic_Split --> Epic_Backlog[生成 openspec/epic-KEY.story-list.json]
     Epic_Backlog --> Epic_Roadmap[更新 Roadmap]
-    Epic_Roadmap --> End_Epic((结束探索，等待 Feature 启动))
+    Epic_Roadmap --> End_Epic((结束探索，等待 Story 启动))
 
-    %% Feature 分支
-    Type -->|Feature 具体功能| F_Prop[Proposal 提案 /opsx:propose]
+    %% Story 分支
+    Type -->|Story 具体功能| F_Prop[Proposal 提案 /opsx:propose]
     F_Prop --> F_Proto[Prototype UI原型 /opsx:prototype]
     F_Proto --> F_Spec[Specs 行为规范 /opsx:spec-design]
     F_Spec --> F_Des[Design 技术设计]
@@ -62,11 +62,11 @@ graph TD
 - **目标**: 在没有任何制品前，通过对话澄清需求，探索代码库，权衡方案。
 - **强制约束 (Hard Constraint)**:
   - 必须严格遵循“结构化 6 步法”。
-  - **任务类型确认 (Task Classification)**: 必须确认是 Epic, Feature, Bug Fix 还是 Tech Debt。
-  - **Epic 治理**: 如果是 Epic，必须在 `openspec/` 目录下创建一个 `epic-<key>.feature-list.json` 文件作为执行队列。
+  - **任务类型确认 (Task Classification)**: 必须确认是 Epic, Story, Bug Fix 还是 Tech Debt。
+  - **Epic 治理**: 如果是 Epic，必须在 `openspec/` 目录下创建一个 `epic-<key>.story-list.json` 文件作为执行队列。
   - **唯一输出**: 必须生成 `ideas/idea.md` (相对于变更目录) 作为后续提案的唯一源头。
   - 不得在没有 `ideas/idea.md` 的情况下跳过此阶段进入提案。
-
+  
 ### 2. 提案阶段 (Propose)
 - **指令**: `/opsx:propose <name>`
 - **目标**: 根据 `idea.md` 生成变更提案 `proposal.md`。
@@ -74,10 +74,10 @@ graph TD
   - 必须基于 `idea.md` 的任务类型明确后续路径。
   - 对于 Epic 类型，生成提案后应停止，等待拆分。
   - 对于其他类型，引导用户进入下一步（`/opsx:prototype` 或 `/opsx:spec-design`）。
-
+  
 ### 3. 原型验证阶段 (Prototype) - 可选
 - **指令**: `/opsx:prototype <name>`
-- **目标**: 为 Feature 或涉及 UI 的 Bug Fix 生成交互式 HTML 原型。
+- **目标**: 为 Story 或涉及 UI 的 Bug Fix 生成交互式 HTML 原型。
 - **强制约束 (Hard Constraint) - HITL 检查点**:
   - 生成原型后，必须通过 `AskUserQuestion` 获取人类确认。
   - 原型是 UI 逻辑的唯一事实来源，确认后方可进入下一步。
@@ -117,15 +117,15 @@ graph TD
 
 ## Epic 队列管理 (Backlog Management)
 
-当 Explore 阶段识别为 Epic 时，引入 `openspec/epic-<key>.feature-list.json` 进行跨 change 编排。
+当 Explore 阶段识别为 Epic 时，引入 `openspec/epic-<key>.story-list.json` 进行跨 change 编排。
 
 ### 1. JSON 结构规范
 ```json
 {
   "epicKey": "coupon-system",
-  "features": [
+  "stories": [
     {
-      "featureKey": "coupon-create",
+      "storyKey": "coupon-create",
       "status": "planned",
       "changeName": null
     }
@@ -134,10 +134,10 @@ graph TD
 ```
 
 ### 2. 状态流转
-- **Explore**: 创建文件，登记所有拆解出的 Feature，状态为 `planned`。
-- **Propose**: AI 自动读取第一个 `planned` 状态的 Feature 并建议启动。启动后更新状态为 `in_progress` 并记录 `changeName`。
-- **Archive**: 归档完成后，AI 更新该 Feature 状态为 `done`，并提示下一个 `planned` 任务。
-- **销毁**: 当所有 Feature 状态均为 `done` 时，AI 自动删除该 `feature-list.json` 文件（无需归档）。
+- **Explore**: 创建文件，登记所有拆解出的 Story，状态为 `planned`。
+- **Propose**: AI 自动读取第一个 `planned` 状态的 Story 并建议启动。启动后更新状态为 `in_progress` 并记录 `changeName`。
+- **Archive**: 归档完成后，AI 更新该 Story 状态为 `done`，并提示下一个 `planned` 任务。
+- **销毁**: 当所有 Story 状态均为 `done` 时，AI 自动删除该 `story-list.json` 文件（无需归档）。
 
 ## 异常处理与防漂移
 - **Schema 优先**: `openspec/schemas/spec-driven.yaml` 是每个制品的生成说明 (Instruction) 和内容格式的唯一事实来源。如果 SOP 描述与 Schema 有出入，请以 Schema 为准。

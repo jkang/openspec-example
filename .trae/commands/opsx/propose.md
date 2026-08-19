@@ -10,12 +10,12 @@ Propose a new change - create the change and generate the initial `proposal.md`.
 
 **Planning boundary**: This workflow creates the initial planning artifact (`proposal.md`) only. Do not edit project code. After the proposal is complete, stop and let the user decide the next step based on the task type.
 
-**Epic/Feature Queue Awareness**:
+**Epic/Story Queue Awareness**:
 Before proposing a new change:
-1. Check if any `openspec/epic-*.feature-list.json` exists.
-2. If a list exists, check for the first `planned` feature.
-3. If a planned feature is found, suggest starting that specific feature.
-4. Once a feature change is started, update its status to `in_progress` and record the `changeName` in the corresponding `.feature-list.json`.
+1. Check if any `openspec/epic-*.story-list.json` exists.
+2. If a list exists, check for the first `planned` story.
+3. If a planned story is found, suggest starting that specific story.
+4. Once a story change is started, update its status to `in_progress` and record the `changeName` in the corresponding `.story-list.json`.
 
 I'll create a change with the initial artifacts:
 - ideas/idea.md (structured exploration conclusions - MANDATORY first step)
@@ -24,9 +24,9 @@ I'll create a change with the initial artifacts:
 `<capability-path>` is the spec directory relative to `specs/` (for example, `user-auth` or `identity/user-auth`). Preserve an existing capability's full path and follow the project's established organization for new capabilities.
 
 After generating the proposal, recommend the next command:
-- **Feature/Bug Fix (with UI)**: `/opsx:prototype`
+- **Story/Bug Fix (with UI)**: `/opsx:prototype`
 - **Tech Debt/Bug Fix (no UI)**: `/opsx:spec-design`
-- **Epic**: Wait for the user to select a sub-feature.
+- **Epic**: Wait for the user to select a sub-story.
 
 ---
 
