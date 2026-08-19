@@ -2,7 +2,7 @@
 
 ## 1. 引言
 
-OpenSpec 是一种以规格（Spec）为中心的工程方法与工具链，旨在通过统一的结构化文档与自动化工作流，提升复杂系统在设计到交付全周期的确定性与可验证性。本文结合一个小型电商网站的完整案例，演示从架构设计、系统设计、模块设计、接口设计，到单元测试、集成测试（覆盖接口层验收）、性能测试的全流程，以促进在真实项目中落地。
+OpenSpec 是一种以规格（Spec）为中心的工程方法与工具链，旨在通过统一的结构化文档与自动化工作流，提升复杂系统在设计到交付全周期的确定性与可验证性。OpenSpec v2.0 引入了**规划层 (Planning Layer)**，强调“治理驱动”，确保 AI 探索始终在业务目标的护栏内进行。
 
 > **进阶阅读**：关于本案例的 AI 协作全流程复盘（Prompt 设计与交互记录）及 Python 版本的跨语言复刻验证，请参考 [OpenSpec 实战指南：AI 辅助软件工程全流程深度复盘](./openspec-ai-workflow-analysis.md)。
 >
@@ -62,18 +62,20 @@ CLI (`openspec`) 适合人类开发者进行管理操作：
 
 #### 2.3.2 AI 协作指令 (Slash Commands)
 
-OpenSpec 1.0+ 引入了 OPSX 工作流，实现了**动态指令体系**——AI 不再接收静态指令，而是主动查询 CLI 了解当前项目状态和文档依赖。
+OpenSpec 2.0+ 引入了全新的 OPSX 工作流，实现了**动态指令体系**。
 
 在支持的 AI 编辑器（如 Cursor、Claude Code、Qoder、Junie、Lingma IDE、ForgeCode 等 20+ 工具）中，推荐使用斜杠命令（Slash Commands）驱动开发：
 
 **默认 Core 配置**：
 
-| 命令                          | 作用                                                          |
-| :---------------------------- | :------------------------------------------------------------ |
-| `/opsx:propose <description>` | 一步创建变更并生成所有规划文档（proposal/design/specs/tasks） |
-| `/opsx:explore`               | 进入探索模式，思考问题、调查代码库，不写代码                  |
-| `/opsx:apply`                 | 按照 tasks.md 实现任务，动态读取当前变更上下文                |
-| `/opsx:archive`               | 完成并归档当前变更，提示是否同步 Delta Spec 到主规范          |
+| 命令 | 作用 | v2.0 变化 |
+| :--- | :--- | :--- |
+| `/opsx:product-sense` | 定义产品感 | **新增**。确立业务基调与灵魂。 |
+| `/opsx:product-planning` | 维护路线图 | **新增**。确立滚动计划与阶段边界。 |
+| `/opsx:explore` | 深度探索 | **升级**。强制 Roadmap 对齐校验。 |
+| `/opsx:propose <description>` | 创建变更提案 | 基于 idea.md 生成规划文档。 |
+| `/opsx:apply` | 实施开发 | 按照 tasks.md 实现任务。 |
+| `/opsx:archive` | 归档变更 | 完成并归档。 |
 
 **扩展工作流命令**（通过 `openspec config profile` 开启）
 
@@ -89,11 +91,11 @@ OpenSpec 1.0+ 引入了 OPSX 工作流，实现了**动态指令体系**——AI
 
 OPSX 工作流与旧版的最大区别在于：**动作而非阶段**。可以在任意时刻编辑任意文档，不存在阶段锁定。
 
-**v1.8.0 新特性**：
+**v2.0 新特性**：
 
-- **Explore First（探索优先）**：`/opsx:explore` 作为推荐的起点。在不确定方案时，先进入探索模式调查代码库、对比选项、澄清需求——零成本的思考阶段，避免盲目开发。详见本指南第 6 章的真实探索过程复盘。
-- **Fluid Workflow（流式迭代）**：强化「流动而非僵化」的核心理念。所有规划文档可在实现过程中随时调整，不存在阶段锁。发现设计问题？直接编辑对应文档即可，AI 会自动感知变更。
-- **Stores（跨仓库规划，Beta）**：当项目涉及多个代码仓库（如微服务、前后端分离）时，可将规范集中在一个独立的 store 仓库中统一管理。各代码仓库通过 `references` 声明只读依赖。详见 [OpenSpec 使用手册 §3.5](./openspec-user-manual.md#35-各文件说明)。
+- **Planning Layer (规划层)**：通过 `PRODUCT_SENSE.md` 和 `ROADMAP.md` 划定护栏。
+- **Roadmap Alignment (规划对齐)**：在 `/opsx:explore` 阶段强制执行路线图校验。
+- **Explore First（探索优先）**：作为推荐的起点，澄清需求并对齐规划。
 
 ### 2.4 验证与可观测性
 
@@ -546,7 +548,7 @@ OpenSpec-practise/
 │   │   ├── payment/spec.md
 │   │   ├── domain-model/spec.md
 │   │   ├── error-handling/spec.md
-│   │   └── product-query/spec.md    <-- v1.8.0 新增：按 ID 查询商品
+│   │   └── product-query/spec.md    <-- v2.0 新增：按 ID 查询商品 (历史遗留)
 │   └── changes/                     <-- 变更目录
 │       ├── archive/                 <-- 已归档变更
 │       │   ├── 2025-01-27-v1-mvp/   <-- MVP 变更规范（已归档）
@@ -561,7 +563,7 @@ OpenSpec-practise/
 │       │   │       ├── payment/spec.md
 │       │   │       ├── domain-model/spec.md
 │       │   │       └── error-handling/spec.md
-│       │   └── 2026-07-08-add-product-get-by-id/  <-- v1.8.0 工作流实践
+│       │   └── 2026-07-08-add-product-get-by-id/  <-- v2.0 工作流实践 (历史遗留)
 ├── ecommerce/
 │   ├── ecommerce-mini/              <-- Node.js Implementation
 │   │   └── src/

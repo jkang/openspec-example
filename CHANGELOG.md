@@ -2,6 +2,22 @@
 
 本项目跟随 OpenSpec（[Fission-AI/OpenSpec](https://github.com/Fission-AI/OpenSpec)）版本演进的实践记录。
 
+## v2.0 (2026-08-19)
+
+OpenSpec v2.0 是一次重大的**治理驱动 (Governance-Driven)** 变革，核心变化：
+
+- **引入规划层 (Planning Layer)** — 明确了「治理先行」的原则，通过 `PRODUCT_SENSE.md` 和 `ROADMAP.md` 为项目划定业务边界与演进护栏。
+- **Roadmap Alignment (规划对齐)** — 在 `/opsx:explore` 阶段增加了强制的路线图对齐校验，防止 AI 产生偏离阶段目标的冗余设计。
+- **指令集解耦与重构** — 将 `/opsx:propose` 进一步拆解为 `/opsx:prototype` (原型验证) 和 `/opsx:spec-design` (规格与设计)，增强了流程的灵活性与 HITL (人机协同) 深度。
+- **跨工具一致性体系** — 确立了 `.trae/`, `.cursor/`, `.agents/` 三端配置同步的强制规则，防止协作漂移。
+
+本仓库跟进：
+
+- 全量文档升级至 v2.0，重构了 `learning-sdd/` 下的全部核心指南。
+- 将规划层指令与技能移入 `planning/` 子目录，实现了三端同步。
+- 在 `openspec/config.yaml` 中注入了规划层治理护栏的强制引用。
+- 详细复盘见 [v2.0 工作流实践文档](learning-sdd/openspec-v2.0-workflow-practice.md) 和 [v2.0 治理变革解读](learning-sdd/openspec-v2.0-upgrade.md)。
+
 ## v1.8.0 (2026-08-17)
 
 OpenSpec v1.8.0 是目前的稳定版本，核心变化：
@@ -14,7 +30,7 @@ OpenSpec v1.8.0 是目前的稳定版本，核心变化：
 
 - 全量文档升级至 v1.8.0，统一视觉与术语规范
 - 移除旧版 `v1.5.0` 和 `v1.7.0` 的升级与实践文档，合并为最新的 `v1.8.0` 系列
-- 详细复盘见 [v1.8.0 工作流实践文档](learning-sdd/openspec-v1.8.0-workflow-practice.md) 和 [v1.8.0 升级解读](learning-sdd/openspec-v1.8.0-upgrade.md)
+- 详细复盘见 [v2.0 工作流实践文档](learning-sdd/openspec-v2.0-workflow-practice.md) 和 [v2.0 治理变革解读](learning-sdd/openspec-v2.0-upgrade.md)
 
 ## v1.7.0 (2026-07-28)
 
@@ -48,7 +64,7 @@ OpenSpec v1.7.0 是一个中型迭代（91 commits），核心变化：
 5. **Sync** — 智能合并到主 spec：MODIFIED 保留未提及内容，ADDED 新增 Requirement
 6. **Archive** — 一致性验证后归档至 `changes/archive/2026-07-28-add-product-search/`
 
-实践产物：`openspec/specs/catalog-management/spec.md` 更新为 4 个 Requirement、11 个 Scenario。详细复盘见 [v1.8.0 工作流实践文档](learning-sdd/openspec-v1.8.0-workflow-practice.md)。
+实践产物：`openspec/specs/catalog-management/spec.md` 更新为 4 个 Requirement、11 个 Scenario。详细复盘见 [v2.0 工作流实践文档](learning-sdd/openspec-v2.0-workflow-practice.md)。
 
 ## v1.6.0 (2026-07-10)
 
@@ -67,7 +83,7 @@ OpenSpec v1.6.0 是一个小型迭代，核心变化：
 
 ## v1.5.0 (2026-06-28)
 
-OpenSpec v1.5.0 是三个版本积累的重大更新。详见 [升级解读文章](learning-sdd/openspec-v1.8.0-upgrade.md)。
+OpenSpec v1.5.0 是三个版本积累的重大更新。详见 [v2.0 升级解读文章](learning-sdd/openspec-v2.0-upgrade.md)。
 
 三大变革：
 

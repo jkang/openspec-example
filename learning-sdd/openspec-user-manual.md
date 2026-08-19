@@ -199,7 +199,7 @@ openspec --help
 
 ### 2.4 配置 Shell 自动补全（可选）
 
-自 v1.8.0 起，为了避免在某些终端（如 PowerShell）中出现编码问题，Shell 自动补全功能改为**手动开启（Opt-in）**。
+自 v2.0 起，为了避免在某些终端（如 PowerShell）中出现编码问题，Shell 自动补全功能改为**手动开启（Opt-in）**。
 
 如果你希望在终端中使用 `openspec` 的命令补全，可以运行以下命令生成并安装补全脚本（支持 bash、zsh、fish 等）：
 
@@ -245,7 +245,7 @@ openspec init
 
 使用空格键选择，回车键确认。
 
-> **Claude Code 用户提示**：如果你使用的是 Claude Code，请选择 **Claude Code**。OpenSpec v1.8.0 对 Claude Code 提供原生支持，会自动在 `.claude/commands/opsx/` 和 `.claude/skills/` 目录生成对应的命令 and Skills 文件。
+> **Claude Code 用户提示**：如果你使用的是 Claude Code，请选择 **Claude Code**。OpenSpec v2.0 对 Claude Code 提供原生支持，会自动在 `.claude/commands/opsx/` 和 `.claude/skills/` 目录生成对应的命令 and Skills 文件，并包含 `planning/` 子目录。
 
 ### 3.3 非交互模式
 
@@ -300,7 +300,7 @@ your-project/
 │   │   ├── explore.md
 │   │   └── ...
 │   └── skills/                   # Agent Skills
-│       ├── planning/             # 规划层技能
+│       ├── planning/             # 规划层技能 (openspec-product-planning, openspec-product-sense)
 │       ├── openspec-propose/
 │       └── ...
 └── ... (项目其他文件)
@@ -316,20 +316,26 @@ your-project/
 | `changes/`    | 存放活跃的变更提案                             | 必需     |
 | `specs/`      | 存放已归档的规范                               | 可选     |
 
-> **与旧版的区别**：v1.0.0 起，`openspec/AGENTS.md` 和 `openspec/project.md` 已移除。项目上下文统一写入 `openspec/config.yaml` 的 `context:` 字段，该字段会被注入到每一次 AI 规划请求中，比旧方式更可靠。
+> **与旧版的区别**：v2.0 起，项目上下文统一写入 `openspec/config.yaml` 的 `context:` 字段，并引入了 `docs/PRODUCT_SENSE.md` 和 `docs/ROADMAP.md` 作为全局规划护栏。
 
 **config.yaml 结构示例**：
 
 ```yaml
 schema: spec-driven
 
+# 全局上下文注入
 context: |
   Tech stack: TypeScript, React, Node.js
   Testing: Jest with React Testing Library
-  API: RESTful, documented in docs/api.md
-  We maintain backwards compatibility for all public APIs
+
+# 规划层文档引用 (v2.0 核心)
+planning:
+  product_sense: docs/PRODUCT_SENSE.md
+  roadmap: docs/ROADMAP.md
 
 rules:
+  explore:
+    - "Must check docs/ROADMAP.md for phase alignment"
   proposal:
     - Include rollback plan for risky changes
   specs:
@@ -875,7 +881,7 @@ openspec show <change-name> --json --deltas-only
 openspec status --change <change-name>
 ```
 
-> **提示**：自 v1.8.0 起，如果当前不存在任何变更，`openspec status` 命令会优雅地退出（提示无变更），而不再抛出致命错误。
+> **提示**：自 v2.0 起，如果当前不存在任何变更，`openspec status` 命令会优雅地退出（提示无变更），而不再抛出致命错误。
 
 输出示例：
 
@@ -1148,17 +1154,19 @@ OpenSpec 1.0+ 引入了全新的 OPSX 工作流，替换了旧版的阶段锁定
 | `/opsx:bulk-archive` | 批量归档多个已完成的变更             |
 | `/opsx:onboard`      | 带教 15 分钟全流程引导，适合新手上手 |
 
-> **迁移说明**：旧版命令（`/openspec:proposal`、`/openspec:apply`、`/openspec:archive`）已在 v1.0.0 移除。修复映射关系：
+> **迁移说明**：旧版命令（`/openspec:proposal`、`/openspec:apply`、`/openspec:archive`）已在 v2.0 移除。修复映射关系：
 >
 > - `/openspec:proposal` → `/opsx:propose`
 > - `/openspec:apply` → `/opsx:apply`
 > - `/openspec:archive` → `/opsx:archive`
 
-**v1.8.0 新特性**：
+**v2.0 新特性**：
 
-- **Explore First（探索优先）**：通过 `/opsx:explore` 命令在不确定方案时先进入探索模式，系统性思考问题、调查代码库，明确后再提案，避免盲目开发。
-- **Fluid Workflow（流式迭代）**：强化文档随时可编辑、无阶段锁定的迭代体验，支持在实现过程中自由调整规划文档，真正实现「流动而非僵化」。
-- **Stores（跨仓库规划）**：支持跨多个仓库统一管理规范，适合微服务架构下的多项目协作场景。结合 `/opsx:sync` 命令，可将 Delta 规范同步到统一的主规范仓库。
+- **Planning First（规划先行）**：引入 `/opsx:product-sense` 和 `/opsx:product-planning`，通过 `PRODUCT_SENSE.md` 和 `ROADMAP.md` 划定产品边界和滚动计划。
+- **Roadmap Alignment（路线图对齐）**：在 `/opsx:explore` 阶段强制校验需求是否符合当前阶段目标，防止 AI 建议超出范围。
+- **Explore First（探索优先）**：通过 `/opsx:explore` 命令在不确定方案时先进入探索模式，系统性思考问题、调查代码库，明确后再提案。
+- **Fluid Workflow（流式迭代）**：强化文档随时可编辑、无阶段锁定的迭代体验。
+- **Stores（跨仓库规划）**：支持跨多个仓库统一管理规范。
 
 #### 8.5.2 与 AI 协作的技巧
 

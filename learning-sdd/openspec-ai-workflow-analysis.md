@@ -2,11 +2,13 @@
 
 ## 1. 引言：软件工程的新范式
 
-在 AI 辅助编程（AI-Assisted Programming）日益普及的今天，开发者面临的核心挑战已从“如何写代码”转变为“如何与 AI 协作以获得确定性的结果”。传统的开发模式是 **需求 -> 人 -> 代码**，而 OpenSpec v1.8.0 倡导的新范式正在演变为：**意图 -> Explore (探索) -> Propose (提案) -> 原型 (Prototype) -> Spec (规范) -> Apply (实现) -> Sync (同步) -> Archive (归档)**。
+在 AI 辅助编程（AI-Assisted Programming）日益普及的今天，开发者面临的核心挑战已从“如何写代码”转变为“如何与 AI 协作以获得确定性的结果”。传统的开发模式是 **需求 -> 人 -> 代码**，而 OpenSpec v2.0 倡导的新范式正在演变为：**规划层 (Planning Layer) -> Explore (探索) -> Propose (提案) -> 原型 (Prototype) -> Spec (规范) -> Apply (实现) -> Sync (同步) -> Archive (归档)**。
 
 ```mermaid
 graph TD
-    A[意图 Intent] --> B(Explore 探索与调研)
+    Sense[Product Sense /opsx:product-sense] --> Plan[Roadmap Planning /opsx:product-planning]
+    Plan --> Context((上下文注入 config.yaml))
+    Context --> B(Explore 探索与路线图对齐)
     B --> C{决策确认?}
     C -- 否 --> B
     C -- 是 --> D(Propose 提案与设计)
@@ -22,32 +24,32 @@ graph TD
     K --> L(Archive 归档)
 ```
 
-本文以一个 **小型电商系统** 的从零构建到生产级演进为例，深度复盘基于 OpenSpec v1.8.0 的 AI 协同开发全流程。我们将展示 OpenSpec 如何作为“人机通用语言”，贯穿从调研到归档的每一个环节，确保 AI 生成的代码可控、可信、可维护。
+本文以一个 **小型电商系统** 的从零构建到生产级演进为例，深度复盘基于 OpenSpec v2.0 的 AI 协同开发全流程。我们将展示 OpenSpec 如何作为“治理驱动的桥梁”，确保每一个变更都长在产品规划的护栏内。
 
 ---
 
 ## 2. 完整迭代流程复盘（Node.js 版）
 
-### 2.0 阶段零：探索与调研 (Explore First)
+### 2.0 阶段零：规划与治理 (Planning Layer)
 
 **用户输入**:
 
-> `/opsx:explore` "我想做一个电商 MVP，目前项目里已经有哪些基础能力？如果我要加一个购物车功能，该怎么设计？"
+> `/opsx:product-sense` "定义积分商城的 Elevator Pitch..."
+> `/opsx:product-planning` "制定未来 3 个月的滚动路线图..."
 
 **AI 思考与动作**:
 
-在 v1.8.0 中，`Explore` 是推荐的起始点。AI 不会立即创建文件，而是充当“零成本的头脑风暴伙伴”：
+在 v2.0 中，`Planning` 是整个项目的根基：
 
-1.  **代码库调研**: AI 扫描现有代码，发现已有的商品目录结构。
-2.  **方案对比**: AI 提出是在 `ecommerce-mini` 下扩展还是新建目录的优劣。
-3.  **架构草图**: 在对话中给出初步的组件交互图。
+1.  **产品感定义**: AI 协助 PM 明确目标用户、痛点与核心竞争优势。
+2.  **路线图划定**: AI 基于当前 Baseline 划定本月 In-Scope 边界，并将月度滚动计划持久化到 `ROADMAP.md`。
 
 **价值分析**:
 
--   **消除偏差**: 在正式写提案前对齐技术路径，避免方向性错误。
--   **无痛实验**: 开发者可以反复询问“如果...会怎样”，直到找到最佳方案。
+-   **护栏机制**: 为后续的 Explore 提供了强制的“对齐基准”。
+-   **阶段感知**: AI 知道什么是现在该做的，什么是未来才做的。
 
-### 2.1 阶段一：意图对齐、原型确认与规格生成 (Intent to Spec)
+### 2.1 阶段一：探索、对齐与原型 (Explore & Prototype)
 
 **用户输入**:
 
@@ -55,7 +57,7 @@ graph TD
 
 **AI 思考与动作**:
 
-在此阶段，AI 不急于编写具体代码，而是首先进行 **领域建模**、**视觉原型设计** 与 **规格定义**。这是 OpenSpec 方法论的核心——先想清楚（并看清楚），再动手。AI 通过运行 `openspec instructions proposal --json` 动态获取当前项目的背景和约束。
+在此阶段，AI 不急于编写具体代码，而是首先进行 **领域建模**、**视觉原型设计** 与 **规格定义**。这是 OpenSpec 方法论的核心——先想清楚（并看清楚），再动手。AI 通过运行 `openspec instructions proposal --json` 动态获取当前项目的规划背景。
 
 1.  **架构设计**: AI 分析出电商系统的核心上下文：商品 (Catalog)、用户 (User)、购物车 (Cart)、订单 (Order)、支付 (Payment)；
 2.  **生成交互式原型 (New!)**: 
@@ -141,11 +143,11 @@ AI 不仅仅生成功能代码，还生成了配套的测试脚本来验证代�
 
 **AI 动作**:
 
-在 v1.8.0 中，归档流程更加严谨：
+在 v2.0 中，归档流程更加严谨：
 
-1.  **规格同步 (Sync)**: AI 运行 `openspec sync`，将当前变更中的 Delta Specs（增量规格）同步回主规格库（`openspec/specs/`），确保全局规格是最新的。
-2.  **验证 (Verify)**: 在归档前，AI 可以运行 `/opsx:verify` 确保实现代码与最新的 Spec 契约 100% 匹配。
-3.  **正式归档 (Archive)**: 移动变更文档到 `archive/` 目录，清理工作区。
+1.  **规格同步 (Sync)**: AI 运行 `openspec sync`，将当前变更中的 Delta Specs（增量规格）同步回主规格库（`openspec/specs/`）。
+2.  **路线图更新 (Roadmap Update)**: 归档完成后，AI 会提示更新 `ROADMAP.md` 中的当前 Baseline。
+3.  **正式归档 (Archive)**: 移动变更文档到 `archive/` 目录。
 
 **价值分析**:
 
@@ -156,13 +158,13 @@ AI 不仅仅生成功能代码，还生成了配套的测试脚本来验证代�
 
 ## 3. 核心洞察：OpenSpec 在 AI 编程中的角色
 
-通过上述案例，我们可以总结出 OpenSpec 在 AI 软件工程中的三个关键角色：
+通过上述案例，我们可以总结出 OpenSpec v2.0 在 AI 软件工程中的进化——从“执行工具”变成了“治理框架”。
 
 ### 3.1 上下文锚点
 
 在长对话或跨会话开发中，AI 容易丢失上下文。OpenSpec 的文档体系充当了 **外部存储器**：
 
-- **`openspec/config.yaml`**（v1.0.0 起）：项目级持久上下文——技术栈、架构约束、规则等信息会被自动注入到每一次 AI 规划请求中，AI 无需每次重新输入项目背景。例如，本项目的 `config.yaml` 中声明了：
+- **`openspec/config.yaml`**（v2.0 起）：项目级持久上下文——包含对 `docs/PRODUCT_SENSE.md` 和 `docs/ROADMAP.md` 的引用。
 
   ```yaml
   context: |
@@ -185,12 +187,13 @@ AI 生成代码往往具有随机性。OpenSpec 定义的接口契约（Schema�
 
 ### 3.3 协作中间件
 
-- **人 -> AI (Explore)**: 人通过模糊的需求表达意图，AI 协助澄清并完成前置调研。
-- **AI -> 人 (Propose)**: AI 基于调研结果生成交互式原型供人评审（“UI 风格和交互流程是这样吗？”）。
+- **人 -> AI (Planning)**: 人定义感性目标，AI 协助将其转化为理性的路线图与护栏。
+- **AI -> 人 (Explore)**: AI 在护栏内探索需求，并执行 **规划对齐 (Roadmap Alignment)**。
+- **AI -> 人 (Propose)**: AI 生成提案与原型供人评审。
 - **人 -> AI (Approve)**: 人通过确认断点给出反馈或批准设计。
 - **AI -> 代码 (Apply)**: AI 基于已确认的原型和 Spec 生成代码与测试。
 - **测试 -> 验证 (Verify)**: 测试结果反向验证实现与规格的达成情况。
-- **AI -> 规格库 (Sync)**: 最终将经验证的变更同步回项目主规格。
+- **AI -> 规格库/路线图 (Sync & Archive)**: 最终同步规格并刷新 Baseline。
 
 ---
 

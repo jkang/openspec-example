@@ -24,16 +24,27 @@
 
 ## 🔄 需求到代码的完整实践 (SDD Flow)
 
-本项目遵循 OpenSpec v2.0 倡导的 **“规划先行，意图驱动”** 全链路流程：
+本项目由 OpenSpec (v2.0) 框架进行治理。
 
-0.  **规划 (Planning)**：使用 `/opsx:product-sense` 定义产品灵魂（Elevator Pitch），使用 `/opsx:product-planning` 制定滚动路线图（ROADMAP）。
-1.  **意图 (Intent)**：在规划边界内产生业务想法。
-2.  **探索 (Explore)**：使用 `/opsx:explore` 执行 **6 步法探索**（含 **规划对齐**），产出 `idea.md`。
-3.  **提案 (Propose)**：执行 `/opsx:propose`。AI 自动生成 `proposal.md`。
-4.  **原型 (Prototype)**：执行 `/opsx:prototype` 生成 UI 原型并进行 HITL (人机协同) 确认。
-5.  **设计与规范 (Spec-Design)**：执行 `/opsx:spec-design`。一口气生成 `spec.md`、`design.md` 和 `tasks.md`。
-6.  **实施 (Apply)**：执行 `/opsx:apply`。按任务清单编写代码并运行测试。
-7.  **同步与归档 (Sync & Archive)**：执行 `/opsx:sync` 合并规格，最后 `/opsx:archive` 沉淀记录并刷新路线图。
+### 🚀 快速启动
+
+```bash
+./init.sh              # 查看帮助菜单
+/opsx:product-sense    # (AI) 明确产品感
+/opsx:product-planning # (AI) 制定路线图
+/opsx:explore          # (AI) 探索需求并对齐路线图
+```
+
+### 📖 SDD 工作流 v2.0
+
+我们采用 **规格驱动开发 (Spec-Driven Development)**，将流程分为“规划层”与“交付层”：
+
+1.  **规划层 (Planning Layer)**：通过 `/opsx:product-sense` 和 `/opsx:product-planning` 划定护栏。
+2.  **探索阶段 (Explore)**：使用 `/opsx:explore` 深入思考并对齐路线图。
+3.  **提案阶段 (Propose)**：使用 `/opsx:propose` 创建变更。
+4.  **原型阶段 (Prototype)**：使用 `/opsx:prototype` 验证 UI。
+5.  **设计阶段 (Spec-Design)**：生成 Specs 和技术设计。
+6.  **交付阶段 (Apply)**：编写代码并完成 E2E 测试。
 
 ---
 
