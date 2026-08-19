@@ -15,23 +15,25 @@
 ## 🛠️ 核心增强：需求分析 Skills & Commands
 
 本项目不仅是一个代码演示，更是一个 **AI 协作技能库**。我们特别加强了需求分析环节：
-- **`opsx:explore` (需求深度探索)**：集成“5 步法探索”Skill，自动生成结构化的业务意图分析，避免需求二义性。
-- **`opsx:propose` (增强型提案)**：在生成规范的同时，自动注入业务价值（Rationale）与优先级（Priority）分析。
-- **UI 原型联动**：新增 `opsx:prototype` 指令，支持快速生成基于 Tailwind 的高保真交互原型，实现“可视即验收”。
+- **`opsx:product-sense` (产品感定义)**：确立 Elevator Pitch，明确用户、痛点与竞争优势，防止产品方向漂移。
+- **`opsx:product-planning` (滚动路线图)**：维护月度滚动计划，划定 In-Scope/Out-of-Scope 边界，为 AI 探索提供护栏。
+- **`opsx:explore` (需求深度探索)**：升级为“6 步法探索”，强制执行 **规划对齐 (Roadmap Alignment)**，确保每一个 Idea 都长在路线图上。
+- **`opsx:prototype` (UI 原型验证)**：引入强制的 HITL (人机协同) 检查点，确保 UI 逻辑在进入开发前已获得人类验收。
 
 ---
 
 ## 🔄 需求到代码的完整实践 (SDD Flow)
 
-本项目遵循 OpenSpec v1.8.0 倡导的 **“意图驱动”** 全链路流程：
+本项目遵循 OpenSpec v2.0 倡导的 **“规划先行，意图驱动”** 全链路流程：
 
-1.  **意图 (Intent)**：PM 产生一个业务想法（如：增加优惠券功能）。
-2.  **探索 (Explore)**：使用 `/opsx:explore` 执行 **5 步法探索**（澄清意图、设计思路、需求拆分、架构影响、用户确认），产出 `idea.md`。
-3.  **提案 (Propose)**：执行 `/opsx:propose`。AI 自动生成 `proposal.md`（目标）、`design.md`（方案）和可交互的 **HTML 原型**。
-4.  **规范 (Spec)**：PM 审查规格文档。确保业务规则（如：优惠券不能叠加、需满足门槛）被准确描述。
-5.  **规划 (Plan)**：审查 `tasks.md`。确保技术路径与业务需求 100% 对齐。
-6.  **实施 (Apply)**：执行 `/opsx:apply`。AI 自动编写代码并运行单元测试、集成测试，确保质量门禁通过。
-7.  **归档 (Archive)**：执行 `/opsx:archive`。将变更记录沉淀到 `archive/`，并将最新规范同步至主干。
+0.  **规划 (Planning)**：使用 `/opsx:product-sense` 定义产品灵魂（Elevator Pitch），使用 `/opsx:product-planning` 制定滚动路线图（ROADMAP）。
+1.  **意图 (Intent)**：在规划边界内产生业务想法。
+2.  **探索 (Explore)**：使用 `/opsx:explore` 执行 **6 步法探索**（含 **规划对齐**），产出 `idea.md`。
+3.  **提案 (Propose)**：执行 `/opsx:propose`。AI 自动生成 `proposal.md`。
+4.  **原型 (Prototype)**：执行 `/opsx:prototype` 生成 UI 原型并进行 HITL (人机协同) 确认。
+5.  **设计与规范 (Spec-Design)**：执行 `/opsx:spec-design`。一口气生成 `spec.md`、`design.md` 和 `tasks.md`。
+6.  **实施 (Apply)**：执行 `/opsx:apply`。按任务清单编写代码并运行测试。
+7.  **同步与归档 (Sync & Archive)**：执行 `/opsx:sync` 合并规格，最后 `/opsx:archive` 沉淀记录并刷新路线图。
 
 ---
 
@@ -41,7 +43,7 @@
 | :--- | :--- | :--- |
 | **`AGENTS.md`** | **AI 导航入口** | 强制约束 AI 的全局行为宪法，人类与 AI 协作的第一入口。 |
 | **`init.sh`** | **全局启动器** | 屏蔽底层复杂度，一键启动多模块开发和测试环境。 |
-| **`docs/`** | **系统事实与规范** | 包含 `FRONTEND.md`、`PRODUCT_SENSE.md` 等架构与业务护栏。 |
+| **`docs/`** | **全局治理与规划** | 包含 `ROADMAP.md` (滚动计划)、`PRODUCT_SENSE.md` (感性定义) 等系统事实与业务护栏。 |
 | **`openspec/`** | **需求中心** | **核心入口**。在这里定义规则、查看历史变更、管理业务逻辑基线。 |
 | ├── `specs/` | 业务事实来源 | 系统当前的所有功能规格。这是你与研发沟通的“标准语言”。 |
 | ├── `changes/` | 变更工作区 | 正在进行的需求迭代。包含每个需求的提案、原型和任务清单。 |
@@ -49,7 +51,7 @@
 | **`ecommerce/`** | **系统实现** | **验证场所**。查看同一套规格如何驱动 Node.js, Python 和 Vue 3 的多端实现。 |
 | ├── `ecommerce-mini-frontend/` | 前端界面 | 验收 UI/UX 是否符合“现代扁平化”视觉规范。 |
 | ├── `ecommerce-mini-python/` | 高性能后端 | 验证核心计价、核销逻辑的严谨性。 |
-| **`learning-sdd/`** | **知识库** | **充电站**。包含 [入门工作坊手册](file:///Users/superkkk/MyCoding/OpenSpec-practice/learning-sdd/workshop-facilitation.html)、实战指南和 AI 协作流程分析。 |
+| **`learning-sdd/`** | **知识库** | **充电站**。包含 [入门工作坊手册](./learning-sdd/workshop-facilitation.html)、实战指南和 AI 协作流程分析。 |
 
 ---
 
@@ -94,9 +96,11 @@ npm install -g @fission-ai/openspec@latest
 
 ## 📚 学习资源
 
-- **实战手册**: [SDD 入门工作坊引导手册](file:///Users/superkkk/MyCoding/OpenSpec-practice/learning-sdd/workshop-facilitation.html) — 3 小时快速上手流程。
-- **进阶指南**: [OpenSpec 实战指南](file:///Users/superkkk/MyCoding/OpenSpec-practice/learning-sdd/openspec-practical-guide.md) — 深度理解 SDD 工程实践。
-- **复盘分析**: [AI 协作全流程深度复盘](file:///Users/superkkk/MyCoding/OpenSpec-practice/learning-sdd/openspec-ai-workflow-analysis.md) — 学习应用实例，如何使用这个框架通过提示实现需求。
+- **实战手册**: [SDD 入门工作坊引导手册](./learning-sdd/workshop-facilitation.html) — 3 小时快速上手流程。
+- **版本升级**: [从 v1.8.0 升级到 v2.0](./learning-sdd/openspec-v2.0-upgrade.md) — 深度解析规划层与治理变革。
+- **流程实践**: [v2.0 完整工作流实战案例](./learning-sdd/openspec-v2.0-workflow-practice.md) — 以商品搜索为例演示全链路协作。
+- **进阶指南**: [OpenSpec 实战指南](./learning-sdd/openspec-practical-guide.md) — 深度理解 SDD 工程实践。
+- **复盘分析**: [AI 协作全流程深度复盘](./learning-sdd/openspec-ai-workflow-analysis.md) — 学习应用实例，如何使用这个框架通过提示实现需求。
 
 ---
 
