@@ -12,8 +12,7 @@
 - **[SDD 工作流 SOP](docs/sops/sdd-workflow.md)**: `/opsx:` 指令的使用规则、6步探索法、HITL（人机协同）检查点以及**四大任务类型 (Epic/Feature/Bug Fix/Tech Debt) 的分支策略**与闭环更新 (Update/Sync/Archive) 机制。**开始任务前必读**。
 - **[产品路线图](docs/ROADMAP.md)**: 高阶业务规划，明确当前项目所处阶段，指导 Explore 探索的边界。
 - **[产品感与业务导向](docs/PRODUCT_SENSE.md)**: AI 决策准则、目标用户画像，确保构建“可视即价值”的极简电商。
-- **[UI 验证闭环 SOP](docs/sops/ui-validation-loop.md)**: 前端开发完成后，如何通过浏览器验证视觉约束的标准化流程。
-- **[前端开发规范](docs/FRONTEND.md)**: 严格的 UI 约束（扁平化设计、无圆角、slate 色系、真实数据）。
+- **[前端开发规范与验证闭环](docs/FRONTEND.md)**: 包含极简 UI 约束（无圆角、slate 色系、真实数据），以及通过浏览器验证视觉约束的闭环 SOP。
 - **[后端架构指南](docs/ARCHITECTURE.md)**: 适用于 Node.js 和 Python 的四层架构设计 (HTTP -> Service -> Domain -> Repo)。
 - **[质量与评估标准](docs/QUALITY_SCORE.md)**: 端到端 (E2E) 验证要求以及“代码即规范”的质量底线。
 - **[自动化测试策略](docs/TESTING_STRATEGY.md)**: 分层测试金字塔与 Cucumber BDD 标签规范 (`@unit`, `@api`, `@e2e`)。

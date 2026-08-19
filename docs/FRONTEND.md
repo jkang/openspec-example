@@ -1,6 +1,6 @@
 # Frontend Governance & UI Specifications
 
-本文档定义了 OpenSpec-Practice 项目前端（特别是 Vue 3 客户端）的 UI 设计与开发规范。所有 AI Agent 在生成前端代码或 UI 原型时，必须严格遵守以下规则。
+本文档定义了 OpenSpec-Practice 项目前端（特别是 Vue 3 客户端）的 UI 设计、开发规范以及验证闭环。所有 AI Agent 在生成前端代码或 UI 原型时，必须严格遵守以下规则。
 
 ## 1. 核心视觉理念 (Visual Style)
 
@@ -36,3 +36,25 @@
 - **框架**: Vue 3 (Composition API) + Vite
 - **样式**: Tailwind CSS (遵循上述 `slate-*` 和 `rounded-none` 约束)
 - **单一职责**: `src/App.vue` 保持 Minimalist 风格，遵循单屏展示逻辑。
+
+## 6. UI 验证闭环 SOP (Validation Loop)
+
+单纯的单元测试无法保障视觉约束，必须通过浏览器验证。AI Agent 在进行前端开发或修改（新增组件、修改样式、调整布局）时，必须遵循以下闭环：
+
+### 6.1 启动服务
+使用 `init.sh` 脚本启动 Vite 服务器，并确保没有报错。
+```bash
+./init.sh vue:start
+```
+
+### 6.2 获取快照与核对约束
+使用 Browser MCP 工具（如 `browser_navigate`, `browser_snapshot`）或 OpenPreview 访问 `http://localhost:5173`。
+**强制自检清单**：
+- [ ] 检查 DOM 树：是否彻底消除了 `border-radius` 和 `box-shadow`？
+- [ ] 检查色彩：是否严格使用 `slate` 色系及 1px 实线边框？
+- [ ] 检查数据：是否清除了所有的无意义占位符（如 foo, test），填充了真实业务数据？
+- [ ] 检查布局：是否保持了单屏体验，未出现不当的卡片堆叠？
+
+### 6.3 交互验证与 HITL 确认
+使用 Browser MCP 的点击与输入功能，模拟核心用户画像完成一次交互操作。
+如果发现任何偏离，Agent 必须立即修改代码并重新获取快照验证。验证通过后，请求人类确认 (HITL)。
