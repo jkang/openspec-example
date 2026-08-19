@@ -25,26 +25,23 @@
 - **AND** 库存被扣减
 
 #### Scenario: 创建订单时购物车为空
-
-Given 用户购物车为空
-When 发送 POST /api/orders 携带 { userId }
-Then 返回状态码 400
-And 返回错误码 CART_EMPTY
+- **GIVEN** 用户购物车为空
+- **WHEN** 发送 POST /api/orders 携带 { userId }
+- **THEN** 返回状态码 400
+- **AND** 返回错误码 CART_EMPTY
 
 #### Scenario: 创建订单时库存不足
-
-Given 用户购物车中有商品
-And 商品库存不足
-When 发送 POST /api/orders 携带 { userId }
-Then 返回状态码 409
-And 返回错误码 OUT_OF_STOCK
+- **GIVEN** 用户购物车中有商品
+- **AND** 商品库存不足
+- **WHEN** 发送 POST /api/orders 携带 { userId }
+- **THEN** 返回状态码 409
+- **AND** 返回错误码 OUT_OF_STOCK
 
 #### Scenario: 幂等性创建订单
-
-Given 用户携带 Idempotency-Key 请求头
-When 重复发送相同的 POST /api/orders 请求
-Then 返回相同的订单信息
-And 不重复创建订单
+- **GIVEN** 用户携带 Idempotency-Key 请求头
+- **WHEN** 重复发送相同的 POST /api/orders 请求
+- **THEN** 返回相同的订单信息
+- **AND** 不重复创建订单
 
 ---
 
@@ -54,21 +51,19 @@ And 不重复创建订单
 
 **Priority**: P1 (High)
 
-**Rationale**: 用户需要能够查看已创建订单的状态和详细信息。
+**Rationale**: 用户需要能够查看已创建订单的状态 and 详细信息。
 
 #### Scenario: 查询存在的订单
-
-Given 订单 ID 存在
-When 发送 GET /api/orders/:id
-Then 返回状态码 200
-And 返回订单详情 Order
+- **GIVEN** 订单 ID 存在
+- **WHEN** 发送 GET /api/orders/:id
+- **THEN** 返回状态码 200
+- **AND** 返回订单详情 Order
 
 #### Scenario: 查询不存在的订单
-
-Given 订单 ID 不存在
-When 发送 GET /api/orders/:id
-Then 返回状态码 404
-And 返回错误码 NOT_FOUND
+- **GIVEN** 订单 ID 不存在
+- **WHEN** 发送 GET /api/orders/:id
+- **THEN** 返回状态码 404
+- **AND** 返回错误码 NOT_FOUND
 
 ---
 
@@ -81,19 +76,17 @@ And 返回错误码 NOT_FOUND
 **Rationale**: 正确的价格计算是交易的基础，持久化实付金额为财务对账和后续退款提供依据。
 
 #### Scenario: 计算单个商品订单总价
-
-Given 订单包含 1 个条目
-And 条目单价为 100 分，数量为 2
-When 计算订单总价
-Then 总价为 200 分
+- **GIVEN** 订单包含 1 个条目
+- **AND** 条目单价为 100 分，数量为 2
+- **WHEN** 计算订单总价
+- **THEN** 总价为 200 分
 
 #### Scenario: 计算多个商品订单总价
-
-Given 订单包含 2 个条目
-And 条目 1 单价 100 分，数量 2
-And 条目 2 单价 50 分，数量 1
-When 计算订单总价
-Then 总价为 250 分
+- **GIVEN** 订单包含 2 个条目
+- **AND** 条目 1 单价 100 分，数量 2
+- **AND** 条目 2 单价 50 分，数量 1
+- **WHEN** 计算订单总价
+- **THEN** 总价为 250 分
 
 #### Scenario: 成功应用优惠券后的总价计算
 - @unit
@@ -107,16 +100,19 @@ Then 总价为 250 分
 ---
 
 ### Requirement: 结算时支持优惠券 ID
-`checkout` 接口 SHALL 接收可选的 `couponId` 参数。如果未提供，系统 SHALL 尝试自动应用最优券。
+
+`checkout` 接口 SHALL 接收可选的 `couponId` 参数。如果未提供，系统 SHALL 尝试自动应用最优券。结算必须依赖后端最新的购物车状态，前端 SHALL 在结算前确保本地数据已同步。
+
 - **Priority**: P0
 - **Rationale**: 确保结算时的优惠计算是经过后端权威验证的，并支持自动推荐。
 
 #### Scenario: 结算时携带有效优惠券 ID
 - @api
-- **GIVEN** 用户购物车中有商品
+- **GIVEN** 用户购物车中有商品且已与后端同步
 - **AND** 优惠券 ID 有效且满足门槛
 - **WHEN** 发送 POST /api/checkout 携带 { userId, couponId }
 - **THEN** 结算成功并返回应用折扣后的订单，且订单记录该 `couponId`
+- **AND** 结算使用的商品清单必须与后端购物车存储完全一致
 
 #### Scenario: 结算时不携带优惠券 ID 但有可用券
 - @api
