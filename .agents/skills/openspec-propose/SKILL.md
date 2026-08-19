@@ -21,8 +21,9 @@ I'll create a change with the initial artifacts:
 `<capability-path>` is the spec directory relative to `specs/` (for example, `user-auth` or `identity/user-auth`). Preserve an existing capability's full path and follow the project's established organization for new capabilities.
 
 After generating the proposal, summarize the task type and recommend the next command:
-- **Feature/Bug Fix (with UI)**: `/opsx:prototype` -> `/opsx:story`
-- **Tech Debt/Bug Fix (no UI)**: `/opsx:story` -> `/opsx:spec-design`
+- **Story/Bug Fix (with UI)**: `/opsx:prototype` -> `/opsx:story`
+- **Bug Fix (no UI)**: `/opsx:story` -> `/opsx:spec-design`
+- **Tech Debt**: `/opsx:spec-design`
 - **Epic**: Stop here and wait for the user to select a sub-feature to start.
 
 ---
@@ -106,7 +107,7 @@ After generating the proposal, summarize the task type and recommend the next co
 After completing the proposal, summarize:
 - Change name and location
 - Artifacts created: `idea.md` (if newly created) and `proposal.md`.
-- Next step recommendation: "The initial proposal is ready. Based on the task type, you should now run `/opsx:prototype` (for UI features) or `/opsx:story` (for business review)."
+- Next step recommendation: "The initial proposal is ready. Based on the task type, you should now run `/opsx:prototype` (for UI changes), `/opsx:story` (for business review), or `/opsx:spec-design` (for Tech Debt)."
 
 **Guardrails**
 - This workflow ONLY creates `proposal.md`. Do NOT proceed to generate prototypes, specs, designs, or tasks.

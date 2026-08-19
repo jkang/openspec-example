@@ -30,8 +30,8 @@ I'll create the following artifacts:
 1. **Verify pre-requisites**
    
    Ensure `proposal.md` exists. 
-   If the task type requires a prototype (Feature/UI Bug Fix), ensure `prototype.html` exists and was approved.
-   Ensure `story.md` exists and was approved (unless it's a Tech Debt change skipping specs).
+   If the task type requires a prototype (Story/UI Bug Fix), ensure `prototype.html` exists and was approved.
+   If the task type is not Tech Debt, ensure `story.md` exists and was approved.
 
 2. **Generate Specs, Design, and Tasks**
    
@@ -42,7 +42,7 @@ I'll create the following artifacts:
         ```bash
         openspec instructions <artifact-id> --change "<name>" --json
         ```
-      - Read dependencies (e.g., `proposal.md`, `story.md`, `prototype.html`, and preceding artifacts) for context.
+      - Read dependencies (e.g., `proposal.md`, `prototype.html`, `story.md` if any, and preceding artifacts) for context.
       - Follow the `template` and `instruction` to generate the artifact.
       - If `skip_specs: true` is set in `.openspec.yaml`, skip `specs`.
       - Write the file to `resolvedOutputPath`.
@@ -62,5 +62,5 @@ Prompt: "Planning is complete. When you are ready, run `/opsx:apply` to start im
 
 **Guardrails**
 - This workflow ONLY creates `specs`, `design`, and `tasks`. Do NOT proceed to implementation.
-- Always read the approved `story.md` and `prototype.html` (if any) before creating specs.
+- Always read the approved `prototype.html` (if any) and `story.md` (if any) before creating specs.
 - Ensure `tasks.md` contains E2E validation steps.
