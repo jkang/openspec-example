@@ -1,6 +1,6 @@
 name: spec-driven
 version: 1
-description: 包含交互式原型验证的 OpenSpec 工作流 - 探索 (explore) → 提案 (proposal) → 原型 (prototype) → 业务评审 (story) → 规范 (specs) → 设计 (design) → 任务 (tasks)
+description: 包含交互式原型验证的 OpenSpec 工作流 - 探索 (explore) → 提案 (proposal) → 原型 (prototype) → 业务评审 (story) → 规范 (specs) → 设计 (design) → 任务 (tasks) → 验证 (verify)
 artifacts:
   - id: explore
     generates: ideas/idea.md
@@ -170,8 +170,27 @@ artifacts:
     requires:
       - design
 
+  - id: verify
+    generates: verify.md
+    description: 实施验证报告，包含自动化测试结果与人工验收证据
+    template: verify.md
+    instruction: |
+      在实施 (apply) 过程中及完成后，记录验证证据。
+
+      **强制要求**：
+      - 必须包含 Hard Gates (编译通过、单测通过、集成测试通过) 的 PASS 证据。
+      - 如果跳过某些测试（如 E2E），必须在报告中说明原因。
+      - 所有的验证证据必须对应 `tasks.md` 中的验证项。
+    requires:
+      - tasks
+
 apply:
-  requires: [tasks]
+  requires: [tasks, verify]
   tracks: tasks.md
   instruction: |
     阅读上下文文件，逐个处理待完成的任务，完成后标记为已完成。
+
+    **关键动作**：
+    - 在任务勾选前，必须运行对应的验证命令。
+    - 所有的验证结果必须实时记录在 `verify.md` 中。
+    - 只有当 `verify.md` 中的 Hard Gates 全部为 PASS 时，方可认为变更实施完成。
