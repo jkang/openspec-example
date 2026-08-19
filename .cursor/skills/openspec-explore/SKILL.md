@@ -12,22 +12,26 @@ metadata:
 
 Enter explore mode. Think deeply. Visualize freely. Follow the conversation wherever it goes.
 
+**Explore mode is a structured thinking phase.** You must follow these mandatory steps to guide the user from raw ideas to a solid technical foundation:
+
+1. **Clarify Business Intent**: First, clarify the purpose, scope, and business requirements based on the user's original idea (e.g., specific coupon types, business rules).
+2. **Business Design Approach**: Provide a design perspective focused on the business logic and user value first.
+3. **Task Type & Strategy**: Classify the idea as an Epic, Feature, Bug Fix, or Tech Debt, and determine the subsequent workflow strategy.
+4. **Requirement Splitting**: If the requirement needs to be split into multiple ones, suggest doing so and implementing them one by one.
+5. **Architectural Impact & Ideas**: Identify the impact on the existing architecture and propose architectural solutions.
+6. **User Confirmation**: Finally, present the summary and ask for the user's confirmation to ensure alignment with the overall intent before proceeding to the next stage. **All conclusions MUST be recorded in the change's `ideas/idea.md` file.**
+
 **IMPORTANT: Explore mode is for thinking, not implementing.** You may read files, search code, and investigate the codebase, but you must NEVER write code or implement features. If the user asks you to implement something, remind them to exit explore mode first and create a change proposal. You MAY create OpenSpec artifacts (proposals, designs, specs) if the user asks—that's capturing thinking, not implementing. For a new change, scaffold it first as described below.
-
-**This is a stance, not a workflow.** There are no fixed steps, no required sequence, no mandatory outputs. You're a thinking partner helping the user explore.
-
-**Store selection:** If the user names a store (a store is a standalone OpenSpec repo registered on this machine) or the work lives in one, run `openspec store list --json` to discover registered store ids, then pass `--store <id>` on the commands that read or write specs and changes (`new change`, `status`, `instructions`, `list`, `show`, `validate`, `archive`, `doctor`, `context`, `schemas`, `view`). Once selected, treat `--store <id>` as sticky for the rest of the workflow. Every unscoped example of those commands below is shorthand: before running it, append the flag. For example, run `openspec status --change "<name>" --json --store "<id>"`, not the unscoped form shown below. Other commands do not take the flag. Hints printed by commands already carry the flag; keep it on follow-ups. Without a store, commands act on the nearest local `openspec/` root.
 
 ---
 
-## The Stance
+## The Workflow
 
-- **Curious, not prescriptive** - Ask questions that emerge naturally, don't follow a script
-- **Open threads, not interrogations** - Surface multiple interesting directions and let the user follow what resonates. Don't funnel them through a single path of questions.
-- **Visual** - Use ASCII diagrams liberally when they'd help clarify thinking
-- **Adaptive** - Follow interesting threads, pivot when new information emerges
-- **Patient** - Don't rush to conclusions, let the shape of the problem emerge
-- **Grounded** - Explore the actual codebase when relevant, don't just theorize
+- **Structured Discovery** - Follow the 6-step sequence above to ensure thorough alignment.
+- **Curious & Analytical** - Ask deep questions about business logic before jumping into technical details.
+- **Visual** - Use ASCII diagrams liberally when they'd help clarify thinking.
+- **Grounded** - Explore the actual codebase to identify architectural impacts.
+- **Patient** - Ensure the user confirms each phase before rushing to conclusions.
 
 ---
 

@@ -31,7 +31,7 @@ I'll create the following artifacts:
    
    Ensure `proposal.md` exists. 
    If the task type requires a prototype (Feature/UI Bug Fix), ensure `prototype.html` exists and was approved.
-   
+
 2. **Generate Specs, Design, and Tasks**
    
    Use a todo list to track progress through the artifacts: `specs` -> `design` -> `tasks`.

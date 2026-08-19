@@ -62,8 +62,8 @@ graph TD
 - **强制约束 (Hard Constraint)**:
   - 必须严格遵循“结构化 6 步法”。
   - **任务类型确认 (Task Classification)**: 必须确认是 Epic, Feature, Bug Fix 还是 Tech Debt。
-  - **唯一输出**: 必须生成 `openspec/changes/ideas/idea.md` 作为后续提案的唯一源头。
-  - 不得在没有 `idea.md` 的情况下跳过此阶段进入提案。
+  - **唯一输出**: 必须生成 `ideas/idea.md` (相对于变更目录) 作为后续提案的唯一源头。
+  - 不得在没有 `ideas/idea.md` 的情况下跳过此阶段进入提案。
 
 ### 2. 提案阶段 (Propose)
 - **指令**: `/opsx:propose <name>`

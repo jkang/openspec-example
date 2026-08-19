@@ -36,7 +36,7 @@ artifacts:
       - **What Changes (变更内容)**: 使用项目符号列出具体的变更点。明确说明新增功能、修改点或移除的内容。对于破坏性变更，请标记为 **BREAKING**。
       - **Capabilities (系统能力)**: 明确指出将要创建或修改哪些规范 (specs)：
         - **新增能力 (New Capabilities)**: 列出引入的新能力。每个新能力将生成一个新的 `specs/<capability-path>/spec.md`。新增的路径片段必须使用烤串命名法（kebab-case，例如 `user-auth` 或 `identity/user-auth`），并遵循项目现有的规范组织结构。
-        - **修改能力 (Modified Capabilities)**: 列出需求 (REQUIREMENTS) 发生变化的现有能力。只有在规范级别的行为发生变化时才包含在此处（不仅仅是实现细节的改变）。每个被修改的能力都需要一个增量规范文件。必须使用 `openspec/specs/` 下完全相同的现有路径。如果没有需求变更，请留空。
+        - **修改能力 (Modified Capabilities)**: 列出需求 (REQUIREMENTS)发生变化的现有能力。只有在规范级别的行为发生变化时才包含在此处（不仅仅是实现细节的改变）。每个被修改的能力都需要一个增量规范文件。必须使用 `openspec/specs/` 下完全相同的现有路径。如果没有需求变更，请留空。
       - **Impact (影响范围)**: 受影响的代码、API、依赖项或系统模块。
 
       重要提示：Capabilities (系统能力) 章节至关重要。它构成了提案阶段与规范阶段之间的契约。在填写此部分之前，请务必研究现有的规范。
@@ -61,7 +61,7 @@ artifacts:
       在进入技术设计阶段之前，该原型将作为 UI/UX 设计的唯一事实来源 (Single Source of Truth)。
       
       **流程分支控制**：
-      - 如果 `idea.md` 中的任务类型是 Tech Debt，或是不涉及前端 UI 变更的 Bug Fix，请在工作流中明确说明，并直接跳过生成 HTML 原型。
+      - 如果 `idea.md` 中的任务类型是 Tech Debt，或是不涉及前端 UI 变更的 Bug Fix，请直接跳过此阶段。
       - 为每个涉及前端变更的能力创建一个 HTML 文件：输出路径使用 `prototypes/<capability-path>.html`。
     requires:
       - proposal
@@ -77,93 +77,38 @@ artifacts:
       
       **流程分支控制**：
       - 如果任务类型是 Tech Debt 且无外部行为变更，通常在 `.openspec.yaml` 中设置 `skip_specs: true` 并跳过此阶段。
-      - 如果任务类型是 Bug Fix，规范重点在于使用 `MODIFIED Requirements` 修正现有行为的描述，不需要写长篇大论的新功能。
+      - 如果任务类型是 Bug Fix，规范重点在于使用 `MODIFIED Requirements` 修正现有行为的描述。
+      - **重要**：如果该能力涉及 UI 变更，你必须先参考已生成的 `prototype.html`，提取交互场景并将其嵌入规范中。
 
       优秀的规范内容应包含：
       - 用户或下游系统所依赖的可观察行为
       - 输入、输出以及错误处理条件
-      - 外部约束（安全性、隐私、可靠性、兼容性）
       - 可以被测试或明确验证的场景 (Scenarios)
 
       在规范中应避免：
       - 内部类名或函数名
       - 具体的库或框架选择
       - 逐步的实现细节
-      - 详细的执行计划（这些属于 design.md 或 tasks.md）
-
-      快速自测：如果实现方式发生改变，但外部可见的行为并未改变，那么这些细节很可能不属于规范。
 
       为提案的 Capabilities 章节中列出的每个能力创建一个规范文件。
-      `<capability-path>` 是相对于 `specs/` 的目录路径（例如，`user-auth` 或 `identity/user-auth`）。请保持完整的路径：
-      - 新增能力：直接使用提案中定义的准确路径 `specs/<capability-path>/spec.md`。提案中引入的任何新路径片段都必须使用烤串命名法 (kebab-case)。遵循项目现有的组织结构；如果项目采用扁平化布局，请勿随意添加新的领域层级。
-      - 修改能力：在创建增量规范 `specs/<capability-path>/spec.md` 时，必须使用 `openspec/specs/<capability-path>/` 下现有的完全一致的路径。不要移动或重命名该能力。
-
-      除非变更的 `.openspec.yaml` 设置了 `skip_specs: true`（表示没有规范级别的行为变更），否则必须至少存在一个规范文件 - 没有该标记的零增量变更会被 `openspec validate` 拒绝。如果提案中没有列出任何能力，且未设置 `skip_specs`，请先返回修改提案。
+      `<capability-path>` 是相对于 `specs/` 的目录路径。
 
       增量操作（使用 ## 标题级别）：
       - **ADDED Requirements (新增需求)**: 全新的系统能力
-      - **MODIFIED Requirements (修改需求)**: 变更的系统行为 - 必须包含更新后的完整内容
-      - **REMOVED Requirements (移除需求)**: 废弃的功能 - 必须包含 **Reason (原因)** 和 **Migration (迁移方案)**
-      - **RENAMED Requirements (重命名需求)**: 仅修改名称 - 使用 FROM:/TO: 的格式
+      - **MODIFIED Requirements (修改需求)**: 变更的系统行为
+      - **REMOVED Requirements (移除需求)**: 废弃的功能
+      - **RENAMED Requirements (重命名需求)**: 仅修改名称
 
       需求格式要求：
-      - 每个需求：使用 `### Requirement: <name>`，随后跟上描述说明
-      - 规范性需求必须使用 SHALL 或 MUST（避免使用 should 或 may）
-      - 每个场景：使用 `#### Scenario: <name>`，并采用 WHEN/THEN (当/那么) 格式
-      - **严重警告**：场景 (Scenarios) 必须严格使用 4 个井号 (`####`)。使用 3 个井号或项目符号将导致静默失败。
-      - 每个需求必须至少包含一个场景。
+      - 每个需求：使用 `### Requirement: <name>`
+      - 每个场景：使用 `#### Scenario: <name>`，并采用 WHEN/THEN 格式
+      - **严重警告**：场景 (Scenarios) 必须严格使用 4 个井号 (`####`)。
 
-      仅针对新增能力：在增量规范的开头添加 `## Purpose` 章节 - 用一两句话（50个字符以上，否则 `openspec validate --strict` 会报错提示太短）描述该能力的用途。在归档 (archive) 时，此内容会被复制到生成的主规范中；如果没有它，新生成的主规范将留下一个 `TBD ... Update Purpose after archive` 的占位符需要手动填写。切勿在修改现有能力的增量规范中添加 `## Purpose` - 现有规范已有此内容，增量中的内容会被忽略。若要修改现有能力的 Purpose（包括清理残留的 `TBD` 占位符），请直接编辑 `openspec/specs/<capability-path>/spec.md`。
+      关于原型的特别要求：
+      - 如果涉及前端变更，你必须从 `prototype.html` 中提取交互逻辑，并使用 `<details>` 标签将原型代码完整嵌入规范。
 
-      修改需求 (MODIFIED) 的工作流：
-      1. 在 openspec/specs/<capability-path>/spec.md 中定位到现有的需求
-      2. 复制完整的需求块（从 `### Requirement:` 开始，包含所有的场景）
-      3. 粘贴到 `## MODIFIED Requirements` 下方，并根据新行为进行编辑修改
-      4. 确保标题文本完全匹配（对空格不敏感）
-
-      常见陷阱：如果在 MODIFIED 中只提供部分内容，会导致归档时丢失细节。
-      如果只是增加新关注点而未改变现有行为，请使用 ADDED。
-
-      示例（一个新增能力，所以以 `## Purpose` 开头）：
-      ```
-      ## Purpose
-
-      允许用户以可移植的格式将他们的数据从产品中导出。
-
-      ## ADDED Requirements
-
-      ### Requirement: User can export data
-      系统 SHALL 允许用户以 CSV 格式导出他们的数据。
-
-      #### Scenario: Successful export
-      - **WHEN** 用户点击 "Export" 按钮
-      - **THEN** 系统下载包含所有用户数据的 CSV 文件
-
-      ## REMOVED Requirements
-
-      ### Requirement: Legacy export
-      **Reason**: 被新的导出系统替代
-      **Migration**: 请使用新的导出接口 /api/v2/export
-      ```
-
-      规范应当是可测试的 - 每个场景都是一个潜在的测试用例。
-
-      关于原型的特别要求 (IMPORTANT FOR PROTOTYPES)：
-      - 如果提案中涉及前端变更，你必须先生成 `prototype.html` 并获得用户确认。
-      - 你必须从 `prototype.html` 中提取交互行为、状态变更和 UI 逻辑，并将它们记录为明确的场景 (Given/When/Then)。
-      - 你必须使用 `<details>` 标签将生成的原型代码完整地嵌入到规范文件中，以便开发者轻松参考：
-        ```html
-        <details>
-        <summary>View UI Prototype Code</summary>
-        
-        ```html
-        <!-- 在此处粘贴准确的原型代码 -->
-        ```
-        </details>
-        ```
     requires:
       - proposal
-      - prototype
 
   - id: design
     generates: design.md
@@ -172,33 +117,22 @@ artifacts:
     instruction: |
       创建技术设计文档，解释如何 (HOW) 实现此次变更。
 
-      **强制要求 (Pre-requisite)**：必须在 `idea.md`、`prototype.html` (若有) 和 `specs/*.md` (若有) 均已通过用户 review 确认后方可开始。本设计必须与确认后的原型 and 行为规范完全一致。
+      **强制要求**：必须在 `proposal.md`、`prototype.html` (若涉及UI) 和 `specs/*.md` (若涉及行为变更) 均已准备就绪后方可开始。
 
-      何时需要包含 design.md（仅在符合以下情况时创建）：
-      - 跨模块变更（涉及多个服务/模块）或新的架构模式
-      - 引入新的外部依赖，或进行重大的数据模型变更
-      - 涉及安全性、性能优化或复杂的迁移工作
-      - **Bug Fix**: 需要进行根本原因分析 (Root Cause Analysis) 和制定修复方案。
-      - **Tech Debt**: 需要详细说明重构方案、依赖升级策略等。
-      - 存在模糊性，在编写代码前先做技术决策会有所帮助
+      何时需要包含 design.md：
+      - 跨模块变更、引入新依赖、或重大数据模型变更。
+      - **Bug Fix**: 需要进行根本原因分析 (Root Cause Analysis)。
+      - **Tech Debt**: 需要说明重构方案。
 
       章节结构：
-      - **Context (上下文)**: 仅提供解释方案所需的当前状态和约束。关于动机，请直接引用提案，而不要重新赘述（例如：“请参阅 proposal.md - Why”）。
-      - **Goals / Non-Goals (目标与非目标)**: 本设计要实现什么，以及明确排除的内容。不要重述提案的范围 - 仅添加设计层面的边界。
-      - **Decisions (技术决策)**: 关键的技术选择及其理由（为什么选 X 而不是 Y？）。针对每个决策，列出考虑过的替代方案。
-      - **Risks / Trade-offs (风险与权衡)**: 已知的限制、可能出错的地方。格式：[Risk] → Mitigation (缓解措施)
-      - **Migration Plan (迁移计划)**: 部署步骤、回滚策略（如果适用）
-      - **Open Questions (待确认问题)**: 可以在稍后安全解答的未知事项，且这些解答不会改变规范、技术方案或任务拆解。如果没有，请省略此节。
+      - **Context (上下文)**: 引用提案，不要赘述。
+      - **Goals / Non-Goals**: 仅添加设计层面的边界。
+      - **Decisions (技术决策)**: 关键技术选择及其理由。
+      - **Risks / Trade-offs**: 已知限制与缓解措施。
+      - **Open Questions**: 真正的未知事项。
 
-      待确认问题 (Open questions) 是指那些真正可以延后决定的未知事项，而不是你偷懒跳过的决策。如果一个问题会改变规范、所选方案或任务拆解，请现在就解决它 - 询问用户，而不是盲目猜测。
-
-      重点关注架构和方案方法，而不是逐行的代码实现。
-      提案涵盖了“为什么”和“做什么”；设计涵盖了“怎么做”。关于动机请参考提案，关于需求请参考已写好的规范 - 如果某个章节只是单纯重复它们的内容，请直接提供指向它们的引用。
-
-      优秀的设计文档会解释技术决策背后的“原因 (why)”。
     requires:
       - proposal
-      - specs
 
   - id: tasks
     generates: tasks.md
@@ -207,33 +141,16 @@ artifacts:
     instruction: |
       创建任务列表，将实施工作进行详细拆解。
 
-      在编写任务之前，请检查 design.md 中的 Open Questions (待确认问题)。如果其中任何问题会改变最终要构建的内容，请先与用户沟通解决 - 绝不要把未说明的假设硬塞进任务列表中。
-
-      **重要提示：请严格遵循下方模板。** 应用 (apply) 阶段会解析复选框格式来追踪进度。没有使用 `- [ ]` 格式的任务将无法被追踪。
+      **重要提示：请严格遵循下方模板。** 必须使用 `- [ ]` 格式。
 
       指南：
       - 在带编号的 ## 标题下对相关任务进行分组
-      - 每个任务必须是一个复选框：`- [ ] X.Y 任务描述`
-      - 任务的粒度应足够小，能够在一个工作阶段内完成
-      - 按照依赖关系对任务进行排序（哪些必须先做？）
+      - 任务粒度应足够小
+      - 按照依赖关系排序
+      - **E2E 优先**：必须包含跨端全链路验证任务。
 
-      示例：
-      ```
-      ## 1. Setup
-
-      - [ ] 1.1 创建新模块结构
-      - [ ] 1.2 在 package.json 中添加依赖
-
-      ## 2. Core Implementation
-
-      - [ ] 2.1 实现数据导出功能
-      - [ ] 2.2 添加 CSV 格式化工具函数
-      ```
-
-      参考 specs 了解需要构建什么，参考 design 了解如何构建。
-      每个任务都应该是可验证的 - 你必须能清楚地知道它何时算作完成。
+      参考 specs 了解要做什么，参考 design 了解如何构建。
     requires:
-      - specs
       - design
 
 apply:
@@ -241,4 +158,3 @@ apply:
   tracks: tasks.md
   instruction: |
     阅读上下文文件，逐个处理待完成的任务，完成后标记为已完成。
-    如果遇到阻塞问题或需要澄清，请暂停执行。

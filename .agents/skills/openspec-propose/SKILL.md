@@ -1,3 +1,4 @@
+---
 name: openspec-propose
 description: Propose a new change by generating the initial proposal document. This is the first step of the proposal phase after exploration.
 allowed-tools: Bash(openspec:*)
