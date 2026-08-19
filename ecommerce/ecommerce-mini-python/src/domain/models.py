@@ -27,13 +27,29 @@ class Order(BaseModel):
     status: Literal["PENDING_PAYMENT", "PAID"]
     total_cents: int = Field(..., ge=0, alias="totalCents")
     discount_cents: int = Field(0, ge=0, alias="discountCents")
+    actual_paid_cents: int = Field(0, ge=0, alias="actualPaidCents")
     coupon_id: Optional[str] = Field(None, alias="couponId")
     items: List[OrderItem]
 
 class Coupon(BaseModel):
     id: str
     name: str
-    type: Literal["FIXED"]
-    value_cents: int = Field(..., ge=0, alias="valueCents")
-    threshold_cents: int = Field(..., ge=0, alias="thresholdCents")
-    status: Literal["UNUSED", "USED"]
+    type: Literal["FLAT", "PERCENTAGE"]
+    value: float = Field(..., ge=0)
+    min_spend_cents: int = Field(..., ge=0, alias="minSpendCents")
+    status: Literal["UNUSED", "USED", "EXPIRED"]
+
+def calculate_discount(total_cents: int, coupon: Optional[Coupon]) -> int:
+    if not coupon or total_cents < coupon.min_spend_cents:
+        return 0
+    
+    if coupon.type == "FLAT":
+        return min(total_cents, int(coupon.value))
+    elif coupon.type == "PERCENTAGE":
+        # 折扣额 = 总价 * (1 - 折扣率/10)
+        discount = total_cents * (1 - coupon.value / 10)
+        import math
+        # 同样处理浮点误差
+        return math.floor(discount + 0.00001)
+    
+    return 0

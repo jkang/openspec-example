@@ -1,5 +1,5 @@
 import uuid
-from ..domain.models import Order, OrderItem
+from ..domain.models import Order, OrderItem, calculate_discount
 from ..repo.memory import MemoryRepo
 from .cart import CartService
 from .catalog import CatalogService
@@ -37,12 +37,20 @@ class OrderService:
             ))
 
         # 3. Coupon Validation & Calculation
+        effective_coupon_id = coupon_id
         discount_cents = 0
-        if coupon_id:
-            coupon = self.coupon_svc.validate(coupon_id, subtotal_cents)
-            discount_cents = coupon.value_cents
 
-        total_cents = max(0, subtotal_cents - discount_cents)
+        # 如果没传 coupon_id，尝试自动推荐最优券
+        if not effective_coupon_id:
+            best_coupon = self.coupon_svc.get_best_coupon(user_id, subtotal_cents)
+            if best_coupon:
+                effective_coupon_id = best_coupon.id
+
+        if effective_coupon_id:
+            coupon = self.coupon_svc.validate(effective_coupon_id, subtotal_cents)
+            discount_cents = calculate_discount(subtotal_cents, coupon)
+
+        actual_paid_cents = max(0, subtotal_cents - discount_cents)
 
         # 4. Deduct Stock
         for item in cart.items:
@@ -53,17 +61,19 @@ class OrderService:
         # 5. Create Order
         order = Order(
             id=f"order_{uuid.uuid4().hex[:8]}",
+            userId=user_id,
             status="PENDING_PAYMENT",
-            totalCents=total_cents,
+            totalCents=subtotal_cents,
             discountCents=discount_cents,
-            couponId=coupon_id,
+            actualPaidCents=actual_paid_cents,
+            couponId=effective_coupon_id,
             items=order_items
         )
         self.repo.save(order.id, order)
 
         # 6. Redeem Coupon
-        if coupon_id:
-            self.coupon_svc.redeem(coupon_id)
+        if effective_coupon_id:
+            self.coupon_svc.redeem(effective_coupon_id)
 
         # 7. Clear Cart
         self.cart_svc.clear_cart(user_id)

@@ -70,7 +70,7 @@
 
       <!-- 右侧购物车侧边栏 -->
       <aside 
-        :class="['w-80 flex-shrink-0 bg-white border-l border-slate-200 flex flex-col transition-all duration-300 transform', isCartOpen ? 'translate-x-0' : 'translate-x-full absolute right-0 h-full shadow-2xl z-20 md:relative md:translate-x-0 md:shadow-none']"
+        :class="['w-80 flex-shrink-0 bg-white border-l border-slate-200 flex flex-col transition-all duration-300 transform', isCartOpen ? 'translate-x-0' : 'translate-x-full absolute right-0 h-full z-20 md:relative md:translate-x-0']"
       >
         <div class="p-6 border-b border-slate-200 flex items-center justify-between">
           <h2 class="font-semibold tracking-tight uppercase text-xs">Cart ({{ cartTotalItems }})</h2>
@@ -121,9 +121,12 @@
                 ]"
               >
                 <div class="flex justify-between items-center w-full">
-                  <span class="text-xs font-bold uppercase tracking-tight">{{ coupon.name }}</span>
+                  <div class="flex items-center gap-2">
+                    <span class="text-xs font-bold uppercase tracking-tight">{{ coupon.name }}</span>
+                    <span v-if="coupon.id === bestCouponId" class="px-1 py-0.5 bg-slate-100 text-slate-900 text-[8px] font-bold uppercase tracking-tighter border border-slate-900">最优方案</span>
+                  </div>
                   <span v-if="coupon.status === 'USED'" class="text-[8px] uppercase tracking-tighter opacity-70">已使用</span>
-                  <span v-else-if="isCouponDisabled(coupon)" class="text-[8px] uppercase tracking-tighter opacity-70">差 ¥{{ ((coupon.thresholdCents - cartTotalPrice) / 100).toFixed(2) }} 可用</span>
+                  <span v-else-if="isCouponDisabled(coupon)" class="text-[8px] uppercase tracking-tighter opacity-70">差 ¥{{ ((coupon.minSpendCents - cartTotalPrice) / 100).toFixed(2) }} 可用</span>
                 </div>
                 <p :class="['text-[10px]', selectedCouponId === coupon.id ? 'text-slate-300' : 'text-slate-500']">{{ coupon.description }}</p>
               </button>
@@ -204,6 +207,7 @@ const lastOrderId = ref('')
 // 优惠券数据
 const coupons = ref([])
 const selectedCouponId = ref(null)
+const bestCouponId = ref(null)
 
 // 图片加载失败处理
 const PLACEHOLDER_IMAGE = 'https://images.unsplash.com/photo-1560393464-5c69a73c5770?auto=format&fit=crop&q=80&w=400'
@@ -241,13 +245,52 @@ const fetchCoupons = async () => {
     }
   } catch (e) {
     console.error('获取优惠券失败:', e)
-    // 降级使用初始数据
-    coupons.value = [
-      { id: 'FLAT10', name: '满 50 减 10', type: 'FIXED', valueCents: 1000, thresholdCents: 5000, description: '满 ¥50.00 可用' },
-      { id: 'FLAT20', name: '满 100 减 20', type: 'FIXED', valueCents: 2000, thresholdCents: 10000, description: '满 ¥100.00 可用' }
-    ]
   }
 }
+
+// 自动推荐最优券逻辑
+const recommendBestCoupon = () => {
+  if (cart.value.length === 0 || coupons.value.length === 0) {
+    selectedCouponId.value = null
+    bestCouponId.value = null
+    return
+  }
+
+  let recommendedId = null
+  let maxDiscount = -1
+
+  coupons.value.forEach(coupon => {
+    if (coupon.status === 'USED') return
+    if (cartTotalPrice.value < coupon.minSpendCents) return
+
+    let discount = 0
+    if (coupon.type === 'FLAT') {
+      discount = Math.min(cartTotalPrice.value, coupon.value)
+    } else if (coupon.type === 'PERCENTAGE') {
+      discount = Math.floor(cartTotalPrice.value * (1 - coupon.value / 10) + 0.00001)
+    }
+
+    if (discount > maxDiscount) {
+      maxDiscount = discount
+      recommendedId = coupon.id
+    } else if (discount === maxDiscount && recommendedId) {
+      // 保持与后端一致的稳定排序
+      if (coupon.id < recommendedId) recommendedId = coupon.id
+    }
+  })
+
+  bestCouponId.value = recommendedId
+  // 如果当前未选择或选择的是不可用的，自动切换到最优
+  if (selectedCouponId.value === null) {
+    selectedCouponId.value = recommendedId
+  }
+}
+
+// 监听购物车变化以更新推荐券
+import { watch } from 'vue'
+watch(() => cart.value, () => {
+  recommendBestCoupon()
+}, { deep: true })
 
 // 搜索过滤逻辑
 const filteredProducts = computed(() => {
@@ -270,16 +313,21 @@ const couponDiscount = computed(() => {
   if (!selectedCoupon.value) return 0
   
   // 校验门槛
-  if (cartTotalPrice.value < selectedCoupon.value.thresholdCents) return 0
+  if (cartTotalPrice.value < selectedCoupon.value.minSpendCents) return 0
   
-  return selectedCoupon.value.valueCents
+  if (selectedCoupon.value.type === 'FLAT') {
+    return Math.min(cartTotalPrice.value, selectedCoupon.value.value)
+  } else if (selectedCoupon.value.type === 'PERCENTAGE') {
+    return Math.floor(cartTotalPrice.value * (1 - selectedCoupon.value.value / 10) + 0.00001)
+  }
+  return 0
 })
 
 const finalTotalPrice = computed(() => Math.max(0, cartTotalPrice.value - couponDiscount.value))
 
 // 优惠券可用性检查
 const isCouponDisabled = (coupon) => {
-  return cartTotalPrice.value < coupon.thresholdCents || coupon.status === 'USED'
+  return cartTotalPrice.value < coupon.minSpendCents || coupon.status === 'USED'
 }
 
 // 选择优惠券

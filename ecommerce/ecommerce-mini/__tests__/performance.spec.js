@@ -8,9 +8,10 @@ describe('性能基线测试', () => {
 
   before(async () => {
     const { server } = createServer()
-    await new Promise(resolve => server.listen(0, resolve))
+    await new Promise(resolve => server.listen(0, () => resolve(undefined)))
     const address = server.address()
-    base = `http://127.0.0.1:${address.port}`
+    const port = address && typeof address === 'object' ? address.port : 0
+    base = `http://127.0.0.1:${port}`
     stop = () => server.close()
   })
   after(() => stop())

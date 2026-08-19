@@ -1,3 +1,5 @@
+import { calculateDiscount } from '../domain/logic.js'
+
 export class OrderService {
   constructor(cartRepo, orderRepo, productRepo, couponService) {
     this.cartRepo = cartRepo
@@ -30,13 +32,23 @@ export class OrderService {
     }
 
     // 2. Coupon Validation & Calculation
+    let effectiveCouponId = couponId
     let discountCents = 0
-    if (couponId) {
-      const coupon = this.couponService.validate(couponId, subtotalCents)
-      discountCents = coupon.valueCents
+
+    // 如果没传 couponId，尝试自动推荐最优券
+    if (!effectiveCouponId) {
+      const bestCoupon = this.couponService.getBestCoupon(userId, subtotalCents)
+      if (bestCoupon) {
+        effectiveCouponId = bestCoupon.id
+      }
     }
 
-    const totalCents = Math.max(0, subtotalCents - discountCents)
+    if (effectiveCouponId) {
+      const coupon = this.couponService.validate(effectiveCouponId, subtotalCents)
+      discountCents = calculateDiscount(subtotalCents, coupon)
+    }
+
+    const actualPaidCents = Math.max(0, subtotalCents - discountCents)
 
     // 3. Deduct stock (Simulated Transaction)
     for (const item of cart.items) {
@@ -50,16 +62,17 @@ export class OrderService {
       id: `order_${Math.random().toString(36).substr(2, 9)}`,
       userId,
       status: 'PENDING_PAYMENT',
-      totalCents,
+      totalCents: subtotalCents, // 订单总额记录商品总额
       discountCents,
-      couponId,
+      actualPaidCents,
+      couponId: effectiveCouponId,
       items: orderItems
     }
     this.orderRepo.save(order)
 
     // 5. Redeem Coupon
-    if (couponId) {
-      this.couponService.redeem(couponId)
+    if (effectiveCouponId) {
+      this.couponService.redeem(effectiveCouponId)
     }
 
     // 6. Clear Cart

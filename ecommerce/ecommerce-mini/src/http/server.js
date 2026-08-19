@@ -43,11 +43,11 @@ const initialProducts = [
 initialProducts.forEach(p => productRepo.save(p))
 
 // 注入初始优惠券数据
-const couponsPath = path.join(process.cwd(), 'data/coupons.json')
-if (fs.existsSync(couponsPath)) {
-  const coupons = JSON.parse(fs.readFileSync(couponsPath, 'utf8'))
-  coupons.forEach(c => couponRepo.save(c))
-}
+const initialCoupons = [
+  { id: 'FLAT10', name: '满 50 减 10', type: 'FLAT', value: 1000, minSpendCents: 5000, status: 'UNUSED' },
+  { id: 'PERCENT9', name: '9 折数码券', type: 'PERCENTAGE', value: 9, minSpendCents: 10000, status: 'UNUSED' }
+]
+initialCoupons.forEach(c => couponRepo.save(c))
 
 const catalogService = new CatalogService(productRepo)
 const cartService = new CartService(cartRepo, productRepo)

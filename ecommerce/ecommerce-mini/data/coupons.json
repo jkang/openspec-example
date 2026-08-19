@@ -2,17 +2,17 @@
   {
     "id": "FLAT10",
     "name": "满 50 减 10",
-    "type": "FIXED",
-    "valueCents": 1000,
-    "thresholdCents": 5000,
+    "type": "FLAT",
+    "value": 1000,
+    "minSpendCents": 5000,
     "status": "UNUSED"
   },
   {
-    "id": "FLAT20",
-    "name": "满 100 减 20",
-    "type": "FIXED",
-    "valueCents": 2000,
-    "thresholdCents": 10000,
+    "id": "PERCENT9",
+    "name": "9 折数码券",
+    "type": "PERCENTAGE",
+    "value": 9,
+    "minSpendCents": 10000,
     "status": "UNUSED"
   }
 ]

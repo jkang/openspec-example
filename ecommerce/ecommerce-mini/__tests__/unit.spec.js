@@ -1,25 +1,30 @@
 import { describe, it, beforeEach } from 'node:test'
 import assert from 'node:assert'
-import { ProductRepo, CartRepo, OrderRepo } from '../src/repo/memoryRepo.js'
+import { ProductRepo, CartRepo, OrderRepo, CouponRepo } from '../src/repo/memoryRepo.js'
 import { CatalogService } from '../src/services/catalog.js'
 import { CartService } from '../src/services/cart.js'
 import { OrderService } from '../src/services/order.js'
+import { CouponService } from '../src/services/coupon.js'
 
 describe('领域与服务单元测试', () => {
   let productRepo
   let cartRepo
   let orderRepo
+  let couponRepo
   let catalog
   let cart
+  let coupon
   let orders
 
   beforeEach(() => {
     productRepo = new ProductRepo()
     cartRepo = new CartRepo()
     orderRepo = new OrderRepo()
+    couponRepo = new CouponRepo()
     catalog = new CatalogService(productRepo)
     cart = new CartService(cartRepo, productRepo)
-    orders = new OrderService(cartRepo, orderRepo, productRepo)
+    coupon = new CouponService(couponRepo)
+    orders = new OrderService(cartRepo, orderRepo, productRepo, coupon)
   })
 
   it('商品上架与列表', () => {
@@ -43,7 +48,31 @@ describe('领域与服务单元测试', () => {
     
     assert.ok(order.id)
     assert.strictEqual(order.totalCents, 200)
+    assert.strictEqual(order.actualPaidCents, 200)
     assert.strictEqual(catalog.getProduct(p.id).stock, 8)
+  })
+
+  it('智能最优券推荐逻辑', () => {
+    // 设置商品: 100元
+    const p = catalog.addProduct({ name: 'Tech', priceCents: 10000, stock: 10 })
+    cart.addToCart('u1', p.id, 1)
+    
+    // 设置优惠券
+    // c1: 满100减20 (FLAT)
+    couponRepo.save({ id: 'c1', name: 'FLAT20', type: 'FLAT', value: 2000, minSpendCents: 10000, status: 'UNUSED' })
+    // c2: 9.5折 (PERCENTAGE) -> 减5元
+    couponRepo.save({ id: 'c2', name: 'PERCENT9.5', type: 'PERCENTAGE', value: 9.5, minSpendCents: 0, status: 'UNUSED' })
+    // c3: 满500减10 (不可用)
+    couponRepo.save({ id: 'c3', name: 'FLAT10', type: 'FLAT', value: 1000, minSpendCents: 50000, status: 'UNUSED' })
+
+    // 自动下单
+    const order = orders.createOrder('u1')
+    
+    // 应该选中 c1 (减20比减5多)
+    assert.strictEqual(order.couponId, 'c1')
+    assert.strictEqual(order.discountCents, 2000)
+    assert.strictEqual(order.actualPaidCents, 8000)
+    assert.strictEqual(order.totalCents, 10000)
   })
   
   it('库存不足抛错', () => {
