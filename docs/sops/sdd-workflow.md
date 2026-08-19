@@ -15,8 +15,9 @@ graph TD
 
     %% Epic 分支
     Type -->|Epic 大块需求| Epic_Split[拆解为具体 Feature]
-    Epic_Split --> Epic_Roadmap[更新 Roadmap]
-    Epic_Roadmap --> End_Epic((结束探索，暂不开发))
+    Epic_Split --> Epic_Backlog[生成 openspec/epic-KEY.feature-list.json]
+    Epic_Backlog --> Epic_Roadmap[更新 Roadmap]
+    Epic_Roadmap --> End_Epic((结束探索，等待 Feature 启动))
 
     %% Feature 分支
     Type -->|Feature 具体功能| F_Prop[Proposal 提案 /opsx:propose]
@@ -62,6 +63,7 @@ graph TD
 - **强制约束 (Hard Constraint)**:
   - 必须严格遵循“结构化 6 步法”。
   - **任务类型确认 (Task Classification)**: 必须确认是 Epic, Feature, Bug Fix 还是 Tech Debt。
+  - **Epic 治理**: 如果是 Epic，必须在 `openspec/` 目录下创建一个 `epic-<key>.feature-list.json` 文件作为执行队列。
   - **唯一输出**: 必须生成 `ideas/idea.md` (相对于变更目录) 作为后续提案的唯一源头。
   - 不得在没有 `ideas/idea.md` 的情况下跳过此阶段进入提案。
 
@@ -112,6 +114,30 @@ graph TD
   - 归档前必须确保已经完成过 `sync`。
   - **技术债登记**: 登记本次变更遗留的技术债。
   - 移动路径: `openspec/changes/<name>/` -> `openspec/changes/archive/YYYY-MM-DD-<name>/`。
+
+## Epic 队列管理 (Backlog Management)
+
+当 Explore 阶段识别为 Epic 时，引入 `openspec/epic-<key>.feature-list.json` 进行跨 change 编排。
+
+### 1. JSON 结构规范
+```json
+{
+  "epicKey": "coupon-system",
+  "features": [
+    {
+      "featureKey": "coupon-create",
+      "status": "planned",
+      "changeName": null
+    }
+  ]
+}
+```
+
+### 2. 状态流转
+- **Explore**: 创建文件，登记所有拆解出的 Feature，状态为 `planned`。
+- **Propose**: AI 自动读取第一个 `planned` 状态的 Feature 并建议启动。启动后更新状态为 `in_progress` 并记录 `changeName`。
+- **Archive**: 归档完成后，AI 更新该 Feature 状态为 `done`，并提示下一个 `planned` 任务。
+- **销毁**: 当所有 Feature 状态均为 `done` 时，AI 自动删除该 `feature-list.json` 文件（无需归档）。
 
 ## 异常处理与防漂移
 - **Schema 优先**: `openspec/schemas/spec-driven.yaml` 是每个制品的生成说明 (Instruction) 和内容格式的唯一事实来源。如果 SOP 描述与 Schema 有出入，请以 Schema 为准。

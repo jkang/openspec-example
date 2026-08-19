@@ -17,6 +17,13 @@ Enter explore mode. Think deeply. Visualize freely. Follow the conversation wher
 5. **Architectural Impact & Ideas**: Identify the impact on the existing architecture and propose architectural solutions.
 6. **User Confirmation**: Finally, present the summary and ask for the user's confirmation to ensure alignment with the overall intent before proceeding to the next stage. **All conclusions MUST be recorded in the change's `ideas/idea.md` file.**
 
+**Epic Backlog Management**:
+If the Task Type is identified as an **Epic**:
+- You MUST split it into multiple Features.
+- You MUST create an `openspec/epic-<key>.feature-list.json` file to track the execution queue.
+- Each feature in the list should initially have `status: "planned"`.
+- Do NOT proceed to create a change directory for the Epic itself; Epics are realized through multiple individual Feature changes.
+
 **IMPORTANT: Explore mode is for thinking, not implementing.** You may read files, search code, and investigate the codebase, but you must NEVER write code or implement features. If the user asks you to implement something, remind them to exit explore mode first and create a change proposal. You MAY create OpenSpec artifacts (proposals, designs, specs) if the user asks—that's capturing thinking, not implementing.
 
 **Store selection:** If the user names a store (a store is a standalone OpenSpec repo registered on this machine) or the work lives in one, run `openspec store list --json` to discover registered store ids, then pass `--store <id>` on the commands that read or write specs and changes (`new change`, `status`, `instructions`, `list`, `show`, `validate`, `archive`, `doctor`, `context`, `view`). Other commands do not take the flag. Hints printed by commands already carry the flag; keep it on follow-ups. Without a store, commands act on the nearest local `openspec/` root.

@@ -10,6 +10,14 @@ Archive a completed change in the experimental workflow.
 
 **Store selection:** If the user names a store (a store is a standalone OpenSpec repo registered on this machine) or the work lives in one, run `openspec store list --json` to discover registered store ids, then pass `--store <id>` on the commands that read or write specs and changes (`new change`, `status`, `instructions`, `list`, `show`, `validate`, `archive`, `doctor`, `context`, `view`). Other commands do not take the flag. Hints printed by commands already carry the flag; keep it on follow-ups. Without a store, commands act on the nearest local `openspec/` root.
 
+**Epic Backlog Sync**:
+After a successful archive:
+1. Search all `openspec/epic-*.feature-list.json` for a feature matching the current `changeName`.
+2. If found, update its status to `done`.
+3. Check if all features in that list are `done`.
+4. If all are `done`, DELETE the `.feature-list.json` file.
+5. If there are remaining `planned` features, notify the user and suggest the next feature.
+
 **Input**: Optionally specify a change name after `/opsx:archive` (e.g., `/opsx:archive add-auth`). If omitted, check if it can be inferred from conversation context. If vague or ambiguous you MUST prompt for available changes.
 
 **Steps**

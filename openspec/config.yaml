@@ -32,6 +32,7 @@ rules:
   explore:
     - 必须严格遵循 docs/sops/sdd-workflow.md 中的“结构化 6 步法”
     - 必须确认任务类型 (Epic/Feature/Bug Fix/Tech Debt)
+    - 对于 Epic 类型，必须在 openspec/ 目录下创建 epic-<key>.feature-list.json
     - 必须输出 ideas/idea.md 作为后续提案的唯一源头
   proposal:
     - 基于已确认的 idea.md 结论，明确说明 Why 和 What
@@ -59,3 +60,6 @@ rules:
     - 指出每个任务适用于哪个实现版本 (Node.js / Python / Frontend / 全部)
     - 包含全链路验证 (E2E) 任务，明确执行 init.sh 中的测试入口
     - 按依赖关系排序任务，确保测试覆盖
+  archive:
+    - 归档后必须更新对应的 epic-*.feature-list.json 状态
+    - 如果 Epic 下所有 Feature 已完成，必须删除该 feature-list.json 文件

@@ -10,6 +10,13 @@ Propose a new change - create the change and generate the initial `proposal.md`.
 
 **Planning boundary**: This workflow creates the initial planning artifact (`proposal.md`) only. Do not edit project code. After the proposal is complete, stop and let the user decide the next step based on the task type.
 
+**Epic/Feature Queue Awareness**:
+Before proposing a new change:
+1. Check if any `openspec/epic-*.feature-list.json` exists.
+2. If a list exists, check for the first `planned` feature.
+3. If a planned feature is found, suggest starting that specific feature.
+4. Once a feature change is started, update its status to `in_progress` and record the `changeName` in the corresponding `.feature-list.json`.
+
 I'll create a change with the initial artifacts:
 - ideas/idea.md (structured exploration conclusions - MANDATORY first step)
 - proposal.md (what & why - defines the scope and capabilities)
