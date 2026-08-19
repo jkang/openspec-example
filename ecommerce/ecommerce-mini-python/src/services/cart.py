@@ -44,3 +44,9 @@ class CartService:
     def clear_cart(self, user_id: str):
         cart = Cart(userId=user_id, items=[])
         self.repo.save(user_id, cart)
+
+    def remove_from_cart(self, user_id: str, product_id: str) -> Cart:
+        cart = self.get_cart(user_id)
+        cart.items = [i for i in cart.items if i.product_id != product_id]
+        self.repo.save(user_id, cart)
+        return cart

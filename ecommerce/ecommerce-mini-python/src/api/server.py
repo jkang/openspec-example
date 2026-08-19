@@ -62,6 +62,10 @@ class AddToCartRequest(BaseModel):
     productId: str
     quantity: int
 
+class RemoveFromCartRequest(BaseModel):
+    userId: str
+    productId: str
+
 class CreateOrderRequest(BaseModel):
     userId: str
     couponId: Optional[str] = None
@@ -91,6 +95,10 @@ def add_to_cart(req: AddToCartRequest):
         if str(e) == "MAX_QUANTITY_EXCEEDED":
             raise HTTPException(status_code=400, detail="Max quantity exceeded")
         raise e
+
+@app.post("/api/cart/remove", response_model=Cart)
+def remove_from_cart(req: RemoveFromCartRequest):
+    return cart_svc.remove_from_cart(req.userId, req.productId)
 
 @app.post("/api/orders", status_code=201, response_model=Order)
 def create_order(req: CreateOrderRequest):

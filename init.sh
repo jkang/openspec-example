@@ -101,7 +101,7 @@ case "$1" in
         cd ecommerce/ecommerce-mini && npm test
         cd ../..
         echo "[2/2] 运行 Python 测试..."
-        cd ecommerce/ecommerce-mini-python && pytest
+        cd ecommerce/ecommerce-mini-python && PYTHONPATH=. python3 -m pytest
         ;;
     *)
         show_help

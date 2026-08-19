@@ -126,9 +126,15 @@ export function createServer() {
 
       if (pathname === '/api/cart/items' && req.method === 'POST') {
         const body = await readJson(req)
-        // Mock user ID for dev
-        const userId = 'user_dev'
+        const userId = body.userId || 'user_dev'
         const cart = cartService.addToCart(userId, body.productId, body.quantity)
+        return sendJson(res, 200, cart)
+      }
+
+      if (pathname === '/api/cart/remove' && req.method === 'POST') {
+        const body = await readJson(req)
+        const userId = body.userId || 'user_dev'
+        const cart = cartService.removeFromCart(userId, body.productId)
         return sendJson(res, 200, cart)
       }
 

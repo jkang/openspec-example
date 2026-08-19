@@ -88,14 +88,14 @@
             <div class="flex-1 flex flex-col justify-between py-1">
               <div class="flex justify-between">
                 <h4 class="text-xs font-medium truncate pr-2">{{ item.name }}</h4>
-                <button @click="removeFromCart(item.id)" class="text-[10px] text-slate-300 hover:text-red-500 font-bold uppercase">Del</button>
+                <button @click="removeFromCart(item.productId)" class="text-[10px] text-slate-300 hover:text-red-500 font-bold uppercase">Del</button>
               </div>
               <div class="flex justify-between items-end">
                 <span class="text-xs font-semibold">¥{{ (item.priceCents * item.quantity / 100).toFixed(2) }}</span>
                 <div class="flex items-center border border-slate-200 bg-white">
-                  <button @click="removeFromCart(item.id)" class="w-6 h-6 flex items-center justify-center text-xs hover:bg-slate-50 border-r border-slate-200">-</button>
+                  <button @click="decreaseQuantity(item)" class="w-6 h-6 flex items-center justify-center text-xs hover:bg-slate-50 border-r border-slate-200">-</button>
                   <span class="w-8 text-[10px] text-center font-medium">{{ item.quantity }}</span>
-                  <button @click="addToCart(item)" class="w-6 h-6 flex items-center justify-center text-xs hover:bg-slate-50 border-l border-slate-200">+</button>
+                  <button @click="addToCart(item, 1)" class="w-6 h-6 flex items-center justify-center text-xs hover:bg-slate-50 border-l border-slate-200">+</button>
                 </div>
               </div>
             </div>
@@ -198,11 +198,29 @@ import { ref, computed, onMounted } from 'vue'
 // 状态管理
 const products = ref([])
 const cart = ref([])
+const API_BASE = 'http://localhost:3000' // 统一使用 Node 后端作为主入口验证，支持 userId 隔离
 const searchQuery = ref('')
 const isCartOpen = ref(true)
 const isProcessing = ref(false)
 const isCheckoutSuccess = ref(false)
 const lastOrderId = ref('')
+
+// 同步购物车状态（服务端驱动）
+const syncCart = (serverCart) => {
+  if (!serverCart || !serverCart.items) {
+    cart.value = []
+    return
+  }
+  
+  cart.value = serverCart.items.map(item => {
+    const product = products.value.find(p => String(p.id) === String(item.productId))
+    return {
+      ...product,
+      productId: item.productId,
+      quantity: item.quantity
+    }
+  }).filter(item => !!item.id)
+}
 
 // 优惠券数据
 const coupons = ref([])
@@ -218,7 +236,7 @@ const handleImageError = (e) => {
 // 获取商品列表
 const fetchProducts = async () => {
   try {
-    const response = await fetch('http://localhost:8000/api/products')
+    const response = await fetch(`${API_BASE}/api/products`)
     if (response.ok) {
       products.value = await response.json()
     }
@@ -239,12 +257,31 @@ const fetchProducts = async () => {
 // 获取优惠券列表
 const fetchCoupons = async () => {
   try {
-    const response = await fetch('http://localhost:8000/api/coupons')
+    const response = await fetch(`${API_BASE}/api/coupons`)
     if (response.ok) {
       coupons.value = await response.json()
     }
-  } catch (e) {
+  } catch (e) { 
     console.error('获取优惠券失败:', e)
+  }
+}
+
+// 获取购物车状态
+const fetchCart = async () => {
+  try {
+    // 这里借用 checkout 接口预览或新增一个 GET /api/cart 接口
+    // 目前 Node 后端没有显式的 GET /api/cart，但我们可以通过加购数量为 0 来获取
+    const response = await fetch(`${API_BASE}/api/cart/items`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: 'user_dev', productId: '1', quantity: 0 })
+    })
+    if (response.ok) {
+      const serverCart = await response.json()
+      syncCart(serverCart)
+    }
+  } catch (e) {
+    console.error('获取购物车失败:', e)
   }
 }
 
@@ -342,15 +379,15 @@ const toggleCoupon = (couponId) => {
   }
 }
 
-const addToCart = async (product) => {
+const addToCart = async (product, quantity = 1) => {
   try {
-    const response = await fetch('http://localhost:8000/api/cart/items', {
+    const response = await fetch(`${API_BASE}/api/cart/items`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
         userId: 'user_dev',
-        productId: String(product.id), 
-        quantity: 1 
+        productId: String(product.id || product.productId), 
+        quantity: quantity 
       })
     })
 
@@ -359,33 +396,44 @@ const addToCart = async (product) => {
       throw new Error(err.detail || err.message || '同步失败')
     }
 
-    const existingItem = cart.value.find(item => item.id === product.id)
-    if (existingItem) {
-      existingItem.quantity++
-    } else {
-      cart.value.push({ ...product, quantity: 1 })
-    }
+    const serverCart = await response.json()
+    syncCart(serverCart)
     isCartOpen.value = true
   } catch (e) {
     console.error('加入购物车失败:', e)
-    // 离线模式处理
-    const existingItem = cart.value.find(item => item.id === product.id)
-    if (existingItem) {
-      existingItem.quantity++
-    } else {
-      cart.value.push({ ...product, quantity: 1 })
-    }
+    alert(`加入购物车失败: ${e.message}`)
   }
 }
 
-const removeFromCart = (productId) => {
-  const index = cart.value.findIndex(item => item.id === productId)
-  if (index !== -1) {
-    if (cart.value[index].quantity > 1) {
-      cart.value[index].quantity--
-    } else {
-      cart.value.splice(index, 1)
+const removeFromCart = async (productId) => {
+  try {
+    const response = await fetch(`${API_BASE}/api/cart/remove`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ 
+        userId: 'user_dev',
+        productId: String(productId)
+      })
+    })
+
+    if (!response.ok) {
+      const err = await response.json()
+      throw new Error(err.detail || err.message || '移除失败')
     }
+
+    const serverCart = await response.json()
+    syncCart(serverCart)
+  } catch (e) {
+    console.error('移除购物车商品失败:', e)
+    alert(`移除失败: ${e.message}`)
+  }
+}
+
+const decreaseQuantity = async (item) => {
+  if (item.quantity > 1) {
+    await addToCart(item, -1)
+  } else {
+    await removeFromCart(item.productId)
   }
 }
 
@@ -393,7 +441,10 @@ const checkout = async () => {
   if (cart.value.length === 0) return
   isProcessing.value = true
   try {
-    const response = await fetch('http://localhost:8000/api/checkout', {
+    // 结算前最后一次同步，确保优惠券计算基于最新状态
+    await fetchCart()
+    
+    const response = await fetch(`${API_BASE}/api/checkout`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ 
@@ -426,6 +477,7 @@ const resetCheckoutState = () => {
 onMounted(() => {
   fetchProducts()
   fetchCoupons()
+  fetchCart()
 })
 </script>
 

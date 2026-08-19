@@ -40,4 +40,11 @@ export class CartService {
     const cart = { userId, items: [] }
     this.cartRepo.save(cart)
   }
+
+  removeFromCart(userId, productId) {
+    const cart = this.getCart(userId)
+    cart.items = cart.items.filter(i => i.productId !== productId)
+    this.cartRepo.save(cart)
+    return cart
+  }
 }

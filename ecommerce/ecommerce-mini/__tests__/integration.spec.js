@@ -55,4 +55,44 @@ describe('集成测试 (E2E)', () => {
     assert.strictEqual(order.discountCents, 1000)
     assert.strictEqual(order.actualPaidCents, 9000)
   })
+
+  it('多用户购物车隔离性', async () => {
+    const userA = 'user_a'
+    const userB = 'user_b'
+    const productId = '1'
+
+    // User A 加购 2 个
+    await fetch(`${base}/api/cart/items`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: userA, productId, quantity: 2 }),
+    })
+
+    // User B 加购 5 个
+    await fetch(`${base}/api/cart/items`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: userB, productId, quantity: 5 }),
+    })
+
+    // 验证 User A 的结算预览 (触发 checkout 但不下单)
+    const resA = await fetch(`${base}/api/checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: userA }),
+    })
+    const previewA = await resA.json()
+    // 键盘 29900 * 2 = 59800
+    assert.strictEqual(previewA.totalCents, 59800)
+
+    // 验证 User B 的结算预览
+    const resB = await fetch(`${base}/api/checkout`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId: userB }),
+    })
+    const previewB = await resB.json()
+    // 键盘 29900 * 5 = 149500
+    assert.strictEqual(previewB.totalCents, 149500)
+  })
 })
