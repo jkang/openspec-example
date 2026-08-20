@@ -9,16 +9,7 @@
             theme: {
                 extend: {
                     colors: {
-                        slate: {
-                            50: '#f8fafc',
-                            100: '#f1f5f9',
-                            200: '#e2e8f0',
-                            300: '#cbd5e1',
-                            500: '#64748b',
-                            700: '#334155',
-                            800: '#1e293b',
-                            900: '#0f172a',
-                        }
+                        slate: { 50: '#f8fafc', 100: '#f1f5f9', 200: '#e2e8f0', 300: '#cbd5e1', 500: '#64748b', 700: '#334155', 800: '#1e293b', 900: '#0f172a' }
                     }
                 }
             }
@@ -29,97 +20,111 @@
         * { border-radius: 0 !important; box-shadow: none !important; transition: all 0.2s; }
         .kanban-col { min-width: 300px; }
         .card:hover { border-color: #0f172a; transform: translateY(-2px); }
+        .progress-bar-bg { background-color: #e2e8f0; height: 4px; width: 100%; margin-top: 8px; }
+        .progress-bar-fill { background-color: #0f172a; height: 100%; }
     </style>
 </head>
 <body class="p-8">
-    <!-- Header & Quick Links -->
     <div class="max-w-7xl mx-auto mb-12">
         <div class="flex justify-between items-end mb-8 border-b-2 border-slate-900 pb-4">
             <div>
-                <h1 class="text-4xl font-black text-slate-900 uppercase tracking-tighter">Delivery Board</h1>
+                <h1 class="text-4xl font-black text-slate-900 uppercase tracking-tighter">交付看板 (Delivery Board)</h1>
                 <p class="text-slate-500 mt-2">OpenSpec Practice 交付可视化与治理看板</p>
             </div>
             <div class="text-right">
-                <span class="text-xs text-slate-400 block uppercase font-bold">Last Refreshed</span>
-                <span class="text-slate-900 font-mono">2026-08-20 12:56:10</span>
+                <span class="text-xs text-slate-400 block uppercase font-bold">最后刷新时间</span>
+                <span class="text-slate-900 font-mono">2026-08-20 13:27:10</span>
             </div>
         </div>
 
-        <!-- Metrics Row -->
         <div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
             <div class="bg-white border border-slate-200 p-6">
-                <div class="text-xs text-slate-500 uppercase font-bold mb-1">Planning</div>
-                <div class="text-3xl font-black text-slate-900">1 <span class="text-sm font-normal text-slate-400">Items</span></div>
+                <div class="text-xs text-slate-500 uppercase font-bold mb-1">规划中 (Planning)</div>
+                <div class="text-3xl font-black text-slate-900">2 <span class="text-sm font-normal text-slate-400">项</span></div>
             </div>
             <div class="bg-white border border-slate-200 p-6">
-                <div class="text-xs text-slate-500 uppercase font-bold mb-1">Active Changes</div>
-                <div class="text-3xl font-black text-slate-900">1 <span class="text-sm font-normal text-slate-400">Total</span></div>
+                <div class="text-xs text-slate-500 uppercase font-bold mb-1">活跃变更 (Active Changes)</div>
+                <div class="text-3xl font-black text-slate-900">1 <span class="text-sm font-normal text-slate-400">个</span></div>
             </div>
             <div class="bg-white border border-slate-200 p-6">
-                <div class="text-xs text-slate-500 uppercase font-bold mb-1">Archived (7d)</div>
-                <div class="text-3xl font-black text-slate-900">10 <span class="text-sm font-normal text-slate-400">Done</span></div>
+                <div class="text-xs text-slate-500 uppercase font-bold mb-1">已归档 (7天内)</div>
+                <div class="text-3xl font-black text-slate-900">10 <span class="text-sm font-normal text-slate-400">已完成</span></div>
             </div>
             <div class="bg-white border border-slate-200 p-6">
-                <div class="text-xs text-slate-500 uppercase font-bold mb-1">Quality Signal</div>
-                <div class="text-3xl font-black text-slate-900">N/A <span class="text-sm font-normal text-slate-400">Pass Rate</span></div>
+                <div class="text-xs text-slate-500 uppercase font-bold mb-1">质量信号 (Quality Signal)</div>
+                <div class="text-3xl font-black text-slate-900">N/A <span class="text-sm font-normal text-slate-400">通过率</span></div>
             </div>
         </div>
 
-        <!-- Baseline Links -->
         <div class="flex gap-4 mb-12">
             
-        <a href="../baseline/service_blueprint.html" class="flex-1 bg-white border border-slate-200 p-4 group hover:border-slate-900">
-            <div class="text-[10px] text-slate-400 uppercase font-bold mb-1 group-hover:text-slate-900">Service Blueprint</div>
+        <a href="../baseline/service_blueprint.html" class="flex-1 bg-white border border-slate-200 p-4 group hover:border-slate-900 block">
+            <div class="text-[10px] text-slate-400 uppercase font-bold mb-1 group-hover:text-slate-900">服务蓝图 (Service Blueprint)</div>
             <div class="text-slate-900 font-bold truncate">service_blueprint.html</div>
-            <div class="text-[10px] text-slate-400 mt-2 font-mono">Updated: 2026-08-20</div>
+            <div class="text-[10px] text-slate-400 mt-2 font-mono">更新于: 2026-08-20</div>
         </a>
         
-        <a href="../baseline/business_process.html" class="flex-1 bg-white border border-slate-200 p-4 group hover:border-slate-900">
-            <div class="text-[10px] text-slate-400 uppercase font-bold mb-1 group-hover:text-slate-900">Business Process</div>
+        <a href="../baseline/business_process.html" class="flex-1 bg-white border border-slate-200 p-4 group hover:border-slate-900 block">
+            <div class="text-[10px] text-slate-400 uppercase font-bold mb-1 group-hover:text-slate-900">业务流程 (Business Process)</div>
             <div class="text-slate-900 font-bold truncate">business_process.html</div>
-            <div class="text-[10px] text-slate-400 mt-2 font-mono">Updated: 2026-08-20</div>
+            <div class="text-[10px] text-slate-400 mt-2 font-mono">更新于: 2026-08-20</div>
         </a>
         
-        <a href="../baseline/domain_model.html" class="flex-1 bg-white border border-slate-200 p-4 group hover:border-slate-900">
-            <div class="text-[10px] text-slate-400 uppercase font-bold mb-1 group-hover:text-slate-900">Domain Model</div>
+        <a href="../baseline/domain_model.html" class="flex-1 bg-white border border-slate-200 p-4 group hover:border-slate-900 block">
+            <div class="text-[10px] text-slate-400 uppercase font-bold mb-1 group-hover:text-slate-900">领域模型 (Domain Model)</div>
             <div class="text-slate-900 font-bold truncate">domain_model.html</div>
-            <div class="text-[10px] text-slate-400 mt-2 font-mono">Updated: 2026-08-20</div>
+            <div class="text-[10px] text-slate-400 mt-2 font-mono">更新于: 2026-08-20</div>
         </a>
         
         </div>
 
-        <!-- Kanban Board -->
         <div class="flex gap-6 overflow-x-auto pb-8">
             <!-- Planning -->
             <div class="kanban-col flex-1">
-                <div class="bg-slate-900 text-white px-4 py-2 text-xs font-bold uppercase mb-4">01. Planning (1)</div>
+                <div class="bg-slate-900 text-white px-4 py-2 text-xs font-bold uppercase mb-4">01. 规划中 (2)</div>
                 <div class="space-y-3">
                     
-        <div class="bg-white border border-slate-200 p-4 card group">
-            <div class="text-slate-900 font-bold text-sm mb-1">`epic-payment-integration`, `epic-order-lifecycle`.</div>
-            <div class="text-[10px] text-slate-400 font-mono uppercase tracking-widest">Planned</div>
-        </div>
-    
+        <a href="../../docs/ROADMAP.md" class="block bg-white border border-slate-200 p-4 card group ">
+            <span class="inline-block px-2 py-0.5 text-[10px] font-bold uppercase bg-slate-200 text-slate-700 mb-2">Roadmap Epic</span>
+            <div class="text-slate-900 font-bold text-sm mb-1 group-hover:underline leading-tight">`epic-payment-integration`, `epic-order-lifecycle`.</div>
+            <div class="text-[10px] text-slate-400 font-mono truncate">docs/ROADMAP.md</div>
+            
+            
+            
+        </a>
+        
+        <a href="../../openspec/epic-advanced-coupon-system.story-list.json" class="block bg-white border border-slate-200 p-4 card group ">
+            <span class="inline-block px-2 py-0.5 text-[10px] font-bold uppercase bg-slate-200 text-slate-700 mb-2">Story (Planned)</span>
+            <div class="text-slate-900 font-bold text-sm mb-1 group-hover:underline leading-tight">B 端极简运营后台</div>
+            <div class="text-[10px] text-slate-400 font-mono truncate">openspec/epic-advanced-coupon-system.story-list.json</div>
+            
+            
+            
+        </a>
+        
                 </div>
             </div>
 
             <!-- Exploring -->
             <div class="kanban-col flex-1">
-                <div class="bg-slate-200 text-slate-700 px-4 py-2 text-xs font-bold uppercase mb-4">02. Exploring (1)</div>
+                <div class="bg-slate-200 text-slate-700 px-4 py-2 text-xs font-bold uppercase mb-4">02. 探索中 (1)</div>
                 <div class="space-y-3">
                     
-        <div class="bg-white border border-slate-200 p-4 card cursor-pointer group">
-            <div class="text-slate-900 font-bold text-sm mb-1 group-hover:underline">Global Ideas Pool</div>
+        <a href="../../openspec/changes/ideas/idea.md" class="block bg-white border border-slate-200 p-4 card group ">
+            <span class="inline-block px-2 py-0.5 text-[10px] font-bold uppercase bg-slate-200 text-slate-700 mb-2">Idea Pool</span>
+            <div class="text-slate-900 font-bold text-sm mb-1 group-hover:underline leading-tight">全局想法池 (Global Ideas Pool)</div>
             <div class="text-[10px] text-slate-400 font-mono truncate">openspec/changes/ideas/idea.md</div>
             
-        </div>
+            
+            
+        </a>
         
                 </div>
             </div>
 
             <!-- Designing -->
             <div class="kanban-col flex-1">
-                <div class="bg-slate-200 text-slate-700 px-4 py-2 text-xs font-bold uppercase mb-4">03. Designing (0)</div>
+                <div class="bg-slate-200 text-slate-700 px-4 py-2 text-xs font-bold uppercase mb-4">03. 设计中 (0)</div>
                 <div class="space-y-3">
                     
                 </div>
@@ -127,76 +132,115 @@
 
             <!-- Coding -->
             <div class="kanban-col flex-1">
-                <div class="bg-slate-200 text-slate-700 px-4 py-2 text-xs font-bold uppercase mb-4">04. Coding (0)</div>
+                <div class="bg-slate-200 text-slate-700 px-4 py-2 text-xs font-bold uppercase mb-4">04. 开发中 (0)</div>
                 <div class="space-y-3">
                     
                 </div>
             </div>
 
-            <!-- Archived (Recent) -->
+            <!-- Archived -->
             <div class="kanban-col flex-1">
-                <div class="bg-slate-900 text-white px-4 py-2 text-xs font-bold uppercase mb-4">05. Archived (10)</div>
+                <div class="bg-slate-900 text-white px-4 py-2 text-xs font-bold uppercase mb-4">05. 已归档 (10)</div>
                 <div class="space-y-3">
                     
-        <div class="bg-white border border-slate-200 p-4 card opacity-75">
-            <div class="text-slate-900 font-bold text-sm mb-1">2026-08-19-bugfix-cart-user-consistency</div>
-            <div class="text-[10px] text-slate-400 font-mono">2026-08-19</div>
-        </div>
-    
-        <div class="bg-white border border-slate-200 p-4 card opacity-75">
-            <div class="text-slate-900 font-bold text-sm mb-1">2026-08-19-story-coupon-engine-upgrade</div>
-            <div class="text-[10px] text-slate-400 font-mono">2026-08-19</div>
-        </div>
-    
-        <div class="bg-white border border-slate-200 p-4 card opacity-75">
-            <div class="text-slate-900 font-bold text-sm mb-1">2026-08-19-payoff-mvp-e2e-debt</div>
-            <div class="text-[10px] text-slate-400 font-mono">2026-08-19</div>
-        </div>
-    
-        <div class="bg-white border border-slate-200 p-4 card opacity-75">
-            <div class="text-slate-900 font-bold text-sm mb-1">2025-01-27-v1-mvp</div>
-            <div class="text-[10px] text-slate-400 font-mono">2025-01-27</div>
-        </div>
-    
-        <div class="bg-white border border-slate-200 p-4 card opacity-75">
-            <div class="text-slate-900 font-bold text-sm mb-1">2026-07-08-add-product-get-by-id</div>
-            <div class="text-[10px] text-slate-400 font-mono">2026-07-08</div>
-        </div>
-    
-        <div class="bg-white border border-slate-200 p-4 card opacity-75">
-            <div class="text-slate-900 font-bold text-sm mb-1">2026-07-28-add-product-search</div>
-            <div class="text-[10px] text-slate-400 font-mono">2026-07-28</div>
-        </div>
-    
-        <div class="bg-white border border-slate-200 p-4 card opacity-75">
-            <div class="text-slate-900 font-bold text-sm mb-1">2026-08-14-checkout-functionality</div>
-            <div class="text-[10px] text-slate-400 font-mono">2026-08-14</div>
-        </div>
-    
-        <div class="bg-white border border-slate-200 p-4 card opacity-75">
-            <div class="text-slate-900 font-bold text-sm mb-1">2026-08-14-checkout-success-ui</div>
-            <div class="text-[10px] text-slate-400 font-mono">2026-08-14</div>
-        </div>
-    
-        <div class="bg-white border border-slate-200 p-4 card opacity-75">
-            <div class="text-slate-900 font-bold text-sm mb-1">2026-08-14-product-ui-optimization</div>
-            <div class="text-[10px] text-slate-400 font-mono">2026-08-14</div>
-        </div>
-    
-        <div class="bg-white border border-slate-200 p-4 card opacity-75">
-            <div class="text-slate-900 font-bold text-sm mb-1">2026-08-17-coupon-integration</div>
-            <div class="text-[10px] text-slate-400 font-mono">2026-08-17</div>
-        </div>
-    
+        <a href="../../openspec/changes/archive/2026-08-19-bugfix-cart-user-consistency" class="block bg-white border border-slate-200 p-4 card group opacity-75">
+            <span class="inline-block px-2 py-0.5 text-[10px] font-bold uppercase bg-red-100 text-red-800 mb-2">Bug Fix</span>
+            <div class="text-slate-900 font-bold text-sm mb-1 group-hover:underline leading-tight">2026-08-19-bugfix-cart-user-consistency</div>
+            <div class="text-[10px] text-slate-400 font-mono truncate">openspec/changes/archive/2026-08-19-bugfix-cart-user-consistency</div>
+            
+            
+            <div class='text-[10px] text-slate-400 font-mono mt-2'>归档日期: 2026-08-19</div>
+        </a>
+        
+        <a href="../../openspec/changes/archive/2026-08-19-story-coupon-engine-upgrade" class="block bg-white border border-slate-200 p-4 card group opacity-75">
+            <span class="inline-block px-2 py-0.5 text-[10px] font-bold uppercase bg-blue-100 text-blue-800 mb-2">Story</span>
+            <div class="text-slate-900 font-bold text-sm mb-1 group-hover:underline leading-tight">2026-08-19-story-coupon-engine-upgrade</div>
+            <div class="text-[10px] text-slate-400 font-mono truncate">openspec/changes/archive/2026-08-19-story-coupon-engine-upgrade</div>
+            
+            
+            <div class='text-[10px] text-slate-400 font-mono mt-2'>归档日期: 2026-08-19</div>
+        </a>
+        
+        <a href="../../openspec/changes/archive/2026-08-19-payoff-mvp-e2e-debt" class="block bg-white border border-slate-200 p-4 card group opacity-75">
+            <span class="inline-block px-2 py-0.5 text-[10px] font-bold uppercase bg-slate-200 text-slate-700 mb-2">Feature</span>
+            <div class="text-slate-900 font-bold text-sm mb-1 group-hover:underline leading-tight">2026-08-19-payoff-mvp-e2e-debt</div>
+            <div class="text-[10px] text-slate-400 font-mono truncate">openspec/changes/archive/2026-08-19-payoff-mvp-e2e-debt</div>
+            
+            
+            <div class='text-[10px] text-slate-400 font-mono mt-2'>归档日期: 2026-08-19</div>
+        </a>
+        
+        <a href="../../openspec/changes/archive/2025-01-27-v1-mvp" class="block bg-white border border-slate-200 p-4 card group opacity-75">
+            <span class="inline-block px-2 py-0.5 text-[10px] font-bold uppercase bg-slate-200 text-slate-700 mb-2">Feature</span>
+            <div class="text-slate-900 font-bold text-sm mb-1 group-hover:underline leading-tight">2025-01-27-v1-mvp</div>
+            <div class="text-[10px] text-slate-400 font-mono truncate">openspec/changes/archive/2025-01-27-v1-mvp</div>
+            
+            
+            <div class='text-[10px] text-slate-400 font-mono mt-2'>归档日期: 2025-01-27</div>
+        </a>
+        
+        <a href="../../openspec/changes/archive/2026-07-08-add-product-get-by-id" class="block bg-white border border-slate-200 p-4 card group opacity-75">
+            <span class="inline-block px-2 py-0.5 text-[10px] font-bold uppercase bg-slate-200 text-slate-700 mb-2">Feature</span>
+            <div class="text-slate-900 font-bold text-sm mb-1 group-hover:underline leading-tight">2026-07-08-add-product-get-by-id</div>
+            <div class="text-[10px] text-slate-400 font-mono truncate">openspec/changes/archive/2026-07-08-add-product-get-by-id</div>
+            
+            
+            <div class='text-[10px] text-slate-400 font-mono mt-2'>归档日期: 2026-07-08</div>
+        </a>
+        
+        <a href="../../openspec/changes/archive/2026-07-28-add-product-search" class="block bg-white border border-slate-200 p-4 card group opacity-75">
+            <span class="inline-block px-2 py-0.5 text-[10px] font-bold uppercase bg-slate-200 text-slate-700 mb-2">Feature</span>
+            <div class="text-slate-900 font-bold text-sm mb-1 group-hover:underline leading-tight">2026-07-28-add-product-search</div>
+            <div class="text-[10px] text-slate-400 font-mono truncate">openspec/changes/archive/2026-07-28-add-product-search</div>
+            
+            
+            <div class='text-[10px] text-slate-400 font-mono mt-2'>归档日期: 2026-07-28</div>
+        </a>
+        
+        <a href="../../openspec/changes/archive/2026-08-14-checkout-functionality" class="block bg-white border border-slate-200 p-4 card group opacity-75">
+            <span class="inline-block px-2 py-0.5 text-[10px] font-bold uppercase bg-slate-200 text-slate-700 mb-2">Feature</span>
+            <div class="text-slate-900 font-bold text-sm mb-1 group-hover:underline leading-tight">2026-08-14-checkout-functionality</div>
+            <div class="text-[10px] text-slate-400 font-mono truncate">openspec/changes/archive/2026-08-14-checkout-functionality</div>
+            
+            
+            <div class='text-[10px] text-slate-400 font-mono mt-2'>归档日期: 2026-08-14</div>
+        </a>
+        
+        <a href="../../openspec/changes/archive/2026-08-14-checkout-success-ui" class="block bg-white border border-slate-200 p-4 card group opacity-75">
+            <span class="inline-block px-2 py-0.5 text-[10px] font-bold uppercase bg-slate-200 text-slate-700 mb-2">Feature</span>
+            <div class="text-slate-900 font-bold text-sm mb-1 group-hover:underline leading-tight">2026-08-14-checkout-success-ui</div>
+            <div class="text-[10px] text-slate-400 font-mono truncate">openspec/changes/archive/2026-08-14-checkout-success-ui</div>
+            
+            
+            <div class='text-[10px] text-slate-400 font-mono mt-2'>归档日期: 2026-08-14</div>
+        </a>
+        
+        <a href="../../openspec/changes/archive/2026-08-14-product-ui-optimization" class="block bg-white border border-slate-200 p-4 card group opacity-75">
+            <span class="inline-block px-2 py-0.5 text-[10px] font-bold uppercase bg-slate-200 text-slate-700 mb-2">Feature</span>
+            <div class="text-slate-900 font-bold text-sm mb-1 group-hover:underline leading-tight">2026-08-14-product-ui-optimization</div>
+            <div class="text-[10px] text-slate-400 font-mono truncate">openspec/changes/archive/2026-08-14-product-ui-optimization</div>
+            
+            
+            <div class='text-[10px] text-slate-400 font-mono mt-2'>归档日期: 2026-08-14</div>
+        </a>
+        
+        <a href="../../openspec/changes/archive/2026-08-17-coupon-integration" class="block bg-white border border-slate-200 p-4 card group opacity-75">
+            <span class="inline-block px-2 py-0.5 text-[10px] font-bold uppercase bg-slate-200 text-slate-700 mb-2">Feature</span>
+            <div class="text-slate-900 font-bold text-sm mb-1 group-hover:underline leading-tight">2026-08-17-coupon-integration</div>
+            <div class="text-[10px] text-slate-400 font-mono truncate">openspec/changes/archive/2026-08-17-coupon-integration</div>
+            
+            
+            <div class='text-[10px] text-slate-400 font-mono mt-2'>归档日期: 2026-08-17</div>
+        </a>
+        
                 </div>
             </div>
         </div>
 
-        <!-- Archived History -->
         <div class="mt-12 border-t border-slate-200 pt-8">
             <h2 class="text-xl font-bold text-slate-900 mb-6 flex items-center">
                 <span class="w-2 h-2 bg-slate-900 mr-2"></span>
-                Archived History
+                归档历史 (Archived History)
             </h2>
             <div id="older-archives" class="hidden">
                 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -209,9 +253,8 @@
             </button>
         </div>
     </div>
-
     <footer class="mt-20 text-center text-slate-400 text-xs pb-12">
-        OpenSpec v2.0 Governance Framework &bull; SDD Methodology
+        OpenSpec v2.0 治理框架 &bull; SDD 方法论
     </footer>
 </body>
 </html>
