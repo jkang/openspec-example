@@ -26,12 +26,13 @@ rules:
   explore:
     - 必须严格遵循 docs/SOPS/SDD_WORKFLOW.md 中的“结构化 6 步法”
     - 必须包含 Roadmap Alignment (规划对齐) 校验，参考 docs/ROADMAP.md
+    - 必须参考 docs/baseline/domain_model.html 识别 Impacted Bounded Contexts 与 Candidate Capabilities
     - 必须确认任务类型 (Epic/Story/Bug Fix/Tech Debt)
     - 对于 Epic 类型，必须在 openspec/ 目录下创建 epic-<key>.story-list.json
     - 必须输出 ideas/idea.md 作为后续提案的唯一源头
   proposal:
     - 基于已确认的 idea.md 结论，明确说明 Why 和 What
-    - 包含映射到 spec 文件夹名称的 Capabilities 章节
+    - 包含映射到 spec 文件夹名称的 Capabilities 章节，且必须与 Domain Model 映射对齐
     - 必须说明受影响的实现版本 (Node.js / Python / Frontend / 全部)
     - 说明后续流程分支（是否跳过 Prototype 或 Specs）
   prototype:

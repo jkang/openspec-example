@@ -480,6 +480,26 @@
                 </div>
             </section>
 
+            <section class="section">
+                <div class="section-header">
+                    <div>
+                        <h3 class="section-title">6. Bounded Context -> Capability Mapping</h3>
+                        <div class="section-desc">
+                            明确 Bounded Context (业务边界) 对 Capability (Spec 契约) 的治理关系。
+                            这是从 Baseline 层推导 Spec Flow 影响范围的核心桥梁。
+                        </div>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="viz-shell">
+                        <div class="viz-canvas">
+                            <div id="mapping-canvas" class="viz-canvas-inner" style="width: 1180px; height: 1040px;"></div>
+                        </div>
+                        <table class="viz-table" id="mapping-table"></table>
+                    </div>
+                </div>
+            </section>
+
             <div class="footer-note">Last Updated: 2026-08-20</div>
         </div>
     </div>
@@ -768,6 +788,40 @@
                 invariant: '只有 ACTIVE 且满足 minSpendCents 的券才可参与最优券计算。'
             }
         ];
+
+        const mappingGraph = {
+            canvas: { width: 1180, height: 1040, nodeWidth: 240, nodeHeight: 120 },
+            nodes: [
+                { id: 'bc-catalog', title: 'Catalog Context', subtitle: 'Bounded Context', meta: ['Governance'], x: 100, y: 40 },
+                { id: 'bc-cart', title: 'Cart Context', subtitle: 'Bounded Context', meta: ['Governance'], x: 100, y: 180 },
+                { id: 'bc-coupon', title: 'Coupon Context', subtitle: 'Bounded Context', meta: ['Governance'], x: 100, y: 320 },
+                { id: 'bc-order', title: 'Order Context', subtitle: 'Bounded Context', meta: ['Governance'], x: 100, y: 460 },
+                { id: 'bc-shared', title: 'Shared / Cross', subtitle: 'Shared Boundary', meta: ['Governance'], x: 100, y: 600 },
+
+                { id: 'cap-catalog', title: 'catalog-management', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 20 },
+                { id: 'cap-prodquery', title: 'product-query', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 120 },
+                { id: 'cap-cart', title: 'cart-management', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 220 },
+                { id: 'cap-coupon', title: 'coupon-management', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 320 },
+                { id: 'cap-order', title: 'order-management', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 420 },
+                { id: 'cap-checkout', title: 'checkout-management', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 520 },
+                { id: 'cap-payment', title: 'payment', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 620 },
+                { id: 'cap-domain', title: 'domain-model', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 720 },
+                { id: 'cap-error', title: 'error-handling', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 820 },
+                { id: 'cap-ui', title: 'frontend-ui', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 920 }
+            ],
+            edges: [
+                { from: 'bc-catalog', to: 'cap-catalog', label: 'Governs', rule: 'Catalog 边界负责商品元数据与库存管理' },
+                { from: 'bc-catalog', to: 'cap-prodquery', label: 'Governs', rule: 'Catalog 边界负责搜索与展现逻辑' },
+                { from: 'bc-cart', to: 'cap-cart', label: 'Governs', rule: 'Cart 边界负责 Session 一致性与加购逻辑' },
+                { from: 'bc-coupon', to: 'cap-coupon', label: 'Governs', rule: 'Coupon 边界负责券生命周期与推荐算法' },
+                { from: 'bc-order', to: 'cap-order', label: 'Governs', rule: 'Order 边界负责订单状态流转与审计' },
+                { from: 'bc-order', to: 'cap-checkout', label: 'Governs', rule: 'Order 边界负责交易编排入口' },
+                { from: 'bc-order', to: 'cap-payment', label: 'Governs', rule: 'Order 边界负责支付对接与状态确认' },
+                { from: 'bc-shared', to: 'cap-domain', label: 'Cross-Context', rule: '共享领域对象结构定义' },
+                { from: 'bc-shared', to: 'cap-error', label: 'Cross-Context', rule: '全局错误码与异常处理规范' },
+                { from: 'bc-shared', to: 'cap-ui', label: 'Cross-Context', rule: '全局极简 UI 组件库与视觉规范' }
+            ]
+        };
 
         function createSvgEl(name) {
             return document.createElementNS('http://www.w3.org/2000/svg', name);
@@ -1064,6 +1118,7 @@
         renderGraph('context-map-canvas', 'context-map-table', contextMap, { nodeClass: 'context-node' });
         renderStateMachines();
         renderGraph('domain-object-canvas', 'domain-object-table', domainGraph, { nodeClass: 'entity-node' });
+        renderGraph('mapping-canvas', 'mapping-table', mappingGraph, { nodeClass: 'context-node' });
         renderStormingMatrix();
         renderAggregateCatalog();
     </script>

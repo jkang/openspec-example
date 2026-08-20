@@ -82,6 +82,7 @@ graph TD
 - **强制约束 (Hard Constraint)**:
   - 必须严格遵循“结构化 6 步法”。
   - **任务类型确认 (Task Classification)**: 必须确认是史诗、功能、缺陷修复还是技术债。
+  - **治理映射对齐**: 必须参考 `docs/baseline/domain_model.html` 识别 `Impacted Bounded Contexts` 并据此推出 `Candidate Capabilities`。
   - **规划对齐 (Roadmap Alignment)**: 在 `ideas/idea.md` 中必须显式写一段“与当前阶段目标对齐说明”，引用 `docs/ROADMAP.md` 中的目标。
   - **史诗治理**: 如果是史诗，必须在 `openspec/` 目录下创建一个 `epic-<key>.story-list.json` 文件作为执行队列。
   - **唯一输出**: 必须生成 `ideas/idea.md` (相对于变更目录) 作为后续提案的唯一源头。
@@ -92,6 +93,7 @@ graph TD
 - **目标**: 根据 `idea.md` 生成变更提案 `proposal.md`。
 - **强制约束 (Hard Constraint)**:
   - 必须基于 `idea.md` 的任务类型明确后续路径。
+  - **治理映射引用**: `proposal.md` 中的 `Capabilities` 必须与 `Domain Model` 映射表对齐。若出现新能力，需说明 taxonomy 扩展理由。
   - 对于史诗类型，生成提案后应停止，等待拆分。
   - 对于功能类型，引导用户进入下一步（涉及 UI 先 `/opsx:prototype` 并完成确认，再 `/opsx:story`，随后进入 `/opsx:spec-design`；不涉及 UI 则直接 `/opsx:story`，随后进入 `/opsx:spec-design`）。
   - 对于缺陷修复类型，引导用户进入下一步（涉及 UI 先 `/opsx:prototype` 并完成确认，随后进入 `/opsx:spec-design`；不涉及 UI 则直接进入 `/opsx:spec-design`，并在设计中包含根因分析）。
