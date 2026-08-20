@@ -5,8 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Domain Model - OpenSpec Baseline</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -14,130 +12,1081 @@
                     colors: {
                         slate: {
                             50: '#f8fafc',
+                            100: '#f1f5f9',
                             200: '#e2e8f0',
+                            400: '#94a3b8',
+                            500: '#64748b',
+                            700: '#334155',
                             900: '#0f172a',
                         }
                     }
                 }
             }
-        }
+        };
     </script>
     <style>
-        body { background-color: #f8fafc; font-family: sans-serif; }
-        .prose { max-width: 64rem; margin: 0 auto; padding: 2rem; background: white; border: 1px solid #e2e8f0; }
-        * { border-radius: 0 !important; box-shadow: none !important; }
-        table { width: 100%; border-collapse: collapse; margin: 1rem 0; }
-        th, td { border: 1px solid #e2e8f0; padding: 0.5rem; text-align: left; }
-        th { background-color: #f8fafc; }
-        pre { background: #f8fafc; padding: 1rem; border: 1px solid #e2e8f0; overflow-x: auto; }
-        .mermaid { margin: 2rem 0; display: flex; justify-content: center; }
+        :root {
+            --bg: #f8fafc;
+            --panel: #ffffff;
+            --line: #e2e8f0;
+            --line-strong: #cbd5e1;
+            --text: #0f172a;
+            --muted: #64748b;
+            --soft: #f1f5f9;
+        }
+        * {
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Helvetica Neue", sans-serif;
+        }
+        .page {
+            max-width: 1360px;
+            margin: 0 auto;
+            padding: 32px 24px 56px;
+        }
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        .page-title {
+            font-size: 42px;
+            line-height: 1;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+            margin: 0;
+            padding-left: 18px;
+            border-left: 5px solid var(--text);
+        }
+        .page-subtitle {
+            margin-top: 10px;
+            color: var(--muted);
+            font-size: 14px;
+            max-width: 760px;
+            line-height: 1.6;
+        }
+        .back-link {
+            color: var(--muted);
+            text-decoration: none;
+            font-size: 14px;
+            padding-top: 10px;
+            white-space: nowrap;
+        }
+        .board {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            padding: 24px;
+        }
+        .hero-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .hero-block,
+        .metric-block {
+            border: 1px solid var(--line);
+            background: var(--panel);
+            min-height: 140px;
+            padding: 18px;
+        }
+        .eyebrow {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+        .hero-heading {
+            font-size: 24px;
+            font-weight: 800;
+            line-height: 1.2;
+            margin: 0 0 10px;
+        }
+        .hero-text {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+        .metric {
+            border: 1px solid var(--line);
+            background: var(--soft);
+            padding: 12px;
+        }
+        .metric-value {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.04em;
+        }
+        .metric-label {
+            color: var(--muted);
+            font-size: 12px;
+            margin-top: 4px;
+        }
+        .section {
+            margin-top: 18px;
+            border: 1px solid var(--line);
+            background: var(--panel);
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: flex-start;
+            padding: 16px 18px;
+            border-bottom: 1px solid var(--line);
+            background: var(--soft);
+        }
+        .section-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+        .section-desc {
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+            max-width: 860px;
+        }
+        .section-body {
+            padding: 18px;
+        }
+        .viz-shell {
+            border: 1px solid var(--line);
+            background: var(--panel);
+        }
+        .viz-shell + .viz-shell {
+            margin-top: 14px;
+        }
+        .viz-canvas {
+            position: relative;
+            overflow: auto;
+            border-bottom: 1px solid var(--line);
+            background: var(--panel);
+        }
+        .viz-canvas-inner {
+            position: relative;
+        }
+        .viz-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 12px;
+        }
+        .viz-table th,
+        .viz-table td {
+            border: 1px solid var(--line);
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+        .viz-table th {
+            background: var(--soft);
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 11px;
+            font-weight: 700;
+        }
+        .filter-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .filter-chip {
+            border: 1px solid var(--line);
+            background: var(--panel);
+            padding: 7px 10px;
+            cursor: pointer;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1;
+        }
+        .filter-chip.active {
+            color: var(--text);
+            border-color: var(--text);
+            background: var(--soft);
+            font-weight: 700;
+        }
+        .context-node,
+        .entity-node,
+        .state-node {
+            position: absolute;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            padding: 12px 14px;
+            cursor: pointer;
+        }
+        .context-node.active,
+        .entity-node.active,
+        .state-node.active {
+            border-color: var(--text);
+        }
+        .node-title {
+            font-size: 14px;
+            font-weight: 800;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        .node-title::before {
+            content: "";
+            width: 8px;
+            height: 8px;
+            background: var(--text);
+            flex: 0 0 auto;
+        }
+        .node-subtitle {
+            margin-top: 6px;
+            font-size: 12px;
+            line-height: 1.5;
+            color: var(--muted);
+        }
+        .node-meta {
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        .meta-pill {
+            border: 1px solid var(--line);
+            background: var(--soft);
+            color: var(--muted);
+            padding: 2px 6px;
+            font-size: 11px;
+            line-height: 1.2;
+        }
+        .matrix {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+        }
+        .matrix-col {
+            border: 1px solid var(--line);
+            background: var(--panel);
+        }
+        .matrix-head {
+            padding: 10px 12px;
+            border-bottom: 1px solid var(--line);
+            background: var(--soft);
+            font-size: 12px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+        }
+        .matrix-body {
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .matrix-card {
+            border: 1px solid var(--line);
+            padding: 10px;
+            background: var(--panel);
+        }
+        .matrix-card strong {
+            display: block;
+            font-size: 13px;
+            margin-bottom: 6px;
+        }
+        .matrix-card p {
+            margin: 0;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+        .aggregate-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        .aggregate-card {
+            border: 1px solid var(--line);
+            padding: 14px;
+            background: var(--panel);
+        }
+        .aggregate-title {
+            font-size: 14px;
+            font-weight: 800;
+        }
+        .aggregate-block {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid var(--line);
+        }
+        .aggregate-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--muted);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .aggregate-text {
+            font-size: 12px;
+            line-height: 1.6;
+            color: var(--text);
+        }
+        .footer-note {
+            margin-top: 18px;
+            color: var(--muted);
+            font-size: 12px;
+            text-align: right;
+        }
+        @media (max-width: 1100px) {
+            .hero-grid,
+            .matrix,
+            .aggregate-grid,
+            .state-layout {
+                grid-template-columns: 1fr !important;
+            }
+        }
     </style>
 </head>
-<body class="p-8">
-    <div class="mb-8 flex items-center justify-between max-w-4xl mx-auto">
-        <h1 class="text-2xl font-bold text-slate-900 border-l-4 border-slate-900 pl-4">Domain Model</h1>
-        <a href="index.html" class="text-sm text-slate-500 hover:text-slate-900">返回基线列表</a>
+<body>
+    <div class="page">
+        <div class="page-header">
+            <div>
+                <h1 class="page-title">Domain Model</h1>
+                <div class="page-subtitle">
+                    以 DDD 与 Event Storming 的规范视角，对当前电商系统做建模表达。页面同时呈现
+                    Bounded Context、核心领域对象关系、核心业务对象状态机，以及命令 / 事件 / 策略 / 读模型的事件风暴结构。
+                </div>
+            </div>
+            <a class="back-link" href="index.html">返回基线列表</a>
+        </div>
+
+        <div class="board">
+            <div class="hero-grid">
+                <div class="hero-block">
+                    <div class="eyebrow">Purpose</div>
+                    <h2 class="hero-heading">规范化建模看板</h2>
+                    <p class="hero-text">
+                        本页不是“实体列表”，而是对系统核心业务语义的结构化表达：谁负责什么、对象之间如何引用、
+                        状态如何迁移、事件在何种规则下触发，以及各个 Bounded Context 之间如何通过事实协作。
+                    </p>
+                </div>
+                <div class="metric-block">
+                    <div class="eyebrow">Model Snapshot</div>
+                    <div class="metric-grid">
+                        <div class="metric">
+                            <div class="metric-value">4</div>
+                            <div class="metric-label">Bounded Contexts</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">6</div>
+                            <div class="metric-label">Core Domain Objects</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">10+</div>
+                            <div class="metric-label">Domain Events</div>
+                        </div>
+                        <div class="metric">
+                            <div class="metric-value">1</div>
+                            <div class="metric-label">Single-Coupon Rule</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <section class="section">
+                <div class="section-header">
+                    <div>
+                        <h3 class="section-title">1. Bounded Context Map</h3>
+                        <div class="section-desc">
+                            用上下文边界而不是技术模块来定义系统职责。重点描述 Catalog、Cart、Coupon、Order
+                            之间交换的业务事实，以及哪些规则在边界内被维护。
+                        </div>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="viz-shell">
+                        <div class="viz-canvas">
+                            <div id="context-map-canvas" class="viz-canvas-inner" style="width: 1180px; height: 540px;"></div>
+                        </div>
+                        <table class="viz-table" id="context-map-table"></table>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="section-header">
+                    <div>
+                        <h3 class="section-title">2. Core Business Object State Machines</h3>
+                        <div class="section-desc">
+                            选择一个核心业务对象，查看它的状态迁移、触发事件以及规则约束。这里强调的是业务状态机，
+                            不是技术流程图。
+                        </div>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="filter-bar" id="state-machine-tabs"></div>
+                    <div class="viz-shell" style="margin-top: 12px;">
+                        <div style="padding: 14px 16px; border-bottom: 1px solid var(--line); background: var(--soft);">
+                            <div id="state-machine-title" class="section-title" style="font-size: 16px;"></div>
+                            <div id="state-machine-desc" class="section-desc" style="margin-top: 4px;"></div>
+                        </div>
+                        <div class="viz-canvas">
+                            <div id="state-machine-canvas" class="viz-canvas-inner" style="width: 1040px; height: 520px;"></div>
+                        </div>
+                        <table class="viz-table" id="state-machine-table"></table>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="section-header">
+                    <div>
+                        <h3 class="section-title">3. Core Domain Object Relationship Graph</h3>
+                        <div class="section-desc">
+                            表达 Aggregate / Entity 之间的包含、引用与结算生成关系，并把关键业务不变量直接挂到关系上，
+                            避免只看到“线”，看不到“规则”。
+                        </div>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="viz-shell">
+                        <div class="viz-canvas">
+                            <div id="domain-object-canvas" class="viz-canvas-inner" style="width: 1180px; height: 560px;"></div>
+                        </div>
+                        <table class="viz-table" id="domain-object-table"></table>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="section-header">
+                    <div>
+                        <h3 class="section-title">4. Event Storming Structure</h3>
+                        <div class="section-desc">
+                            按 Event Storming 的标准层次整理 Commands、Domain Events、Policies 与 Read Models，
+                            让“行为”与“结构”同时可读。
+                        </div>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="matrix" id="storming-matrix"></div>
+                </div>
+            </section>
+
+            <section class="section">
+                <div class="section-header">
+                    <div>
+                        <h3 class="section-title">5. Aggregate Catalog</h3>
+                        <div class="section-desc">
+                            对当前系统的核心 Aggregate 做标准化说明：根实体、主要实体、值对象与关键业务约束。
+                        </div>
+                    </div>
+                </div>
+                <div class="section-body">
+                    <div class="aggregate-grid" id="aggregate-grid"></div>
+                </div>
+            </section>
+
+            <div class="footer-note">Last Updated: 2026-08-20</div>
+        </div>
     </div>
-    
-    <article id="content" class="prose border border-slate-200 p-8 bg-white">
-        <!-- Content will be rendered here -->
-    </article>
 
     <script>
-        const markdown = `# Domain Model 基线 (Event-Storming 视角)
+        const contextMap = {
+            canvas: { width: 1180, height: 540, nodeWidth: 240, nodeHeight: 128 },
+            nodes: [
+                {
+                    id: 'catalog',
+                    title: 'Catalog Context',
+                    subtitle: '商品目录 / 价格 / 库存事实',
+                    meta: ['Product', 'priceCents', 'stock'],
+                    x: 60,
+                    y: 70
+                },
+                {
+                    id: 'cart',
+                    title: 'Cart Context',
+                    subtitle: '购物车快照 / Session 一致性',
+                    meta: ['Cart', 'CartItem', 'user/session'],
+                    x: 370,
+                    y: 70
+                },
+                {
+                    id: 'coupon',
+                    title: 'Coupon Context',
+                    subtitle: '优惠券生命周期 / 最优券决策',
+                    meta: ['Coupon', 'FLAT', 'PERCENTAGE'],
+                    x: 680,
+                    y: 70
+                },
+                {
+                    id: 'order',
+                    title: 'Order Context',
+                    subtitle: '订单创建 / 支付确认 / 审计锁定',
+                    meta: ['Order', 'OrderItem', 'actualPaidCents'],
+                    x: 990,
+                    y: 70
+                }
+            ],
+            edges: [
+                {
+                    from: 'catalog',
+                    to: 'cart',
+                    label: '提供价格与库存事实',
+                    rule: 'Cart 加购前必须读取 Product.priceCents 与 stock；库存不足时拒绝生成 CartItem。'
+                },
+                {
+                    from: 'cart',
+                    to: 'coupon',
+                    label: '提供结算输入',
+                    rule: 'Coupon 引擎以购物车快照、minSpendCents 与券集合为输入计算最优方案。'
+                },
+                {
+                    from: 'coupon',
+                    to: 'order',
+                    label: '返回折扣结果',
+                    rule: '仅允许单券；锁定 couponId 与 actualPaidCents，供 Order 审计与支付确认使用。'
+                },
+                {
+                    from: 'cart',
+                    to: 'order',
+                    label: '结算生成订单',
+                    rule: 'Checkout 以购物车快照生成 Order / OrderItem；历史订单不受后续改价影响。'
+                },
+                {
+                    from: 'order',
+                    to: 'catalog',
+                    label: '支付后扣减库存',
+                    rule: '仅当 PaymentConfirmed 后，Catalog 才执行异步库存扣减。'
+                }
+            ]
+        };
 
-## Purpose
-基于 DDD 与 Event-Storming 描述系统领域模型，包括关键事件、命令、策略与上下文关系，反映电商系统的完整业务全景。
+        const stateMachines = [
+            {
+                id: 'order',
+                name: 'Order',
+                desc: '订单状态机体现了支付确认、取消与库存扣减闭环，是最核心的交易状态对象。',
+                canvas: { width: 1040, height: 520, nodeWidth: 190, nodeHeight: 74 },
+                states: [
+                    { id: 'pending', label: 'PENDING', desc: '订单已创建，等待支付', x: 70, y: 110 },
+                    { id: 'paid', label: 'PAID', desc: '支付确认成功', x: 360, y: 110 },
+                    { id: 'completed', label: 'COMPLETED', desc: '库存扣减完成，闭环', x: 650, y: 110 },
+                    { id: 'cancelled', label: 'CANCELLED', desc: '超时未付或主动取消', x: 360, y: 320 }
+                ],
+                transitions: [
+                    {
+                        from: 'pending',
+                        to: 'paid',
+                        event: 'PaymentConfirmed',
+                        rule: '支付确认后锁定 actualPaidCents；计算折扣时对百分比结果执行 +0.00001 补偿后向下取整。'
+                    },
+                    {
+                        from: 'pending',
+                        to: 'cancelled',
+                        event: 'OrderCancelled',
+                        rule: '未支付超时或用户取消时进入 CANCELLED；不得触发库存扣减。'
+                    },
+                    {
+                        from: 'paid',
+                        to: 'completed',
+                        event: 'OrderStockDeducted',
+                        rule: '库存扣减是支付后的异步后置动作；只有扣减成功才进入 COMPLETED。'
+                    }
+                ]
+            },
+            {
+                id: 'coupon',
+                name: 'Coupon',
+                desc: '优惠券状态机体现营销对象的生命周期，并把“单券规则 + 最优券选择”收敛在核销前。',
+                canvas: { width: 1040, height: 520, nodeWidth: 190, nodeHeight: 74 },
+                states: [
+                    { id: 'draft', label: 'DRAFT', desc: '后台创建，尚未生效', x: 70, y: 110 },
+                    { id: 'active', label: 'ACTIVE', desc: '已发布，可参与推荐', x: 360, y: 110 },
+                    { id: 'used', label: 'USED', desc: '已核销并绑定订单', x: 650, y: 110 },
+                    { id: 'expired', label: 'EXPIRED', desc: '超过有效期被忽略', x: 360, y: 320 }
+                ],
+                transitions: [
+                    {
+                        from: 'draft',
+                        to: 'active',
+                        event: 'CouponPublished',
+                        rule: '发布后才允许被领取或成为全场可用券。'
+                    },
+                    {
+                        from: 'active',
+                        to: 'used',
+                        event: 'CouponApplied',
+                        rule: '仅允许单券；必须满足 minSpendCents；系统选择使 actualPaidCents 最低的方案。'
+                    },
+                    {
+                        from: 'active',
+                        to: 'expired',
+                        event: 'CouponExpired',
+                        rule: '过期券在推荐时必须被过滤，不得进入核销链路。'
+                    }
+                ]
+            },
+            {
+                id: 'cart',
+                name: 'Cart',
+                desc: '购物车状态机强调“商品项快照”与“Session 一致性校验”，它是 Order 与 Coupon 的上游事实来源。',
+                canvas: { width: 1040, height: 520, nodeWidth: 190, nodeHeight: 74 },
+                states: [
+                    { id: 'empty', label: 'EMPTY', desc: '无购物车项', x: 70, y: 110 },
+                    { id: 'active', label: 'ACTIVE', desc: '已有商品项与数量', x: 360, y: 110 },
+                    { id: 'validated', label: 'VALIDATED', desc: '通过一致性校验', x: 650, y: 110 },
+                    { id: 'checkedout', label: 'CHECKOUT_READY', desc: '可进入结算', x: 650, y: 320 }
+                ],
+                transitions: [
+                    {
+                        from: 'empty',
+                        to: 'active',
+                        event: 'ItemAddedToCart',
+                        rule: '加购前先校验库存；CartItem.unitPriceCents 取商品当前价格快照。'
+                    },
+                    {
+                        from: 'active',
+                        to: 'validated',
+                        event: 'CartValidated',
+                        rule: '结算前必须验证 session 用户与购物车归属一致，否则拒绝 Checkout。'
+                    },
+                    {
+                        from: 'validated',
+                        to: 'checkedout',
+                        event: 'CheckoutStarted',
+                        rule: '进入结算后以当前购物车快照作为 Coupon 计算与 Order 生成的唯一输入。'
+                    }
+                ]
+            }
+        ];
 
-## 1. Event Storming 全景
+        const domainGraph = {
+            canvas: { width: 1180, height: 560, nodeWidth: 220, nodeHeight: 120 },
+            nodes: [
+                { id: 'product', title: 'Product', subtitle: '目录上下文中的商品根实体', meta: ['id', 'name', 'priceCents', 'stock'], x: 70, y: 70 },
+                { id: 'cart', title: 'Cart', subtitle: '购物车根实体，持有会话归属', meta: ['userId', 'sessionId', 'items'], x: 370, y: 70 },
+                { id: 'cartItem', title: 'CartItem', subtitle: '购物车项，记录价格快照', meta: ['productId', 'quantity', 'unitPriceCents'], x: 670, y: 70 },
+                { id: 'coupon', title: 'Coupon', subtitle: '优惠券根实体，控制核销规则', meta: ['type', 'value', 'minSpendCents', 'status'], x: 70, y: 320 },
+                { id: 'order', title: 'Order', subtitle: '订单根实体，承载支付与审计', meta: ['status', 'totalCents', 'actualPaidCents', 'couponId'], x: 370, y: 320 },
+                { id: 'orderItem', title: 'OrderItem', subtitle: '订单项，锁定历史价格事实', meta: ['productId', 'quantity', 'priceCents'], x: 670, y: 320 }
+            ],
+            edges: [
+                {
+                    from: 'cart',
+                    to: 'cartItem',
+                    label: '包含 1..*',
+                    rule: 'Cart.items 是聚合内部实体集合；quantity 必须为正数。'
+                },
+                {
+                    from: 'cartItem',
+                    to: 'product',
+                    label: '引用 1',
+                    rule: 'CartItem.productId 指向 Product；unitPriceCents 取加购时价格快照。'
+                },
+                {
+                    from: 'cart',
+                    to: 'order',
+                    label: '结算生成',
+                    rule: 'Checkout 以 Cart 快照生成 Order；后续购物车变更不回写历史订单。'
+                },
+                {
+                    from: 'order',
+                    to: 'orderItem',
+                    label: '包含 1..*',
+                    rule: 'Order.totalCents = Σ(OrderItem.priceCents * quantity)。'
+                },
+                {
+                    from: 'orderItem',
+                    to: 'product',
+                    label: '引用 1',
+                    rule: 'OrderItem 仅引用 productId；priceCents 固化为下单时事实。'
+                },
+                {
+                    from: 'order',
+                    to: 'coupon',
+                    label: '关联 0..1',
+                    rule: 'Order 最多绑定一张 Coupon；couponId 为空表示未使用优惠券。'
+                }
+            ]
+        };
 
-### 领域全景可视化 (Context Map)
-\`\`\`mermaid
-flowchart LR
-    subgraph CatalogContext [Catalog - 商品目录]
-        Product[(Product Aggregate)]
-        Search[Search Service]
-    end
+        const stormingMatrix = {
+            commands: [
+                ['Catalog', 'SearchProduct', '搜索商品目录，返回可购买商品集合。'],
+                ['Cart', 'AddToCart', '将商品快照写入购物车。'],
+                ['Cart', 'ValidateCart', '执行 Session 一致性校验。'],
+                ['Coupon', 'ApplyBestCoupon', '在可用券中选出最优券。'],
+                ['Order', 'PlaceOrder', '基于购物车快照生成订单。'],
+                ['Order', 'ConfirmPayment', '确认支付并触发后续履约动作。']
+            ],
+            events: [
+                ['Catalog', 'ProductSearched', '用户完成商品搜索。'],
+                ['Cart', 'ItemAddedToCart', '商品加入购物车。'],
+                ['Cart', 'CartValidated', '购物车通过归属校验。'],
+                ['Coupon', 'CouponApplied', '优惠券被成功应用。'],
+                ['Order', 'OrderPlaced', '订单已生成。'],
+                ['Order', 'OrderPaymentConfirmed', '支付确认完成。'],
+                ['Order', 'OrderStockDeducted', '库存扣减成功。']
+            ],
+            policies: [
+                ['Coupon', '单券策略', '一次结算仅允许一张券参与实际核销。'],
+                ['Coupon', '最优券推荐', '在满足门槛的券中选择 actualPaidCents 最低的方案。'],
+                ['Order', '精度补偿', '百分比折扣结果执行 +0.00001 后向下取整。'],
+                ['Cart', '一致性校验', 'Session 用户与购物车归属必须一致。'],
+                ['Catalog', '库存扣减时机', '只有 PaymentConfirmed 后才扣减库存。']
+            ],
+            readModels: [
+                ['Catalog', '商品搜索结果', '供买家浏览与筛选。'],
+                ['Cart', '购物车快照', '供结算页与最优券算法消费。'],
+                ['Coupon', '可用券集合', '包含门槛、类型、有效期。'],
+                ['Order', '订单成功页', '展示已锁定的订单与支付信息。'],
+                ['Operator', '库存看板', '运营查看销量与补货状态。']
+            ]
+        };
 
-    subgraph CartContext [Cart - 购物车]
-        Cart[(Cart Aggregate)]
-        Validate[Session Validator]
-    end
+        const aggregateCatalog = [
+            {
+                title: 'Catalog Aggregate',
+                root: 'Product (id, name, description, priceCents, stock, categoryId)',
+                entities: '当前聚合以内聚 Product 为主，库存事实直接维护在根实体。',
+                values: 'Price, StockStatus',
+                invariant: 'priceCents 必须是 cents 整数；stock 不得为负。'
+            },
+            {
+                title: 'Cart Aggregate',
+                root: 'Cart (userId, sessionId, items, lastUpdatedAt)',
+                entities: 'CartItem (productId, quantity, unitPriceCents)',
+                values: 'Session ownership snapshot',
+                invariant: 'Cart 只能被所属 session/user 结算；quantity 必须为正数。'
+            },
+            {
+                title: 'Order Aggregate',
+                root: 'Order (id, userId, status, totalCents, discountCents, actualPaidCents, couponId)',
+                entities: 'OrderItem (productId, priceCents, quantity)',
+                values: 'FinancialPrecision',
+                invariant: 'actualPaidCents 一旦支付确认即锁定；历史价格不因商品改价而变化。'
+            },
+            {
+                title: 'Coupon Aggregate',
+                root: 'Coupon (id, code, type, value, minSpendCents, status)',
+                entities: '当前以根实体为主，规则集中在状态与门槛约束。',
+                values: 'Discount policy semantics',
+                invariant: '只有 ACTIVE 且满足 minSpendCents 的券才可参与最优券计算。'
+            }
+        ];
 
-    subgraph CouponContext [Coupon - 营销优惠]
-        Coupon[(Coupon Aggregate)]
-        Engine[Recommendation Engine]
-    end
+        function createSvgEl(name) {
+            return document.createElementNS('http://www.w3.org/2000/svg', name);
+        }
 
-    subgraph OrderContext [Order - 交易订单]
-        Order[(Order Aggregate)]
-        Calc[Financial Calculator]
-    end
+        function renderGraph(canvasId, tableId, graph, options) {
+            const canvas = document.getElementById(canvasId);
+            const table = document.getElementById(tableId);
+            if (!canvas || !table) return;
 
-    %% Event Flows
-    Search -- "ProductSearched" --> CatalogContext
-    CatalogContext -- "StockUpdated" --> CartContext
-    CartContext -- "ItemAddedToCart" --> OrderContext
-    OrderContext -- "ApplyBestCoupon" --> CouponContext
-    CouponContext -- "CouponApplied" --> OrderContext
-    OrderContext -- "PaymentConfirmed" --> CatalogContext
-    CatalogContext -- "StockDepleted" --> OrderContext
-\`\`\`
+            let selectedNodeId = null;
 
-### 关键 Domain Events (领域事件)
-- **Catalog**: \`ProductCreated\`, \`ProductSearched\`, \`StockUpdated\`, \`StockDepleted\`
-- **Cart**: \`ItemAddedToCart\`, \`ItemRemovedFromCart\`, \`CartQuantityChanged\`, \`CartCleared\`, \`CartValidated\`
-- **Coupon**: \`CouponCreated\`, \`CouponPublished\`, \`CouponApplied\`, \`CouponRecommendationGenerated\`
-- **Order**: \`OrderPlaced\`, \`OrderPaymentConfirmed\`, \`OrderCancelled\`, \`OrderStockDeducted\`, \`FinancialCalculationCompleted\`
+            function renderAll() {
+                canvas.innerHTML = '';
+                const svg = createSvgEl('svg');
+                svg.setAttribute('width', String(graph.canvas.width));
+                svg.setAttribute('height', String(graph.canvas.height));
+                svg.style.position = 'absolute';
+                svg.style.left = '0';
+                svg.style.top = '0';
 
-### 核心 Commands (指令)
-- **Catalog**: \`CreateProduct\`, \`SearchProduct\`, \`UpdateStock\`, \`SyncInventory\`
-- **Cart**: \`AddToCart\`, \`RemoveFromCart\`, \`UpdateQuantity\`, \`ValidateCart\`
-- **Coupon**: \`ApplyBestCoupon\`, \`ValidateCouponThreshold\`, \`ReleaseCoupon\`
-- **Order**: \`PlaceOrder\`, \`ConfirmPayment\`, \`CancelOrder\`, \`CalculateFinalPrice\`
+                const defs = createSvgEl('defs');
+                const marker = createSvgEl('marker');
+                marker.setAttribute('id', `${canvasId}-arrow`);
+                marker.setAttribute('markerWidth', '10');
+                marker.setAttribute('markerHeight', '10');
+                marker.setAttribute('refX', '8');
+                marker.setAttribute('refY', '3');
+                marker.setAttribute('orient', 'auto');
+                const arrow = createSvgEl('path');
+                arrow.setAttribute('d', 'M0,0 L8,3 L0,6 Z');
+                arrow.setAttribute('fill', '#94a3b8');
+                marker.appendChild(arrow);
+                defs.appendChild(marker);
+                svg.appendChild(defs);
 
-## 2. Bounded Contexts (限额上下文)
+                const byId = Object.fromEntries(graph.nodes.map((node) => [node.id, node]));
 
-- **Catalog (商品目录)**: 负责商品元数据管理、基于关键词的搜索引擎以及库存的原子操作。
-- **Cart (购物车)**: 维护用户选购状态，核心策略是“Session 一致性”，确保购物车数据不被非法篡改。
-- **Order (订单)**: 交易核心上下文，管理订单生命周期、财务精度计算 (\`actualPaidCents\`) 以及与支付系统的交互。
-- **Coupon (营销优惠)**: 营销引擎，支持 \`FLAT\` 与 \`PERCENTAGE\` 折扣策略，核心能力是“智能最优推荐”。
+                graph.edges.forEach((edge) => {
+                    const from = byId[edge.from];
+                    const to = byId[edge.to];
+                    if (!from || !to) return;
 
-## 3. 核心 Aggregate 与 Entity
+                    const active = selectedNodeId && (edge.from === selectedNodeId || edge.to === selectedNodeId);
+                    const x1 = from.x + graph.canvas.nodeWidth;
+                    const y1 = from.y + 42;
+                    const x2 = to.x;
+                    const y2 = to.y + 42;
+                    const curve = Math.max(30, Math.min(130, Math.abs(x2 - x1) / 2));
+                    const path = createSvgEl('path');
+                    path.setAttribute('d', `M ${x1} ${y1} C ${x1 + curve} ${y1}, ${x2 - curve} ${y2}, ${x2} ${y2}`);
+                    path.setAttribute('fill', 'none');
+                    path.setAttribute('stroke', active ? '#0f172a' : '#94a3b8');
+                    path.setAttribute('stroke-width', active ? '2' : '1.5');
+                    path.setAttribute('marker-end', `url(#${canvasId}-arrow)`);
+                    svg.appendChild(path);
 
-### Catalog Aggregate
-- **Root Entity**: \`Product\` (id, name, description, priceCents, stock, categoryId)
-- **Value Objects**: \`Price\` (cents 封装), \`StockStatus\`
+                    const label = createSvgEl('text');
+                    label.textContent = edge.label;
+                    label.setAttribute('x', String((x1 + x2) / 2));
+                    label.setAttribute('y', String((y1 + y2) / 2 - 10));
+                    label.setAttribute('text-anchor', 'middle');
+                    label.setAttribute('font-size', '11');
+                    label.setAttribute('fill', active ? '#0f172a' : '#64748b');
+                    svg.appendChild(label);
+                });
 
-### Cart Aggregate
-- **Root Entity**: \`Cart\` (userId, sessionId, items, lastUpdatedAt)
-- **Entities**: \`CartItem\` (productId, quantity, unitPriceCents)
+                canvas.appendChild(svg);
 
-### Order Aggregate
-- **Root Entity**: \`Order\` (id, userId, status, totalCents, discountCents, actualPaidCents, couponId)
-- **Entities**: \`OrderItem\` (productId, priceCents, quantity)
-- **Value Objects**: \`FinancialPrecision\` (含 +0.00001 补偿逻辑)
+                graph.nodes.forEach((node) => {
+                    const el = document.createElement('div');
+                    el.className = `${options.nodeClass} ${selectedNodeId === node.id ? 'active' : ''}`;
+                    el.style.left = `${node.x}px`;
+                    el.style.top = `${node.y}px`;
+                    el.style.width = `${graph.canvas.nodeWidth}px`;
+                    el.innerHTML = `
+                        <div class="node-title">${node.title}</div>
+                        <div class="node-subtitle">${node.subtitle}</div>
+                        <div class="node-meta">${node.meta.map((item) => `<span class="meta-pill">${item}</span>`).join('')}</div>
+                    `;
+                    el.addEventListener('click', () => {
+                        selectedNodeId = selectedNodeId === node.id ? null : node.id;
+                        renderAll();
+                    });
+                    canvas.appendChild(el);
+                });
 
-### Coupon Aggregate
-- **Root Entity**: \`Coupon\` (id, code, type: FLAT/PERCENTAGE, value, minSpendCents, status)
+                const rows = selectedNodeId
+                    ? graph.edges.filter((edge) => edge.from === selectedNodeId || edge.to === selectedNodeId)
+                    : graph.edges;
 
----
-*Last Updated: 2026-08-20*
-`;
-        
-        // Render markdown and then post-process mermaid blocks for better stability
-        document.getElementById('content').innerHTML = marked.parse(markdown);
-        
-        document.querySelectorAll('pre code.language-mermaid').forEach(el => {
-            const pre = el.parentElement;
-            const div = document.createElement('div');
-            div.className = 'mermaid';
-            div.textContent = el.textContent;
-            pre.replaceWith(div);
-        });
+                table.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th style="width: 140px;">Relation</th>
+                            <th style="width: 180px;">From</th>
+                            <th style="width: 180px;">To</th>
+                            <th>Business Rule</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${rows.map((edge) => `
+                            <tr>
+                                <td>${edge.label}</td>
+                                <td>${edge.from}</td>
+                                <td>${edge.to}</td>
+                                <td>${edge.rule}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                `;
+            }
 
-        mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
-        mermaid.init(undefined, '.mermaid');
+            renderAll();
+        }
+
+        function renderStateMachines() {
+            const tabs = document.getElementById('state-machine-tabs');
+            const title = document.getElementById('state-machine-title');
+            const desc = document.getElementById('state-machine-desc');
+            const canvas = document.getElementById('state-machine-canvas');
+            const table = document.getElementById('state-machine-table');
+            if (!tabs || !title || !desc || !canvas || !table) return;
+
+            let activeId = stateMachines[0].id;
+
+            function renderMachine() {
+                tabs.innerHTML = stateMachines.map((machine) => `
+                    <div class="filter-chip ${machine.id === activeId ? 'active' : ''}" data-id="${machine.id}">${machine.name}</div>
+                `).join('');
+
+                tabs.querySelectorAll('.filter-chip').forEach((chip) => {
+                    chip.addEventListener('click', () => {
+                        const id = chip.getAttribute('data-id');
+                        if (!id) return;
+                        activeId = id;
+                        renderMachine();
+                    });
+                });
+
+                const machine = stateMachines.find((item) => item.id === activeId);
+                if (!machine) return;
+
+                title.textContent = machine.name;
+                desc.textContent = machine.desc;
+                canvas.innerHTML = '';
+
+                const svg = createSvgEl('svg');
+                svg.setAttribute('width', String(machine.canvas.width));
+                svg.setAttribute('height', String(machine.canvas.height));
+                svg.style.position = 'absolute';
+                svg.style.left = '0';
+                svg.style.top = '0';
+
+                const defs = createSvgEl('defs');
+                const marker = createSvgEl('marker');
+                marker.setAttribute('id', 'state-arrow');
+                marker.setAttribute('markerWidth', '10');
+                marker.setAttribute('markerHeight', '10');
+                marker.setAttribute('refX', '8');
+                marker.setAttribute('refY', '3');
+                marker.setAttribute('orient', 'auto');
+                const arrow = createSvgEl('path');
+                arrow.setAttribute('d', 'M0,0 L8,3 L0,6 Z');
+                arrow.setAttribute('fill', '#94a3b8');
+                marker.appendChild(arrow);
+                defs.appendChild(marker);
+                svg.appendChild(defs);
+
+                const byId = Object.fromEntries(machine.states.map((state) => [state.id, state]));
+
+                machine.transitions.forEach((transition) => {
+                    const from = byId[transition.from];
+                    const to = byId[transition.to];
+                    if (!from || !to) return;
+
+                    const x1 = from.x + machine.canvas.nodeWidth;
+                    const y1 = from.y + 37;
+                    const x2 = to.x;
+                    const y2 = to.y + 37;
+                    const curve = Math.max(40, Math.min(120, Math.abs(x2 - x1) / 2));
+
+                    const path = createSvgEl('path');
+                    path.setAttribute('d', `M ${x1} ${y1} C ${x1 + curve} ${y1}, ${x2 - curve} ${y2}, ${x2} ${y2}`);
+                    path.setAttribute('fill', 'none');
+                    path.setAttribute('stroke', '#94a3b8');
+                    path.setAttribute('stroke-width', '1.5');
+                    path.setAttribute('marker-end', 'url(#state-arrow)');
+                    svg.appendChild(path);
+
+                    const label = createSvgEl('text');
+                    label.textContent = transition.event;
+                    label.setAttribute('x', String((x1 + x2) / 2));
+                    label.setAttribute('y', String((y1 + y2) / 2 - 10));
+                    label.setAttribute('text-anchor', 'middle');
+                    label.setAttribute('font-size', '11');
+                    label.setAttribute('fill', '#64748b');
+                    svg.appendChild(label);
+                });
+
+                canvas.appendChild(svg);
+
+                machine.states.forEach((state) => {
+                    const el = document.createElement('div');
+                    el.className = 'state-node';
+                    el.style.left = `${state.x}px`;
+                    el.style.top = `${state.y}px`;
+                    el.style.width = `${machine.canvas.nodeWidth}px`;
+                    el.innerHTML = `
+                        <div class="node-title">${state.label}</div>
+                        <div class="node-subtitle">${state.desc}</div>
+                    `;
+                    canvas.appendChild(el);
+                });
+
+                table.innerHTML = `
+                    <thead>
+                        <tr>
+                            <th style="width: 160px;">Event</th>
+                            <th style="width: 140px;">From</th>
+                            <th style="width: 140px;">To</th>
+                            <th>Rule</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${machine.transitions.map((transition) => `
+                            <tr>
+                                <td>${transition.event}</td>
+                                <td>${transition.from.toUpperCase()}</td>
+                                <td>${transition.to.toUpperCase()}</td>
+                                <td>${transition.rule}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                `;
+            }
+
+            renderMachine();
+        }
+
+        function renderStormingMatrix() {
+            const host = document.getElementById('storming-matrix');
+            if (!host) return;
+
+            const columns = [
+                { title: 'Commands', key: 'commands' },
+                { title: 'Domain Events', key: 'events' },
+                { title: 'Policies', key: 'policies' },
+                { title: 'Read Models', key: 'readModels' }
+            ];
+
+            host.innerHTML = columns.map((column) => `
+                <div class="matrix-col">
+                    <div class="matrix-head">${column.title}</div>
+                    <div class="matrix-body">
+                        ${stormingMatrix[column.key].map((item) => `
+                            <div class="matrix-card">
+                                <strong>${item[1]}</strong>
+                                <p><span style="color:#0f172a; font-weight:700;">${item[0]}</span> · ${item[2]}</p>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderAggregateCatalog() {
+            const host = document.getElementById('aggregate-grid');
+            if (!host) return;
+
+            host.innerHTML = aggregateCatalog.map((aggregate) => `
+                <div class="aggregate-card">
+                    <div class="aggregate-title">${aggregate.title}</div>
+                    <div class="aggregate-block">
+                        <div class="aggregate-label">Root Entity</div>
+                        <div class="aggregate-text">${aggregate.root}</div>
+                    </div>
+                    <div class="aggregate-block">
+                        <div class="aggregate-label">Entities</div>
+                        <div class="aggregate-text">${aggregate.entities}</div>
+                    </div>
+                    <div class="aggregate-block">
+                        <div class="aggregate-label">Value Objects</div>
+                        <div class="aggregate-text">${aggregate.values}</div>
+                    </div>
+                    <div class="aggregate-block">
+                        <div class="aggregate-label">Invariant</div>
+                        <div class="aggregate-text">${aggregate.invariant}</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        renderGraph('context-map-canvas', 'context-map-table', contextMap, { nodeClass: 'context-node' });
+        renderStateMachines();
+        renderGraph('domain-object-canvas', 'domain-object-table', domainGraph, { nodeClass: 'entity-node' });
+        renderStormingMatrix();
+        renderAggregateCatalog();
     </script>
 </body>
 </html>
