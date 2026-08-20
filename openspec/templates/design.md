@@ -7,8 +7,15 @@
 -->
 
 ## Domain Boundary Impact (领域边界影响)
-<!-- 
+<!--
 明确说明此次变更的 capabilities 为什么归属于对应的 Bounded Contexts，参考 domain_model.html。
+-->
+
+## Process Delta (流程影响)
+<!--
+描述本次变更对 L2/L3 流程节点的改动或补齐情况。
+- [NEW] 补齐了 L3-XX 的规则实现
+- [MOD] 修正了 L2-XX 的协同逻辑
 -->
 
 ## Goals / Non-Goals (目标与非目标)

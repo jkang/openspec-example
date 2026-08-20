@@ -37,10 +37,12 @@
 -->
 
 ## 5. 治理映射对齐 (Governance Mapping)
-<!-- 
-必须参考 docs/baseline/domain_model.html 识别受影响的边界与能力。
+<!--
+必须参考 docs/baseline/domain_model.html 识别受影响的边界与能力，
+并参考 docs/baseline/business_process.html 识别受影响的流程节点。
 - Impacted Bounded Contexts: [例如：Order Context, Coupon Context]
 - Candidate Capabilities: [例如：order-management, coupon-management]
+- Impacted Process Nodes: [例如：L1-04 下单结算, L2-03 选择优惠方案]
 -->
 
 ## 6. 架构影响分析 (Architectural Impact & Ideas)

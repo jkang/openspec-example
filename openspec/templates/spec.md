@@ -4,8 +4,8 @@
 
 ## ADDED Requirements
 
-### Requirement: <需求名称>
-<!-- 系统 SHALL/MUST 执行的操作 -->
+### Requirement: <需求名称> (Ref: L3-XX)
+<!-- 系统 SHALL/MUST 执行的操作，注明对应的 L3 规则流节点 -->
 
 #### Scenario: <场景名称>
 - **GIVEN** <初始状态>

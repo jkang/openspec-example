@@ -16,7 +16,7 @@ Propose a new change - create the change and generate the initial `proposal.md`.
 
 I'll create a change with the initial artifacts:
 - ideas/idea.md (structured exploration conclusions - MANDATORY first step)
-- proposal.md (what & why - defines the scope and capabilities)
+- proposal.md (what & why - defines the scope, capabilities, and process alignment)
 
 `<capability-path>` is the spec directory relative to `specs/` (for example, `user-auth` or `identity/user-auth`). Preserve an existing capability's full path and follow the project's established organization for new capabilities.
 

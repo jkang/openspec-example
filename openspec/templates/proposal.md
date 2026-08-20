@@ -16,10 +16,18 @@
 -->
 
 ## Capabilities (系统能力)
-<!-- 
+<!--
 明确指出将要创建或修改哪些规范 (specs)。
 必须与 docs/baseline/domain_model.html 中的映射表对齐。
 新增能力路径请使用烤串命名法 (kebab-case)。
+-->
+
+### 流程对齐 (Process Alignment)
+<!--
+明确列出本次变更受影响的流程节点 ID (来自 business_process.html)。
+- [ ] L1-XX: 节点名称
+- [ ] L2-XX: 节点名称
+- [ ] L3-XX: 节点名称
 -->
 
 ### 新增能力 (New Capabilities)

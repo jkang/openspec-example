@@ -39,7 +39,7 @@ I'll create the story artifact:
       ```
    b. **Create `story.md`**:
       - Read `proposal.md`, `ideas/idea.md`, and `prototype.html` (if any) for context.
-      - Extract E2E journeys and business rules.
+      - Extract E2E journeys and business rules. Ensure E2E journeys are mapped to **L1/L2 Process Nodes** (refer to `docs/baseline/business_process.html`).
       - Follow the `template` and `instruction` to generate the Markdown.
       - Write the file to `resolvedOutputPath` (usually `story.md`).
       - Show progress: "Generated business story at story.md"

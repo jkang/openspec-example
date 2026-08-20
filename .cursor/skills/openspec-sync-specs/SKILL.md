@@ -155,14 +155,13 @@ This is an **agent-driven** operation - you will read delta specs and directly e
    If validation fails, report the problems and do not claim the sync succeeded.
 
 6. **Baseline Sync (回流业务基线)**
-
+   
    在完成 Spec 同步后，你必须执行业务基线回流，将变更中的业务认知沉淀到全局规划层：
    - **调用辅助技能**: 依次调用 `baseline/` 子目录下的辅助技能：
-     - `openspec-baseline-journey`: 根据 `story.md` 更新旅程基线。
      - `openspec-baseline-story-map`: 根据 `verify.md` 更新 Story Map 实现状态。
-     - `openspec-baseline-process-flow`: 根据 `design.md` 和状态变更更新流程基线。
-     - `openspec-baseline-domain-model`: 根据 `specs/domain-model/spec.md` 更新领域模型（Event-Storming 视角）。
-   - **自动化渲染**: 所有基线回流完成后，调用 `openspec-baseline-render` 刷新 `docs/baseline/` 下的可视化文档。
+     - `openspec-baseline-process-flow`: 根据 `story.md` (L1/L2) 和 `specs/design.md` (L3) 更新 `business_process.html`。需提取 E2E 旅程节点和规则环节。
+     - `openspec-baseline-domain-model`: 根据 `specs/domain-model/spec.md` 更新领域模型。
+   - **自动化渲染**: 所有基线回流完成后，调用 `openspec-baseline-render` 校验基线 HTML 的索引与可视化完整性。
 
 7. **Show summary**
 

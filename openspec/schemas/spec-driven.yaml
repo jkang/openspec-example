@@ -14,8 +14,8 @@ artifacts:
       1. **澄清业务意图**：目的、范围、具体业务要求。
       2. **业务设计思路**：逻辑流转、用户价值。
       3. **任务类型与后续策略**：必须与用户确认这是 Epic, Story, Bug Fix 还是 Tech Debt，并制定对应的流程策略。
-      4. **治理映射对齐**：必须参考 `docs/baseline/domain_model.html` 识别 **Impacted Bounded Contexts** 并据此推出 **Candidate Capabilities**。
-      5. **需求拆分建议**：是否需要分阶段实施。
+      4. **治理映射对齐**：必须参考 `docs/baseline/domain_model.html` 识别 **Impacted Bounded Contexts**，并参考 `docs/baseline/business_process.html` 识别受影响的 **L1/L2/L3 流程节点**。
+        5. **需求拆分建议**：是否需要分阶段实施。
       6. **架构影响分析**：现有架构改动点、技术挑战。
       7. **确认结论**：用户已确认的最终意图。
 
@@ -37,6 +37,7 @@ artifacts:
       - **What Changes (变更内容)**: 使用项目符号列出具体的变更点。明确说明新增功能、修改点或移除的内容。对于破坏性变更，请标记为 **BREAKING**。
       - **Capabilities (系统能力)**: 明确指出将要创建或修改哪些规范 (specs)：
         - **映射对齐约束**：此处列出的 Capabilities 必须与 `docs/baseline/domain_model.html` 中的映射表对齐。如果 proposal 写了一个未映射的 capability，你必须显式说明这是“新增 taxonomy”及其理由。
+        - **流程对齐约束 (Process Alignment)**: 必须明确列出本次变更受影响的流程节点 ID (来自 `business_process.html`)。
         - **新增能力 (New Capabilities)**: 列出引入的新能力。每个新能力将生成一个新的 `specs/<capability-path>/spec.md`。新增的路径片段必须使用烤串命名法（kebab-case，例如 `user-auth` 或 `identity/user-auth`），并遵循项目现有的规范组织结构。
         - **修改能力 (Modified Capabilities)**: 列出需求 (REQUIREMENTS)发生变化的现有能力。只有在规范级别的行为发生变化时才包含在此处（不仅仅是实现细节的改变）。每个被修改的能力都需要一个增量规范文件。必须使用 `openspec/specs/` 下完全相同的现有路径。如果没有需求变更，请留空。
       - **Impact (影响范围)**: 受影响的代码、API、依赖项或系统模块。
@@ -80,7 +81,8 @@ artifacts:
       - 如果涉及前端 UI 变更，必须在 `prototype.html` 已生成并确认后执行。
 
       **内容要求**：
-      - 该文档用于业务评审，必须包含端到端的验收标准 (Given/When/Then)。
+        - 该文档用于业务评审，必须包含端到端的验收标准 (Given/When/Then)。
+        - 验收标准必须映射到流程基线中的 `L1` (价值流) 和 `L2` (协同流) 节点。
     requires:
       - proposal
 
@@ -97,7 +99,8 @@ artifacts:
       - 如果任务类型是 Tech Debt 且无外部行为变更，通常在 `.openspec.yaml` 中设置 `skip_specs: true` 并跳过此阶段。
       - 如果任务类型是 Bug Fix，规范重点在于使用 `MODIFIED Requirements` 修正现有行为的描述。
       - **重要**：如果该能力涉及 UI 变更，你必须先参考已生成的 `prototype.html`，提取交互场景并将其嵌入规范中。
-      - **重要**：如果任务类型不是 Tech Debt，必须参考已确认的 `story.md`，确保模块规范与 E2E 验收标准保持一致。
+      **重要**：每个能力规范必须注明其对应的流程节点 ID（尤其是 `L3` 规则流节点）。
+      **重要**：如果任务类型不是 Tech Debt，必须参考已确认的 `story.md`，确保模块规范与 E2E 验收标准保持一致。
 
       优秀的规范内容应包含：
       - 用户或下游系统所依赖的可观察行为
@@ -146,6 +149,7 @@ artifacts:
       章节结构：
       - **Context (上下文)**: 引用提案，不要赘述。
       - **Domain Boundary Impact (领域边界影响)**: 必须明确说明此次变更的 capabilities 为什么归属于对应的 Bounded Contexts，参考 `domain_model.html`。
+      - **Process Delta (流程影响)**: 描述本次变更对 L2/L3 流程节点的改动或补齐情况。
       - **Goals / Non-Goals**: 仅添加设计层面的边界。
       - **Decisions (技术决策)**: 关键技术选择及其理由。
       - **Risks / Trade-offs**: 已知限制与缓解措施。

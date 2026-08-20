@@ -28,10 +28,12 @@ rules:
     - 必须参考 docs/baseline/domain_model.html 识别 Impacted Bounded Contexts 与 Candidate Capabilities
     - 必须确认任务类型 (Epic/Story/Bug Fix/Tech Debt)
     - 对于 Epic 类型，必须在 openspec/ 目录下创建 epic-<key>.story-list.json
-    - 必须输出 ideas/idea.md 作为后续提案的唯一源头
+    - 必须参考 docs/baseline/domain_model.html 识别 Impacted Bounded Contexts 与 Candidate Capabilities
+    - 必须参考 docs/baseline/business_process.html 识别受影响的 L1/L2/L3 流程节点
   proposal:
     - 基于已确认的 idea.md 结论，明确说明 Why 和 What
     - 包含映射到 spec 文件夹名称的 Capabilities 章节，且必须与 Domain Model 映射对齐
+    - 必须包含 Process Alignment 章节，明确引用的流程节点 ID (如 L1-04, L2-03)
     - 必须说明受影响的实现版本 (Node.js / Python / Frontend / 全部)
     - 说明后续流程分支（是否跳过 Prototype 或 Specs）
   prototype:
@@ -45,17 +47,19 @@ rules:
     - 必须作为业务评审的 Single Source of Truth
     - Tech Debt 通常跳过此阶段
     - 如果涉及 UI 变更，必须在 prototype.html 确认后生成，并显式链接原型
-    - 验收标准必须覆盖端到端 (E2E) 旅程，使用 Given/When/Then 格式
+    - 验收标准必须覆盖端到端 (E2E) 旅程，使用 Given/When/Then 格式，并映射到 L1/L2 流程节点
     - 必须包含业务规则表 (Business Rules)
     - 必须链接到 proposal.md 及其对应的 capability specs
   specs:
     - 所有场景使用 Given/When/Then (Gherkin) 格式
+    - 每个 Capability Spec 必须显式标注来源流程节点（尤其是 L3 环节）
     - 必须从 prototype.html 中提取交互逻辑记录为 Scenario
-    - 必须按照 docs/TESTING_STRATEGY.md 打上测试标签 (@unit, @api, @e2e)
+    - 按照 docs/TESTING_STRATEGY.md 打上测试标签 (@unit, @api, @e2e)
     - 如果存在 story.md，必须与 story.md 定义的 E2E 旅程保持逻辑一致
     - 规范性需求语言使用 SHALL 或 MUST
   design:
     - 包含架构图 (Mermaid 或 ASCII)
+    - 包含 Process Delta 章节，说明对 L2/L3 流程节点的改动或补齐
     - 对于 Bug Fix，必须包含根本原因分析 (RCA)
     - 对于前端，包含 UI 组件层级和状态管理方案 (必须与确认后的 prototype 完全对齐)
     - 记录关键决策及其理由和考虑过的替代方案

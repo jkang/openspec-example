@@ -15,9 +15,9 @@
   - **目标**: 维护 `docs/ROADMAP.md`，执行每月滚动计划。
 - **业务基线管理 (Auxiliary Baseline Commands)**:
   - **指令**: `/opsx:baseline/story-map` - 维护 `docs/baseline/service_blueprint.html`。
-  - **指令**: `/opsx:baseline/process-flow` - 维护 `docs/baseline/business_process.html`。
+  - **指令**: `/opsx:baseline/process-flow` - 维护 `docs/baseline/business_process.html` (L1/L2/L3 分层流程)。
   - **指令**: `/opsx:baseline/domain-model` - 维护 `docs/baseline/domain_model.html` (Event-Storming 视角)。
-  - **指令**: `/opsx:baseline/render` - 将上述 Markdown 基线渲染为 HTML。
+  - **指令**: `/opsx:baseline/render` - 校验基线 HTML 的索引与可视化完整性。
 - **强制约束**:
   - 规划层产物是全局上下文，将自动注入所有后续指令。
   - 必须包含“未来 +1, +2 个月”的滚动预测。
@@ -81,7 +81,7 @@ graph TD
 - **强制约束 (Hard Constraint)**:
   - 必须严格遵循“结构化 6 步法”。
   - **任务类型确认 (Task Classification)**: 必须确认是史诗、功能、缺陷修复还是技术债。
-  - **治理映射对齐**: 必须参考 `docs/baseline/domain_model.html` 识别 `Impacted Bounded Contexts` 并据此推出 `Candidate Capabilities`。
+  - **治理映射对齐**: 必须参考 `docs/baseline/domain_model.html` 识别 `Impacted Bounded Contexts` 并参考 `docs/baseline/business_process.html` 识别受影响的 `L1/L2/L3` 流程节点。
   - **规划对齐 (Roadmap Alignment)**: 在 `ideas/idea.md` 中必须显式写一段“与当前阶段目标对齐说明”，引用 `docs/ROADMAP.md` 中的目标。
   - **史诗治理**: 如果是史诗，必须在 `openspec/` 目录下创建一个 `epic-<key>.story-list.json` 文件作为执行队列。
   - **唯一输出**: 必须生成 `ideas/idea.md` (相对于变更目录) 作为后续提案的唯一源头。
@@ -92,7 +92,7 @@ graph TD
 - **目标**: 根据 `idea.md` 生成变更提案 `proposal.md`。
 - **强制约束 (Hard Constraint)**:
   - 必须基于 `idea.md` 的任务类型明确后续路径。
-  - **治理映射引用**: `proposal.md` 中的 `Capabilities` 必须与 `Domain Model` 映射表对齐。若出现新能力，需说明 taxonomy 扩展理由。
+  - **治理映射引用**: `proposal.md` 中的 `Capabilities` 必须与 `Domain Model` 映射对齐，且必须包含 `Process Alignment` 章节明确受影响的流程节点 ID。
   - 对于史诗类型，生成提案后应停止，等待拆分。
   - 对于功能类型，引导用户进入下一步（涉及 UI 先 `/opsx:prototype` 并完成确认，再 `/opsx:story`，随后进入 `/opsx:spec-design`；不涉及 UI 则直接 `/opsx:story`，随后进入 `/opsx:spec-design`）。
   - 对于缺陷修复类型，引导用户进入下一步（涉及 UI 先 `/opsx:prototype` 并完成确认，随后进入 `/opsx:spec-design`；不涉及 UI 则直接进入 `/opsx:spec-design`，并在设计中包含根因分析）。
@@ -110,7 +110,7 @@ graph TD
 - **目标**: 生成端到端的验收文档 `story.md`。
 - **强制约束 (Hard Constraint)**:
   - **时机**: 必须在提案之后执行；若涉及 UI，必须在原型确认后执行。
-  - **内容**: 必须包含跨模块的 E2E 旅程及业务规则表。
+  - **内容**: 必须包含跨模块的 E2E 旅程及业务规则表。验收标准应优先参考流程基线中的 `L1/L2` 节点。
   - **HITL 检查点**: 生成后必须由用户确认验收标准，方可进入模块规格设计。
 
 ### 5. 规范与设计阶段 (Spec-Design)
@@ -119,6 +119,7 @@ graph TD
 - **BDD 测试分层防腐**: 在生成 `spec.md` 时，必须为每个 Gherkin Scenario 打上测试标签 (`@unit`, `@api`, 或 `@e2e`)，严格遵循[自动化测试策略](../TESTING_STRATEGY.md)。
 - **强制约束 (Hard Constraint)**:
   - 必须参考已确认的 `proposal.md` 和 `prototype.html` (若有)。如果存在 `story.md`，必须确保 specs 与其 E2E 验收标准一致。
+  - **流程追溯**: 每个 Capability Spec 必须注明其对应的流程节点（尤其是 `L3` 规则环节）。
   - 生成的任务清单必须包含 E2E 验证步骤。
 
 ### 6. 应用阶段 (Apply)
@@ -141,8 +142,8 @@ graph TD
 - **目标**: 在归档前，将增量规格 (delta specs) 同步合并入主规格 (main specs)，并同步回流业务基线 (Baseline Sync)。
 - **核心动作**:
   1. **Spec Sync**: 将 `openspec/changes/<name>/specs/` 下的变更同步至 `openspec/specs/`。
-  2. **Baseline Sync**: 自动调用辅助技能，将 `story.md`、`design.md` 等沉淀的认知回流至 `docs/baseline/` 下的 3 份基线文档。
-  3. **Auto Render**: 同步完成后自动执行渲染，刷新 `docs/baseline/` 下的可视化文档。
+  2. **Baseline Sync**: 自动调用辅助技能，将 `story.md` (L1/L2)、`specs` 与 `design.md` (L3) 沉淀的认知回流至 `docs/baseline/` 下的 HTML 基线文档。
+  3. **Auto Render**: 同步完成后自动刷新基线文档的可视化索引。
 
 ### 9. 归档阶段 (Archive)
 - **指令**: `/opsx:archive`

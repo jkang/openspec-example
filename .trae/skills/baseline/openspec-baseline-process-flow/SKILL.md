@@ -10,20 +10,23 @@ metadata:
 
 # openspec-baseline-process-flow
 
-**目标**: 维护 `docs/baseline/business_process.html`，确保它反映了系统核心业务流程的最新状态机和流转逻辑。
+**目标**: 维护 `docs/baseline/business_process.html`，确保它反映了系统核心业务流程的 L1 (端到端价值流)、L2 (价值段协同流) 和 L3 (关键业务环节规则流)。
 
 ## 工作流
 
 1. **分析流程变更**:
-   - 在 `/opsx:sync` 过程中，阅读 `design.md` 中的架构图和 `specs/` 中的状态描述。
+   - 在 `/opsx:sync` 过程中，阅读 `story.md` (识别 L1/L2 旅程) 和 `design.md` (识别 L3 规则环节)。
 2. **定位流程定义**:
-   - 阅读 `docs/baseline/business_process.html` 中的 `<script>` 标签内的 `const markdown` 或 `swimlaneData` 变量。
+   - 阅读 `docs/baseline/business_process.html`。该文件采用直接 HTML/JS 维护，不通过 Markdown 转换。
 3. **应用回流**:
-   - **内容更新**: 直接修改 HTML 文件中内嵌的 Markdown 字符串或 JS 数据。
+   - **内容更新**: 使用 DOM 选择器逻辑或直接修改 HTML 文件中的结构化数据块。
+   - **分层维护**: 
+     - L1/L2 更新通常由 `story.md` 的业务变更驱动。
+     - L3 更新由 `specs/design.md` 的详细规则逻辑驱动。
 4. **验证逻辑**:
-   - 确保流程图与代码中的状态机实现保持逻辑一致。
+   - 确保流程节点 ID (如 L1-04) 在文档中存在且锚点正确。
 
 ## 输出规范
 
-- 优先使用 Mermaid 流程图描述逻辑。
-- 状态列表必须清晰列出每个状态的含义。
+- 必须遵循分层建模口径：L1 (价值流) -> L2 (协同流) -> L3 (规则流)。
+- 核心逻辑展示采用卡片式泳道图 (CSS Grid)。

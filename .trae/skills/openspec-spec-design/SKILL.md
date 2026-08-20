@@ -42,7 +42,7 @@ I'll create the following artifacts:
         ```bash
         openspec instructions <artifact-id> --change "<name>" --json
         ```
-     - Read dependencies (e.g., `proposal.md`, `prototype.html`, `story.md` if any, and preceding artifacts) for context.
+     - Read dependencies (e.g., `proposal.md`, `prototype.html`, `story.md` if any, and preceding artifacts) for context. Ensure `specs` refer to **L3 Process Nodes** and `design.md` includes **Process Delta** (refer to `docs/baseline/business_process.html`).
       - Follow the `template` and `instruction` to generate the artifact.
       - If `skip_specs: true` is set in `.openspec.yaml`, skip `specs`.
       - Write the file to `resolvedOutputPath`.
