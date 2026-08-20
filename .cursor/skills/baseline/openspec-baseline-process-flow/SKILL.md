@@ -10,7 +10,7 @@ metadata:
 
 # openspec-baseline-process-flow
 
-**目标**: 维护 `docs/baseline/business_process.html`，确保 it 反映了系统核心业务流程的 L1 (端到端价值流)、L2 (价值段协同流) 和 L3 (关键业务环节规则流)。
+**目标**: 维护 `docs/baseline/business_process.html`，确保它反映了系统核心业务流程的 L1 (端到端价值流)、L2 (价值段协同流) 和 L3 (关键业务环节规则流)。
 
 ## 工作流
 

@@ -86,7 +86,7 @@ This is an **agent-driven** operation - you will read delta specs and directly e
 
    a. **Read the delta spec** to understand the intended changes
 
-   b. **Read the main spec** at `<planningHome.root>/openspec/specs/<capability>/spec.md` (may not exist yet)
+   b. - Read the main spec at `<planningHome.root>/openspec/specs/<capability-path>/spec.md` (may not exist yet)
 
    c. **Apply changes intelligently**:
 
@@ -115,14 +115,17 @@ This is an **agent-driven** operation - you will read delta specs and directly e
    d. **Create new main spec** if capability doesn't exist yet:
       - Create `<planningHome.root>/openspec/specs/<capability-path>/spec.md`
       - Add Purpose section: copy the delta's `## Purpose` body verbatim when it has one
-        - Add Requirements section with the ADDED requirements
+      - Add Requirements section with the ADDED requirements
       - Follow the **Main Spec Format Reference** below
 
 5. **Baseline Sync (回流业务基线)**
 
-   在完成 Spec 同步后，你必须执行业务基线回流：
-   - **调用辅助技能**: 依次调用 `baseline/` 下的技能更新 Story Map, Process Flow 和 Domain Model。
-   - **自动化渲染**: 所有回流完成后，调用 `openspec-baseline-render` 刷新可视化文档。
+   在完成 Spec 同步后，你必须执行业务基线回流，将变更中的业务认知沉淀到全局规划层：
+   - **调用辅助技能**: 依次调用 `baseline/` 子目录下的辅助技能：
+     - `openspec-baseline-story-map`: 根据 `verify.md` 更新 Story Map 实现状态。
+     - `openspec-baseline-process-flow`: 根据 `story.md` (L1/L2) 和 `specs/design.md` (L3) 更新 `business_process.html`。
+     - `openspec-baseline-domain-model`: 根据 `specs/domain-model/spec.md` 更新领域模型。
+   - **自动化渲染**: 所有基线回流完成后，调用 `openspec-baseline-render` 校验基线 HTML 的索引与可视化完整性。
 
 6. **Show summary**
 

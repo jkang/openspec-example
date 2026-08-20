@@ -265,6 +265,7 @@
             min-height: 260px;
             padding: 18px;
             border-right: 1px solid var(--line);
+            scroll-margin-top: 100px;
         }
 
         .stream-stage:last-child {
@@ -385,6 +386,7 @@
 
         .swimlane-col {
             min-height: 94px;
+            scroll-margin-top: 100px;
         }
 
         .col-index {
@@ -500,6 +502,7 @@
             background: var(--panel);
             padding: 14px;
             min-height: 180px;
+            scroll-margin-top: 100px;
         }
 
         .step-id {
@@ -1024,7 +1027,7 @@
         function renderL1() {
             const container = document.getElementById("l1-stream");
             container.innerHTML = l1Stages.map(stage => `
-                <article class="stream-stage">
+                <article class="stream-stage" id="${stage.index}">
                     <div class="stage-index">${stage.index}</div>
                     <h3 class="stage-title">${stage.title}</h3>
                     <p class="stage-goal">${stage.goal}</p>
@@ -1054,7 +1057,7 @@
 
             l2Columns.forEach(column => {
                 html += `
-                    <div class="swimlane-col">
+                    <div class="swimlane-col" id="${column.index}">
                         <span class="col-index">${column.index}</span>
                         <h3 class="col-title">${column.title}</h3>
                         <div class="lane-note">${column.note}</div>
@@ -1090,7 +1093,7 @@
         function renderL3() {
             const container = document.getElementById("l3-steps");
             container.innerHTML = l3Steps.map(step => `
-                <article class="step-card">
+                <article class="step-card" id="${step.id}">
                     <div class="step-id">${step.id}</div>
                     <h3 class="step-title">${step.title}</h3>
                     <p class="step-note">${step.note}</p>

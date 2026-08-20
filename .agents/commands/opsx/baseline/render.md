@@ -1,12 +1,12 @@
 ---
-description: 将业务基线 Markdown 文档渲染为 HTML
+description: 校验业务基线 HTML 文档
 ---
 
 # /opsx:baseline/render
 
-将 `docs/baseline/` 下的 Markdown 文档渲染为同目录下的可视化视图。
+校验 `docs/baseline/` 下的 HTML 基线文档，刷新可视化索引并确保页面结构完整性。
 
 ## 核心动作
 1. 调用 `openspec-baseline-render` 技能。
-2. 支持参数：`all` (渲染全部) 或指定文件名。
-3. 生成符合极简 UI 规范的 HTML 页面。
+2. 检查 HTML 基线文档的结构与引用完整性.
+3. 废弃 Markdown 转换逻辑，直接维护 HTML 可视化视图。

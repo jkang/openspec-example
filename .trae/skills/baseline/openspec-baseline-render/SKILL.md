@@ -10,23 +10,25 @@ metadata:
 
 # openspec-baseline-render
 
-**目标**: 将 `docs/baseline/` 下的 Markdown 文件渲染为同目录下的 HTML 文件，提供可视化阅读能力。
+**目标**: 校验 `docs/baseline/` 下的 HTML 基线文档，刷新可视化索引并确保页面结构完整性。
 
 ## 工作流
 
-1. **识别待渲染文档**:
-   - 确定是渲染全部 (`all`) 还是指定文档。
-2. **执行渲染**:
-   - 使用 `python3 scripts/render_baseline.py [path_to_md]` 命令进行渲染。
-   - 如果是 `all`，直接运行 `python3 scripts/render_baseline.py`。
-3. **输出路径**:
-   - `docs/baseline/NAME.md` -> `docs/baseline/NAME.html`。
+1. **识别基线文档**:
+   - `docs/baseline/service_blueprint.html` (Story Map)
+   - `docs/baseline/business_process.html` (L1/L2/L3 Process Flow)
+   - `docs/baseline/domain_model.html` (Event-Storming看板)
+2. **执行校验与刷新**:
+   - 检查 HTML 页面是否包含最新的结构化数据锚点。
+   - 刷新基线文档之间的交叉引用链接。
+   - 验证 CSS Grid 与状态机可视化的渲染逻辑是否正常。
+3. **废弃说明**:
+   - 不再执行 `python3 scripts/render_baseline.py`，基线现在是直接维护的 HTML。
 4. **触发时机**:
-   - 每次 `/opsx:sync` 完成 baseline 回写后自动触发。
-   - 用户手动执行 `/opsx:baseline/render` 时触发。
+   - 每次 `/opsx:sync` 完成基线回写后自动触发，确保持久化后的基线可访问。
+   - 用户手动执行 `/opsx:baseline/render` 时执行完整性检查。
 
 ## 技术要求
 
-- 使用 CDN 引入 Tailwind CSS。
-- 使用 CDN 引入 Mermaid.js。
-- 保持界面极度整洁，隐藏不必要的装饰元素。
+- 确保页面占据 85% 宽度，Header 简洁专业。
+- 校验 Tailwind CSS 与各可视化库的 CDN 连通性。

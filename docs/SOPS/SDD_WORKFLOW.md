@@ -92,7 +92,9 @@ graph TD
 - **目标**: 根据 `idea.md` 生成变更提案 `proposal.md`。
 - **强制约束 (Hard Constraint)**:
   - 必须基于 `idea.md` 的任务类型明确后续路径。
-  - **治理映射引用**: `proposal.md` 中的 `Capabilities` 必须与 `Domain Model` 映射对齐，且必须包含 `Process Alignment` 章节明确受影响的流程节点 ID。
+  - **治理映射引用**: `proposal.md` 中的 `Capabilities` 必须与 `Domain Model` 映射对齐，且必须显式列出受影响的 `Bounded Contexts`。
+  - **Taxonomy 扩展约束**: 如果 proposal 中出现 `domain_model.html` 尚未收录的 capability 或边界映射，必须明确标记为“新增 taxonomy”并说明理由。
+  - **流程对齐约束**: 必须包含 `Process Alignment` 章节明确受影响的流程节点 ID。
   - 对于史诗类型，生成提案后应停止，等待拆分。
   - 对于功能类型，引导用户进入下一步（涉及 UI 先 `/opsx:prototype` 并完成确认，再 `/opsx:story`，随后进入 `/opsx:spec-design`；不涉及 UI 则直接 `/opsx:story`，随后进入 `/opsx:spec-design`）。
   - 对于缺陷修复类型，引导用户进入下一步（涉及 UI 先 `/opsx:prototype` 并完成确认，随后进入 `/opsx:spec-design`；不涉及 UI 则直接进入 `/opsx:spec-design`，并在设计中包含根因分析）。
@@ -119,7 +121,9 @@ graph TD
 - **BDD 测试分层防腐**: 在生成 `spec.md` 时，必须为每个 Gherkin Scenario 打上测试标签 (`@unit`, `@api`, 或 `@e2e`)，严格遵循[自动化测试策略](../TESTING_STRATEGY.md)。
 - **强制约束 (Hard Constraint)**:
   - 必须参考已确认的 `proposal.md` 和 `prototype.html` (若有)。如果存在 `story.md`，必须确保 specs 与其 E2E 验收标准一致。
+  - **治理追溯**: 每个 Capability Spec 必须显式引用 `docs/baseline/domain_model.html` 中的治理来源，记录其所属 `Bounded Context` 与 capability taxonomy。
   - **流程追溯**: 每个 Capability Spec 必须注明其对应的流程节点（尤其是 `L3` 规则环节）。
+  - **同步预判**: `design.md` 必须包含 `Domain Model Sync Assessment`，明确判断本次变更是否需要在 `sync` 阶段回写 `docs/baseline/domain_model.html`，以及触发原因。
   - 生成的任务清单必须包含 E2E 验证步骤。
 
 ### 6. 应用阶段 (Apply)
@@ -143,6 +147,12 @@ graph TD
 - **核心动作**:
   1. **Spec Sync**: 将 `openspec/changes/<name>/specs/` 下的变更同步至 `openspec/specs/`。
   2. **Baseline Sync**: 自动调用辅助技能，将 `story.md` (L1/L2)、`specs` 与 `design.md` (L3) 沉淀的认知回流至 `docs/baseline/` 下的 HTML 基线文档。
+     - **Domain Model Sync 判定**: `sync` 阶段必须先判断是否需要回写 `docs/baseline/domain_model.html`。当且仅当存在以下任一变化时，执行 Domain Model 回流：
+       - `Bounded Context` 边界或 `BC -> Capability` 映射变化
+       - 新增、修改、移除 capability taxonomy
+       - 新增、修改、移除 Domain Event / Command / Policy
+       - Aggregate、状态机、对象关系、业务不变量发生变化
+     - **显式 No-op**: 如果以上信号均不存在，必须在同步结果中明确记录“无需更新 Domain Model”及理由，而不是静默跳过。
   3. **Auto Render**: 同步完成后自动刷新基线文档的可视化索引。
 
 ### 9. 归档阶段 (Archive)

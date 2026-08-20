@@ -33,6 +33,7 @@ rules:
   proposal:
     - 基于已确认的 idea.md 结论，明确说明 Why 和 What
     - 包含映射到 spec 文件夹名称的 Capabilities 章节，且必须与 Domain Model 映射对齐
+    - 必须显式列出 Impacted Bounded Contexts；若出现未映射 capability，必须标记为新增 taxonomy 并说明理由
     - 必须包含 Process Alignment 章节，明确引用的流程节点 ID (如 L1-04, L2-03)
     - 必须说明受影响的实现版本 (Node.js / Python / Frontend / 全部)
     - 说明后续流程分支（是否跳过 Prototype 或 Specs）
@@ -52,6 +53,7 @@ rules:
     - 必须链接到 proposal.md 及其对应的 capability specs
   specs:
     - 所有场景使用 Given/When/Then (Gherkin) 格式
+    - 每个 Capability Spec 必须包含 Governance Mapping，引用 docs/baseline/domain_model.html 中的 Bounded Context 与 capability taxonomy
     - 每个 Capability Spec 必须显式标注来源流程节点（尤其是 L3 环节）
     - 必须从 prototype.html 中提取交互逻辑记录为 Scenario
     - 按照 docs/TESTING_STRATEGY.md 打上测试标签 (@unit, @api, @e2e)
@@ -60,6 +62,7 @@ rules:
   design:
     - 包含架构图 (Mermaid 或 ASCII)
     - 包含 Process Delta 章节，说明对 L2/L3 流程节点的改动或补齐
+    - 包含 Domain Model Sync Assessment，明确判断 sync 阶段是否需要回写 docs/baseline/domain_model.html，并给出触发原因与计划更新项
     - 对于 Bug Fix，必须包含根本原因分析 (RCA)
     - 对于前端，包含 UI 组件层级和状态管理方案 (必须与确认后的 prototype 完全对齐)
     - 记录关键决策及其理由和考虑过的替代方案
