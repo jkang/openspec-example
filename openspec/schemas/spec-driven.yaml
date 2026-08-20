@@ -14,7 +14,7 @@ artifacts:
       1. **澄清业务意图**：目的、范围、具体业务要求。
       2. **业务设计思路**：逻辑流转、用户价值。
       3. **任务类型与后续策略**：必须与用户确认这是 Epic, Story, Bug Fix 还是 Tech Debt，并制定对应的流程策略。
-      4. **治理映射对齐**：必须参考 `docs/baseline/domain_model.html` 识别 **Impacted Bounded Contexts**，参考 `docs/baseline/business_process.html` 识别受影响的 **L1/L2/L3 流程节点**，并参考 `docs/baseline/service_blueprint.html` 与 `docs/SOPS/SERVICE_BLUEPRINT_STANDARD.md` 识别受影响的 **SB-STAGE-* / SB-<LANE>-*** 节点。
+      4. **治理映射对齐**：必须参考 `docs/baseline/domain_model.html` 识别 **Impacted Bounded Contexts**，参考 `docs/baseline/business_process.html` 识别受影响的 **L1/L2/L3 流程节点**，并参考 `docs/baseline/service_blueprint.html` 与 `.trae/skills/baseline/openspec-baseline-story-map/SERVICE_BLUEPRINT_STANDARD.md` 识别受影响的 **SB-STAGE-* / SB-<LANE>-*** 节点。
         5. **需求拆分建议**：是否需要分阶段实施。
       6. **架构影响分析**：现有架构改动点、技术挑战。
       7. **确认结论**：用户已确认的最终意图。

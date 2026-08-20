@@ -8,6 +8,6 @@ description: 维护业务基线中的 Story Map 文档
 
 ## 核心动作
 1. 调用 `openspec-baseline-story-map` 技能。
-2. 按 `docs/SOPS/SERVICE_BLUEPRINT_STANDARD.md` 判断是否需要回写蓝图，必要时更新 `SB-STAGE-*`、`SB-<LANE>-*` 与 capability 状态。
+2. 按 `.trae/skills/baseline/openspec-baseline-story-map/SERVICE_BLUEPRINT_STANDARD.md` 判断是否需要回写蓝图，必要时更新 `SB-STAGE-*`、`SB-<LANE>-*` 与 capability 状态。
 3. 若无需更新，输出显式 no-op 理由。
 4. 直接回写基线 HTML。

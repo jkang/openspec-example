@@ -15,7 +15,7 @@ metadata:
 ## 工作流
 
 1. **收集蓝图增量**:
-   - 在 `/opsx:sync` 过程中，读取 `proposal.md`、`story.md`、`specs/**/*.md`、`design.md`、`verify.md`，并参考 `docs/SOPS/SERVICE_BLUEPRINT_STANDARD.md`。
+   - 在 `/opsx:sync` 过程中，读取 `proposal.md`、`story.md`、`specs/**/*.md`、`design.md`、`verify.md`，并参考 `.trae/skills/baseline/openspec-baseline-story-map/SERVICE_BLUEPRINT_STANDARD.md`。
 2. **判定是否需要回流**:
    - 判断是否命中以下任一触发项：
      - `SB-STAGE-*` 覆盖变化
@@ -37,7 +37,7 @@ metadata:
 ## 输出规范
 
 1. **双重输出**: 同时更新 `docs/baseline/service_blueprint.html` 并输出对应的蓝图结构化数据。
-2. **节点规范**: 必须遵循 `docs/SOPS/SERVICE_BLUEPRINT_STANDARD.md` 的节点、状态与引用规范。
+2. **节点规范**: 必须遵循 `.trae/skills/baseline/openspec-baseline-story-map/SERVICE_BLUEPRINT_STANDARD.md` 的节点、状态与引用规范。
 3. **结构一致性**: 必须保持阶段、泳道、cross-stage support 和 capability mapping table 的结构一致性。
 4. **HTML 模板结构**:
    - **Header**: 包含 `title` (Service Blueprint) 和 `meta` (Baseline / Last Updated)。

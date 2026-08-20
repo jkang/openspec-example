@@ -15,7 +15,7 @@ metadata:
 ## 工作流
 
 1. **收集蓝图增量**:
-   - 在 `/opsx:sync` 过程中，读取 `proposal.md`、`story.md`、`specs/**/*.md`、`design.md`、`verify.md`，并参考 `docs/SOPS/SERVICE_BLUEPRINT_STANDARD.md`。
+   - 在 `/opsx:sync` 过程中，读取 `proposal.md`、`story.md`、`specs/**/*.md`、`design.md`、`verify.md`，并参考 `.trae/skills/baseline/openspec-baseline-story-map/SERVICE_BLUEPRINT_STANDARD.md`。
 2. **判定是否需要回流**:
    - 判断是否命中以下任一触发项：
      - `SB-STAGE-*` 覆盖变化
@@ -36,5 +36,5 @@ metadata:
 
 ## 输出规范
 
-- 必须遵循 `docs/SOPS/SERVICE_BLUEPRINT_STANDARD.md` 的节点、状态与引用规范。
+- 必须遵循 `.trae/skills/baseline/openspec-baseline-story-map/SERVICE_BLUEPRINT_STANDARD.md` 的节点、状态与引用规范。
 - 必须保持阶段、泳道、cross-stage support 和 capability mapping table 的结构一致性。
