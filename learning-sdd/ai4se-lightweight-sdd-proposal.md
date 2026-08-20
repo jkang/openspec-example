@@ -162,15 +162,14 @@ flowchart TD
 
 ## 5. 落地指引：如何在其他业务项目中启用
 
-### 5.1 第一步：引入基础引擎与清空业务示例
-1. **拷贝配置**：将 `.trae/`, `.cursor/`, `.agents/`, `openspec/config.yaml` 拷至目标项目。
-2. **重构 Config**：将 `config.yaml` 中的项目背景改为你真实项目的定位。
-3. **初始化结构**：`mkdir -p docs/baseline openspec/changes`。
+### 5.1 第一步：引入基础引擎与初始化结构
+1. **执行迁移脚本**：在本项目根目录运行 `./scripts/migrate-scaffold.sh <目标项目绝对路径>`。该脚本会自动将 `.trae/`, `.cursor/`, `.agents/`, `openspec/` 基础配置以及 `docs/` 模板拷贝至目标项目。
+2. **重构 Config**：进入目标项目，修改 `openspec/config.yaml` 中的项目背景为真实项目的定位。
 
-### 5.2 第二步：重写并初始化业务基线
-1. **重写规划**：清空并重写 `PRODUCT_SENSE.md` 与 `ROADMAP.md`。
-2. **重写规范**：按需修改 `ARCHITECTURE.md` 和 `FRONTEND.md`。
-3. **初始化基线**：在 `domain_model.html` 和 `business_process.html` 中录入**当前系统真实**的边界与流程。
+### 5.2 第二步：初始化业务基线
+1. **录入规划**：根据项目实际情况修改 `docs/PRODUCT_SENSE.md` 与 `docs/ROADMAP.md`（脚本已生成初始模板）。
+2. **重构规范**：按需修改 `docs/ARCHITECTURE.md` 和 `docs/FRONTEND.md`。
+3. **初始化基线 HTML**：在 `docs/baseline/domain_model.html` 和 `docs/baseline/business_process.html` 中录入**当前系统真实**的边界与流程。
 
 ### 5.3 第三步：执行首个 Change 闭环
 1. **启动探索**：`/opsx:explore` 分析影响范围。
