@@ -10,7 +10,7 @@ metadata:
 
 # openspec-baseline-journey
 
-**目标**: 维护 `docs/baseline/HIGH_LEVEL_JOURNEY.md`，确保它反映了系统当前支持的所有核心用户旅程。
+**目标**: 维护 `docs/baseline/high_level_journey.html`，确保它反映了系统当前支持的所有核心用户旅程。
 
 ## 工作流
 
@@ -18,10 +18,9 @@ metadata:
    - 在 `/opsx:sync` 过程中，阅读变更提案 `proposal.md` 和业务评审 `story.md`。
    - 识别是否有新的用户旅程（Buyer Journey）或运营旅程（Admin/Ops Journey）。
 2. **定位基线位置**:
-   - 阅读 `docs/baseline/HIGH_LEVEL_JOURNEY.md`。
+   - 阅读 `docs/baseline/high_level_journey.html`。
 3. **应用回流**:
-   - 如果是新旅程，在 `核心旅程地图` 中新增章节。
-   - 如果是现有旅程的步骤增加，在对应 Steps 中插入新步骤。
+   - 直接修改 HTML 文件中内嵌的旅程步骤。
    - 更新文档末尾的 `Last Updated` 日期。
 4. **验证一致性**:
    - 确保旅程步骤与 `story.md` 中的 E2E 场景描述保持逻辑一致。

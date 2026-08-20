@@ -14,10 +14,10 @@
 - **指令**: `/opsx:product-planning`
   - **目标**: 维护 `docs/ROADMAP.md`，执行每月滚动计划。
 - **业务基线管理 (Auxiliary Baseline Commands)**:
-  - **指令**: `/opsx:baseline/journey` - 维护 `docs/baseline/HIGH_LEVEL_JOURNEY.md`。
-  - **指令**: `/opsx:baseline/story-map` - 维护 `docs/baseline/STORY_MAP.md`。
-  - **指令**: `/opsx:baseline/process-flow` - 维护 `docs/baseline/CORE_BUSINESS_PROCESS_FLOW.md`。
-  - **指令**: `/opsx:baseline/domain-model` - 维护 `docs/baseline/DOMAIN_MODEL.md` (Event-Storming 视角)。
+  - **指令**: `/opsx:baseline/journey` - 维护 `docs/baseline/high_level_journey.html`。
+  - **指令**: `/opsx:baseline/story-map` - 维护 `docs/baseline/service_blueprint.html`。
+  - **指令**: `/opsx:baseline/process-flow` - 维护 `docs/baseline/business_process.html`。
+  - **指令**: `/opsx:baseline/domain-model` - 维护 `docs/baseline/domain_model.html` (Event-Storming 视角)。
   - **指令**: `/opsx:baseline/render` - 将上述 Markdown 基线渲染为 HTML。
 - **强制约束**:
   - 规划层产物是全局上下文，将自动注入所有后续指令。

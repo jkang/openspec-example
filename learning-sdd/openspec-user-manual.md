@@ -142,12 +142,9 @@ your-project/
 ### 3.6 业务基线治理 (Baseline Governance)
 自 v2.0+ 起，OpenSpec 引入了结构化的业务基线体系。这些文档位于 `docs/baseline/` 目录下：
 
-| 基线文档 | 核心职责 | 事实源 |
-| :--- | :--- | :--- |
-| `HIGH_LEVEL_JOURNEY.md` | 记录用户与运营人员的端到端核心旅程 | `story.md` + 原型 |
-| `STORY_MAP.md` | 追踪 Story 在各发布阶段的实现状态 | `verify.md` + 任务清单 |
-| `CORE_BUSINESS_PROCESS_FLOW.md` | 记录核心业务流程与状态机流转 (Mermaid) | `design.md` + 状态规范 |
-| `DOMAIN_MODEL.md` | 基于 Event-Storming 视角的领域模型全景 | `specs/domain-model/` |
+- `docs/baseline/business_process.html`: 核心流程图
+- `docs/baseline/domain_model.html`: 领域模型图
+- `docs/baseline/service_blueprint.html`: 服务蓝图
 
 **基线回流 (Baseline Sync)**: 在执行 `/opsx:sync` 时，AI 自动从当前 Change 的认知中提取增量并回流至基线文档，最后自动渲染为 HTML 视图。
 

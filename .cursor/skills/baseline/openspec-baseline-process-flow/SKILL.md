@@ -10,17 +10,16 @@ metadata:
 
 # openspec-baseline-process-flow
 
-**目标**: 维护 `docs/baseline/CORE_BUSINESS_PROCESS_FLOW.md`，确保它反映了系统核心业务流程的最新状态机和流转逻辑。
+**目标**: 维护 `docs/baseline/business_process.html`，确保它反映了系统核心业务流程的最新状态机和流转逻辑。
 
 ## 工作流
 
 1. **分析流程变更**:
    - 在 `/opsx:sync` 过程中，阅读 `design.md` 中的架构图和 `specs/` 中的状态描述。
 2. **定位流程定义**:
-   - 阅读 `docs/baseline/CORE_BUSINESS_PROCESS_FLOW.md`。
+   - 阅读 `docs/baseline/business_process.html` 中的 `<script>` 标签内的 `const markdown` 或 `swimlaneData` 变量。
 3. **应用回流**:
-   - **Mermaid 更新**: 如果业务流转逻辑发生变化，更新对应的 Mermaid 流程图代码。
-   - **生命周期更新**: 如果引入了新的业务状态（如订单增加了“退款中”状态），更新生命周期说明列表。
+   - **内容更新**: 直接修改 HTML 文件中内嵌的 Markdown 字符串或 JS 数据。
 4. **验证逻辑**:
    - 确保流程图与代码中的状态机实现保持逻辑一致。
 
