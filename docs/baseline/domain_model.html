@@ -47,62 +47,97 @@
         const markdown = `# Domain Model 基线 (Event-Storming 视角)
 
 ## Purpose
-基于 DDD 与 Event-Storming 描述系统领域模型，包括关键事件、命令、策略与上下文关系。
+基于 DDD 与 Event-Storming 描述系统领域模型，包括关键事件、命令、策略与上下文关系，反映电商系统的完整业务全景。
 
 ## 1. Event Storming 全景
 
+### 领域全景可视化 (Context Map)
+\`\`\`mermaid
+flowchart LR
+    subgraph CatalogContext [Catalog - 商品目录]
+        Product[(Product Aggregate)]
+        Search[Search Service]
+    end
+
+    subgraph CartContext [Cart - 购物车]
+        Cart[(Cart Aggregate)]
+        Validate[Session Validator]
+    end
+
+    subgraph CouponContext [Coupon - 营销优惠]
+        Coupon[(Coupon Aggregate)]
+        Engine[Recommendation Engine]
+    end
+
+    subgraph OrderContext [Order - 交易订单]
+        Order[(Order Aggregate)]
+        Calc[Financial Calculator]
+    end
+
+    %% Event Flows
+    Search -- "ProductSearched" --> CatalogContext
+    CatalogContext -- "StockUpdated" --> CartContext
+    CartContext -- "ItemAddedToCart" --> OrderContext
+    OrderContext -- "ApplyBestCoupon" --> CouponContext
+    CouponContext -- "CouponApplied" --> OrderContext
+    OrderContext -- "PaymentConfirmed" --> CatalogContext
+    CatalogContext -- "StockDepleted" --> OrderContext
+\`\`\`
+
 ### 关键 Domain Events (领域事件)
-- \`ProductCreated\`: 商品已创建
-- \`ProductSearched\`: 执行了商品搜索
-- \`ItemAddedToCart\`: 商品已加入购物车
-- \`CartValidated\`: 购物车用户一致性校验通过
-- \`CouponApplied\`: 优惠券已应用（含满减与折扣类型）
-- \`OrderPlaced\`: 订单已提交
-- \`PaymentConfirmed\`: 模拟支付已确认
+- **Catalog**: \`ProductCreated\`, \`ProductSearched\`, \`StockUpdated\`, \`StockDepleted\`
+- **Cart**: \`ItemAddedToCart\`, \`ItemRemovedFromCart\`, \`CartQuantityChanged\`, \`CartCleared\`, \`CartValidated\`
+- **Coupon**: \`CouponCreated\`, \`CouponPublished\`, \`CouponApplied\`, \`CouponRecommendationGenerated\`
+- **Order**: \`OrderPlaced\`, \`OrderPaymentConfirmed\`, \`OrderCancelled\`, \`OrderStockDeducted\`, \`FinancialCalculationCompleted\`
 
 ### 核心 Commands (指令)
-- \`SearchProduct\`: 搜索商品
-- \`AddToCart\`: 加入购物车
-- \`ApplyBestCoupon\`: 自动应用最优优惠券
-- \`PlaceOrder\`: 提交订单结算
+- **Catalog**: \`CreateProduct\`, \`SearchProduct\`, \`UpdateStock\`, \`SyncInventory\`
+- **Cart**: \`AddToCart\`, \`RemoveFromCart\`, \`UpdateQuantity\`, \`ValidateCart\`
+- **Coupon**: \`ApplyBestCoupon\`, \`ValidateCouponThreshold\`, \`ReleaseCoupon\`
+- **Order**: \`PlaceOrder\`, \`ConfirmPayment\`, \`CancelOrder\`, \`CalculateFinalPrice\`
 
 ## 2. Bounded Contexts (限额上下文)
 
-- **Catalog (商品目录)**: 负责商品元数据、搜索索引与库存原子操作。
-- **Cart (购物车)**: 负责用户选购状态，需保证与 Session 用户一致。
-- **Order (订单)**: 交易核心，负责订单生命周期、财务精度计算 (\`priceCents\`)。
-- **Coupon (优惠券)**: 营销引擎，支持 \`FLAT\` (满减) 与 \`PERCENTAGE\` (折扣) 策略。
+- **Catalog (商品目录)**: 负责商品元数据管理、基于关键词的搜索引擎以及库存的原子操作。
+- **Cart (购物车)**: 维护用户选购状态，核心策略是“Session 一致性”，确保购物车数据不被非法篡改。
+- **Order (订单)**: 交易核心上下文，管理订单生命周期、财务精度计算 (\`actualPaidCents\`) 以及与支付系统的交互。
+- **Coupon (营销优惠)**: 营销引擎，支持 \`FLAT\` 与 \`PERCENTAGE\` 折扣策略，核心能力是“智能最优推荐”。
 
 ## 3. 核心 Aggregate 与 Entity
 
+### Catalog Aggregate
+- **Root Entity**: \`Product\` (id, name, description, priceCents, stock, categoryId)
+- **Value Objects**: \`Price\` (cents 封装), \`StockStatus\`
+
+### Cart Aggregate
+- **Root Entity**: \`Cart\` (userId, sessionId, items, lastUpdatedAt)
+- **Entities**: \`CartItem\` (productId, quantity, unitPriceCents)
+
 ### Order Aggregate
-- **Root Entity**: Order (id, status, totalCents, actualPaidCents, couponId)
-- **Entities**: OrderItem (productId, priceCents, quantity)
-- **Value Objects**: FinancialPrecision (含浮点数补偿逻辑)
+- **Root Entity**: \`Order\` (id, userId, status, totalCents, discountCents, actualPaidCents, couponId)
+- **Entities**: \`OrderItem\` (productId, priceCents, quantity)
+- **Value Objects**: \`FinancialPrecision\` (含 +0.00001 补偿逻辑)
 
 ### Coupon Aggregate
-- **Root Entity**: Coupon (id, type: FLAT/PERCENTAGE, value, minSpendCents)
-
-### Catalog Aggregate
-- **Root Entity**: Product (id, name, priceCents, stock)
+- **Root Entity**: \`Coupon\` (id, code, type: FLAT/PERCENTAGE, value, minSpendCents, status)
 
 ---
-*Last Updated: 2026-08-19*
+*Last Updated: 2026-08-20*
 `;
         
-        // Custom renderer to handle mermaid blocks
-        const renderer = new marked.Renderer();
-        const originalCode = renderer.code.bind(renderer);
-        renderer.code = function(code, language, escaped) {
-            if (language === 'mermaid') {
-                return `<div class="mermaid">${code}</div>`;
-            }
-            return originalCode(code, language, escaped);
-        };
-
-        document.getElementById('content').innerHTML = marked.parse(markdown, { renderer: renderer });
+        // Render markdown and then post-process mermaid blocks for better stability
+        document.getElementById('content').innerHTML = marked.parse(markdown);
         
-        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+        document.querySelectorAll('pre code.language-mermaid').forEach(el => {
+            const pre = el.parentElement;
+            const div = document.createElement('div');
+            div.className = 'mermaid';
+            div.textContent = el.textContent;
+            pre.replaceWith(div);
+        });
+
+        mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
+        mermaid.init(undefined, '.mermaid');
     </script>
 </body>
 </html>

@@ -31,6 +31,23 @@
         th { background-color: #f8fafc; }
         pre { background: #f8fafc; padding: 1rem; border: 1px solid #e2e8f0; overflow-x: auto; }
         .mermaid { margin: 2rem 0; display: flex; justify-content: center; }
+
+        /* Professional Swimlane Styles */
+        .swimlane-container { overflow-x: auto; margin: 2rem 0; border: 1px solid #e2e8f0; background: #fff; }
+        .swimlane-grid { display: grid; min-width: 1000px; grid-template-columns: 120px repeat(4, 1fr); }
+        .lane-header { background: #f8fafc; border-right: 1px solid #e2e8f0; border-bottom: 1px solid #e2e8f0; padding: 1rem; font-weight: bold; display: flex; align-items: center; justify-content: center; text-align: center; font-size: 0.875rem; color: #0f172a; }
+        .col-header { background: #f8fafc; border-bottom: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0; padding: 0.75rem; font-weight: bold; text-align: center; font-size: 0.75rem; color: #64748b; text-transform: uppercase; letter-spacing: 0.05em; }
+        .swimlane-cell { border-right: 1px solid #f1f5f9; border-bottom: 1px solid #f1f5f9; min-height: 140px; padding: 0.75rem; background: #ffffff; }
+        .process-card { background: #fff; border: 1px solid #e2e8f0; padding: 0.75rem; margin-bottom: 0.75rem; border-left: 3px solid #cbd5e1; }
+        .process-card:hover { border-color: #94a3b8; border-left-color: #475569; }
+        .card-title { font-weight: bold; font-size: 0.875rem; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.5rem; color: #1e293b; }
+        .card-desc { font-size: 0.75rem; color: #64748b; line-height: 1.4; }
+        .card-tags { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.75rem; }
+        .card-tag { font-size: 0.625rem; padding: 1px 6px; background: #f8fafc; color: #64748b; border: 1px solid #e2e8f0; }
+        .status-square { width: 8px; height: 8px; flex-shrink: 0; }
+        .status-done { background: #10b981; }
+        .status-system { background: #3b82f6; }
+        .status-pending { background: #f59e0b; }
     </style>
 </head>
 <body class="p-8">
@@ -47,52 +64,118 @@
         const markdown = `# Core Business Process Flow 基线
 
 ## Purpose
-描述跨角色、跨模块的核心业务流程与状态流转逻辑。
+描述跨角色、跨模块的核心业务流程与状态流转逻辑，涵盖从商品发现到订单完成的全链路。
 
 ## 核心流程定义
 
-### 1. 交易订单流转图 (Order Lifecycle)
-\`\`\`mermaid
-graph TD
-    A[购物车结算] --> B{有无可用优惠?}
-    B -->|有| C[智能引擎匹配最优券]
-    B -->|无| D[直接计算 totalCents]
-    C --> E[计算 actualPaidCents<br/>含精度补偿]
-    D --> E
-    E --> F[生成 PENDING 订单]
-    F --> G[模拟支付确认]
-    G --> H[状态变更为 PAID]
-    H --> I[异步扣减商品库存]
-\`\`\`
+### 1. 全链路业务主流程可视化 (Swimlane Journey)
 
-### 2. 优惠券生命周期 (Coupon Lifecycle)
-- **Draft**: 后台创建，尚未生效。
-- **Active**: 已发布，用户可领取或全场自动适用。
-- **Used**: 用户已核销，状态与 \`actualPaidCents\` 锁定，关联具体订单。
-- **Expired**: 超过有效期，计算引擎将自动忽略。
-
-### 3. 财务精度控制策略
-- **输入**: 原始金额 (cents)。
-- **逻辑**: 对于百分比折扣，计算结果执行 \`+ 0.00001\` 补偿后向下取整。
-- **输出**: 最终 \`actualPaidCents\` (整数)。
+<div id="swimlane-viz" class="swimlane-container"></div>
 
 ---
-*Last Updated: 2026-08-19*
+*Last Updated: 2026-08-20*
 `;
         
-        // Custom renderer to handle mermaid blocks
-        const renderer = new marked.Renderer();
-        const originalCode = renderer.code.bind(renderer);
-        renderer.code = function(code, language, escaped) {
-            if (language === 'mermaid') {
-                return `<div class="mermaid">${code}</div>`;
-            }
-            return originalCode(code, language, escaped);
+        const swimlaneData = {
+            columns: ["01 准备与发现", "02 决策与加购", "03 结算与支付", "04 履约与完成"],
+            lanes: [
+                {
+                    name: "买家\n(Buyer)",
+                    cards: [
+                        { col: 0, title: "搜索与浏览", desc: "使用关键词搜索或分类浏览商品", tags: ["实时搜索", "极简UI"], status: "done" },
+                        { col: 1, title: "商品决策", desc: "查看详情，对比参数，决定购买", tags: ["详情页", "财务Cent"], status: "done" },
+                        { col: 1, title: "加入购物车", desc: "选择规格并放入购物车", tags: ["加购", "Session"], status: "done" },
+                        { col: 2, title: "进入结算页", desc: "确认商品及优惠方案", tags: ["结算页", "最优券"], status: "done" },
+                        { col: 2, title: "确认支付", desc: "触发模拟支付确认流程", tags: ["模拟支付", "支付安全"], status: "done" },
+                        { col: 3, title: "查看订单结果", desc: "交易成功，查看履约状态", tags: ["Success页"], status: "done" }
+                    ]
+                },
+                {
+                    name: "运营人员\n(Operator)",
+                    cards: [
+                        { col: 0, title: "发布管理", desc: "录入商品信息、设置价格与初始库存", tags: ["商品录入", "定价策略"], status: "done" },
+                        { col: 0, title: "营销配置", desc: "创建不同类型的优惠券（FLAT/PERCENTAGE）", tags: ["活动策划", "营销工具"], status: "done" },
+                        { col: 1, title: "发放控制", desc: "设定优惠券使用门槛 (minSpendCents)", tags: ["风控", "预算控制"], status: "done" },
+                        { col: 3, title: "库存监控", desc: "查看销售情况，及时补货", tags: ["补货提醒", "库存看板"], status: "pending" }
+                    ]
+                },
+                {
+                    name: "系统/自动化\n(System)",
+                    cards: [
+                        { col: 0, title: "索引实时同步", desc: "确保 C 端搜索结果的实效性", tags: ["Sync", "Elastic"], status: "system" },
+                        { col: 1, title: "库存预校验", desc: "加购时执行原子性库存充足检查", tags: ["并发控制", "原子性"], status: "system" },
+                        { col: 1, title: "用户一致性校验", desc: "Session 用户与购物车数据归属检查", tags: ["安全防护"], status: "system" },
+                        { col: 2, title: "智能最优配券", desc: "引擎自动扫描并应用最大优惠方案", tags: ["推荐算法"], status: "system" },
+                        { col: 2, title: "财务精度计算", desc: "执行 +0.00001 精度补偿逻辑", tags: ["财务安全"], status: "system" },
+                        { col: 2, title: "订单状态流转", desc: "生成 PENDING 订单并监听支付回调", tags: ["状态机"], status: "system" },
+                        { col: 3, title: "库存异步扣减", desc: "支付成功后触发正式库存核销", tags: ["事务最终一致性"], status: "system" }
+                    ]
+                }
+            ]
         };
 
-        document.getElementById('content').innerHTML = marked.parse(markdown, { renderer: renderer });
+        function renderSwimlane() {
+            const container = document.getElementById('swimlane-viz');
+            if (!container) return;
+
+            let html = '<div class="swimlane-grid">';
+            
+            // Render headers
+            html += '<div class="col-header" style="border-right: 1px solid #e2e8f0;">角色/服务</div>';
+            swimlaneData.columns.forEach(col => {
+                html += `<div class="col-header">${col}</div>`;
+            });
+
+            // Render lanes
+            swimlaneData.lanes.forEach(lane => {
+                html += `<div class="lane-header">${lane.name.replace('\n', '<br/>')}</div>`;
+                
+                for (let i = 0; i < swimlaneData.columns.length; i++) {
+                    const cards = lane.cards.filter(c => c.col === i);
+                    html += `<div class="swimlane-cell">`;
+                    cards.forEach(card => {
+                        html += `
+                            <div class="process-card">
+                                <div class="card-title">
+                                    <span class="status-square status-${card.status}"></span>
+                                    ${card.title}
+                                </div>
+                                <div class="card-desc">${card.desc}</div>
+                                <div class="card-tags">
+                                    ${card.tags.map(tag => `<span class="card-tag">${tag}</span>`).join('')}
+                                </div>
+                            </div>
+                        `;
+                    });
+                    html += `</div>`;
+                }
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Render markdown
+        const renderer = {
+            code(token) {
+                const text = token.text;
+                const lang = token.lang;
+                if (lang === 'mermaid') {
+                    return `<div class="mermaid">${text}</div>`;
+                }
+                return `<pre><code>${text}</code></pre>`;
+            }
+        };
+
+        marked.use({ renderer });
+        document.getElementById('content').innerHTML = marked.parse(markdown);
         
-        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+        // Render custom viz
+        renderSwimlane();
+
+        // Render mermaid
+        mermaid.initialize({ startOnLoad: false, theme: 'neutral' });
+        mermaid.init(undefined, '.mermaid');
     </script>
 </body>
 </html>
