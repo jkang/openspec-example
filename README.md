@@ -1,123 +1,126 @@
-# OpenSpec Practise: 产品经理的 SDD 演练场
+# OpenSpec Practise: 轻量级 SDD 演练场与脚手架
 
-本项目基于 [openspec-practice](https://github.com/Fission-AI/openspec-practice) 进行二次开发与增强。我们在原有的基础上，针对 **需求分析 (Requirement Analysis)** 阶段引入了专门的 AI Skills 与指令集，使其更贴合产品经理的实际工作流。
+本项目是一个基于 **规格驱动开发 (Spec-Driven Development, SDD)** 的端到端研发实践库，旨在为产品经理与研发团队提供一套衔接产品规划、交互原型与需求分析的 **轻量级 SDD 脚手架**。
 
----
-
-## 🚀 为什么 PM 需要学习 SDD？
-
-在 AI 编程时代，PM 的核心竞争力正在从“写 PRD”转向“定义规格”。
-- **消除幻觉**：通过结构化的规格约束 AI，防止代码实现偏离业务逻辑。
-- **快速验证**：利用 `/opsx:propose` 瞬间生成可交互原型，在写代码前完成 UI/UX 验收。
-- **单一事实来源**：`openspec/specs` 目录下始终保持最新的业务逻辑描述，彻底解决文档与代码脱节的问题。
-- **确定性交付**：通过 Gherkin (Given/When/Then) 场景定义，确保每个需求都有对应的自动化测试闭环。
-
-## 🛠️ 核心增强：需求分析 Skills & Commands
-
-本项目不仅是一个代码演示，更是一个 **AI 协作技能库**。我们特别加强了需求分析环节：
-- **`opsx:product-sense` (产品感定义)**：确立 Elevator Pitch，明确用户、痛点与竞争优势，防止产品方向漂移。
-- **`opsx:product-planning` (滚动路线图)**：维护月度滚动计划，划定 In-Scope/Out-of-Scope 边界，为 AI 探索提供护栏。
-- **`opsx:explore` (需求深度探索)**：升级为“6 步法探索”，强制执行 **规划对齐 (Roadmap Alignment)**，确保每一个 Idea 都长在路线图上。
-- **`opsx:prototype` (UI 原型验证)**：引入强制的 HITL (人机协同) 检查点，确保 UI 逻辑在进入开发前已获得人类验收。
+我们通过 AI4SE（AI for Software Engineering）的实践，将研发流程从 L3 (Human in the Loop) 推向 L4 (Human on the Loop)，解决需求断链与知识漂移的痛点。
 
 ---
 
-## 🔄 需求到代码的完整实践 (SDD Flow)
+## 📋 目录
+1. [核心价值：为什么需要轻量级 SDD？](#1-核心价值为什么需要轻量级-sdd)
+2. [方案全貌：四层架构与治理闭环](#2-方案全貌四层架构与治理闭环)
+3. [快速启动与示例项目实践](#3-快速启动与示例项目实践)
+4. [落地指引：如何迁移与扩展到新项目](#4-落地指引如何迁移与扩展到新项目)
+5. [成熟度定义：L3 与 L4](#5-成熟度定义l3-与-l4)
+6. [目录导航与资源](#6-目录导航与资源)
 
-本项目由 OpenSpec (v2.0) 框架进行治理。
+---
+
+## 1. 核心价值：为什么需要轻量级 SDD？
+
+在 AI 编程时代，最大的痛点不再是“写代码”，而是 **“需求工程的断链”**：
+- **输入不稳定**：产品规划与研发执行脱节。
+- **分析无落点**：业务规则散落在会议和聊天记录中，导致“知识漂移”。
+- **高昂返工成本**：原型未确认即进入开发，导致 Spec 偏离真实意图。
+
+**轻量级 SDD 的核心目标**：
+- **消除幻觉**：通过结构化的规格约束 AI，防止代码偏离业务逻辑。
+- **快速验证**：利用 `/opsx:prototype` 瞬间生成可交互原型，在写代码前完成验收。
+- **知识沉淀**：让业务资产随开发自然沉淀回 **业务基线 (Baseline)**，拒绝一次性文档。
+
+---
+
+## 2. 方案全貌：四层架构与治理闭环
+
+我们定义了四层架构，确保从宏观规划到微观执行的端到端可追溯性：
+
+| 层级 | 核心工件 | 作用 |
+| :--- | :--- | :--- |
+| **Planning Baseline** | `PRODUCT_SENSE.md`, `ROADMAP.md` | 提供方向、范围和优先级边界 |
+| **Business Baseline** | `domain_model.html`, `business_process.html` | 提供稳定的业务边界与流程参照 (L2/L3) |
+| **Change-Level Analysis** | `idea.md`, `proposal.md`, `story.md`, `prototypes/` | 定义单次变更的目标、交互与验收标准 |
+| **Working Loop** | `specs/`, `design.md`, `tasks.md`, `verify.md` | 确保实现遵循契约，并将认知沉淀回基线 |
+
+### 🔄 Working Loop (端到端大循环)
+流程遵循：`规划基线 -> 需求探索 (/opsx:explore) -> 方案提案 (/opsx:propose) -> 原型设计 (/opsx:prototype) -> 业务故事 (/opsx:story) -> 开发实现 -> 基线同步 (/opsx:sync) -> 归档 (/opsx:archive)`。
+
+---
+
+## 3. 快速启动与示例项目实践
+
+本项目预置了一个完整的 **极简电商系统** 作为演练场，涵盖 Node.js、Python 和 Vue 3 实现。
 
 ### 🚀 快速启动
-
 ```bash
-./init.sh              # 查看帮助菜单
-/opsx:product-sense    # (AI) 明确产品感
-/opsx:product-planning # (AI) 制定路线图
-/opsx:explore          # (AI) 探索需求并对齐路线图
+# 1. 环境初始化与查看帮助
+./init.sh
+
+# 2. 启动电商示例环境
+./init.sh vue:start    # 启动 Vue 前端
+./init.sh node:start   # 启动 Node.js 后端
 ```
 
-### 📖 SDD 工作流 v2.0
-
-我们采用 **规格驱动开发 (Spec-Driven Development)**，将流程分为“规划层”与“交付层”：
-
-1.  **规划层 (Planning Layer)**：通过 `/opsx:product-sense` 和 `/opsx:product-planning` 划定护栏。
-2.  **探索阶段 (Explore)**：使用 `/opsx:explore` 深入思考并对齐路线图。
-3.  **提案阶段 (Propose)**：使用 `/opsx:propose` 创建变更。
-4.  **原型阶段 (Prototype)**：使用 `/opsx:prototype` 验证 UI。
-5.46→5.  **设计阶段 (Spec-Design)**：生成 Specs 和技术设计。
-47→6.  **交付阶段 (Apply)**：编写代码并完成 E2E 测试。
-48→7.  **同步阶段 (Sync)**：执行 `/opsx:sync` 合并规格并**自动回流业务基线**。
+### 🛠️ AI 指令实战
+在 Trae 或 Cursor 的 AI 侧边栏输入以下指令开启 SDD 之旅：
+- **明确方向**：`/opsx:product-sense` 确立产品灵魂。
+- **需求探索**：`/opsx:explore "我想加一个积分商城功能，请分析影响范围"`。
+- **发起变更**：`/opsx:propose <change-name>` 生成提案与原型。
+- **同步回流**：`/opsx:sync` 将开发完成的逻辑自动合并回业务基线。
 
 ---
 
-## 📂 目录导航：你的控制台
+## 4. 落地指引：如何迁移与扩展到新项目
 
-| 目录 | 作用 | PM 关注点 |
-| :--- | :--- | :--- |
-| **`AGENTS.md`** | **AI 导航入口** | 强制约束 AI 的全局行为宪法，人类与 AI 协作的第一入口。 |
-| **`init.sh`** | **全局启动器** | 屏蔽底层复杂度，一键启动多模块开发和测试环境。 |
-| **`docs/`** | **全局治理与规划** | 包含 `ROADMAP.md` (滚动计划)、`PRODUCT_SENSE.md` (感性定义) 等系统事实与业务护栏。 |
-| ├── `baseline/` | **业务基线治理** | **核心认知沉淀**。包含 Blueprint, Process Flow 和 Event-Storming Domain Model 及其可视化 HTML。 |
-| **`openspec/`** | **需求中心** | **核心入口**。在这里定义规则、查看历史变更、管理业务逻辑基线。 |
-| ├── `specs/` | 业务事实来源 | 系统当前的所有功能规格。这是你与研发沟通的“标准语言”。 |
-| ├── `changes/` | 变更工作区 | 正在进行的需求迭代。包含每个需求的提案、原型和任务清单。 |
-| ├── `ideas/` | 创意孵化区 | 存储 `/opsx:explore` 产出的 `idea.md`，记录最初的业务构思。 |
-| **`ecommerce/`** | **系统实现** | **验证场所**。查看同一套规格如何驱动 Node.js, Python 和 Vue 3 的多端实现。 |
-| ├── `ecommerce-mini-frontend/` | 前端界面 | 验收 UI/UX 是否符合“现代扁平化”视觉规范。 |
-| ├── `ecommerce-mini-python/` | 高性能后端 | 验证核心计价、核销逻辑的严谨性。 |
-| **`learning-sdd/`** | **知识库** | **充电站**。包含 [入门工作坊手册](./learning-sdd/workshop-facilitation.html)、实战指南和 AI 协作流程分析。 |
+如果你希望在其他业务项目中启用这套脚手架，请遵循以下步骤：
 
----
+### 5.1 第一步：引入基础引擎
+1. 拷贝 `.trae/`, `.cursor/`, `.agents/` 以及 `openspec/config.yaml` 到目标项目。
+2. 修改 `config.yaml` 中的项目名称与路径定位。
+3. 执行 `mkdir -p docs/baseline openspec/changes` 初始化目录。
 
-## 🤝 角色分工：人机协作新范式
+### 5.2 第二步：重写并初始化业务基线
+1. **清空并重写** `PRODUCT_SENSE.md` 与 `ROADMAP.md`。
+2. **初始化基线**：在 `docs/baseline/` 中录入当前系统真实的领域模型与流程。
 
-在 SDD 实践中，人与 AI 的职责发生了转变：
-
-- **PM (Owner)**：负责 **“输入与验收”**。定义业务意图，审查 `proposal.md` 和 `spec.md`，验收可交互原型。
-- **AI (Pilot)**：负责 **“生成与转换”**。基于 PM 意图生成文档、原型、代码和测试。
-- **Dev (Guardian)**：负责 **“路径与门禁”**。审查 `design.md` 和 `tasks.md` 的技术可行性，确保测试 100% 通过。
+### 5.3 第三步：执行首个 Change 闭环
+通过 `/opsx:explore` 发起首次变更，并使用 `/opsx:sync` 验证基线回流能力。
 
 ---
 
-## 🛠️ 快速开始：开启你的第一个需求之旅
+## 5. 成熟度定义：L3 与 L4
 
-### 1. 环境准备与启动
+- **L3：Human in the Loop**
+  - **特点**：人工确认是关键门禁，AI 不能跳过确认断点。
+  - **核心**：原型确认、验收标准确认、Spec 审查。
+- **L4：Human on the Loop**
+  - **特点**：AI 在明确护栏（Baseline、门禁策略）内自治，人负责监督与异常裁决。
+  - **核心**：稳定的 Baseline、自动化的质量看板、任务自治。
 
-```bash
-# 1. 启动项目环境 (Node.js/Python/Vue)
-chmod +x init.sh
-./init.sh              # 查看统一帮助菜单
-./init.sh vue:start    # 示例：启动前端
+---
 
-# 2. 安装 OpenSpec 命令行工具 (CLI)
-npm install -g @fission-ai/openspec@latest
+## 6. 目录导航与资源
+
+### 📂 目录结构
+```text
+├── .trae/ / .cursor/    # AI 指令与 SDD 规则集 (护栏)
+├── openspec/            # SDD 引擎工作区
+│   ├── specs/           # 主规格说明书 (基线沉淀区)
+│   └── changes/         # 活跃变更闭环区 (活跃迭代)
+├── docs/                # 治理与基线文档
+│   ├── baseline/        # 核心业务基线 (Domain Model / Process Flow)
+│   ├── PRODUCT_SENSE.md # 产品定位
+│   └── ROADMAP.md       # 迭代路线图
+├── ecommerce/           # 示例系统实现 (Node.js/Python/Vue)
+└── init.sh              # 统一工程入口
 ```
 
-> 💡 **概念澄清**：
-> - **OpenSpec CLI**：通过上述命令安装的全局工具，是 SDD 流程的“**底层引擎**”，负责处理变更管理、逻辑解析等核心任务。
-> - **Trae Commands**：位于项目 `.trae/` 目录下的 Markdown 文件，是 AI 的“**操作指南**”，告诉 AI 如何正确调用 CLI 来协助你完成工作。
-
-> 💡 **提示**：本项目已预置 `.trae/`、`.cursor/` 及 `.claude/` 协作技能，**无需手动初始化**。若您在其他环境使用，可运行 `openspec init --tools trae` 重新生成。
-
-### 2. 发起一个探索
-在 Trae 或 Cursor 的 AI 侧边栏输入：
-> `/opsx:explore "我想给电商系统加一个‘积分商城’，用户可以用消费积分兑换商品。请帮我分析现有架构并给出 5 步法方案。"`
-
-### 3. 查看原型与规格
-随后使用 `/opsx:propose`，你将在 `openspec/changes/` 目录下看到新生成的原型文件和规格说明。
-
----
-
-## 📚 学习资源
-
-- **实战手册**: [SDD 入门工作坊引导手册](./learning-sdd/workshop-facilitation.html) — 3 小时快速上手流程。
-- **版本升级**: [从 v1.8.0 升级到 v2.0](./learning-sdd/openspec-v2.0-upgrade.md) — 深度解析规划层与治理变革。
-- **流程实践**: [v2.0 完整工作流实战案例](./learning-sdd/openspec-v2.0-workflow-practice.md) — 以商品搜索为例演示全链路协作。
-- **进阶指南**: [OpenSpec 综合手册](./learning-sdd/openspec-user-manual.md) — 深度理解 SDD 工程实践与实战案例。
-- **复盘分析**: [AI 协作全流程深度复盘](./learning-sdd/openspec-ai-workflow-analysis.md) — 学习应用实例，如何使用这个框架通过提示实现需求。
+### 📚 学习资源
+- [入门工作坊手册](./learning-sdd/workshop-facilitation.html)
+- [OpenSpec 综合手册](./learning-sdd/openspec-user-manual.md)
+- [v2.0 升级解析](./learning-sdd/openspec-v2.0-upgrade.md)
 
 ---
 
 ## 🔗 链接
-
 - [OpenSpec 官方文档](https://github.com/Fission-AI/OpenSpec)
 - [CHANGELOG](./CHANGELOG.md)
