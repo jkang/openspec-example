@@ -56,7 +56,7 @@
 | **`AGENTS.md`** | **AI 导航入口** | 强制约束 AI 的全局行为宪法，人类与 AI 协作的第一入口。 |
 | **`init.sh`** | **全局启动器** | 屏蔽底层复杂度，一键启动多模块开发和测试环境。 |
 | **`docs/`** | **全局治理与规划** | 包含 `ROADMAP.md` (滚动计划)、`PRODUCT_SENSE.md` (感性定义) 等系统事实与业务护栏。 |
-| ├── `baseline/` | **业务基线治理** | **核心认知沉淀**。包含 Story Map, Process Flow 和 Event-Storming Domain Model 及其可视化 HTML。 |
+| ├── `baseline/` | **业务基线治理** | **核心认知沉淀**。包含 Blueprint, Process Flow 和 Event-Storming Domain Model 及其可视化 HTML。 |
 | **`openspec/`** | **需求中心** | **核心入口**。在这里定义规则、查看历史变更、管理业务逻辑基线。 |
 | ├── `specs/` | 业务事实来源 | 系统当前的所有功能规格。这是你与研发沟通的“标准语言”。 |
 | ├── `changes/` | 变更工作区 | 正在进行的需求迭代。包含每个需求的提案、原型和任务清单。 |

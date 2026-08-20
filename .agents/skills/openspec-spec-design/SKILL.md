@@ -32,7 +32,7 @@ I'll create the following artifacts:
    Ensure `proposal.md` exists. 
    If the task type requires a prototype (Story/UI Bug Fix), ensure `prototype.html` exists and was approved.
    If the task type is not Tech Debt, ensure `story.md` exists and was approved.
-   Re-read `docs/baseline/domain_model.html`, `docs/baseline/business_process.html`, `docs/baseline/service_blueprint.html`, and `.trae/skills/baseline/openspec-baseline-story-map/SERVICE_BLUEPRINT_STANDARD.md` before drafting artifacts.
+   Re-read `docs/baseline/domain_model.html`, `docs/baseline/business_process.html`, `docs/baseline/service_blueprint.html`, and `.trae/skills/baseline/openspec-baseline-blueprint/SKILL.md` before drafting artifacts.
 
 2. **Generate Specs, Design, and Tasks**
    

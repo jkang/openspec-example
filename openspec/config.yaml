@@ -30,7 +30,7 @@ rules:
     - 对于 Epic 类型，必须在 openspec/ 目录下创建 epic-<key>.story-list.json
     - 必须参考 docs/baseline/domain_model.html 识别 Impacted Bounded Contexts 与 Candidate Capabilities
     - 必须参考 docs/baseline/business_process.html 识别受影响的 L1/L2/L3 流程节点
-    - 必须参考 docs/baseline/service_blueprint.html 与 .trae/skills/baseline/openspec-baseline-story-map/SERVICE_BLUEPRINT_STANDARD.md 识别受影响的 SB-STAGE-* 与 SB-<LANE>-* 节点
+    - 必须参考 docs/baseline/service_blueprint.html 与 .trae/skills/baseline/openspec-baseline-blueprint/SKILL.md 识别受影响的 SB-STAGE-* 与 SB-<LANE>-* 节点
   proposal:
     - 基于已确认的 idea.md 结论，明确说明 Why 和 What
     - 包含映射到 spec 文件夹名称的 Capabilities 章节，且必须与 Domain Model 映射对齐

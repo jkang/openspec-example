@@ -39,7 +39,7 @@ I'll create the story artifact:
       ```
    b. **Create `story.md`**:
       - Read `proposal.md`, `ideas/idea.md`, and `prototype.html` (if any) for context.
-      - Re-read `docs/baseline/service_blueprint.html` and `.trae/skills/baseline/openspec-baseline-story-map/SERVICE_BLUEPRINT_STANDARD.md`.
+      - Re-read `docs/baseline/service_blueprint.html` and `.trae/skills/baseline/openspec-baseline-blueprint/SKILL.md`.
       - Extract E2E journeys and business rules. Ensure E2E journeys are mapped to **L1/L2 Process Nodes** (refer to `docs/baseline/business_process.html`) and the corresponding `SB-STAGE-*` / `SB-CUSTOMER-*` nodes.
       - Follow the `template` and `instruction` to generate the Markdown.
       - Write the file to `resolvedOutputPath` (usually `story.md`).

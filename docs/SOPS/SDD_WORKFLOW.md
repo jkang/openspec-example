@@ -14,13 +14,13 @@
 - **指令**: `/opsx:product-planning`
   - **目标**: 维护 `docs/ROADMAP.md`，执行每月滚动计划。
 - **业务基线管理 (Auxiliary Baseline Commands)**:
-  - **指令**: `/opsx:baseline/story-map` - 维护 `docs/baseline/service_blueprint.html`。
+  - **指令**: `/opsx:baseline/blueprint` - 维护 `docs/baseline/service_blueprint.html`。
   - **指令**: `/opsx:baseline/process-flow` - 维护 `docs/baseline/business_process.html` (L1/L2/L3 分层流程)。
   - **指令**: `/opsx:baseline/domain-model` - 维护 `docs/baseline/domain_model.html` (Event-Storming 视角)。
   - **指令**: `/opsx:baseline/render` - 校验基线 HTML 的索引与可视化完整性。
   - **指令**: `/opsx:delivery-board` - 生成可视化交付看板 `docs/governance/delivery_board.html`。
 - **补充治理文档**:
-  - `.trae/skills/baseline/openspec-baseline-story-map/SERVICE_BLUEPRINT_STANDARD.md` - 定义 `service_blueprint.html` 的稳定锚点、Planning 阶段引用方式、capability 口径与 Sync 触发/No-op 规则。
+  - `.trae/skills/baseline/openspec-baseline-blueprint/SKILL.md` - 定义 `service_blueprint.html` 的稳定锚点、Planning 阶段引用方式、capability 口径与 Sync 触发/No-op 规则。
 - **强制约束**:
   - 规划层产物是全局上下文，将自动注入所有后续指令。
   - 必须包含“未来 +1, +2 个月”的滚动预测。
@@ -84,7 +84,7 @@ graph TD
 - **强制约束 (Hard Constraint)**:
   - 必须严格遵循“结构化 6 步法”。
   - **任务类型确认 (Task Classification)**: 必须确认是史诗、功能、缺陷修复还是技术债。
-  - **治理映射对齐**: 必须参考 `docs/baseline/domain_model.html` 识别 `Impacted Bounded Contexts`，参考 `docs/baseline/business_process.html` 识别受影响的 `L1/L2/L3` 流程节点，并参考 `docs/baseline/service_blueprint.html` 与 `.trae/skills/baseline/openspec-baseline-story-map/SERVICE_BLUEPRINT_STANDARD.md` 识别受影响的 `SB-STAGE-*` 与 `SB-<LANE>-*` 节点。
+  - **治理映射对齐**: 必须参考 `docs/baseline/domain_model.html` 识别 `Impacted Bounded Contexts`，参考 `docs/baseline/business_process.html` 识别受影响的 `L1/L2/L3` 流程节点，并参考 `docs/baseline/service_blueprint.html` 与 `.trae/skills/baseline/openspec-baseline-blueprint/SKILL.md` 识别受影响的 `SB-STAGE-*` 与 `SB-<LANE>-*` 节点。
   - **规划对齐 (Roadmap Alignment)**: 在 `ideas/idea.md` 中必须显式写一段“与当前阶段目标对齐说明”，引用 `docs/ROADMAP.md` 中的目标。
   - **史诗治理**: 如果是史诗，必须在 `openspec/` 目录下创建一个 `epic-<key>.story-list.json` 文件作为执行队列。
   - **唯一输出**: 必须生成 `ideas/idea.md` (相对于变更目录) 作为后续提案的唯一源头。

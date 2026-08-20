@@ -158,7 +158,7 @@ This is an **agent-driven** operation - you will read delta specs and directly e
    
    在完成 Spec 同步后，你必须执行业务基线回流，将变更中的业务认知沉淀到全局规划层：
    - **调用辅助技能**: 依次调用 `baseline/` 子目录下的辅助技能：
-     - `openspec-baseline-story-map`: 根据 `proposal.md`、`story.md`、`specs/**/*.md`、`design.md` 与 `verify.md` 判断并更新 `service_blueprint.html` 中的阶段覆盖、泳道能力分布与 capability 状态。
+     - `openspec-baseline-blueprint`: 根据 `proposal.md`、`story.md`、`specs/**/*.md`、`design.md` 与 `verify.md` 判断并更新 `service_blueprint.html` 中的阶段覆盖、泳道能力分布与 capability 状态。
      - `openspec-baseline-process-flow`: 根据 `story.md` (L1/L2) 和 `specs/design.md` (L3) 更新 `business_process.html`。需提取 E2E 旅程节点和规则环节。
      - `openspec-baseline-domain-model`: 先基于 `proposal.md`、全部 delta `specs/**/*.md`、主 specs 合并结果与 `design.md` 判断是否需要更新 `docs/baseline/domain_model.html`；若需要，则回写图与清单，若不需要，则输出显式 no-op 理由。
    - **Service Blueprint Sync Trigger**: 当且仅当存在以下任一变化时，执行 Service Blueprint 回流：
