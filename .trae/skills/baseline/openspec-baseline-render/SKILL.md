@@ -30,5 +30,8 @@ metadata:
 
 ## 技术要求
 
-- 确保页面占据 85% 宽度，Header 简洁专业。
-- 校验 Tailwind CSS 与各可视化库的 CDN 连通性。
+1. **容器宽度**: 页面主容器宽度强制设为屏幕的 85% 或符合特定基线文件的 `max-width` 约束。
+2. **标准页眉**: 页眉采用左右分布简洁设计。左侧为 `Title` 与 `Subtitle`，右侧为 `Generator Info` 与 `Timestamp`。
+3. **视觉一致性**: 校验所有基线文档是否遵循 Slate-based 风格（`slate-900` 强调色，无圆角，无阴影）。
+4. **CDN 连通性**: 校验 Tailwind CSS 与各可视化库的 CDN 连通性。
+5. **防止报错**: 校验 HTML 模板中的内联样式是否遵循 `{{ 'style="..."' }}` 格式。

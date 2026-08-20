@@ -20,6 +20,7 @@
 - **[Service Blueprint 标准](docs/SOPS/SERVICE_BLUEPRINT_STANDARD.md)**: `service_blueprint.html` 的稳定锚点、引用方式、capability 口径与 sync 触发规则。凡是 planning artifacts 或 sync 涉及服务蓝图，必须先参考此文档。
 - **[业务基线治理]**: 包含 `service_blueprint.html` (Story 矩阵/服务蓝图)、`business_process.html` (流程图) 和 `domain_model.html` (Event-Storming 模型)。**位于 `docs/baseline/`**。
 - **[治理映射约束]**: **核心准则**：`Bounded Contexts` (Baseline) 治理 `Capabilities` (Spec Layer)。在 Explore/Propose 阶段必须参考 `domain_model.html` 中的映射表来识别 Impact Capabilities。
+- **[交付看板]**: `docs/governance/delivery_board.html` - 使用 `/opsx:delivery-board` 生成，展示系统当前的交付状态与健康度。
 - **[产品路线图](docs/ROADMAP.md)**: 高阶业务规划，明确当前项目所处阶段，指导 Explore 探索的边界。
 - **[产品感与业务导向](docs/PRODUCT_SENSE.md)**: AI 决策准则、目标用户画像，确保构建“可视即价值”的极简电商。
 - **[前端开发规范与验证闭环](docs/FRONTEND.md)**: 包含极简 UI 约束（无圆角、slate 色系、真实数据），以及通过浏览器验证视觉约束的闭环 SOP。

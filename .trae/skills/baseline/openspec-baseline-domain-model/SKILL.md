@@ -36,5 +36,25 @@ metadata:
 
 ## 输出规范
 
-- 必须遵循 Event-Storming 视角的章节结构。
-- 使用清晰的术语，与代码中的领域对象保持一致。
+1. **双重输出**: 同时更新 `docs/baseline/domain_model.html` 并输出对应的结构化数据描述。
+2. **Event-Storming 约束**: 必须遵循 Event-Storming 视角的章节结构。
+3. **术语一致性**: 使用清晰的术语，与代码中的领域对象保持一致。
+4. **HTML 模板结构**:
+   - **Header**: 包含 `page-title` (Domain Model) 和 `page-subtitle`。
+   - **Board**: 主容器，包含 `hero-grid` (Purpose)。
+   - **Sections**:
+     - `1. Bounded Context Map`: 可视化映射图 + 关系表。
+     - `2. Core Business Object State Machines`: 状态机可视化 + 规则表。
+     - `3. Core Domain Object Relationship Graph`: 对象关系图 + 规则表。
+     - `4. Event Storming Structure`: Command/Event/Policy/ReadModel 矩阵。
+     - `5. Aggregate Catalog`: 聚合根、实体、值对象与不变量清单。
+     - `6. Bounded Context -> Capability Mapping`: 治理层到契约层的映射图 + 表。
+   - **Footer**: `footer-note` 包含 `Last Updated` 日期。
+
+## 视觉与设计标准
+
+- **容器宽度**: 强制设为屏幕的 85% 或 `max-width: 1360px`。
+- **风格**: 遵循 Slate-based 治理风格（`slate-900` 强调色，`slate-50` 背景）。
+- **组件**: 严禁使用圆角 (`border-radius: 0 !important`)，禁止使用阴影 (`box-shadow: none !important`)。
+- **交互**: 确保 `cursor-pointer` 添加到所有可点击节点，点击节点需高亮相关关系。
+- **防止报错**: 在 HTML 模板中使用 Jinja 变量生成内联样式时，必须使用 `{{ 'style="..."' }}` 格式。

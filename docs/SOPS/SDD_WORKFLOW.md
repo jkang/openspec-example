@@ -18,6 +18,7 @@
   - **指令**: `/opsx:baseline/process-flow` - 维护 `docs/baseline/business_process.html` (L1/L2/L3 分层流程)。
   - **指令**: `/opsx:baseline/domain-model` - 维护 `docs/baseline/domain_model.html` (Event-Storming 视角)。
   - **指令**: `/opsx:baseline/render` - 校验基线 HTML 的索引与可视化完整性。
+  - **指令**: `/opsx:delivery-board` - 生成可视化交付看板 `docs/governance/delivery_board.html`。
 - **补充治理文档**:
   - `docs/SOPS/SERVICE_BLUEPRINT_STANDARD.md` - 定义 `service_blueprint.html` 的稳定锚点、Planning 阶段引用方式、capability 口径与 Sync 触发/No-op 规则。
 - **强制约束**:
