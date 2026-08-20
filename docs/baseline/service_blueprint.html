@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Service Blueprint - OpenSpec Baseline</title>
+    <style>
+        :root {
+            --bg: #f8fafc;
+            --panel: #ffffff;
+            --soft: #f1f5f9;
+            --soft-2: #e2e8f0;
+            --line: #e2e8f0;
+            --line-strong: #cbd5e1;
+            --text: #0f172a;
+            --muted: #64748b;
+            --accent: #0f172a;
+            --planned: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+
+        body {
+            margin: 0;
+            background: var(--bg);
+            color: var(--text);
+            font-family: "PingFang SC", "Hiragino Sans GB", "Noto Sans SC", "Helvetica Neue", sans-serif;
+        }
+
+        .page {
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 28px 24px 56px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .title-wrap {
+            max-width: 980px;
+        }
+
+        .title {
+            margin: 0;
+            padding-left: 16px;
+            border-left: 5px solid var(--accent);
+            font-size: 42px;
+            line-height: 1;
+            letter-spacing: -0.04em;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            margin: 10px 0 0;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .meta {
+            font-size: 12px;
+            color: var(--muted);
+            white-space: nowrap;
+            padding-top: 10px;
+        }
+
+        .panel {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            padding: 18px;
+        }
+
+        .intro-grid {
+            display: grid;
+            grid-template-columns: 1.3fr 0.7fr;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .eyebrow {
+            margin: 0 0 10px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .intro-title {
+            margin: 0 0 10px;
+            font-size: 24px;
+            line-height: 1.25;
+            letter-spacing: -0.03em;
+            font-weight: 800;
+        }
+
+        .intro-text {
+            margin: 0;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .legend-list,
+        .summary-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .legend-item,
+        .summary-item {
+            display: grid;
+            grid-template-columns: 110px 1fr;
+            gap: 10px;
+            align-items: start;
+            padding: 10px 0;
+            border-top: 1px solid var(--line);
+        }
+
+        .legend-item:first-child,
+        .summary-item:first-child {
+            border-top: 0;
+            padding-top: 0;
+        }
+
+        .legend-key,
+        .summary-key {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text);
+        }
+
+        .legend-value,
+        .summary-value {
+            font-size: 13px;
+            color: var(--muted);
+            line-height: 1.6;
+        }
+
+        .line-sample {
+            display: inline-block;
+            width: 70px;
+            border-top: 2px solid var(--accent);
+            margin-right: 8px;
+            vertical-align: middle;
+        }
+
+        .line-sample.planned {
+            border-top-style: dashed;
+            border-top-color: var(--planned);
+        }
+
+        .line-sample.support {
+            border-top-color: var(--line-strong);
+        }
+
+        .board-shell {
+            background: var(--panel);
+            border: 1px solid var(--line);
+            overflow-x: auto;
+        }
+
+        .board {
+            min-width: 1400px;
+        }
+
+        .stage-row,
+        .blueprint-row {
+            display: grid;
+            grid-template-columns: 170px repeat(6, minmax(190px, 1fr));
+        }
+
+        .stage-label,
+        .row-label {
+            padding: 18px 16px;
+            border-right: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+            background: var(--soft);
+        }
+
+        .stage-label {
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .stage-cell {
+            position: relative;
+            padding: 16px;
+            border-right: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+            background: var(--text);
+            color: #ffffff;
+            min-height: 96px;
+        }
+
+        .stage-cell:last-child,
+        .blueprint-cell:last-child {
+            border-right: 0;
+        }
+
+        .stage-index {
+            display: block;
+            font-size: 11px;
+            opacity: 0.7;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: 8px;
+        }
+
+        .stage-name {
+            font-size: 20px;
+            line-height: 1.15;
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            margin: 0 0 8px;
+        }
+
+        .stage-note {
+            margin: 0;
+            font-size: 12px;
+            line-height: 1.6;
+            opacity: 0.85;
+        }
+
+        .row-label {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .row-title {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .row-note {
+            margin: 0;
+            font-size: 12px;
+            line-height: 1.6;
+            color: var(--muted);
+        }
+
+        .blueprint-cell {
+            padding: 14px;
+            border-right: 1px solid var(--line);
+            border-bottom: 1px solid var(--line);
+            min-height: 240px;
+            background: var(--panel);
+        }
+
+        .cell-block + .cell-block {
+            margin-top: 12px;
+        }
+
+        .cell-block-title {
+            margin: 0 0 8px;
+            font-size: 11px;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+        }
+
+        .activity-list {
+            margin: 0;
+            padding-left: 16px;
+            font-size: 13px;
+            line-height: 1.65;
+        }
+
+        .activity-list li + li {
+            margin-top: 4px;
+        }
+
+        .capability-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .capability {
+            border: 1px solid var(--accent);
+            padding: 8px 10px;
+            font-size: 12px;
+            line-height: 1.45;
+            background: #ffffff;
+            cursor: pointer;
+        }
+
+        .capability.planned {
+            border-style: dashed;
+            border-color: var(--planned);
+            color: var(--muted);
+            background: var(--soft);
+        }
+
+        .capability.support {
+            border-color: var(--line-strong);
+            background: var(--soft);
+        }
+
+        .capability.active {
+            background: var(--text);
+            color: #ffffff;
+            border-color: var(--text);
+        }
+
+        .capability.planned.active {
+            background: #cbd5e1;
+            color: var(--text);
+            border-color: var(--planned);
+        }
+
+        .capability-name {
+            display: block;
+            font-weight: 700;
+            margin-bottom: 2px;
+        }
+
+        .capability-desc {
+            display: block;
+            color: inherit;
+            opacity: 0.86;
+        }
+
+        .cross-section {
+            margin-top: 16px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+        }
+
+        .cross-header {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--line);
+            background: var(--soft);
+        }
+
+        .cross-title {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+
+        .cross-note {
+            margin: 6px 0 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .cross-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0;
+        }
+
+        .cross-card {
+            padding: 16px 18px;
+            border-right: 1px solid var(--line);
+        }
+
+        .cross-card:last-child {
+            border-right: 0;
+        }
+
+        .cross-card-title {
+            margin: 0 0 8px;
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .cross-card-text {
+            margin: 0;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.65;
+        }
+
+        .mapping-section {
+            margin-top: 16px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+        }
+
+        .mapping-header {
+            padding: 14px 18px;
+            border-bottom: 1px solid var(--line);
+            background: var(--soft);
+        }
+
+        .mapping-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .mapping-table th,
+        .mapping-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid var(--line);
+            border-right: 1px solid var(--line);
+            text-align: left;
+            vertical-align: top;
+            font-size: 13px;
+            line-height: 1.6;
+        }
+
+        .mapping-table th:last-child,
+        .mapping-table td:last-child {
+            border-right: 0;
+        }
+
+        .mapping-table th {
+            background: var(--soft);
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        .mapping-table tr:last-child td {
+            border-bottom: 0;
+        }
+
+        .footnote {
+            margin-top: 16px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.7;
+        }
+
+        @media (max-width: 1100px) {
+            .intro-grid,
+            .cross-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .cross-card {
+                border-right: 0;
+                border-bottom: 1px solid var(--line);
+            }
+
+            .cross-card:last-child {
+                border-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="header">
+            <div class="title-wrap">
+                <h1 class="title">Service Blueprint</h1>
+                <p class="subtitle">
+                    将高层用户旅程升级为服务蓝图视图：最上层呈现买家视角的端到端流程与系统 Feature，
+                    中间层呈现电商运营的核心活动与支撑能力，最下层呈现后台实现与支撑能力。
+                    所有能力命名优先对齐 `domain_model.html` 中的 Capability taxonomy。
+                </p>
+            </div>
+            <div class="meta">Baseline / Last Updated: 2026-08-20</div>
+        </div>
+
+        <div class="intro-grid">
+            <div class="panel">
+                <p class="eyebrow">Purpose</p>
+                <h2 class="intro-title">把“旅程”提升为“服务协同结构”</h2>
+                <p class="intro-text">
+                    这份蓝图不再只描述买家看见的步骤，而是把前台体验、运营动作和后台能力放到同一张图里。
+                    这样可以直接回答三个问题：用户此刻在做什么、运营靠什么支撑这一步、系统由哪些 capability 负责兑现。
+                    图中实线框表示当前代码库中已有主规格或实现证据的能力；虚线框表示治理上已识别、但尚未形成当前主规格闭环的能力。
+                </p>
+            </div>
+            <div class="panel">
+                <p class="eyebrow">Legend</p>
+                <div class="legend-list">
+                    <div class="legend-item">
+                        <div class="legend-key"><span class="line-sample"></span>已落地</div>
+                        <div class="legend-value">在 `openspec/specs/` 或现有前后端实现中已有对应能力。</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-key"><span class="line-sample planned"></span>规划中</div>
+                        <div class="legend-value">Capability taxonomy 已存在，但主规格或运行时闭环尚未完整沉淀。</div>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-key"><span class="line-sample support"></span>横切支撑</div>
+                        <div class="legend-value">跨多个阶段复用的 UI、治理模型或错误处理能力。</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel" style="margin-bottom: 16px;">
+            <p class="eyebrow">Scope Summary</p>
+            <div class="summary-list">
+                <div class="summary-item">
+                    <div class="summary-key">客户主线</div>
+                    <div class="summary-value">商品发现 → 加购 → 结算确认 → 提交订单 → 模拟支付 → 成功回流。</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-key">运营主线</div>
+                    <div class="summary-value">商品发布与库存维护、优惠券配置与门槛控制、订单与支付结果追踪。</div>
+                </div>
+                <div class="summary-item">
+                    <div class="summary-key">能力边界</div>
+                    <div class="summary-value">Catalog / Cart / Coupon / Order 四个 Bounded Context 负责治理对应 capability；Shared / Cross 承担 UI、治理模型与异常规范。</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="board-shell">
+            <div class="board">
+                <div class="stage-row">
+                    <div class="stage-label">阶段</div>
+                    <div class="stage-cell">
+                        <span class="stage-index">Stage 01</span>
+                        <h2 class="stage-name">触达与发现</h2>
+                        <p class="stage-note">首页进入、商品浏览、搜索与排序、单品详情查看。</p>
+                    </div>
+                    <div class="stage-cell">
+                        <span class="stage-index">Stage 02</span>
+                        <h2 class="stage-name">选购与加购</h2>
+                        <p class="stage-note">挑选商品、录入数量、加入购物车并同步状态。</p>
+                    </div>
+                    <div class="stage-cell">
+                        <span class="stage-index">Stage 03</span>
+                        <h2 class="stage-name">结算确认</h2>
+                        <p class="stage-note">进入结算页、自动推荐最优券、确认优惠后金额。</p>
+                    </div>
+                    <div class="stage-cell">
+                        <span class="stage-index">Stage 04</span>
+                        <h2 class="stage-name">提交订单</h2>
+                        <p class="stage-note">把购物车转成订单，完成库存与金额校验。</p>
+                    </div>
+                    <div class="stage-cell">
+                        <span class="stage-index">Stage 05</span>
+                        <h2 class="stage-name">模拟支付</h2>
+                        <p class="stage-note">通过支付接口完成 PENDING_PAYMENT → PAID 的状态流转。</p>
+                    </div>
+                    <div class="stage-cell">
+                        <span class="stage-index">Stage 06</span>
+                        <h2 class="stage-name">成功回流</h2>
+                        <p class="stage-note">展示成功页与订单详情，并把用户带回下一轮浏览。</p>
+                    </div>
+                </div>
+
+                <div class="blueprint-row">
+                    <div class="row-label">
+                        <h3 class="row-title">客户视角 E2E 流程</h3>
+                        <p class="row-note">这里强调买家真正感知到的步骤，以及界面层暴露出来的 feature。</p>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="cell-block">
+                            <p class="cell-block-title">客户动作</p>
+                            <ul class="activity-list">
+                                <li>进入商城首页</li>
+                                <li>搜索商品名称 / 按价格排序</li>
+                                <li>打开商品详情确认图片与库存</li>
+                            </ul>
+                        </div>
+                        <div class="cell-block">
+                            <p class="cell-block-title">系统 Feature</p>
+                            <div class="capability-list">
+                                <div class="capability" data-capability="catalog-management">
+                                    <span class="capability-name">catalog-management</span>
+                                    <span class="capability-desc">商品列表、排序、库存可见性</span>
+                                </div>
+                                <div class="capability" data-capability="product-query">
+                                    <span class="capability-name">product-query</span>
+                                    <span class="capability-desc">按 ID 查询单品详情</span>
+                                </div>
+                                <div class="capability support" data-capability="frontend-ui">
+                                    <span class="capability-name">frontend-ui</span>
+                                    <span class="capability-desc">商品栅格与搜索交互</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="cell-block">
+                            <p class="cell-block-title">客户动作</p>
+                            <ul class="activity-list">
+                                <li>选择规格与数量</li>
+                                <li>加入购物车</li>
+                                <li>看到购物车状态实时更新</li>
+                            </ul>
+                        </div>
+                        <div class="cell-block">
+                            <p class="cell-block-title">系统 Feature</p>
+                            <div class="capability-list">
+                                <div class="capability" data-capability="cart-management">
+                                    <span class="capability-name">cart-management</span>
+                                    <span class="capability-desc">加购、数量累加、移除与清空</span>
+                                </div>
+                                <div class="capability support" data-capability="frontend-ui">
+                                    <span class="capability-name">frontend-ui</span>
+                                    <span class="capability-desc">本地状态必须与后端返回严格同步</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="cell-block">
+                            <p class="cell-block-title">客户动作</p>
+                            <ul class="activity-list">
+                                <li>进入结算页</li>
+                                <li>查看推荐优惠券与折扣结果</li>
+                                <li>确认应付金额与优惠说明</li>
+                            </ul>
+                        </div>
+                        <div class="cell-block">
+                            <p class="cell-block-title">系统 Feature</p>
+                            <div class="capability-list">
+                                <div class="capability" data-capability="checkout-management">
+                                    <span class="capability-name">checkout-management</span>
+                                    <span class="capability-desc">购物车转结算态</span>
+                                </div>
+                                <div class="capability" data-capability="coupon-management">
+                                    <span class="capability-name">coupon-management</span>
+                                    <span class="capability-desc">最优券推荐与门槛校验</span>
+                                </div>
+                                <div class="capability" data-capability="order-management">
+                                    <span class="capability-name">order-management</span>
+                                    <span class="capability-desc">持久化 total / discount / actualPaid</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="cell-block">
+                            <p class="cell-block-title">客户动作</p>
+                            <ul class="activity-list">
+                                <li>点击提交订单</li>
+                                <li>等待校验与创建结果</li>
+                                <li>感知到订单编号生成</li>
+                            </ul>
+                        </div>
+                        <div class="cell-block">
+                            <p class="cell-block-title">系统 Feature</p>
+                            <div class="capability-list">
+                                <div class="capability" data-capability="order-management">
+                                    <span class="capability-name">order-management</span>
+                                    <span class="capability-desc">订单创建与幂等保证</span>
+                                </div>
+                                <div class="capability" data-capability="checkout-management">
+                                    <span class="capability-name">checkout-management</span>
+                                    <span class="capability-desc">结算触发与成功反馈</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="cell-block">
+                            <p class="cell-block-title">客户动作</p>
+                            <ul class="activity-list">
+                                <li>完成模拟支付</li>
+                                <li>确认订单由待支付变为已支付</li>
+                            </ul>
+                        </div>
+                        <div class="cell-block">
+                            <p class="cell-block-title">系统 Feature</p>
+                            <div class="capability-list">
+                                <div class="capability" data-capability="payment">
+                                    <span class="capability-name">payment</span>
+                                    <span class="capability-desc">支付成功与状态流转</span>
+                                </div>
+                                <div class="capability" data-capability="order-management">
+                                    <span class="capability-name">order-management</span>
+                                    <span class="capability-desc">承接支付后的订单状态确认</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="cell-block">
+                            <p class="cell-block-title">客户动作</p>
+                            <ul class="activity-list">
+                                <li>查看 Checkout Success 页面</li>
+                                <li>确认订单详情</li>
+                                <li>继续购物，重新回到商品浏览</li>
+                            </ul>
+                        </div>
+                        <div class="cell-block">
+                            <p class="cell-block-title">系统 Feature</p>
+                            <div class="capability-list">
+                                <div class="capability support" data-capability="frontend-ui">
+                                    <span class="capability-name">frontend-ui</span>
+                                    <span class="capability-desc">成功模态框 / 成功页规范</span>
+                                </div>
+                                <div class="capability" data-capability="order-management">
+                                    <span class="capability-name">order-management</span>
+                                    <span class="capability-desc">订单详情读取与展示</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="blueprint-row">
+                    <div class="row-label">
+                        <h3 class="row-title">电商运营层</h3>
+                        <p class="row-note">这里展示运营如何支撑前台体验，包括商品、营销和订单观察面的核心活动。</p>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="cell-block">
+                            <p class="cell-block-title">核心活动</p>
+                            <ul class="activity-list">
+                                <li>录入商品名称、价格、图片、库存</li>
+                                <li>维护可售商品池与展示顺序</li>
+                            </ul>
+                        </div>
+                        <div class="cell-block">
+                            <p class="cell-block-title">支撑 Capability</p>
+                            <div class="capability-list">
+                                <div class="capability" data-capability="catalog-management">
+                                    <span class="capability-name">catalog-management</span>
+                                    <span class="capability-desc">商品上架、库存维护、图片字段</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="cell-block">
+                            <p class="cell-block-title">核心活动</p>
+                            <ul class="activity-list">
+                                <li>关注高库存商品的转化表现</li>
+                                <li>确保商品仍然可售、价格有效</li>
+                            </ul>
+                        </div>
+                        <div class="cell-block">
+                            <p class="cell-block-title">支撑 Capability</p>
+                            <div class="capability-list">
+                                <div class="capability" data-capability="catalog-management">
+                                    <span class="capability-name">catalog-management</span>
+                                    <span class="capability-desc">价格与库存事实维护</span>
+                                </div>
+                                <div class="capability planned" data-capability="error-handling">
+                                    <span class="capability-name">error-handling</span>
+                                    <span class="capability-desc">异常加购反馈仍缺少主规格沉淀</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="cell-block">
+                            <p class="cell-block-title">核心活动</p>
+                            <ul class="activity-list">
+                                <li>创建 FLAT / PERCENTAGE 优惠券</li>
+                                <li>设置 minSpendCents 与有效期</li>
+                                <li>驱动“自动推荐最优券”体验</li>
+                            </ul>
+                        </div>
+                        <div class="cell-block">
+                            <p class="cell-block-title">支撑 Capability</p>
+                            <div class="capability-list">
+                                <div class="capability" data-capability="coupon-management">
+                                    <span class="capability-name">coupon-management</span>
+                                    <span class="capability-desc">优惠券定义、校验、核销</span>
+                                </div>
+                                <div class="capability" data-capability="checkout-management">
+                                    <span class="capability-name">checkout-management</span>
+                                    <span class="capability-desc">在结算节点暴露推荐结果</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="cell-block">
+                            <p class="cell-block-title">核心活动</p>
+                            <ul class="activity-list">
+                                <li>确认订单创建后优惠券已锁定</li>
+                                <li>关注库存扣减与购物车清空是否一致</li>
+                            </ul>
+                        </div>
+                        <div class="cell-block">
+                            <p class="cell-block-title">支撑 Capability</p>
+                            <div class="capability-list">
+                                <div class="capability" data-capability="order-management">
+                                    <span class="capability-name">order-management</span>
+                                    <span class="capability-desc">订单生成、金额持久化</span>
+                                </div>
+                                <div class="capability" data-capability="catalog-management">
+                                    <span class="capability-name">catalog-management</span>
+                                    <span class="capability-desc">库存扣减原子性</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="cell-block">
+                            <p class="cell-block-title">核心活动</p>
+                            <ul class="activity-list">
+                                <li>确认支付成功并观察状态变化</li>
+                                <li>将订单推进到已支付状态</li>
+                            </ul>
+                        </div>
+                        <div class="cell-block">
+                            <p class="cell-block-title">支撑 Capability</p>
+                            <div class="capability-list">
+                                <div class="capability" data-capability="payment">
+                                    <span class="capability-name">payment</span>
+                                    <span class="capability-desc">支付接口与状态流转</span>
+                                </div>
+                                <div class="capability" data-capability="order-management">
+                                    <span class="capability-name">order-management</span>
+                                    <span class="capability-desc">订单支付结果承接</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="cell-block">
+                            <p class="cell-block-title">核心活动</p>
+                            <ul class="activity-list">
+                                <li>查看成功交易结果</li>
+                                <li>以订单数据复盘营销效果</li>
+                                <li>推动用户回到下一轮浏览</li>
+                            </ul>
+                        </div>
+                        <div class="cell-block">
+                            <p class="cell-block-title">支撑 Capability</p>
+                            <div class="capability-list">
+                                <div class="capability" data-capability="order-management">
+                                    <span class="capability-name">order-management</span>
+                                    <span class="capability-desc">订单查询与结果可见性</span>
+                                </div>
+                                <div class="capability support" data-capability="frontend-ui">
+                                    <span class="capability-name">frontend-ui</span>
+                                    <span class="capability-desc">成功反馈、继续购物入口</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="blueprint-row">
+                    <div class="row-label">
+                        <h3 class="row-title">后台核心活动</h3>
+                        <p class="row-note">这里落到服务、接口和核心业务规则，用来说明前台体验背后的系统编排。</p>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="cell-block">
+                            <p class="cell-block-title">核心活动</p>
+                            <ul class="activity-list">
+                                <li>`GET /api/products` 支持搜索与排序</li>
+                                <li>`GET /api/products/{id}` 返回完整商品详情</li>
+                                <li>返回 `imageUrl / stock / priceCents` 等权威字段</li>
+                            </ul>
+                        </div>
+                        <div class="cell-block">
+                            <p class="cell-block-title">支撑 Capability</p>
+                            <div class="capability-list">
+                                <div class="capability" data-capability="catalog-management">
+                                    <span class="capability-name">catalog-management</span>
+                                    <span class="capability-desc">商品列表与库存事实</span>
+                                </div>
+                                <div class="capability" data-capability="product-query">
+                                    <span class="capability-name">product-query</span>
+                                    <span class="capability-desc">按 ID 读取详情</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="cell-block">
+                            <p class="cell-block-title">核心活动</p>
+                            <ul class="activity-list">
+                                <li>`POST /api/cart/items` 写入后端权威购物车</li>
+                                <li>数量累加、数量上限校验</li>
+                                <li>购物车移除 / 清空能力供结算后回收</li>
+                            </ul>
+                        </div>
+                        <div class="cell-block">
+                            <p class="cell-block-title">支撑 Capability</p>
+                            <div class="capability-list">
+                                <div class="capability" data-capability="cart-management">
+                                    <span class="capability-name">cart-management</span>
+                                    <span class="capability-desc">用户购物车一致性与状态同步</span>
+                                </div>
+                                <div class="capability planned" data-capability="error-handling">
+                                    <span class="capability-name">error-handling</span>
+                                    <span class="capability-desc">错误码体系未形成当前主规格目录</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="cell-block">
+                            <p class="cell-block-title">核心活动</p>
+                            <ul class="activity-list">
+                                <li>计算最优券并校验 minSpendCents</li>
+                                <li>处理百分比折扣的 cent 精度补偿</li>
+                                <li>把购物车项转换成订单项候选</li>
+                            </ul>
+                        </div>
+                        <div class="cell-block">
+                            <p class="cell-block-title">支撑 Capability</p>
+                            <div class="capability-list">
+                                <div class="capability" data-capability="checkout-management">
+                                    <span class="capability-name">checkout-management</span>
+                                    <span class="capability-desc">结算编排与成功反馈入口</span>
+                                </div>
+                                <div class="capability" data-capability="coupon-management">
+                                    <span class="capability-name">coupon-management</span>
+                                    <span class="capability-desc">推荐、折扣计算、核销规则</span>
+                                </div>
+                                <div class="capability support" data-capability="domain-model">
+                                    <span class="capability-name">domain-model</span>
+                                    <span class="capability-desc">金额字段与状态机语义基线</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="cell-block">
+                            <p class="cell-block-title">核心活动</p>
+                            <ul class="activity-list">
+                                <li>创建订单并写入 `PENDING_PAYMENT`</li>
+                                <li>扣减库存，持久化 `discountCents / actualPaidCents`</li>
+                                <li>成功后清空购物车并保证幂等</li>
+                            </ul>
+                        </div>
+                        <div class="cell-block">
+                            <p class="cell-block-title">支撑 Capability</p>
+                            <div class="capability-list">
+                                <div class="capability" data-capability="order-management">
+                                    <span class="capability-name">order-management</span>
+                                    <span class="capability-desc">订单创建、查询、总价计算</span>
+                                </div>
+                                <div class="capability" data-capability="catalog-management">
+                                    <span class="capability-name">catalog-management</span>
+                                    <span class="capability-desc">库存扣减不可为负</span>
+                                </div>
+                                <div class="capability" data-capability="cart-management">
+                                    <span class="capability-name">cart-management</span>
+                                    <span class="capability-desc">结算成功后自动清空购物车</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="cell-block">
+                            <p class="cell-block-title">核心活动</p>
+                            <ul class="activity-list">
+                                <li>`POST /api/payments/:orderId` 推进支付</li>
+                                <li>订单状态遵循 `PENDING_PAYMENT → PAID`</li>
+                                <li>重复支付时保持幂等语义</li>
+                            </ul>
+                        </div>
+                        <div class="cell-block">
+                            <p class="cell-block-title">支撑 Capability</p>
+                            <div class="capability-list">
+                                <div class="capability" data-capability="payment">
+                                    <span class="capability-name">payment</span>
+                                    <span class="capability-desc">支付接口与支付校验</span>
+                                </div>
+                                <div class="capability support" data-capability="domain-model">
+                                    <span class="capability-name">domain-model</span>
+                                    <span class="capability-desc">订单状态机规则来源</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="blueprint-cell">
+                        <div class="cell-block">
+                            <p class="cell-block-title">核心活动</p>
+                            <ul class="activity-list">
+                                <li>读取订单详情并渲染成功反馈</li>
+                                <li>保留下一轮浏览的入口，不阻塞用户继续购物</li>
+                            </ul>
+                        </div>
+                        <div class="cell-block">
+                            <p class="cell-block-title">支撑 Capability</p>
+                            <div class="capability-list">
+                                <div class="capability" data-capability="order-management">
+                                    <span class="capability-name">order-management</span>
+                                    <span class="capability-desc">订单详情回读</span>
+                                </div>
+                                <div class="capability support" data-capability="frontend-ui">
+                                    <span class="capability-name">frontend-ui</span>
+                                    <span class="capability-desc">成功页与继续购物动作</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="cross-section">
+            <div class="cross-header">
+                <h2 class="cross-title">跨阶段支撑能力</h2>
+                <p class="cross-note">
+                    这些能力不是单一阶段的“一个动作”，而是横向约束整个交易旅程的共性支撑。
+                </p>
+            </div>
+            <div class="cross-grid">
+                <div class="cross-card">
+                    <div class="capability support" data-capability="frontend-ui" style="display: inline-block; margin-bottom: 10px;">
+                        <span class="capability-name">frontend-ui</span>
+                        <span class="capability-desc">已落地</span>
+                    </div>
+                    <h3 class="cross-card-title">统一前台呈现</h3>
+                    <p class="cross-card-text">
+                        承担商品卡片、搜索交互、成功反馈模态框等体验层规范，
+                        让“发现 → 结算 → 成功”在视觉和交互上保持同一种语言。
+                    </p>
+                </div>
+                <div class="cross-card">
+                    <div class="capability support" data-capability="domain-model" style="display: inline-block; margin-bottom: 10px;">
+                        <span class="capability-name">domain-model</span>
+                        <span class="capability-desc">治理基线</span>
+                    </div>
+                    <h3 class="cross-card-title">领域语义对齐</h3>
+                    <p class="cross-card-text">
+                        负责把 Order、Coupon、Cart、Product 的状态机、对象关系与金额语义稳定下来，
+                        是 capability taxonomy 和服务蓝图之间的治理桥梁。
+                    </p>
+                </div>
+                <div class="cross-card">
+                    <div class="capability planned" data-capability="error-handling" style="display: inline-block; margin-bottom: 10px;">
+                        <span class="capability-name">error-handling</span>
+                        <span class="capability-desc">规划中</span>
+                    </div>
+                    <h3 class="cross-card-title">异常规范仍待主规格闭环</h3>
+                    <p class="cross-card-text">
+                        代码与历史提案里已经出现统一错误码诉求，但当前 `openspec/specs/` 下还没有主规格目录。
+                        因此在蓝图中保留为虚线能力，提示其应补齐为真正的横切能力。
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="mapping-section">
+            <div class="mapping-header">
+                <h2 class="cross-title">Capability 对照表</h2>
+                <p class="cross-note">
+                    该表用于解释本蓝图如何映射到 `domain_model.html` 的 capability taxonomy，以及为什么某些能力采用虚线表达。
+                </p>
+            </div>
+            <table class="mapping-table">
+                <thead>
+                    <tr>
+                        <th style="width: 190px;">Capability</th>
+                        <th style="width: 180px;">治理归属</th>
+                        <th style="width: 120px;">状态</th>
+                        <th>在蓝图中的职责</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>catalog-management</strong></td>
+                        <td>Catalog Context</td>
+                        <td>已落地</td>
+                        <td>支撑商品列表、排序、上架、库存维护与下单时库存扣减。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>product-query</strong></td>
+                        <td>Catalog Context</td>
+                        <td>已落地</td>
+                        <td>支撑商品详情查询，服务于前台发现与选购决策。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>cart-management</strong></td>
+                        <td>Cart Context</td>
+                        <td>已落地</td>
+                        <td>支撑加购、移除、数量限制和结算后的购物车清空。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>coupon-management</strong></td>
+                        <td>Coupon Context</td>
+                        <td>已落地</td>
+                        <td>支撑优惠券配置、最优券推荐、门槛校验与核销。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>order-management</strong></td>
+                        <td>Order Context</td>
+                        <td>已落地</td>
+                        <td>支撑订单创建、查询、金额持久化和支付后的状态承接。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>checkout-management</strong></td>
+                        <td>Order Context</td>
+                        <td>已落地</td>
+                        <td>支撑从购物车到订单的编排，以及结算成功反馈入口。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>payment</strong></td>
+                        <td>Order Context</td>
+                        <td>已落地</td>
+                        <td>支撑模拟支付与订单状态流转。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>frontend-ui</strong></td>
+                        <td>Shared / Cross</td>
+                        <td>已落地</td>
+                        <td>支撑商品浏览、搜索、结算成功模态框等统一前台体验。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>domain-model</strong></td>
+                        <td>Shared / Cross</td>
+                        <td>治理基线</td>
+                        <td>支撑订单状态机、对象关系、金额字段定义，是蓝图的语义底座。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>error-handling</strong></td>
+                        <td>Shared / Cross</td>
+                        <td>规划中</td>
+                        <td>历史提案中已有统一错误码诉求，但当前主规格目录尚未形成，因此用虚线提示。</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <p class="footnote">
+            Source of truth: `docs/baseline/domain_model.html` capability mapping、
+            `openspec/specs/` 当前主规格目录，以及 `ecommerce/ecommerce-mini*` 中已存在的实现痕迹。
+            点击同名 capability 可在页面中高亮其所有出现位置。
+        </p>
+    </div>
+
+    <script>
+        const capabilityNodes = Array.from(document.querySelectorAll('[data-capability]'));
+
+        capabilityNodes.forEach((node) => {
+            node.addEventListener('click', () => {
+                const key = node.getAttribute('data-capability');
+                const active = node.classList.contains('active');
+
+                capabilityNodes.forEach((item) => item.classList.remove('active'));
+                if (active) return;
+
+                capabilityNodes
+                    .filter((item) => item.getAttribute('data-capability') === key)
+                    .forEach((item) => item.classList.add('active'));
+            });
+        });
+    </script>
+</body>
+</html>

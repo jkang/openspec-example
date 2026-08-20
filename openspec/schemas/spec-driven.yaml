@@ -14,9 +14,10 @@ artifacts:
       1. **澄清业务意图**：目的、范围、具体业务要求。
       2. **业务设计思路**：逻辑流转、用户价值。
       3. **任务类型与后续策略**：必须与用户确认这是 Epic, Story, Bug Fix 还是 Tech Debt，并制定对应的流程策略。
-      4. **需求拆分建议**：是否需要分阶段实施。
-      5. **架构影响分析**：现有架构改动点、技术挑战。
-      6. **确认结论**：用户已确认的最终意图。
+      4. **治理映射对齐**：必须参考 `docs/baseline/domain_model.html` 识别 **Impacted Bounded Contexts** 并据此推出 **Candidate Capabilities**。
+      5. **需求拆分建议**：是否需要分阶段实施。
+      6. **架构影响分析**：现有架构改动点、技术挑战。
+      7. **确认结论**：用户已确认的最终意图。
 
       该文档是后续所有产物的源头，未完成此文档前不得开始 `proposal`。
     requires: []
@@ -35,6 +36,7 @@ artifacts:
       - **Why (背景原因)**: 用 1-2 句话说明要解决的问题或抓住的机遇。这解决了什么问题？为什么现在要做？
       - **What Changes (变更内容)**: 使用项目符号列出具体的变更点。明确说明新增功能、修改点或移除的内容。对于破坏性变更，请标记为 **BREAKING**。
       - **Capabilities (系统能力)**: 明确指出将要创建或修改哪些规范 (specs)：
+        - **映射对齐约束**：此处列出的 Capabilities 必须与 `docs/baseline/domain_model.html` 中的映射表对齐。如果 proposal 写了一个未映射的 capability，你必须显式说明这是“新增 taxonomy”及其理由。
         - **新增能力 (New Capabilities)**: 列出引入的新能力。每个新能力将生成一个新的 `specs/<capability-path>/spec.md`。新增的路径片段必须使用烤串命名法（kebab-case，例如 `user-auth` 或 `identity/user-auth`），并遵循项目现有的规范组织结构。
         - **修改能力 (Modified Capabilities)**: 列出需求 (REQUIREMENTS)发生变化的现有能力。只有在规范级别的行为发生变化时才包含在此处（不仅仅是实现细节的改变）。每个被修改的能力都需要一个增量规范文件。必须使用 `openspec/specs/` 下完全相同的现有路径。如果没有需求变更，请留空。
       - **Impact (影响范围)**: 受影响的代码、API、依赖项或系统模块。
@@ -143,6 +145,7 @@ artifacts:
 
       章节结构：
       - **Context (上下文)**: 引用提案，不要赘述。
+      - **Domain Boundary Impact (领域边界影响)**: 必须明确说明此次变更的 capabilities 为什么归属于对应的 Bounded Contexts，参考 `domain_model.html`。
       - **Goals / Non-Goals**: 仅添加设计层面的边界。
       - **Decisions (技术决策)**: 关键技术选择及其理由。
       - **Risks / Trade-offs**: 已知限制与缓解措施。

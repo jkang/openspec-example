@@ -36,7 +36,14 @@
 - Phase 3: 异常边界 (P2)
 -->
 
-## 5. 架构影响分析 (Architectural Impact & Ideas)
+## 5. 治理映射对齐 (Governance Mapping)
+<!-- 
+必须参考 docs/baseline/domain_model.html 识别受影响的边界与能力。
+- Impacted Bounded Contexts: [例如：Order Context, Coupon Context]
+- Candidate Capabilities: [例如：order-management, coupon-management]
+-->
+
+## 6. 架构影响分析 (Architectural Impact & Ideas)
 <!-- 
 识别对现有系统架构的影响。
 - 涉及哪些后端服务 (Node.js / Python)？
@@ -45,7 +52,7 @@
 - 是否涉及跨域 (CORS) 或数据同步问题？
 -->
 
-## 6. 确认结论 (User Confirmation)
+## 7. 确认结论 (User Confirmation)
 <!-- 
 记录与用户达成共识的最终结论。
 在此处明确方案是否可以进入 Proposal 阶段。

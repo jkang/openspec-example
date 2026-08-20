@@ -18,6 +18,7 @@
 ## Capabilities (系统能力)
 <!-- 
 明确指出将要创建或修改哪些规范 (specs)。
+必须与 docs/baseline/domain_model.html 中的映射表对齐。
 新增能力路径请使用烤串命名法 (kebab-case)。
 -->
 

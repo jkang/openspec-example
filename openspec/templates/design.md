@@ -6,6 +6,11 @@
 在此补充实现方案所需的当前状态和约束。
 -->
 
+## Domain Boundary Impact (领域边界影响)
+<!-- 
+明确说明此次变更的 capabilities 为什么归属于对应的 Bounded Contexts，参考 domain_model.html。
+-->
+
 ## Goals / Non-Goals (目标与非目标)
 - **Goals**: 
     - [ ] 核心目标 A
