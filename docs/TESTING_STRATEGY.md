@@ -1,3 +1,9 @@
+---
+name: Testing Strategy
+purpose: 定义自动化测试金字塔策略及 SDD 工作流中的执行约束
+updated_at: 2026-08-20
+---
+
 # 自动化测试策略与金字塔 (Testing Strategy)
 
 在规格驱动开发 (SDD) 流程中，OpenSpec 生成的 Gherkin 规格（Given/When/Then）不仅是业务文档，更是**可执行的测试契约**。

@@ -1,3 +1,9 @@
+---
+name: Backend Architecture
+purpose: 定义后端分层架构、核心设计决策及 Node.js/Python 实现规范
+updated_at: 2026-08-20
+---
+
 # Backend Architecture Guidelines
 
 本文档定义了 OpenSpec-Practice 项目的后端架构原则。当前包含 Node.js 和 Python 两种实现，两者必须保持架构对齐。

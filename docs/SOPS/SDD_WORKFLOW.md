@@ -1,3 +1,9 @@
+---
+name: SDD Workflow SOP
+purpose: 定义规格驱动开发的标准操作程序与指令规则
+updated_at: 2026-08-20
+---
+
 # OpenSpec SDD Workflow SOP (v2.0)
 
 本文档定义了 OpenSpec-Practice 项目的规格驱动开发 (Spec-Driven Development, SDD) 标准操作程序。所有参与此项目的 AI Agent 必须严格遵循本流程。
@@ -13,11 +19,8 @@
   - **目标**: 维护 `docs/PRODUCT_SENSE.md`，明确 Elevator Pitch 和产品原则。
 - **指令**: `/opsx:product-planning`
   - **目标**: 维护 `docs/ROADMAP.md`，执行每月滚动计划。
-- **业务基线管理 (Auxiliary Baseline Commands)**:
-  - **指令**: `/opsx:baseline/blueprint` - 维护 `docs/baseline/service_blueprint.html`。
-  - **指令**: `/opsx:baseline/process-flow` - 维护 `docs/baseline/business_process.html` (L1/L2/L3 分层流程)。
-  - **指令**: `/opsx:baseline/domain-model` - 维护 `docs/baseline/domain_model.html` (Event-Storming 视角)。
-  - **指令**: `/opsx:baseline/render` - 校验基线 HTML 的索引与可视化完整性。
+- **业务基线管理 (Auxiliary Baseline Command)**:
+  - **指令**: `/opsx:baseline/sync` - 统一同步并回流所有业务基线文档 (Blueprint, Process Flow, Domain Model) 并刷新渲染。
   - **指令**: `/opsx:delivery-board` - 生成可视化交付看板 `docs/governance/delivery_board.html`。
 - **补充治理文档**:
   - `.trae/skills/baseline/openspec-baseline-blueprint/SKILL.md` - 定义 `service_blueprint.html` 的稳定锚点、Planning 阶段引用方式、capability 口径与 Sync 触发/No-op 规则。

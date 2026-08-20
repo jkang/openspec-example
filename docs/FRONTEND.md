@@ -1,3 +1,9 @@
+---
+name: Frontend Governance
+purpose: 定义前端 UI 开发规范、视觉约束及验证闭环
+updated_at: 2026-08-20
+---
+
 # Frontend Governance & UI Specifications
 
 本文档定义了 OpenSpec-Practice 项目前端（特别是 Vue 3 客户端）的 UI 设计、开发规范以及验证闭环。所有 AI Agent 在生成前端代码或 UI 原型时，必须严格遵守以下规则。

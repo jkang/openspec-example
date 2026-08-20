@@ -1,3 +1,9 @@
+---
+name: Product Roadmap
+purpose: 定义项目当前阶段目标、已完成能力及未来滚动规划
+updated_at: 2026-08-20
+---
+
 # 产品路线图 (Product Roadmap)
 
 本文档定义了 OpenSpec-Practice 极简电商系统的高阶业务规划。

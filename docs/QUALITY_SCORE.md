@@ -1,3 +1,9 @@
+---
+name: Quality Standards
+purpose: 确立项目质量基线、验收标准及规范防漂移机制
+updated_at: 2026-08-20
+---
+
 # 质量与评估标准 (Quality & Evaluation Standards)
 
 本文档确立了 OpenSpec-Practice 项目的质量基线和 Agent 工作评估标准。
