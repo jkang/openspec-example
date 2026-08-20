@@ -30,8 +30,9 @@ I'll create the following artifacts:
 1. **Verify pre-requisites**
    
    Ensure `proposal.md` exists. 
-  If the task type requires a prototype (Story/UI Bug Fix), ensure `prototype.html` exists and was approved.
-  If the task type is not Tech Debt, ensure `story.md` exists and was approved.
+   If the task type requires a prototype (Story/UI Bug Fix), ensure `prototype.html` exists and was approved.
+   If the task type is not Tech Debt, ensure `story.md` exists and was approved.
+   Re-read `docs/baseline/domain_model.html` and `docs/baseline/business_process.html` before drafting artifacts.
 
 2. **Generate Specs, Design, and Tasks**
    
@@ -42,7 +43,9 @@ I'll create the following artifacts:
         ```bash
         openspec instructions <artifact-id> --change "<name>" --json
         ```
-     - Read dependencies (e.g., `proposal.md`, `prototype.html`, `story.md` if any, and preceding artifacts) for context. Ensure `specs` refer to **L3 Process Nodes** and `design.md` includes **Process Delta** (refer to `docs/baseline/business_process.html`).
+      - Read dependencies (e.g., `proposal.md`, `prototype.html`, `story.md` if any, and preceding artifacts) for context.
+      - Ensure every `specs/<capability-path>/spec.md` includes `Governance Mapping`, references the owning `Bounded Context`, and cites the related **L3 Process Nodes**.
+      - Ensure `design.md` includes both `Domain Boundary Impact` and `Domain Model Sync Assessment`, with an explicit `Needs Sync: Yes/No` decision for `docs/baseline/domain_model.html`.
       - Follow the `template` and `instruction` to generate the artifact.
       - If `skip_specs: true` is set in `.openspec.yaml`, skip `specs`.
       - Write the file to `resolvedOutputPath`.
@@ -58,6 +61,7 @@ I'll create the following artifacts:
 **Output**
 
 Summarize the created artifacts and announce that the planning phase is complete.
+Include a short governance recap: impacted bounded contexts, capability taxonomy alignment, and the Domain Model sync assessment.
 Prompt: "Planning is complete. When you are ready, run `/opsx:apply` to start implementation."
 
 **Guardrails**

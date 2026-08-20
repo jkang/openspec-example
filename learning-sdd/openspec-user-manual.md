@@ -246,14 +246,11 @@ openspec validate <change-name>
 | **基础设施 (repo/)** | 数据持久化实现 (Memory/File) | Detail |
 
 ### 9.3 规范驱动实现示例
-**Spec 定义 (`specs/domain-model/spec.md`)**:
+**治理来源 (`docs/baseline/domain_model.html` + capability spec)**:
 ```markdown
-### Requirement: 商品实体定义
-系统 SHALL 定义商品实体，包含唯一标识、名称、价格和库存。
-#### Scenario: 创建有效商品
-Given 需要创建新商品
-When 提供商品信息 { id, name, priceCents, stock }
-Then 商品实体创建成功
+- Domain Model Baseline: Catalog Context -> catalog-management capability
+- Domain Object / Invariant: Product 必须包含唯一标识、名称、价格和库存
+- Related Capability Spec: openspec/specs/catalog-management/spec.md
 ```
 
 **代码实现 (`src/domain/types.js`)**:

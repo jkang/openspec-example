@@ -18,6 +18,15 @@
 - [MOD] 修正了 L2-XX 的协同逻辑
 -->
 
+## Domain Model Sync Assessment (领域模型同步评估)
+<!--
+判断 sync 阶段是否需要回写 docs/baseline/domain_model.html。
+- Needs Sync: Yes / No
+- Trigger Type: [BC 映射 | Capability taxonomy | Domain Event | Command | Policy | Aggregate | State Machine | Object Relationship | Invariant]
+- Evidence Source: [proposal.md / specs/... / design decisions]
+- Planned Baseline Update: [更新图、清单、映射表的哪些部分]
+-->
+
 ## Goals / Non-Goals (目标与非目标)
 - **Goals**: 
     - [ ] 核心目标 A

@@ -125,7 +125,14 @@ This is an **agent-driven** operation - you will read delta specs and directly e
    - **调用辅助技能**: 依次调用 `baseline/` 子目录下的辅助技能：
      - `openspec-baseline-story-map`: 根据 `verify.md` 更新 Story Map 实现状态。
      - `openspec-baseline-process-flow`: 根据 `story.md` (L1/L2) 和 `specs/design.md` (L3) 更新 `business_process.html`。
-     - `openspec-baseline-domain-model`: 根据 `specs/domain-model/spec.md` 更新领域模型。
+     - `openspec-baseline-domain-model`: 先基于 `proposal.md`、全部 delta `specs/**/*.md`、主 specs 合并结果与 `design.md` 判断是否需要更新 `docs/baseline/domain_model.html`；若需要，则回写图与清单，若不需要，则输出显式 no-op 理由。
+   - **Domain Model Sync Trigger**: 当且仅当存在以下任一变化时，执行 Domain Model 回流：
+     - `Bounded Context` 边界或 `BC -> Capability` 映射变化
+     - 新增、修改、移除 capability taxonomy
+     - 新增、修改、移除 Domain Event / Command / Policy
+     - Aggregate、状态机、对象关系、业务不变量发生变化
+     - `design.md` 中的 `Domain Model Sync Assessment` 明确写为 `Needs Sync: Yes`
+   - **Explicit No-op**: 若上述条件均不满足，必须在同步摘要中明确记录“无需更新 Domain Model”及理由，不能静默跳过。
    - **自动化渲染**: 所有基线回流完成后，调用 `openspec-baseline-render` 校验基线 HTML 的索引与可视化完整性。
 
 6. **Show summary**

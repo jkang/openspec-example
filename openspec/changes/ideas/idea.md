@@ -35,7 +35,7 @@
 3. **退款逻辑 (已移至 Roadmap 下一阶段)**: 后续将实现基于实付金额退款及优惠券回滚机制。
 
 ## 5. 架构影响与思路 (Architectural Impact & Ideas)
-- **数据模型**: [domain-model/spec.md](file:///Users/superkkk/MyCoding/OpenSpec-practice/openspec/specs/domain-model/spec.md) 扩展 `Coupon` 实体，增加 `type: 'FLAT' | 'PERCENTAGE'`, `value: number`, `status: 'UNUSED' | 'USED' | 'EXPIRED'`。
+- **数据模型**: 需同步更新 [domain_model.html](file:///Users/superkkk/MyCoding/OpenSpec-practice/docs/baseline/domain_model.html) 中的 `Coupon Context` 状态、对象关系与 capability 映射，并在对应 capability spec 中补充约束：`type: 'FLAT' | 'PERCENTAGE'`, `value: number`, `status: 'UNUSED' | 'USED' | 'EXPIRED'`。
 - **结算服务**: `SettlementService` 抽离核心计算逻辑，支持多策略计算。
 - **订单追踪**: `Order` 实体必须持久化 `actualPaidCents` 和 `couponId`，用于退款校验。
 

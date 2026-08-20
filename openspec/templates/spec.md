@@ -1,3 +1,12 @@
+## Governance Mapping
+
+<!--
+- Source of Truth: docs/baseline/domain_model.html
+- Bounded Context: <边界名称>
+- Capability Taxonomy: <capability-path>
+- Related Process Nodes: <L3-XX, L3-YY>
+-->
+
 ## Purpose
 
 <!-- 用 1-2 句话描述该能力的用途（至少 50 个字符） -->

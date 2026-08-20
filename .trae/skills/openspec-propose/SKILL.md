@@ -92,7 +92,10 @@ After generating the proposal, summarize the task type and recommend the next co
       ```
    b. **Create `proposal.md`**:
       - Read `ideas/idea.md` for context.
+      - Re-read `docs/baseline/domain_model.html` and `docs/baseline/business_process.html` as the governance source of truth.
       - Follow the `template` and `instruction` from the JSON.
+      - Ensure the proposal explicitly lists `Impacted Bounded Contexts`, aligns `Capabilities` to the `domain_model.html` mapping, and records `Process Alignment` node IDs.
+      - If the proposal introduces an unmapped capability or changes a BC -> Capability relationship, mark it as `新增 taxonomy` and explain why.
       - Write the file to `resolvedOutputPath`.
       - Show brief progress: "Created proposal"
 
@@ -107,6 +110,7 @@ After generating the proposal, summarize the task type and recommend the next co
 After completing the proposal, summarize:
 - Change name and location
 - Artifacts created: `idea.md` (if newly created) and `proposal.md`.
+- Governance summary: impacted bounded contexts, capabilities, and whether a future Domain Model sync is likely required.
 - Next step recommendation: "The initial proposal is ready. Based on the task type, you should now run `/opsx:prototype` (for UI changes), `/opsx:story` (for business review), or `/opsx:spec-design` (for Tech Debt)."
 
 **Guardrails**

@@ -59,6 +59,7 @@ Revise a change's existing planning artifacts and keep them coherent. Never edit
    - Read the artifact(s) the request touches and the change's other existing artifacts.
    - Apply the requested edit. Then check every other existing artifact against it - in ANY direction: an edit to a later artifact may require revising an earlier one, not only the other way around. Build order is a useful reading order, not a constraint on which artifacts may be revised.
    - **Process Flow Consistency**: Specifically check if the changes impact the referenced **L1/L2/L3 Process Nodes** in `docs/baseline/business_process.html`. If the business logic has changed, ensure the `Process Alignment` (in proposal) and `Process Delta` (in design) are updated accordingly.
+   - **Domain Model Consistency**: Specifically check whether the change affects `docs/baseline/domain_model.html` references: impacted `Bounded Contexts`, capability taxonomy, domain events, commands, policies, state machines, object relationships, or invariants. If so, keep `proposal.md`, `specs/*.md`, and `design.md` aligned and refresh `Domain Model Sync Assessment`.
    - Note everything that is now inconsistent, missing, or contradictory.
    - Revise only files that already exist (`existingOutputPaths`). Do NOT create artifacts that don't exist yet, and do NOT invent new files under a glob artifact - note them and point the user to `/opsx-continue` to create them.
    - If the change is already coherent, say so and make no edits.

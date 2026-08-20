@@ -19,8 +19,12 @@
 <!--
 明确指出将要创建或修改哪些规范 (specs)。
 必须与 docs/baseline/domain_model.html 中的映射表对齐。
+必须显式列出受影响的 Bounded Contexts；若出现未映射 capability，必须标记为新增 taxonomy 并说明理由。
 新增能力路径请使用烤串命名法 (kebab-case)。
 -->
+
+### 受影响边界 (Impacted Bounded Contexts)
+- [ ] `<Bounded Context>`
 
 ### 流程对齐 (Process Alignment)
 <!--

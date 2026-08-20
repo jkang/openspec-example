@@ -239,12 +239,12 @@ OpenSpec 的核心价值之一是 **语言无关性 (Language Agnostic)**。为�
 
 ### 4.2 步骤一：领域模型生成
 
-**交互意图**: 基于 `domain-model/spec.md` 生成 Python 数据类，确保类型定义与 Spec 一致。
+**交互意图**: 基于 `docs/baseline/domain_model.html` 的治理基线，以及对应 capability spec，生成 Python 数据类，确保类型定义与业务边界一致。
 
 **User Prompt**:
 
-> 请读取 [domain-model/spec.md](../openspec/changes/archive/2025-01-27-v1-mvp/specs/domain-model/spec.md)。（注：v1-mvp 已归档至 `changes/archive/`）
-> 请基于此 Spec，使用 Python 的 Pydantic 库定义 Domain Models。
+> 请先读取 [domain_model.html](file:///Users/superkkk/MyCoding/OpenSpec-practice/docs/baseline/domain_model.html) 中的领域对象、状态与边界映射，
+> 再结合对应 capability spec，使用 Python 的 Pydantic 库定义 Domain Models。
 > 要求：
 >
 > 1. 文件路径：[src/domain/models.py](../ecommerce/ecommerce-mini-python/src/domain/models.py)
@@ -452,6 +452,7 @@ ecommerce/ecommerce-mini-python/tests/test_smoke.py ..           [100%]
 - 交互式原型目录: `openspec/changes/<change-name>/prototypes/`（Vue 3 + Tailwind CSS）
 - 综合使用手册与实战案例: [openspec-user-manual.md](./openspec-user-manual.md)
 - OpenSpec 项目配置: `openspec/config.yaml`（技术栈、架构约束与规则，自动注入每次 AI 规划请求）
+- 业务治理基线: `docs/baseline/domain_model.html`（Bounded Context、Capability 映射、状态机、对象关系与 Event-Storming 看板）
 - OpenSpec 规范文件: `openspec/changes/archive/2025-01-27-v1-mvp/`（已归档）
   - `proposal.md`: 变更提案
   - `design.md`: 架构设计
@@ -459,7 +460,6 @@ ecommerce/ecommerce-mini-python/tests/test_smoke.py ..           [100%]
   - `specs/cart-management/spec.md`: 购物车管理规范
   - `specs/order-management/spec.md`: 订单管理规范
   - `specs/payment/spec.md`: 支付规范
-  - `specs/domain-model/spec.md`: 领域模型规范
   - `specs/error-handling/spec.md`: 错误处理规范
 - Node.js 基础实现: `ecommerce/ecommerce-mini/src/{domain,repo,services,http}`
 - Python 复刻实现: `ecommerce/ecommerce-mini-python/src/{domain,services,api}`
