@@ -44,7 +44,7 @@ OpenSpec v2.0 引入了**规划层 (Planning Layer)**，将产品感定义与路
 ### 2.6 Sync & Archive：路线图与基线的回馈
 
 归档前执行 `/opsx:sync` 合并规格：
-- **v2.0 联动**：执行 `sync` 不仅会合并规格，还会自动将 `story.md` 和 `design.md` 中的认知回写到 `docs/baseline/` 下的 4 份基线文档，并刷新 HTML 视图。
+- **v2.0 联动**：执行 `sync` 不仅会合并规格，还会自动将 `story.md` 和 `design.md` 中的认知回写到 `docs/baseline/` 下的 3 份基线文档，并刷新 HTML 视图。
 - **Roadmap 刷新**：归档成功后，AI 会提醒用户运行 `/opsx:product-planning` 来刷新 `ROADMAP.md` 的当前 Baseline，标志着该功能已正式进入系统基线。
 
 ## 三、实践总结：v2.0 的价值

@@ -17,7 +17,6 @@ context: |
 planning:
   product_sense: docs/PRODUCT_SENSE.md
   roadmap: docs/ROADMAP.md
-  journey: docs/baseline/high_level_journey.html
   story_map: docs/baseline/service_blueprint.html
   process_flow: docs/baseline/business_process.html
   domain_model: docs/baseline/domain_model.html

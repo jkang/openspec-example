@@ -121,7 +121,7 @@ This is an **agent-driven** operation - you will read delta specs and directly e
 5. **Baseline Sync (回流业务基线)**
 
    在完成 Spec 同步后，你必须执行业务基线回流：
-   - **调用辅助技能**: 依次调用 `baseline/` 下的技能更新 Journey, Story Map, Process Flow 和 Domain Model。
+   - **调用辅助技能**: 依次调用 `baseline/` 下的技能更新 Story Map, Process Flow 和 Domain Model。
    - **自动化渲染**: 所有回流完成后，调用 `openspec-baseline-render` 刷新可视化文档。
 
 6. **Show summary**
