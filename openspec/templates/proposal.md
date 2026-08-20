@@ -34,6 +34,18 @@
 - [ ] L3-XX: 节点名称
 -->
 
+### 服务蓝图对齐 (Service Blueprint Alignment)
+<!--
+明确列出本次变更受影响的服务蓝图节点 ID (来自 service_blueprint.html)。
+- [ ] SB-STAGE-XX: 阶段名称
+- [ ] SB-<LANE>-XX: 泳道节点名称
+
+说明本次变更是：
+- [NEW] 新增蓝图能力/节点
+- [MOD] 调整已有阶段或能力分布
+- [REUSE] 仅复用已有蓝图结构，无需改图
+-->
+
 ### 新增能力 (New Capabilities)
 - [ ] `specs/<capability-path>/spec.md`
 

@@ -5,6 +5,7 @@
 - Bounded Context: <边界名称>
 - Capability Taxonomy: <capability-path>
 - Related Process Nodes: <L3-XX, L3-YY>
+- Related Service Blueprint Nodes: <SB-STAGE-XX, SB-BACKSTAGE-XX>
 -->
 
 ## Purpose

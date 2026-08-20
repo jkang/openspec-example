@@ -18,6 +18,15 @@
 - [MOD] 修正了 L2-XX 的协同逻辑
 -->
 
+## Service Blueprint Sync Assessment (服务蓝图同步评估)
+<!--
+判断 sync 阶段是否需要回写 docs/baseline/service_blueprint.html。
+- Needs Sync: Yes / No
+- Trigger Type: [Stage Coverage | Lane Capability Distribution | Capability Status | Cross-stage Support | Story Journey Mapping]
+- Evidence Source: [proposal.md / story.md / specs/... / design decisions / verify.md]
+- Planned Baseline Update: [更新哪些 SB-STAGE-* / SB-<LANE>-* / capability 状态]
+-->
+
 ## Domain Model Sync Assessment (领域模型同步评估)
 <!--
 判断 sync 阶段是否需要回写 docs/baseline/domain_model.html。

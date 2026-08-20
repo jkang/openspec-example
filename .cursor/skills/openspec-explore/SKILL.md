@@ -18,7 +18,7 @@ Enter explore mode. Think deeply. Visualize freely. Follow the conversation wher
 2. **Roadmap Alignment**: Check `docs/ROADMAP.md` to ensure the idea aligns with the current phase's targets and scope. Explicitly record this alignment in `ideas/idea.md`.
 3. **Business Design Approach**: Provide a design perspective focused on the business logic and user value first.
 4. **Task Type & Strategy**: Classify the idea as an Epic, Story, Bug Fix, or Tech Debt.
-   - **Governance Mapping**: Must refer to `docs/baseline/domain_model.html` to identify **Impacted Bounded Contexts** and `docs/baseline/business_process.html` to identify impacted **L1/L2/L3 Process Nodes**. Record these in `ideas/idea.md`.
+   - **Governance Mapping**: Must refer to `docs/baseline/domain_model.html` to identify **Impacted Bounded Contexts**, `docs/baseline/business_process.html` to identify impacted **L1/L2/L3 Process Nodes**, and `docs/baseline/service_blueprint.html` plus `docs/SOPS/SERVICE_BLUEPRINT_STANDARD.md` to identify impacted **SB-STAGE-* / SB-<LANE>-*** nodes. Record these in `ideas/idea.md`.
    - **Epic Handling**: If it's an Epic, you MUST split it into individual stories. Create a backlog file `openspec/epic-<key>.story-list.json` with the structure: `{"epicKey": "<key>", "stories": [{"storyKey": "...", "status": "planned", "changeName": null}, ...]}`.
    - Record the classification and strategy in `ideas/idea.md`.
 5. **Requirement Splitting**: If the requirement needs to be split into multiple ones, suggest doing so and implementing them one by one.

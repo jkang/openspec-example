@@ -31,9 +31,10 @@
 <!--
 聚焦于跨模块的端到端用户旅程，使用 Given/When/Then 描述。
 必须映射到流程基线中的 L1 (价值流) 和 L2 (协同流) 节点。
+同时必须映射到 service_blueprint.html 中的 SB-STAGE-* 与 SB-CUSTOMER-* 节点。
 -->
 
-### 旅程 1：<旅程名称> (Ref: L1-XX, L2-XX)
+### 旅程 1：<旅程名称> (Ref: L1-XX, L2-XX | SB-STAGE-XX, SB-CUSTOMER-XX)
 #### 场景：<正常主流程场景名>
 - @e2e
 - **GIVEN** <初始状态>

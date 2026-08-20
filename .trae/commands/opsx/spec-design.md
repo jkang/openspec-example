@@ -26,12 +26,14 @@ I'll create the following artifacts:
 1. **Verify pre-requisites**
    - Ensure `proposal.md` exists.
    - If UI-related, ensure approved `prototype.html` exists.
-   - Re-read `docs/baseline/domain_model.html` and `docs/baseline/business_process.html` before drafting artifacts.
+   - Re-read `docs/baseline/domain_model.html`, `docs/baseline/business_process.html`, `docs/baseline/service_blueprint.html`, and `docs/SOPS/SERVICE_BLUEPRINT_STANDARD.md` before drafting artifacts.
 
 2. **Generate Specs, Design, and Tasks**
    - Loop through `specs`, `design`, and `tasks`.
    - Get instructions for each: `openspec instructions <artifact-id> --change "<name>" --json`
    - Ensure every capability spec includes `Governance Mapping`, references its owning `Bounded Context`, and cites the related `L3` process nodes.
+   - Ensure every capability spec cites the related `SB-STAGE-*` and `SB-<LANE>-*` nodes.
+   - Ensure `design.md` includes `Service Blueprint Sync Assessment`, with an explicit `Needs Sync: Yes/No` decision for `docs/baseline/service_blueprint.html`.
    - Ensure `design.md` includes both `Domain Boundary Impact` and `Domain Model Sync Assessment`, with an explicit `Needs Sync: Yes/No` decision for `docs/baseline/domain_model.html`.
    - Create the artifact following the template and instructions.
    - Show progress: "Created <artifact-id>."

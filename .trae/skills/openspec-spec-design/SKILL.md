@@ -32,7 +32,7 @@ I'll create the following artifacts:
    Ensure `proposal.md` exists. 
    If the task type requires a prototype (Story/UI Bug Fix), ensure `prototype.html` exists and was approved.
    If the task type is not Tech Debt, ensure `story.md` exists and was approved.
-   Re-read `docs/baseline/domain_model.html` and `docs/baseline/business_process.html` before drafting artifacts.
+   Re-read `docs/baseline/domain_model.html`, `docs/baseline/business_process.html`, `docs/baseline/service_blueprint.html`, and `docs/SOPS/SERVICE_BLUEPRINT_STANDARD.md` before drafting artifacts.
 
 2. **Generate Specs, Design, and Tasks**
    
@@ -45,6 +45,8 @@ I'll create the following artifacts:
         ```
       - Read dependencies (e.g., `proposal.md`, `prototype.html`, `story.md` if any, and preceding artifacts) for context.
       - Ensure every `specs/<capability-path>/spec.md` includes `Governance Mapping`, references the owning `Bounded Context`, and cites the related **L3 Process Nodes**.
+      - Ensure every `specs/<capability-path>/spec.md` cites the related `SB-STAGE-*` and `SB-<LANE>-*` nodes.
+      - Ensure `design.md` includes `Service Blueprint Sync Assessment`, with an explicit `Needs Sync: Yes/No` decision for `docs/baseline/service_blueprint.html`.
       - Ensure `design.md` includes both `Domain Boundary Impact` and `Domain Model Sync Assessment`, with an explicit `Needs Sync: Yes/No` decision for `docs/baseline/domain_model.html`.
       - Follow the `template` and `instruction` to generate the artifact.
       - If `skip_specs: true` is set in `.openspec.yaml`, skip `specs`.

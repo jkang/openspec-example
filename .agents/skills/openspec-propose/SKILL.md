@@ -92,9 +92,10 @@ After generating the proposal, summarize the task type and recommend the next co
       ```
    b. **Create `proposal.md`**:
       - Read `ideas/idea.md` for context.
-      - Re-read `docs/baseline/domain_model.html` and `docs/baseline/business_process.html` as the governance source of truth.
+      - Re-read `docs/baseline/domain_model.html`, `docs/baseline/business_process.html`, `docs/baseline/service_blueprint.html`, and `docs/SOPS/SERVICE_BLUEPRINT_STANDARD.md` as the governance source of truth.
       - Follow the `template` and `instruction` from the JSON.
       - Ensure the proposal explicitly lists `Impacted Bounded Contexts`, aligns `Capabilities` to the `domain_model.html` mapping, and records `Process Alignment` node IDs.
+      - Ensure the proposal includes `Service Blueprint Alignment`, explicitly citing impacted `SB-STAGE-*` and `SB-<LANE>-*` nodes and whether the change adds, modifies, or reuses existing blueprint structure.
       - If the proposal introduces an unmapped capability or changes a BC -> Capability relationship, mark it as `新增 taxonomy` and explain why.
       - Write the file to `resolvedOutputPath`.
       - Show brief progress: "Created proposal"

@@ -39,11 +39,13 @@
 ## 5. 治理映射对齐 (Governance Mapping)
 <!--
 必须参考 docs/baseline/domain_model.html 识别受影响的边界与能力，
-并参考 docs/baseline/business_process.html 识别受影响的流程节点。
+并参考 docs/baseline/business_process.html 与 docs/baseline/service_blueprint.html 识别受影响的流程节点与服务蓝图节点。
 - Impacted Bounded Contexts: [例如：Order Context, Coupon Context]
 - Candidate Capabilities: [例如：order-management, coupon-management]
 - Impacted Process Nodes: [例如：L1-04 下单结算, L2-03 选择优惠方案]
+- Impacted Service Blueprint Nodes: [例如：SB-STAGE-03, SB-CUSTOMER-03, SB-BACKSTAGE-03]
 - Potential Domain Model Sync Triggers: [例如：新增 Domain Event、修改状态机、调整 BC -> Capability 映射]
+- Potential Service Blueprint Sync Triggers: [例如：新增阶段能力、能力状态由规划中变为已落地、横切支撑能力职责变化]
 - Preliminary Sync Assessment: [Yes/No + 原因]
 -->
 

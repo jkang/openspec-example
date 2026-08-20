@@ -526,32 +526,32 @@
             <div class="board">
                 <div class="stage-row">
                     <div class="stage-label">阶段</div>
-                    <div class="stage-cell">
+                    <div class="stage-cell" id="SB-STAGE-01" data-blueprint-stage="SB-STAGE-01">
                         <span class="stage-index">Stage 01</span>
                         <h2 class="stage-name">触达与发现</h2>
                         <p class="stage-note">首页进入、商品浏览、搜索与排序、单品详情查看。</p>
                     </div>
-                    <div class="stage-cell">
+                    <div class="stage-cell" id="SB-STAGE-02" data-blueprint-stage="SB-STAGE-02">
                         <span class="stage-index">Stage 02</span>
                         <h2 class="stage-name">选购与加购</h2>
                         <p class="stage-note">挑选商品、录入数量、加入购物车并同步状态。</p>
                     </div>
-                    <div class="stage-cell">
+                    <div class="stage-cell" id="SB-STAGE-03" data-blueprint-stage="SB-STAGE-03">
                         <span class="stage-index">Stage 03</span>
                         <h2 class="stage-name">结算确认</h2>
                         <p class="stage-note">进入结算页、自动推荐最优券、确认优惠后金额。</p>
                     </div>
-                    <div class="stage-cell">
+                    <div class="stage-cell" id="SB-STAGE-04" data-blueprint-stage="SB-STAGE-04">
                         <span class="stage-index">Stage 04</span>
                         <h2 class="stage-name">提交订单</h2>
                         <p class="stage-note">把购物车转成订单，完成库存与金额校验。</p>
                     </div>
-                    <div class="stage-cell">
+                    <div class="stage-cell" id="SB-STAGE-05" data-blueprint-stage="SB-STAGE-05">
                         <span class="stage-index">Stage 05</span>
                         <h2 class="stage-name">模拟支付</h2>
                         <p class="stage-note">通过支付接口完成 PENDING_PAYMENT → PAID 的状态流转。</p>
                     </div>
-                    <div class="stage-cell">
+                    <div class="stage-cell" id="SB-STAGE-06" data-blueprint-stage="SB-STAGE-06">
                         <span class="stage-index">Stage 06</span>
                         <h2 class="stage-name">成功回流</h2>
                         <p class="stage-note">展示成功页与订单详情，并把用户带回下一轮浏览。</p>
@@ -559,11 +559,11 @@
                 </div>
 
                 <div class="blueprint-row">
-                    <div class="row-label">
+                    <div class="row-label" id="SB-LANE-CUSTOMER" data-blueprint-lane="SB-LANE-CUSTOMER">
                         <h3 class="row-title">客户视角 E2E 流程</h3>
                         <p class="row-note">这里强调买家真正感知到的步骤，以及界面层暴露出来的 feature。</p>
                     </div>
-                    <div class="blueprint-cell">
+                    <div class="blueprint-cell" id="SB-CUSTOMER-01" data-blueprint-ref="SB-CUSTOMER-01">
                         <div class="cell-block">
                             <p class="cell-block-title">客户动作</p>
                             <ul class="activity-list">
@@ -590,7 +590,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="blueprint-cell">
+                    <div class="blueprint-cell" id="SB-CUSTOMER-02" data-blueprint-ref="SB-CUSTOMER-02">
                         <div class="cell-block">
                             <p class="cell-block-title">客户动作</p>
                             <ul class="activity-list">
@@ -613,7 +613,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="blueprint-cell">
+                    <div class="blueprint-cell" id="SB-CUSTOMER-03" data-blueprint-ref="SB-CUSTOMER-03">
                         <div class="cell-block">
                             <p class="cell-block-title">客户动作</p>
                             <ul class="activity-list">
@@ -640,7 +640,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="blueprint-cell">
+                    <div class="blueprint-cell" id="SB-CUSTOMER-04" data-blueprint-ref="SB-CUSTOMER-04">
                         <div class="cell-block">
                             <p class="cell-block-title">客户动作</p>
                             <ul class="activity-list">
@@ -663,7 +663,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="blueprint-cell">
+                    <div class="blueprint-cell" id="SB-CUSTOMER-05" data-blueprint-ref="SB-CUSTOMER-05">
                         <div class="cell-block">
                             <p class="cell-block-title">客户动作</p>
                             <ul class="activity-list">
@@ -685,7 +685,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="blueprint-cell">
+                    <div class="blueprint-cell" id="SB-CUSTOMER-06" data-blueprint-ref="SB-CUSTOMER-06">
                         <div class="cell-block">
                             <p class="cell-block-title">客户动作</p>
                             <ul class="activity-list">
@@ -711,11 +711,11 @@
                 </div>
 
                 <div class="blueprint-row">
-                    <div class="row-label">
+                    <div class="row-label" id="SB-LANE-OPS" data-blueprint-lane="SB-LANE-OPS">
                         <h3 class="row-title">电商运营层</h3>
                         <p class="row-note">这里展示运营如何支撑前台体验，包括商品、营销和订单观察面的核心活动。</p>
                     </div>
-                    <div class="blueprint-cell">
+                    <div class="blueprint-cell" id="SB-OPS-01" data-blueprint-ref="SB-OPS-01">
                         <div class="cell-block">
                             <p class="cell-block-title">核心活动</p>
                             <ul class="activity-list">
@@ -733,7 +733,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="blueprint-cell">
+                    <div class="blueprint-cell" id="SB-OPS-02" data-blueprint-ref="SB-OPS-02">
                         <div class="cell-block">
                             <p class="cell-block-title">核心活动</p>
                             <ul class="activity-list">
@@ -755,7 +755,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="blueprint-cell">
+                    <div class="blueprint-cell" id="SB-OPS-03" data-blueprint-ref="SB-OPS-03">
                         <div class="cell-block">
                             <p class="cell-block-title">核心活动</p>
                             <ul class="activity-list">
@@ -778,7 +778,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="blueprint-cell">
+                    <div class="blueprint-cell" id="SB-OPS-04" data-blueprint-ref="SB-OPS-04">
                         <div class="cell-block">
                             <p class="cell-block-title">核心活动</p>
                             <ul class="activity-list">
@@ -800,7 +800,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="blueprint-cell">
+                    <div class="blueprint-cell" id="SB-OPS-05" data-blueprint-ref="SB-OPS-05">
                         <div class="cell-block">
                             <p class="cell-block-title">核心活动</p>
                             <ul class="activity-list">
@@ -822,7 +822,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="blueprint-cell">
+                    <div class="blueprint-cell" id="SB-OPS-06" data-blueprint-ref="SB-OPS-06">
                         <div class="cell-block">
                             <p class="cell-block-title">核心活动</p>
                             <ul class="activity-list">
@@ -848,11 +848,11 @@
                 </div>
 
                 <div class="blueprint-row">
-                    <div class="row-label">
+                    <div class="row-label" id="SB-LANE-BACKSTAGE" data-blueprint-lane="SB-LANE-BACKSTAGE">
                         <h3 class="row-title">后台核心活动</h3>
                         <p class="row-note">这里落到服务、接口和核心业务规则，用来说明前台体验背后的系统编排。</p>
                     </div>
-                    <div class="blueprint-cell">
+                    <div class="blueprint-cell" id="SB-BACKSTAGE-01" data-blueprint-ref="SB-BACKSTAGE-01">
                         <div class="cell-block">
                             <p class="cell-block-title">核心活动</p>
                             <ul class="activity-list">
@@ -875,7 +875,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="blueprint-cell">
+                    <div class="blueprint-cell" id="SB-BACKSTAGE-02" data-blueprint-ref="SB-BACKSTAGE-02">
                         <div class="cell-block">
                             <p class="cell-block-title">核心活动</p>
                             <ul class="activity-list">
@@ -898,7 +898,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="blueprint-cell">
+                    <div class="blueprint-cell" id="SB-BACKSTAGE-03" data-blueprint-ref="SB-BACKSTAGE-03">
                         <div class="cell-block">
                             <p class="cell-block-title">核心活动</p>
                             <ul class="activity-list">
@@ -925,7 +925,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="blueprint-cell">
+                    <div class="blueprint-cell" id="SB-BACKSTAGE-04" data-blueprint-ref="SB-BACKSTAGE-04">
                         <div class="cell-block">
                             <p class="cell-block-title">核心活动</p>
                             <ul class="activity-list">
@@ -952,7 +952,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="blueprint-cell">
+                    <div class="blueprint-cell" id="SB-BACKSTAGE-05" data-blueprint-ref="SB-BACKSTAGE-05">
                         <div class="cell-block">
                             <p class="cell-block-title">核心活动</p>
                             <ul class="activity-list">
@@ -975,7 +975,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="blueprint-cell">
+                    <div class="blueprint-cell" id="SB-BACKSTAGE-06" data-blueprint-ref="SB-BACKSTAGE-06">
                         <div class="cell-block">
                             <p class="cell-block-title">核心活动</p>
                             <ul class="activity-list">
