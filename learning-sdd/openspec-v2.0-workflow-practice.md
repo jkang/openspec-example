@@ -35,7 +35,7 @@ OpenSpec v2.0 引入了**规划层 (Planning Layer)**，将产品感定义与路
 
 执行 `/opsx:spec-design`。一口气生成 `spec.md`、`design.md` 和 `tasks.md`。
 - **v2.0 优化**：对于技术债任务，此步骤可配置为跳过 `specs`；但对于本例，AI 严格按 BDD 标签生成场景。
-- **业务基线同步**：在 `spec-design` 阶段，AI 会初步分析领域模型，为后续 `sync` 回流 [DOMAIN_MODEL.md](file:///Users/superkkk/MyCoding/OpenSpec-practice/docs/baseline/DOMAIN_MODEL.md) 做准备。
+- **业务基线同步**：在 `spec-design` 阶段，AI 会初步分析领域模型，为后续 `sync` 回流 [domain_model.html](file:///Users/superkkk/MyCoding/OpenSpec-practice/docs/baseline/domain_model.html) 做准备。
 
 ### 2.5 Apply：治理驱动的实现
 
