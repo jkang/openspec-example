@@ -5,6 +5,24 @@
 
 set -e
 
+# 端口配置
+NODE_PORT=3000
+NODE_PROD_PORT=3002
+PYTHON_PORT=8000
+VUE_PORT=5173
+
+# 检查并释放被占用的端口
+function free_port() {
+    local port=$1
+    local pid=$(lsof -ti:$port 2>/dev/null || true)
+    if [ -n "$pid" ]; then
+        echo "-> 端口 $port 被占用 (PID: $pid)，正在释放..."
+        kill -9 $pid 2>/dev/null || true
+        sleep 1
+        echo "-> 端口 $port 已释放"
+    fi
+}
+
 function show_help() {
     echo "========================================================"
     echo " OpenSpec Practice - Harness 启动脚本"
@@ -48,10 +66,12 @@ case "$1" in
         ;;
     node:start)
         echo "-> 启动 Node.js 开发服务器..."
+        free_port $NODE_PORT
         cd ecommerce/ecommerce-mini && npm start
         ;;
     node:prod)
         echo "-> 启动 Node.js 生产服务器..."
+        free_port $NODE_PROD_PORT
         cd ecommerce/ecommerce-mini && npm run start:prod
         ;;
     node:test)
@@ -64,6 +84,7 @@ case "$1" in
         ;;
     python:start)
         echo "-> 启动 Python 开发服务器..."
+        free_port $PYTHON_PORT
         cd ecommerce/ecommerce-mini-python && PYTHONPATH=. python3 -m uvicorn src.api.server:app --reload
         ;;
     python:test)
@@ -76,6 +97,7 @@ case "$1" in
         ;;
     vue:start)
         echo "-> 启动 Vue 开发服务器..."
+        free_port $VUE_PORT
         cd ecommerce/ecommerce-mini-frontend && npm run dev
         ;;
     vue:build)

@@ -198,7 +198,7 @@ import { ref, computed, onMounted } from 'vue'
 // 状态管理
 const products = ref([])
 const cart = ref([])
-const API_BASE = 'http://localhost:3000' // 统一使用 Node 后端作为主入口验证，支持 userId 隔离
+const API_BASE = '' // 使用相对路径，通过 Vite 代理转发到后端
 const searchQuery = ref('')
 const isCartOpen = ref(true)
 const isProcessing = ref(false)
