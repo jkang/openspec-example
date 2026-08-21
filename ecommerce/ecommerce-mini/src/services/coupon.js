@@ -24,14 +24,17 @@ export class CouponService {
 
   /**
    * 获取最优优惠券
-   * @param {string} userId 用户ID (目前优惠券是全场通用的，但未来可能与用户绑定)
+   * 候选集 = 全场通用券 (userId 为 null) + 该用户持有的券
+   * @param {string} userId 用户ID
    * @param {number} orderTotalCents 订单总额
    * @returns {import("../domain/types.js").Coupon | null} 最优优惠券
    */
   getBestCoupon(userId, orderTotalCents) {
     const allCoupons = this.couponRepo.findAll()
-    const availableCoupons = allCoupons.filter(c => 
-      c.status === 'UNUSED' && orderTotalCents >= c.minSpendCents
+    const availableCoupons = allCoupons.filter(c =>
+      c.status === 'UNUSED'
+      && orderTotalCents >= c.minSpendCents
+      && ((c.userId ?? null) === null || c.userId === userId)
     )
 
     if (availableCoupons.length === 0) return null
@@ -59,7 +62,15 @@ export class CouponService {
     }
   }
 
-  list() {
-    return this.couponRepo.findAll()
+  /**
+   * 列出当前用户可见的券：全场通用券 (ACTIVE 规则模板除外) + 本人持有的券
+   * @param {string} [userId] 不传时仅返回全场通用券
+   */
+  list(userId = null) {
+    return this.couponRepo.findAll().filter(c => {
+      const ownerId = c.userId ?? null
+      if (ownerId !== null) return ownerId === userId
+      return c.status !== 'ACTIVE'
+    })
   }
 }

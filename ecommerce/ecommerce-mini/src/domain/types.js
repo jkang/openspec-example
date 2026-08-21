@@ -44,7 +44,20 @@
  * @property {string} id
  * @property {string} name
  * @property {"FLAT" | "PERCENTAGE"} type
- * @property {number} value
- * @property {number} minSpendCents
- * @property {"UNUSED" | "USED" | "EXPIRED"} status
+ * @property {number} value FLAT 为减免金额 (cents)；PERCENTAGE 为折扣率 (如 9 表示 9 折)
+ * @property {number} minSpendCents 使用门槛 (0 表示无门槛)
+ * @property {"UNUSED" | "USED" | "EXPIRED" | "ACTIVE"} status ACTIVE 为运营创建的规则模板
+ * @property {string|null} [expiryDate] 有效期至 (YYYY-MM-DD)
+ * @property {string|null} [userId] 归属用户；null 表示全场通用券
+ * @property {string|null} [templateId] 发放实例关联的规则模板 id
+ */
+
+/**
+ * @typedef {Object} Issuance
+ * @property {string} id
+ * @property {string} time 发放时间 (YYYY-MM-DD HH:mm)
+ * @property {string} couponId 规则模板 id
+ * @property {string} couponName
+ * @property {string} userId 目标用户
+ * @property {string} operator 操作人
  */

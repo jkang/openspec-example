@@ -60,4 +60,22 @@ export class CouponRepo {
   findAll() {
     return Array.from(this.coupons.values())
   }
+
+  countByTemplateId(templateId) {
+    return this.findAll().filter(c => c.templateId === templateId).length
+  }
+}
+
+export class IssuanceRepo {
+  constructor() {
+    this.issuances = new Map()
+  }
+
+  save(issuance) {
+    this.issuances.set(issuance.id, issuance)
+  }
+
+  findAll() {
+    return Array.from(this.issuances.values())
+  }
 }

@@ -472,7 +472,7 @@
                     所有能力命名优先对齐 `domain_model.html` 中的 Capability taxonomy。
                 </p>
             </div>
-            <div class="meta">Baseline / Last Updated: 2026-08-20</div>
+            <div class="meta">Baseline / Last Updated: 2026-08-21</div>
         </div>
 
         <div class="intro-grid">
@@ -761,6 +761,7 @@
                             <ul class="activity-list">
                                 <li>创建 FLAT / PERCENTAGE 优惠券</li>
                                 <li>设置 minSpendCents 与有效期</li>
+                                <li>手动单人发券（模板生成用户归属实例）</li>
                                 <li>驱动“自动推荐最优券”体验</li>
                             </ul>
                         </div>
@@ -769,7 +770,7 @@
                             <div class="capability-list">
                                 <div class="capability" data-capability="coupon-management">
                                     <span class="capability-name">coupon-management</span>
-                                    <span class="capability-desc">优惠券定义、校验、核销</span>
+                                    <span class="capability-desc">优惠券定义、校验、核销；规则配置与发放归属</span>
                                 </div>
                                 <div class="capability" data-capability="checkout-management">
                                     <span class="capability-name">checkout-management</span>
@@ -905,6 +906,7 @@
                                 <li>计算最优券并校验 minSpendCents</li>
                                 <li>处理百分比折扣的 cent 精度补偿</li>
                                 <li>把购物车项转换成订单项候选</li>
+                                <li>券规则持久化与单人发放接口（/api/admin/coupons*）</li>
                             </ul>
                         </div>
                         <div class="cell-block">

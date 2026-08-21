@@ -1,10 +1,12 @@
 import { describe, it, beforeEach } from 'node:test'
 import assert from 'node:assert'
-import { ProductRepo, CartRepo, OrderRepo, CouponRepo } from '../src/repo/memoryRepo.js'
+import { ProductRepo, CartRepo, OrderRepo, CouponRepo, IssuanceRepo } from '../src/repo/memoryRepo.js'
 import { CatalogService } from '../src/services/catalog.js'
 import { CartService } from '../src/services/cart.js'
 import { OrderService } from '../src/services/order.js'
 import { CouponService } from '../src/services/coupon.js'
+import { AdminCouponService } from '../src/services/adminCoupon.js'
+import { validateCouponRule, validateIssue } from '../src/domain/logic.js'
 
 describe('领域与服务单元测试', () => {
   let productRepo
@@ -138,5 +140,86 @@ describe('领域与服务单元测试', () => {
     // Search + sort combination: only "A" contains 'a'
     const combo = catalog.list('a', 'price_desc')
     assert.deepStrictEqual(combo.map(p => p.priceCents), [300])
+  })
+})
+
+describe('优惠券运营后台领域校验 (@unit)', () => {
+  let couponRepo
+  let issuanceRepo
+  let adminCoupon
+  let couponService
+
+  beforeEach(() => {
+    couponRepo = new CouponRepo()
+    issuanceRepo = new IssuanceRepo()
+    adminCoupon = new AdminCouponService(couponRepo, issuanceRepo)
+    couponService = new CouponService(couponRepo)
+  })
+
+  it('折扣比例边界: 10 折与 0 折被拒绝', () => {
+    assert.throws(() => validateCouponRule({ type: 'PERCENTAGE', value: 10, minSpendCents: 0 }), /INVALID_DISCOUNT_RATE/)
+    assert.throws(() => validateCouponRule({ type: 'PERCENTAGE', value: 0, minSpendCents: 0 }), /INVALID_DISCOUNT_RATE/)
+    assert.throws(() => validateCouponRule({ type: 'PERCENTAGE', value: 10.5, minSpendCents: 0 }), /INVALID_DISCOUNT_RATE/)
+    // 合法边界: 9.9 折通过
+    assert.doesNotThrow(() => validateCouponRule({ type: 'PERCENTAGE', value: 9.9, minSpendCents: 0 }))
+  })
+
+  it('满减金额大于等于门槛被拒绝', () => {
+    assert.throws(() => validateCouponRule({ type: 'FLAT', value: 10000, minSpendCents: 10000 }), /COUPON_VALUE_EXCEEDS_THRESHOLD/)
+    assert.throws(() => validateCouponRule({ type: 'FLAT', value: 12000, minSpendCents: 10000 }), /COUPON_VALUE_EXCEEDS_THRESHOLD/)
+    // 减免小于门槛通过；无门槛 (0) 不校验该规则
+    assert.doesNotThrow(() => validateCouponRule({ type: 'FLAT', value: 5000, minSpendCents: 10000 }))
+    assert.doesNotThrow(() => validateCouponRule({ type: 'FLAT', value: 5000, minSpendCents: 0 }))
+  })
+
+  it('创建规则即 ACTIVE 且出现在规则列表', () => {
+    const coupon = adminCoupon.create({ name: '中秋特惠 8.5 折券', type: 'PERCENTAGE', value: 8.5, minSpendCents: 30000, expiryDate: '2026-10-15' })
+    assert.strictEqual(coupon.status, 'ACTIVE')
+    assert.strictEqual(coupon.userId, null)
+    const list = adminCoupon.list()
+    assert.strictEqual(list.length, 1)
+    assert.strictEqual(list[0].issuedCount, 0)
+  })
+
+  it('发放校验: 非法用户 ID 与非 ACTIVE 模板被拒绝', () => {
+    const template = adminCoupon.create({ name: '新客券', type: 'FLAT', value: 2000, minSpendCents: 10000 })
+    assert.throws(() => adminCoupon.issue(template.id, 'unknown123'), /INVALID_USER_ID/)
+
+    couponRepo.save({ id: 'SEED1', name: '种子券', type: 'FLAT', value: 1000, minSpendCents: 5000, status: 'UNUSED', userId: null })
+    assert.throws(() => adminCoupon.issue('SEED1', 'user_1003'), /COUPON_NOT_ACTIVE/)
+  })
+
+  it('发放成功生成用户归属实例，重复发放被拒绝', () => {
+    const template = adminCoupon.create({ name: '新客券', type: 'FLAT', value: 2000, minSpendCents: 10000 })
+    const { instance, issuance } = adminCoupon.issue(template.id, 'user_1003')
+    assert.strictEqual(instance.status, 'UNUSED')
+    assert.strictEqual(instance.userId, 'user_1003')
+    assert.strictEqual(instance.templateId, template.id)
+    assert.strictEqual(issuance.userId, 'user_1003')
+    assert.strictEqual(adminCoupon.list()[0].issuedCount, 1)
+    assert.strictEqual(adminCoupon.listIssuances().length, 1)
+
+    assert.throws(() => adminCoupon.issue(template.id, 'user_1003'), /COUPON_ALREADY_ISSUED/)
+    // 拒绝后数量与记录不变
+    assert.strictEqual(adminCoupon.list()[0].issuedCount, 1)
+    assert.strictEqual(adminCoupon.listIssuances().length, 1)
+  })
+
+  it('最优券推荐: 他人持有的券不进入候选集', () => {
+    const template = adminCoupon.create({ name: '8 折券', type: 'PERCENTAGE', value: 8, minSpendCents: 0 })
+    const { instance } = adminCoupon.issue(template.id, 'user_1003')
+
+    // user_1003 可见并推荐该券 (10000 * 0.2 = 2000)
+    const bestForHolder = couponService.getBestCoupon('user_1003', 10000)
+    assert.strictEqual(bestForHolder.id, instance.id)
+
+    // user_1004 不可见该券
+    const bestForOther = couponService.getBestCoupon('user_1004', 10000)
+    assert.strictEqual(bestForOther, null)
+
+    // C 端列表可见性: 实例仅持有人可见, ACTIVE 模板不在 C 端展示
+    assert.ok(couponService.list('user_1003').some(c => c.id === instance.id))
+    assert.ok(!couponService.list('user_1004').some(c => c.id === instance.id))
+    assert.ok(!couponService.list('user_1003').some(c => c.id === template.id))
   })
 })

@@ -96,3 +96,119 @@ describe('集成测试 (E2E)', () => {
     assert.strictEqual(previewB.totalCents, 149500)
   })
 })
+
+describe('优惠券运营后台 API (@api)', () => {
+  let adminBase = ''
+  let adminStop = () => {}
+
+  before(async () => {
+    const { server } = createServer()
+    await new Promise(resolve => server.listen(0, () => resolve(undefined)))
+    const address = server.address()
+    const port = address && typeof address === 'object' ? address.port : 0
+    adminBase = `http://127.0.0.1:${port}`
+    adminStop = () => server.close()
+  })
+  after(() => adminStop())
+
+  const post = (path, body) => fetch(`${adminBase}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  })
+
+  it('创建折扣券成功生效 (ACTIVE, issuedCount=0)', async () => {
+    const res = await post('/api/admin/coupons', {
+      name: '中秋特惠 8 折券', type: 'PERCENTAGE', value: 8, minSpendCents: 30000, expiryDate: '2026-10-15'
+    })
+    assert.strictEqual(res.status, 201)
+    const coupon = await res.json()
+    assert.strictEqual(coupon.status, 'ACTIVE')
+    assert.strictEqual(coupon.userId, null)
+    assert.ok(coupon.id)
+
+    const listRes = await fetch(`${adminBase}/api/admin/coupons`)
+    const list = await listRes.json()
+    const created = list.find(c => c.id === coupon.id)
+    assert.ok(created)
+    assert.strictEqual(created.issuedCount, 0)
+  })
+
+  it('折扣比例非法被拒绝 (INVALID_DISCOUNT_RATE)', async () => {
+    const res = await post('/api/admin/coupons', {
+      name: '非法券', type: 'PERCENTAGE', value: 10, minSpendCents: 0
+    })
+    assert.strictEqual(res.status, 400)
+    assert.strictEqual((await res.json()).code, 'INVALID_DISCOUNT_RATE')
+  })
+
+  it('满减金额超过门槛被拒绝 (COUPON_VALUE_EXCEEDS_THRESHOLD)', async () => {
+    const res = await post('/api/admin/coupons', {
+      name: '超额满减券', type: 'FLAT', value: 12000, minSpendCents: 10000
+    })
+    assert.strictEqual(res.status, 400)
+    assert.strictEqual((await res.json()).code, 'COUPON_VALUE_EXCEEDS_THRESHOLD')
+  })
+
+  it('单人发放全流程: 成功 / 重复拒绝 / 非法 userId / 记录回流', async () => {
+    // 创建 8 折无门槛券
+    const createRes = await post('/api/admin/coupons', {
+      name: '全员 8 折券', type: 'PERCENTAGE', value: 8, minSpendCents: 0, expiryDate: '2026-11-30'
+    })
+    const template = await createRes.json()
+
+    // 发放成功
+    const issueRes = await post(`/api/admin/coupons/${template.id}/issue`, { userId: 'user_1003' })
+    assert.strictEqual(issueRes.status, 201)
+    const { instance, issuance } = await issueRes.json()
+    assert.strictEqual(instance.status, 'UNUSED')
+    assert.strictEqual(instance.userId, 'user_1003')
+    assert.strictEqual(instance.templateId, template.id)
+    assert.strictEqual(issuance.userId, 'user_1003')
+
+    // issuedCount 聚合 +1
+    const list = await (await fetch(`${adminBase}/api/admin/coupons`)).json()
+    assert.strictEqual(list.find(c => c.id === template.id).issuedCount, 1)
+
+    // 重复发放拒绝 (409)
+    const dupRes = await post(`/api/admin/coupons/${template.id}/issue`, { userId: 'user_1003' })
+    assert.strictEqual(dupRes.status, 409)
+    assert.strictEqual((await dupRes.json()).code, 'COUPON_ALREADY_ISSUED')
+
+    // 非法 userId (400)
+    const badRes = await post(`/api/admin/coupons/${template.id}/issue`, { userId: 'unknown123' })
+    assert.strictEqual(badRes.status, 400)
+    assert.strictEqual((await badRes.json()).code, 'INVALID_USER_ID')
+
+    // 发放记录回流 (最新在前)
+    const logs = await (await fetch(`${adminBase}/api/admin/issuances`)).json()
+    assert.strictEqual(logs[0].couponId, template.id)
+    assert.strictEqual(logs[0].userId, 'user_1003')
+    assert.ok(logs[0].time)
+    assert.ok(logs[0].operator)
+
+    // C 端可见性: 持有人可见，他人不可见
+    const holderCoupons = await (await fetch(`${adminBase}/api/coupons?userId=user_1003`)).json()
+    assert.ok(holderCoupons.some(c => c.id === instance.id))
+    const otherCoupons = await (await fetch(`${adminBase}/api/coupons?userId=user_1004`)).json()
+    assert.ok(!otherCoupons.some(c => c.id === instance.id))
+
+    // 最优推荐: 上架 100 元商品
+    const product = await (await post('/api/products', { name: '推荐测试商品', priceCents: 10000, stock: 10 })).json()
+
+    // 他人下单: 不命中该实例 (FLAT10 与 PERCENT9 各减 1000, 按 ID 升序取 FLAT10)
+    await post('/api/cart/items', { userId: 'user_1004', productId: product.id, quantity: 1 })
+    const otherOrderRes = await post('/api/orders', { userId: 'user_1004' })
+    const otherOrder = await otherOrderRes.json()
+    assert.strictEqual(otherOrder.couponId, 'FLAT10')
+    assert.strictEqual(otherOrder.discountCents, 1000)
+
+    // 持有人下单: 命中 8 折实例 (减 2000)
+    await post('/api/cart/items', { userId: 'user_1003', productId: product.id, quantity: 1 })
+    const holderOrderRes = await post('/api/orders', { userId: 'user_1003' })
+    const holderOrder = await holderOrderRes.json()
+    assert.strictEqual(holderOrder.couponId, instance.id)
+    assert.strictEqual(holderOrder.discountCents, 2000)
+    assert.strictEqual(holderOrder.actualPaidCents, 8000)
+  })
+})

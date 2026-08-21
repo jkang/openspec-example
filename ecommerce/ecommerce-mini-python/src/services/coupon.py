@@ -20,10 +20,13 @@ class CouponService:
         return coupon
 
     def get_best_coupon(self, user_id: str, order_total_cents: int) -> Optional[Coupon]:
+        # 候选集 = 全场通用券 (user_id 为 None) + 该用户持有的券
         all_coupons = self.repo.find_all()
         available_coupons = [
-            c for c in all_coupons 
-            if c.status == "UNUSED" and order_total_cents >= c.min_spend_cents
+            c for c in all_coupons
+            if c.status == "UNUSED"
+            and order_total_cents >= c.min_spend_cents
+            and (c.user_id is None or c.user_id == user_id)
         ]
 
         if not available_coupons:
@@ -46,5 +49,13 @@ class CouponService:
             coupon.status = "USED"
             self.repo.save(coupon.id, coupon)
 
-    def list_coupons(self):
-        return self.repo.find_all()
+    def list_coupons(self, user_id: Optional[str] = None) -> List[Coupon]:
+        # 当前用户可见的券：全场通用券 (ACTIVE 规则模板除外) + 本人持有的券
+        result = []
+        for c in self.repo.find_all():
+            if c.user_id is not None:
+                if c.user_id == user_id:
+                    result.append(c)
+            elif c.status != "ACTIVE":
+                result.append(c)
+        return result

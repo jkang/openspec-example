@@ -5,7 +5,9 @@
     "type": "FLAT",
     "value": 1000,
     "minSpendCents": 5000,
-    "status": "UNUSED"
+    "status": "UNUSED",
+    "expiryDate": "2026-12-31",
+    "userId": null
   },
   {
     "id": "PERCENT9",
@@ -13,6 +15,8 @@
     "type": "PERCENTAGE",
     "value": 9,
     "minSpendCents": 10000,
-    "status": "UNUSED"
+    "status": "UNUSED",
+    "expiryDate": "2026-12-31",
+    "userId": null
   }
 ]

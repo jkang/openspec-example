@@ -500,7 +500,7 @@
                 </div>
             </section>
 
-            <div class="footer-note">Last Updated: 2026-08-20</div>
+            <div class="footer-note">Last Updated: 2026-08-21</div>
         </div>
     </div>
 
@@ -615,9 +615,10 @@
                 canvas: { width: 1040, height: 520, nodeWidth: 190, nodeHeight: 74 },
                 states: [
                     { id: 'draft', label: 'DRAFT', desc: '后台创建，尚未生效', x: 70, y: 110 },
-                    { id: 'active', label: 'ACTIVE', desc: '已发布，可参与推荐', x: 360, y: 110 },
+                    { id: 'active', label: 'ACTIVE', desc: '已发布模板，作为发放蓝本', x: 360, y: 110 },
                     { id: 'used', label: 'USED', desc: '已核销并绑定订单', x: 650, y: 110 },
-                    { id: 'expired', label: 'EXPIRED', desc: '超过有效期被忽略', x: 360, y: 320 }
+                    { id: 'expired', label: 'EXPIRED', desc: '超过有效期被忽略', x: 360, y: 320 },
+                    { id: 'unused', label: 'UNUSED', desc: '发放生成的用户归属实例', x: 650, y: 320 }
                 ],
                 transitions: [
                     {
@@ -628,9 +629,15 @@
                     },
                     {
                         from: 'active',
+                        to: 'unused',
+                        event: 'CouponIssued',
+                        rule: '运营手动单人发券：以 ACTIVE 模板为蓝本生成归属 userId 的 UNUSED 实例；同一用户同一模板仅可发放一次。'
+                    },
+                    {
+                        from: 'unused',
                         to: 'used',
                         event: 'CouponApplied',
-                        rule: '仅允许单券；必须满足 minSpendCents；系统选择使 actualPaidCents 最低的方案。'
+                        rule: '仅 UNUSED 实例可核销；必须满足 minSpendCents 且归属匹配（userId 为空则全场通用）；系统选择使 actualPaidCents 最低的方案。'
                     },
                     {
                         from: 'active',
@@ -680,7 +687,7 @@
                 { id: 'product', title: 'Product', subtitle: '目录上下文中的商品根实体', meta: ['id', 'name', 'priceCents', 'stock'], x: 70, y: 70 },
                 { id: 'cart', title: 'Cart', subtitle: '购物车根实体，持有会话归属', meta: ['userId', 'sessionId', 'items'], x: 370, y: 70 },
                 { id: 'cartItem', title: 'CartItem', subtitle: '购物车项，记录价格快照', meta: ['productId', 'quantity', 'unitPriceCents'], x: 670, y: 70 },
-                { id: 'coupon', title: 'Coupon', subtitle: '优惠券根实体，控制核销规则', meta: ['type', 'value', 'minSpendCents', 'status'], x: 70, y: 320 },
+                { id: 'coupon', title: 'Coupon', subtitle: '优惠券根实体，控制核销规则', meta: ['type', 'value', 'minSpendCents', 'status', 'userId', 'templateId'], x: 70, y: 320 },
                 { id: 'order', title: 'Order', subtitle: '订单根实体，承载支付与审计', meta: ['status', 'totalCents', 'actualPaidCents', 'couponId'], x: 370, y: 320 },
                 { id: 'orderItem', title: 'OrderItem', subtitle: '订单项，锁定历史价格事实', meta: ['productId', 'quantity', 'priceCents'], x: 670, y: 320 }
             ],
@@ -730,6 +737,7 @@
                 ['Cart', 'AddToCart', '将商品快照写入购物车。'],
                 ['Cart', 'ValidateCart', '执行 Session 一致性校验。'],
                 ['Coupon', 'ApplyBestCoupon', '在可用券中选出最优券。'],
+                ['Coupon', 'IssueCoupon', '运营以 ACTIVE 模板为蓝本向指定用户发放券实例。'],
                 ['Order', 'PlaceOrder', '基于购物车快照生成订单。'],
                 ['Order', 'ConfirmPayment', '确认支付并触发后续履约动作。']
             ],
@@ -738,6 +746,7 @@
                 ['Cart', 'ItemAddedToCart', '商品加入购物车。'],
                 ['Cart', 'CartValidated', '购物车通过归属校验。'],
                 ['Coupon', 'CouponApplied', '优惠券被成功应用。'],
+                ['Coupon', 'CouponIssued', '优惠券实例已发放并归属指定用户。'],
                 ['Order', 'OrderPlaced', '订单已生成。'],
                 ['Order', 'OrderPaymentConfirmed', '支付确认完成。'],
                 ['Order', 'OrderStockDeducted', '库存扣减成功。']
@@ -745,6 +754,7 @@
             policies: [
                 ['Coupon', '单券策略', '一次结算仅允许一张券参与实际核销。'],
                 ['Coupon', '最优券推荐', '在满足门槛的券中选择 actualPaidCents 最低的方案。'],
+                ['Coupon', '发放归属', '发放的实例仅对持有人可见并参与其最优券推荐。'],
                 ['Order', '精度补偿', '百分比折扣结果执行 +0.00001 后向下取整。'],
                 ['Cart', '一致性校验', 'Session 用户与购物车归属必须一致。'],
                 ['Catalog', '库存扣减时机', '只有 PaymentConfirmed 后才扣减库存。']
@@ -752,7 +762,7 @@
             readModels: [
                 ['Catalog', '商品搜索结果', '供买家浏览与筛选。'],
                 ['Cart', '购物车快照', '供结算页与最优券算法消费。'],
-                ['Coupon', '可用券集合', '包含门槛、类型、有效期。'],
+                ['Coupon', '可用券集合', '包含门槛、类型、有效期与归属。'],
                 ['Order', '订单成功页', '展示已锁定的订单与支付信息。'],
                 ['Operator', '库存看板', '运营查看销量与补货状态。']
             ]
@@ -782,10 +792,10 @@
             },
             {
                 title: 'Coupon Aggregate',
-                root: 'Coupon (id, code, type, value, minSpendCents, status)',
+                root: 'Coupon (id, code, type, value, minSpendCents, status, expiryDate, userId, templateId)',
                 entities: '当前以根实体为主，规则集中在状态与门槛约束。',
                 values: 'Discount policy semantics',
-                invariant: '只有 ACTIVE 且满足 minSpendCents 的券才可参与最优券计算。'
+                invariant: '只有 UNUSED 且满足 minSpendCents 的券才可参与最优券计算；userId 为空表示全场通用，非空实例仅对归属用户可见。'
             }
         ];
 

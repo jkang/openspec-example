@@ -14,3 +14,6 @@ class MemoryRepo(Generic[T]):
 
     def find_all(self) -> List[T]:
         return list(self._data.values())
+
+    def count_by(self, field: str, value) -> int:
+        return sum(1 for item in self._data.values() if getattr(item, field, None) == value)

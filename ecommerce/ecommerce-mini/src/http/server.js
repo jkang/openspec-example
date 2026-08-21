@@ -1,19 +1,14 @@
 import http from 'http'
 import fs from 'fs'
 import path from 'path'
-import { ProductRepo, CartRepo, OrderRepo, CouponRepo } from '../repo/memoryRepo.js'
+import { ProductRepo, CartRepo, OrderRepo, CouponRepo, IssuanceRepo } from '../repo/memoryRepo.js'
 import { CatalogService } from '../services/catalog.js'
 import { CartService } from '../services/cart.js'
 import { OrderService } from '../services/order.js'
 import { CouponService } from '../services/coupon.js'
-
-const productRepo = new ProductRepo()
-const cartRepo = new CartRepo()
-const orderRepo = new OrderRepo()
-const couponRepo = new CouponRepo()
+import { AdminCouponService } from '../services/adminCoupon.js'
 
 // 注入初始商品数据
-// ... (initialProducts logic)
 const initialProducts = [
   { 
     id: '1', name: '极简机械键盘', description: '84键紧凑布局，红轴', priceCents: 29900, stock: 99,
@@ -40,19 +35,12 @@ const initialProducts = [
     imageUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252728f?auto=format&fit=crop&q=80&w=800'
   }
 ]
-initialProducts.forEach(p => productRepo.save(p))
 
 // 注入初始优惠券数据
 const initialCoupons = [
-  { id: 'FLAT10', name: '满 50 减 10', type: 'FLAT', value: 1000, minSpendCents: 5000, status: 'UNUSED' },
-  { id: 'PERCENT9', name: '9 折数码券', type: 'PERCENTAGE', value: 9, minSpendCents: 10000, status: 'UNUSED' }
+  { id: 'FLAT10', name: '满 50 减 10', type: 'FLAT', value: 1000, minSpendCents: 5000, status: 'UNUSED', expiryDate: '2026-12-31', userId: null },
+  { id: 'PERCENT9', name: '9 折数码券', type: 'PERCENTAGE', value: 9, minSpendCents: 10000, status: 'UNUSED', expiryDate: '2026-12-31', userId: null }
 ]
-initialCoupons.forEach(c => couponRepo.save(c))
-
-const catalogService = new CatalogService(productRepo)
-const cartService = new CartService(cartRepo, productRepo)
-const couponService = new CouponService(couponRepo)
-const orderService = new OrderService(cartRepo, orderRepo, productRepo, couponService)
 
 const readJson = async (req) => {
   return new Promise((resolve, reject) => {
@@ -89,6 +77,23 @@ const sendError = (res, code, message, status = 500) => {
 }
 
 export function createServer() {
+  // 每个 server 实例独立的仓储与服务（保证测试套件间状态隔离）
+  const productRepo = new ProductRepo()
+  const cartRepo = new CartRepo()
+  const orderRepo = new OrderRepo()
+  const couponRepo = new CouponRepo()
+  const issuanceRepo = new IssuanceRepo()
+
+  // 克隆种子对象，避免跨 server 实例共享引用导致状态污染
+  initialProducts.forEach(p => productRepo.save({ ...p }))
+  initialCoupons.forEach(c => couponRepo.save({ ...c }))
+
+  const catalogService = new CatalogService(productRepo)
+  const cartService = new CartService(cartRepo, productRepo)
+  const couponService = new CouponService(couponRepo)
+  const adminCouponService = new AdminCouponService(couponRepo, issuanceRepo)
+  const orderService = new OrderService(cartRepo, orderRepo, productRepo, couponService)
+
   const server = http.createServer(async (req, res) => {
     // Handle CORS preflight
     if (req.method === 'OPTIONS') {
@@ -153,7 +158,35 @@ export function createServer() {
       }
 
       if (pathname === '/api/coupons' && req.method === 'GET') {
-        return sendJson(res, 200, couponService.list())
+        const userId = url.searchParams.get('userId')
+        return sendJson(res, 200, couponService.list(userId))
+      }
+
+      if (pathname === '/api/admin/coupons' && req.method === 'POST') {
+        const body = await readJson(req)
+        const coupon = adminCouponService.create({
+          name: body.name,
+          type: body.type,
+          value: body.value,
+          minSpendCents: body.minSpendCents ?? 0,
+          expiryDate: body.expiryDate
+        })
+        return sendJson(res, 201, coupon)
+      }
+
+      if (pathname === '/api/admin/coupons' && req.method === 'GET') {
+        return sendJson(res, 200, adminCouponService.list())
+      }
+
+      if (pathname.startsWith('/api/admin/coupons/') && pathname.endsWith('/issue') && req.method === 'POST') {
+        const templateId = pathname.split('/')[4]
+        const body = await readJson(req)
+        const { instance, issuance } = adminCouponService.issue(templateId, body.userId, body.operator)
+        return sendJson(res, 201, { instance, issuance })
+      }
+
+      if (pathname === '/api/admin/issuances' && req.method === 'GET') {
+        return sendJson(res, 200, adminCouponService.listIssuances())
       }
       
       if (pathname.startsWith('/api/orders/') && req.method === 'GET') {
@@ -178,7 +211,17 @@ export function createServer() {
         return sendError(res, 'COUPON_ALREADY_USED', '优惠券已使用', 400)
       if (e.message === 'COUPON_THRESHOLD_NOT_MET')
         return sendError(res, 'COUPON_THRESHOLD_NOT_MET', '未达优惠券使用门槛', 400)
-        
+      if (e.message === 'INVALID_DISCOUNT_RATE')
+        return sendError(res, 'INVALID_DISCOUNT_RATE', '折扣比例必须大于 0 且小于 10 折', 400)
+      if (e.message === 'COUPON_VALUE_EXCEEDS_THRESHOLD')
+        return sendError(res, 'COUPON_VALUE_EXCEEDS_THRESHOLD', '减免金额不能大于或等于使用门槛', 400)
+      if (e.message === 'INVALID_USER_ID')
+        return sendError(res, 'INVALID_USER_ID', '用户 ID 格式不正确，应形如 user_1003', 400)
+      if (e.message === 'COUPON_ALREADY_ISSUED')
+        return sendError(res, 'COUPON_ALREADY_ISSUED', '该用户已持有此券，请勿重复发放', 409)
+      if (e.message === 'COUPON_NOT_ACTIVE')
+        return sendError(res, 'COUPON_NOT_ACTIVE', '该券当前不可发放（非 ACTIVE 状态）', 400)
+
       console.error(e)
       sendError(res, 'INTERNAL_ERROR', e.message, 500)
     }

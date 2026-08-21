@@ -1,14 +1,16 @@
 from fastapi import FastAPI, HTTPException, status
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List, Literal, Optional
 
-from ..domain.models import Product, Order, Cart, Coupon
+from ..domain.models import Product, Order, Cart, Coupon, Issuance
 from ..repo.memory import MemoryRepo
 from ..services.catalog import CatalogService
 from ..services.cart import CartService
 from ..services.order import OrderService
 from ..services.coupon import CouponService
+from ..services.admin_coupon import AdminCouponService
 
 app = FastAPI()
 
@@ -25,10 +27,12 @@ product_repo = MemoryRepo[Product]()
 cart_repo = MemoryRepo[Cart]()
 order_repo = MemoryRepo[Order]()
 coupon_repo = MemoryRepo[Coupon]()
+issuance_repo = MemoryRepo[Issuance]()
 
 catalog_svc = CatalogService(product_repo)
 cart_svc = CartService(cart_repo, catalog_svc)
 coupon_svc = CouponService(coupon_repo)
+admin_coupon_svc = AdminCouponService(coupon_repo, issuance_repo)
 order_svc = OrderService(order_repo, cart_svc, catalog_svc, coupon_svc)
 
 # 注入初始商品数据
@@ -45,8 +49,8 @@ for p in initial_products:
 
 # 注入初始优惠券数据
 initial_coupons = [
-    { "id": "FLAT10", "name": "满 50 减 10", "type": "FLAT", "value": 1000, "minSpendCents": 5000, "status": "UNUSED" },
-    { "id": "PERCENT9", "name": "9 折数码券", "type": "PERCENTAGE", "value": 9, "minSpendCents": 10000, "status": "UNUSED" }
+    { "id": "FLAT10", "name": "满 50 减 10", "type": "FLAT", "value": 1000, "minSpendCents": 5000, "status": "UNUSED", "expiryDate": "2026-12-31", "userId": None },
+    { "id": "PERCENT9", "name": "9 折数码券", "type": "PERCENTAGE", "value": 9, "minSpendCents": 10000, "status": "UNUSED", "expiryDate": "2026-12-31", "userId": None }
 ]
 for c in initial_coupons:
     coupon_repo.save(c["id"], Coupon(**c))
@@ -69,6 +73,24 @@ class RemoveFromCartRequest(BaseModel):
 class CreateOrderRequest(BaseModel):
     userId: str
     couponId: Optional[str] = None
+
+class CreateCouponRequest(BaseModel):
+    name: str
+    type: Literal["FLAT", "PERCENTAGE"]
+    value: float
+    minSpendCents: int = 0
+    expiryDate: Optional[str] = None
+
+class IssueCouponRequest(BaseModel):
+    userId: str
+    operator: Optional[str] = None
+
+class IssueCouponResponse(BaseModel):
+    instance: Coupon
+    issuance: Issuance
+
+def admin_error(code: str, message: str, status_code: int) -> JSONResponse:
+    return JSONResponse(status_code=status_code, content={"code": code, "message": message})
 
 @app.get("/api/products", response_model=List[Product])
 def list_products(name: Optional[str] = None, sort: Optional[str] = None):
@@ -135,5 +157,40 @@ def checkout(req: CreateOrderRequest):
         raise e
 
 @app.get("/api/coupons", response_model=List[Coupon])
-def list_coupons():
-    return coupon_svc.list_coupons()
+def list_coupons(userId: Optional[str] = None):
+    return coupon_svc.list_coupons(userId)
+
+@app.post("/api/admin/coupons", status_code=201, response_model=Coupon)
+def admin_create_coupon(req: CreateCouponRequest):
+    try:
+        return admin_coupon_svc.create(req.name, req.type, req.value, req.minSpendCents, req.expiryDate)
+    except ValueError as e:
+        if str(e) == "INVALID_DISCOUNT_RATE":
+            return admin_error("INVALID_DISCOUNT_RATE", "折扣比例必须大于 0 且小于 10 折", 400)
+        if str(e) == "COUPON_VALUE_EXCEEDS_THRESHOLD":
+            return admin_error("COUPON_VALUE_EXCEEDS_THRESHOLD", "减免金额不能大于或等于使用门槛", 400)
+        raise e
+
+@app.get("/api/admin/coupons")
+def admin_list_coupons():
+    return admin_coupon_svc.list()
+
+@app.post("/api/admin/coupons/{template_id}/issue", status_code=201, response_model=IssueCouponResponse)
+def admin_issue_coupon(template_id: str, req: IssueCouponRequest):
+    try:
+        instance, issuance = admin_coupon_svc.issue(template_id, req.userId, req.operator or "王琳")
+        return IssueCouponResponse(instance=instance, issuance=issuance)
+    except ValueError as e:
+        if str(e) == "COUPON_NOT_FOUND":
+            return admin_error("COUPON_NOT_FOUND", "优惠券不存在", 404)
+        if str(e) == "INVALID_USER_ID":
+            return admin_error("INVALID_USER_ID", "用户 ID 格式不正确，应形如 user_1003", 400)
+        if str(e) == "COUPON_ALREADY_ISSUED":
+            return admin_error("COUPON_ALREADY_ISSUED", "该用户已持有此券，请勿重复发放", 409)
+        if str(e) == "COUPON_NOT_ACTIVE":
+            return admin_error("COUPON_NOT_ACTIVE", "该券当前不可发放（非 ACTIVE 状态）", 400)
+        raise e
+
+@app.get("/api/admin/issuances", response_model=List[Issuance])
+def admin_list_issuances():
+    return admin_coupon_svc.list_issuances()
