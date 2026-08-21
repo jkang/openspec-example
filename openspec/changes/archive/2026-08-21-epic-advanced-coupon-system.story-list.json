@@ -7,7 +7,7 @@
       "id": "story-coupon-engine-upgrade",
       "title": "智能结算引擎升级",
       "description": "实现折扣券 (PERCENTAGE) 算法及订单自动推荐最优券逻辑。",
-      "status": "in_progress",
+      "status": "done",
       "changeName": "story-coupon-engine-upgrade",
       "priority": "high"
     },
@@ -15,7 +15,7 @@
       "id": "story-coupon-admin-panel",
       "title": "B 端极简运营后台",
       "description": "实现优惠券规则配置界面及手动单人发券功能。",
-      "status": "in_progress",
+      "status": "done",
       "changeName": "story-coupon-admin-panel",
       "priority": "medium"
     }

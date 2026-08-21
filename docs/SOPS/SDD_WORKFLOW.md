@@ -191,20 +191,27 @@ graph TD
 ```json
 {
   "epicKey": "coupon-system",
+  "title": "优惠券系统升级",
+  "description": "描述该 Epic 的整体目标",
   "stories": [
     {
-      "storyKey": "coupon-create",
+      "id": "story-coupon-create",
+      "title": "优惠券创建",
+      "description": "描述该 Story 的业务范围",
       "status": "planned",
-      "changeName": null
+      "changeName": null,
+      "priority": "high"
     }
-  ]
+  ],
+  "updatedAt": "2026-08-21T00:00:00Z"
 }
 ```
+字段说明：`id` 为 Story 唯一标识（用于跨 change 编排）；`changeName` 在 Propose 启动时记录对应 change 名称；`status` 取值 `planned` / `in_progress` / `done`。
 
 ### 2. 状态流转
 - **Explore**: 创建文件，登记所有拆解出的 Story，状态为 `planned`。
 - **Propose**: AI 自动读取第一个 `planned` 状态的 Story 并建议启动。启动后更新状态为 `in_progress` 并记录 `changeName`。
-- **Archive**: 每次 Story 归档完成后，AI 必须更新该 Story 状态为 `done`（即更新 progress），并提示下一个 `planned` 任务。
+- **Archive**: 每次 Story 归档完成后，AI 必须更新该 Story 状态为 `done`（即更新 progress），并提示下一个 `planned` 任务。同时执行孤儿对账：若存在 `in_progress` 状态的 Story 但其 `changeName` 对应的 change 已归档（不再是活跃 change），一并修正为 `done`。
 - **Epic 完成归档**: 当所有 Story 状态均为 `done` 时，AI 必须将该 `story-list.json` 归档至 `openspec/changes/archive/YYYY-MM-DD-epic-<key>.story-list.json`（保留 Epic 交付记录，禁止删除），并宣布 Epic 完成。
 
 ## 异常处理与防漂移

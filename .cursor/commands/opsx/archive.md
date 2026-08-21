@@ -140,13 +140,14 @@ Archive a completed change in the experimental workflow.
 
 6. **Sync Epic Backlog (progress update)**
 
-   If the archived change belongs to an Epic, sync the `openspec/epic-*.story-list.json` backlog:
+   If the archived change belongs to an Epic, sync the `openspec/epic-*.story-list.json` backlog. All story-list paths below are relative to the same resolved planning root (`planningHome.root`) used in step 2 — stay store-aware:
    1. Search all `openspec/epic-*.story-list.json` for a story whose `changeName` matches the archived change name.
    2. Update the matching story's `status` to `done` — this is the required progress update after every story archive.
-   3. If stories remain `planned` (or `in_progress`), notify the user and suggest the next one.
-   4. If ALL stories are now `done`, the Epic is complete: archive the `.story-list.json` to the archive directory (never delete it):
+   3. Reconcile orphans: if any other story is still `in_progress` but its `changeName` is no longer an active change (i.e., already archived), mark it `done` as well.
+   4. If stories remain `planned` (or `in_progress`), notify the user and suggest the next one.
+   5. If ALL stories are now `done`, the Epic is complete: archive the `.story-list.json` to the archive directory (never delete it), using the same current date resolved in step 5:
       ```bash
-      mv "openspec/epic-<key>.story-list.json" "<planningHome.changesDir>/archive/YYYY-MM-DD-epic-<key>.story-list.json"
+      mv "<planningHome.root>/openspec/epic-<key>.story-list.json" "<planningHome.changesDir>/archive/<YYYY-MM-DD>-epic-<key>.story-list.json"
       ```
       Announce that the Epic is complete and its backlog record has been archived.
 
@@ -157,6 +158,7 @@ Archive a completed change in the experimental workflow.
    - Schema that was used
    - Archive location
    - Spec sync status (synced / sync skipped / no delta specs)
+   - Epic backlog sync result (story marked `done` / next story suggested / Epic complete and backlog archived), if applicable
    - Note about any warnings (incomplete artifacts/tasks)
 
 **Output On Success**
