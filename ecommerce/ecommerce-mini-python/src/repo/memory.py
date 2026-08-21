@@ -17,3 +17,6 @@ class MemoryRepo(Generic[T]):
 
     def count_by(self, field: str, value) -> int:
         return sum(1 for item in self._data.values() if getattr(item, field, None) == value)
+
+    def clear(self):
+        self._data.clear()

@@ -26,7 +26,7 @@
   - `ecommerce-mini` (Node.js)
   - `ecommerce-mini-python` (Python)
   - `ecommerce-mini-frontend` (Vue)
-  - `e2e-tests` (新建的全局测试工程)
+  - `e2e-tests` (既有全局测试工程，已含 smoke 基础设施，本次扩展业务链路用例)
 - **APIs**: 后端各新增一个内部测试用 API `POST /api/__test/reset`，该接口仅在特定环境变量 (`NODE_ENV=test` 或类似机制) 下启用。
 - **Dependencies**: 根目录下 `e2e-tests` 模块新增 `@cucumber/cucumber` 和 `@playwright/test` 依赖。
 - **SLO**: 确保在 CI/CD 或本地执行 `./init.sh e2e:run` 时，E2E 流程稳定可靠运行且在 10s 内执行完毕。

@@ -21,14 +21,14 @@
 - **Rationale**: 这样避免了在 Node 项目中增加不必要的复杂 npm 包，且能同时控制 Python, Node 和 Vue 三个服务。
 
 ### 2. 测试数据重置 (Test Data Reset)
-- **Decision**: 在 Node.js (`src/http/server.js`) 和 Python (`src/api/server.py`) 中暴露 `POST /api/__test/reset` 接口。
-- **Rationale**: Cucumber 在执行每个 Scenario 前 (`Before` hook) 调用此接口清空 `MemoryRepo`，保证测试的独立性和幂等性。
+- **Decision**: 在 Node.js (`ecommerce/ecommerce-mini/src/http/server.js`) 和 Python (`ecommerce/ecommerce-mini-python/src/api/server.py`) 中暴露 `POST /api/__test/reset` 接口，仅在测试环境（如 `NODE_ENV=test`）下启用。
+- **Rationale**: Cucumber 在执行每个 Scenario 前 (`Before` hook) 调用此接口清空 `MemoryRepo`，保证测试的独立性和幂等性。前端通过 Vite proxy 将 `/api` 转发至 Node 后端 (3000)，因此 UI 链路测试只依赖 Node 后端的 reset；Python 端接口为双后端对等保留。
 - **Alternative**: 每次测试重启服务。但重启服务太慢，直接清空内存数据结构最快。
 
 ### 3. Cucumber 钩子设计 (Cucumber Hooks)
-- **Decision**: 在 `e2e-tests/support/hooks.js` 中：
-  - `BeforeAll` / `AfterAll`: 启动和关闭 Playwright `browser`。
-  - `Before` / `After`: 创建新的 `context` 和 `page`，并调用后端的 `/api/__test/reset`。
+- **Decision**: 复用已存在的 `e2e-tests/support/world.js`（不新建 hooks.js）：
+  - 现有 `Before` / `After` 钩子已负责启动/关闭 Playwright `browser` 并创建 `page`（随 smoke 基础设施落地）。
+  - 在现有 `Before` 钩子中追加调用后端的 `/api/__test/reset`（3000 必须成功；8000 未启动时容忍失败）。
 
 ## Architecture Diagram (E2E Flow)
 

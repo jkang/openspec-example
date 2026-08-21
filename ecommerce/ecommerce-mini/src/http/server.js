@@ -110,6 +110,20 @@ export function createServer() {
     const pathname = url.pathname
 
     try {
+      // 测试后门：仅在 NODE_ENV=test 下启用，用于 E2E 数据隔离
+      if (pathname === '/api/__test/reset' && req.method === 'POST') {
+        if (process.env.NODE_ENV !== 'test')
+          return sendError(res, 'NOT_FOUND', 'Endpoint not found', 404)
+        productRepo.products.clear()
+        cartRepo.carts.clear()
+        orderRepo.orders.clear()
+        couponRepo.coupons.clear()
+        issuanceRepo.issuances.clear()
+        initialProducts.forEach(p => productRepo.save({ ...p }))
+        initialCoupons.forEach(c => couponRepo.save({ ...c }))
+        return sendJson(res, 200, { ok: true })
+      }
+
       if (pathname === '/api/products' && req.method === 'GET') {
         const name = url.searchParams.get('name')
         const sort = url.searchParams.get('sort')

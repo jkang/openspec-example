@@ -55,6 +55,16 @@ initial_coupons = [
 for c in initial_coupons:
     coupon_repo.save(c["id"], Coupon(**c))
 
+
+def reset_state():
+    """清空所有内存仓库并恢复种子数据（仅供测试环境使用）"""
+    for repo in (product_repo, cart_repo, order_repo, coupon_repo, issuance_repo):
+        repo.clear()
+    for p in initial_products:
+        product_repo.save(p["id"], Product(**p))
+    for c in initial_coupons:
+        coupon_repo.save(c["id"], Coupon(**c))
+
 # DTOs
 class AddProductRequest(BaseModel):
     name: str
@@ -91,6 +101,15 @@ class IssueCouponResponse(BaseModel):
 
 def admin_error(code: str, message: str, status_code: int) -> JSONResponse:
     return JSONResponse(status_code=status_code, content={"code": code, "message": message})
+
+# 测试后门：仅在 APP_ENV=test 下启用，用于 E2E 数据隔离
+@app.post("/api/__test/reset")
+def test_reset():
+    import os
+    if os.environ.get("APP_ENV") != "test":
+        raise HTTPException(status_code=404, detail="Not found")
+    reset_state()
+    return {"ok": True}
 
 @app.get("/api/products", response_model=List[Product])
 def list_products(name: Optional[str] = None, sort: Optional[str] = None):
