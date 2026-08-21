@@ -181,6 +181,7 @@ graph TD
   - 归档前必须确保已经完成过 `sync`。
   - **技术债登记**: 登记本次变更遗留的技术债。
   - 移动路径: `openspec/changes/<name>/` -> `openspec/changes/archive/YYYY-MM-DD-<name>/`。
+  - **Epic 队列同步**: 归档完成后必须更新对应 `epic-*.story-list.json` 中该 Story 的状态为 `done`；若所有 Story 均已 `done`，将该 `story-list.json` 一并归档至 `openspec/changes/archive/`（文件名加 `YYYY-MM-DD-` 前缀），保留 Epic 交付记录，禁止直接删除。
 
 ## Epic 队列管理 (Backlog Management)
 
@@ -203,8 +204,8 @@ graph TD
 ### 2. 状态流转
 - **Explore**: 创建文件，登记所有拆解出的 Story，状态为 `planned`。
 - **Propose**: AI 自动读取第一个 `planned` 状态的 Story 并建议启动。启动后更新状态为 `in_progress` 并记录 `changeName`。
-- **Archive**: 归档完成后，AI 更新该 Story 状态为 `done`，并提示下一个 `planned` 任务。
-- **销毁**: 当所有 Story 状态均为 `done` 时，AI 自动删除该 `story-list.json` 文件（无需归档）。
+- **Archive**: 每次 Story 归档完成后，AI 必须更新该 Story 状态为 `done`（即更新 progress），并提示下一个 `planned` 任务。
+- **Epic 完成归档**: 当所有 Story 状态均为 `done` 时，AI 必须将该 `story-list.json` 归档至 `openspec/changes/archive/YYYY-MM-DD-epic-<key>.story-list.json`（保留 Epic 交付记录，禁止删除），并宣布 Epic 完成。
 
 ## 异常处理与防漂移
 - **Schema 优先**: `openspec/schemas/spec-driven.yaml` 是每个制品的生成说明 (Instruction) 和内容格式的唯一事实来源。如果 SOP 描述与 Schema 有出入，请以 Schema 为准。

@@ -30,12 +30,6 @@ Archive a completed change in the experimental workflow.
    When prompting, show only active changes (not already archived).
    Include the schema used for each change if available.
    
-   **Epic Backlog Sync**:
-    - After successful archiving, look for any `openspec/epic-*.story-list.json` containing the archived `changeName`.
-    - Update the status of the matching story to `done`.
-    - If all stories in the list are `done`, delete the `.story-list.json` file.
-    - If there are remaining `planned` stories, notify the user and suggest the next one.
-   
    Always announce: "Using change: <name>" and how to override (e.g., `/opsx-archive <other>`).
 
    **Load current archive inputs before the existing archive checks:**
@@ -150,13 +144,27 @@ Archive a completed change in the experimental workflow.
    mv "<changeRoot>" "<planningHome.changesDir>/archive/<target-name>"
    ```
 
-6. **Display summary**
+6. **Sync Epic Backlog (progress update)**
+
+   If the archived change belongs to an Epic, sync the `openspec/epic-*.story-list.json` backlog. All story-list paths below are relative to the same resolved planning root (`planningHome.root`) used in step 2 — stay store-aware:
+   - Search all `openspec/epic-*.story-list.json` for a story whose `changeName` matches the archived change name.
+   - Update the matching story's `status` to `done` — this is the required progress update after every story archive.
+   - Reconcile orphans: if any other story is still `in_progress` but its `changeName` is no longer an active change (i.e., already archived), mark it `done` as well.
+   - If stories remain `planned` (or `in_progress`), notify the user and suggest the next one.
+   - If ALL stories are now `done`, the Epic is complete: archive the `.story-list.json` to the archive directory (never delete it), using the same current date resolved in step 5:
+     ```bash
+     mv "<planningHome.root>/openspec/epic-<key>.story-list.json" "<planningHome.changesDir>/archive/<YYYY-MM-DD>-epic-<key>.story-list.json"
+     ```
+     Announce that the Epic is complete and its backlog record has been archived.
+
+7. **Display summary**
 
    Show archive completion summary including:
    - Change name
    - Schema that was used
    - Archive location
    - Whether specs were synced (if applicable)
+   - Epic backlog sync result (story marked `done` / next story suggested / Epic complete and backlog archived), if applicable
    - Note about any warnings (incomplete artifacts/tasks)
 
 **Output On Success**
@@ -178,6 +186,7 @@ Archive a completed change in the experimental workflow.
 - Don't block archive on warnings - just inform and confirm
 - Preserve .openspec.yaml when moving to archive (it moves with the directory)
 - Show clear summary of what happened
+- Always sync the Epic backlog after archiving: mark the matching story `done`, and archive the `.story-list.json` to the archive directory when the Epic completes (never delete it)
 - If sync is requested, run the `openspec-sync-specs` workflow inline (agent-driven)
 - Never archive while a spec sync is still in flight — run the sync inline and verify the main specs before moving `changeRoot`
 - If delta specs exist, always run the sync assessment and show the combined summary before prompting
