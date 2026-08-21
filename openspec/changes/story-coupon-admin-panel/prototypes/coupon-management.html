@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>优惠券运营后台 - 极简电商 ADMIN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        /* 强制执行 FRONTEND.md 规范 */
+        * {
+            border-radius: 0 !important;
+            box-shadow: none !important;
+        }
+        body {
+            background-color: #f8fafc; /* slate-50 */
+            color: #0f172a; /* slate-900 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .border-slate-200 {
+            border-color: #e2e8f0;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #0f172a;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div id="app" class="flex min-h-screen">
+        <!-- 左侧导航栏 -->
+        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0">
+            <div class="h-16 flex items-center px-6 border-b border-slate-200">
+                <h1 class="text-xl font-bold tracking-tight">极简电商 ADMIN</h1>
+            </div>
+            <nav class="flex-1 py-4">
+                <div class="px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">交易管理</div>
+                <a href="#" class="flex items-center px-6 py-3 border-l-4 border-transparent text-slate-600 hover:bg-slate-50 transition-colors">
+                    订单列表
+                </a>
+                <a href="#" class="flex items-center px-6 py-3 border-l-4 border-transparent text-slate-600 hover:bg-slate-50 transition-colors">
+                    商品管理
+                </a>
+                <div class="mt-8 px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">营销中心</div>
+                <a href="#" class="flex items-center px-6 py-3 border-l-4 border-slate-900 bg-slate-50 text-slate-900 font-medium">
+                    优惠券管理
+                </a>
+            </nav>
+        </aside>
+
+        <!-- 右侧内容区 -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <!-- 顶部栏 -->
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0">
+                <div class="text-slate-600">当前路径: <span class="text-slate-900 font-medium">营销中心 / 优惠券管理</span></div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-slate-500">运营专员: 王琳</span>
+                </div>
+            </header>
+
+            <!-- 核心内容 -->
+            <div class="flex-1 overflow-y-auto p-8">
+                <div class="max-w-5xl mx-auto space-y-8">
+
+                    <!-- 章节一: 新建优惠券规则 -->
+                    <section class="bg-white border border-slate-200 p-8" id="create-section">
+                        <h2 class="text-lg font-bold mb-6 border-b border-slate-200 pb-4">新建优惠券规则</h2>
+                        <form @submit.prevent="createCoupon" class="space-y-6">
+                            <div class="grid grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">优惠券名称</label>
+                                    <input v-model.trim="form.name" type="text" placeholder="例如: 新客专享满减券"
+                                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">优惠类型</label>
+                                    <div class="flex border border-slate-200">
+                                        <button type="button" @click="form.type = 'FLAT'"
+                                                :class="['flex-1 py-2 text-sm transition-colors', form.type === 'FLAT' ? 'bg-slate-900 text-white' : 'bg-white text-slate-600']">
+                                            满减券 (FLAT)
+                                        </button>
+                                        <button type="button" @click="form.type = 'PERCENTAGE'"
+                                                :class="['flex-1 py-2 text-sm border-l border-slate-200 transition-colors', form.type === 'PERCENTAGE' ? 'bg-slate-900 text-white' : 'bg-white text-slate-600']">
+                                            折扣券 (PERCENTAGE)
+                                        </button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">
+                                        {{ form.type === 'FLAT' ? '减免金额 (元)' : '折扣比例 (折)' }}
+                                    </label>
+                                    <input v-model="form.value" type="number" step="0.1" min="0"
+                                           :placeholder="form.type === 'FLAT' ? '例如: 20' : '例如: 9 (表示 9 折)'"
+                                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">使用门槛 (满多少元可用, 0 为无门槛)</label>
+                                    <input v-model="form.minSpend" type="number" step="1" min="0" placeholder="例如: 100"
+                                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">有效期至</label>
+                                    <input v-model="form.expiryDate" type="date"
+                                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white">
+                                </div>
+                            </div>
+
+                            <div v-if="createError" class="border border-slate-900 bg-slate-50 px-4 py-3 text-sm text-slate-900">
+                                {{ createError }}
+                            </div>
+
+                            <div class="flex items-center justify-between border-t border-slate-200 pt-6">
+                                <p class="text-sm text-slate-500">创建后即刻生效 (ACTIVE)，可用于发放并参与结算页最优券推荐。适用范围: 全场通用。</p>
+                                <button type="submit" class="bg-slate-900 text-white px-6 py-2 text-sm font-medium hover:bg-slate-700 transition-colors">
+                                    创建并生效
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <!-- 章节二: 优惠券列表 -->
+                    <section class="bg-white border border-slate-200 p-8">
+                        <div class="flex justify-between items-center mb-6 border-b border-slate-200 pb-4">
+                            <h2 class="text-lg font-bold">优惠券列表</h2>
+                            <span class="text-sm text-slate-500">共 {{ coupons.length }} 条规则</span>
+                        </div>
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="text-left text-slate-500 border-b border-slate-200">
+                                    <th class="pb-3 font-medium">名称</th>
+                                    <th class="pb-3 font-medium">类型</th>
+                                    <th class="pb-3 font-medium">优惠内容</th>
+                                    <th class="pb-3 font-medium">使用门槛</th>
+                                    <th class="pb-3 font-medium">有效期至</th>
+                                    <th class="pb-3 font-medium">状态</th>
+                                    <th class="pb-3 font-medium">已发放</th>
+                                    <th class="pb-3 font-medium text-right">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="coupon in coupons" :key="coupon.id"
+                                    :class="['border-b border-slate-200', issueForm.couponId === coupon.id ? 'bg-slate-50' : '']">
+                                    <td class="py-4 font-medium">{{ coupon.name }}</td>
+                                    <td class="py-4">
+                                        <span class="border border-slate-200 px-2 py-1 text-xs text-slate-600">
+                                            {{ coupon.type === 'FLAT' ? '满减券' : '折扣券' }}
+                                        </span>
+                                    </td>
+                                    <td class="py-4 font-mono">{{ formatValue(coupon) }}</td>
+                                    <td class="py-4">{{ coupon.minSpendCents === 0 ? '无门槛' : '满 ¥' + (coupon.minSpendCents / 100) }}</td>
+                                    <td class="py-4 font-mono">{{ coupon.expiryDate }}</td>
+                                    <td class="py-4">
+                                        <span class="text-xs font-bold text-slate-900">ACTIVE</span>
+                                    </td>
+                                    <td class="py-4 font-mono">{{ coupon.issuedCount }}</td>
+                                    <td class="py-4 text-right">
+                                        <button @click="selectForIssue(coupon)"
+                                                class="border border-slate-900 text-slate-900 px-4 py-1 text-sm hover:bg-slate-900 hover:text-white transition-colors">
+                                            发券
+                                        </button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <!-- 章节三: 手动单人发券 -->
+                    <section class="bg-white border border-slate-200 p-8" id="issue-section">
+                        <h2 class="text-lg font-bold mb-6 border-b border-slate-200 pb-4">手动发券 (单人)</h2>
+
+                        <div v-if="!selectedCoupon" class="border border-slate-200 bg-slate-50 px-4 py-6 text-sm text-slate-500 text-center">
+                            请先在上方列表中点击「发券」选择一张优惠券
+                        </div>
+
+                        <form v-else @submit.prevent="issueCoupon" class="space-y-6">
+                            <div class="border border-slate-200 bg-slate-50 p-4 flex justify-between items-center">
+                                <div>
+                                    <div class="font-bold">{{ selectedCoupon.name }}</div>
+                                    <div class="text-sm text-slate-500 mt-1">
+                                        {{ selectedCoupon.type === 'FLAT' ? '满减券' : '折扣券' }} ·
+                                        {{ formatValue(selectedCoupon) }} ·
+                                        {{ selectedCoupon.minSpendCents === 0 ? '无门槛' : '满 ¥' + (selectedCoupon.minSpendCents / 100) + ' 可用' }} ·
+                                        有效期至 {{ selectedCoupon.expiryDate }}
+                                    </div>
+                                </div>
+                                <button type="button" @click="issueForm.couponId = null" class="text-sm text-slate-500 underline">重新选择</button>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">目标用户 ID</label>
+                                    <input v-model.trim="issueForm.userId" type="text" placeholder="例如: user_1003"
+                                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white font-mono">
+                                    <p class="text-xs text-slate-500 mt-2">仅支持单人发放。同一用户重复领取同一张券将被拒绝。</p>
+                                </div>
+                            </div>
+
+                            <div v-if="issueError" class="border border-slate-900 bg-slate-50 px-4 py-3 text-sm text-slate-900">
+                                {{ issueError }}
+                            </div>
+                            <div v-if="issueSuccess" class="border border-slate-900 bg-slate-900 px-4 py-3 text-sm text-white">
+                                {{ issueSuccess }}
+                            </div>
+
+                            <div class="flex justify-end border-t border-slate-200 pt-6">
+                                <button type="submit" class="bg-slate-900 text-white px-6 py-2 text-sm font-medium hover:bg-slate-700 transition-colors">
+                                    确认发放
+                                </button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <!-- 章节四: 发放记录 -->
+                    <section class="bg-white border border-slate-200 p-8">
+                        <h2 class="text-lg font-bold mb-6 border-b border-slate-200 pb-4">最近发放记录</h2>
+                        <table class="w-full text-sm">
+                            <thead>
+                                <tr class="text-left text-slate-500 border-b border-slate-200">
+                                    <th class="pb-3 font-medium">时间</th>
+                                    <th class="pb-3 font-medium">优惠券</th>
+                                    <th class="pb-3 font-medium">用户 ID</th>
+                                    <th class="pb-3 font-medium">操作人</th>
+                                    <th class="pb-3 font-medium">券状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="record in issueLog" :key="record.id" class="border-b border-slate-200">
+                                    <td class="py-3 font-mono text-slate-600">{{ record.time }}</td>
+                                    <td class="py-3 font-medium">{{ record.couponName }}</td>
+                                    <td class="py-3 font-mono">{{ record.userId }}</td>
+                                    <td class="py-3 text-slate-600">{{ record.operator }}</td>
+                                    <td class="py-3"><span class="text-xs font-bold text-slate-900">UNUSED</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+
+        createApp({
+            setup() {
+                // ---- 优惠券列表 (真实业务数据示例) ----
+                const coupons = ref([
+                    { id: 'CPN-001', name: '新客专享满减券', type: 'FLAT', valueCents: 2000, minSpendCents: 10000, expiryDate: '2026-09-30', issuedCount: 128 },
+                    { id: 'CPN-002', name: '周年庆全场 9 折券', type: 'PERCENTAGE', value: 9, minSpendCents: 20000, expiryDate: '2026-09-15', issuedCount: 356 },
+                    { id: 'CPN-003', name: '老客回馈满 300 减 50', type: 'FLAT', valueCents: 5000, minSpendCents: 30000, expiryDate: '2026-10-07', issuedCount: 42 }
+                ]);
+
+                // ---- 发放记录 ----
+                const issueLog = ref([
+                    { id: 1, time: '2026-08-20 16:42', couponName: '周年庆全场 9 折券', userId: 'user_1002', operator: '王琳' },
+                    { id: 2, time: '2026-08-20 15:18', couponName: '新客专享满减券', userId: 'user_1001', operator: '王琳' },
+                    { id: 3, time: '2026-08-19 11:05', couponName: '老客回馈满 300 减 50', userId: 'user_0876', operator: '王琳' }
+                ]);
+
+                // ---- 新建券表单 ----
+                const form = ref({ name: '', type: 'FLAT', value: '', minSpend: '', expiryDate: '' });
+                const createError = ref('');
+
+                function createCoupon() {
+                    createError.value = '';
+                    const value = parseFloat(form.value.value);
+                    const minSpend = parseFloat(form.value.minSpend || '0');
+
+                    if (!form.value.name) { createError.value = '请填写优惠券名称。'; return; }
+                    if (isNaN(value) || value <= 0) { createError.value = '请填写有效的优惠值。'; return; }
+                    if (form.value.type === 'PERCENTAGE' && (value >= 10)) { createError.value = '折扣券比例必须小于 10 折 (例如 9 表示 9 折)。'; return; }
+                    if (form.value.type === 'FLAT' && minSpend > 0 && value >= minSpend) { createError.value = '减免金额不能大于或等于使用门槛。'; return; }
+                    if (isNaN(minSpend) || minSpend < 0) { createError.value = '使用门槛不能为负数。'; return; }
+                    if (!form.value.expiryDate) { createError.value = '请选择有效期。'; return; }
+
+                    const id = 'CPN-' + String(coupons.value.length + 1).padStart(3, '0');
+                    coupons.value.push({
+                        id,
+                        name: form.value.name,
+                        type: form.value.type,
+                        valueCents: form.value.type === 'FLAT' ? Math.round(value * 100) : undefined,
+                        value: form.value.type === 'PERCENTAGE' ? value : undefined,
+                        minSpendCents: Math.round(minSpend * 100),
+                        expiryDate: form.value.expiryDate,
+                        issuedCount: 0
+                    });
+                    form.value = { name: '', type: 'FLAT', value: '', minSpend: '', expiryDate: '' };
+                }
+
+                // ---- 发券表单 ----
+                const issueForm = ref({ couponId: null, userId: '' });
+                const issueError = ref('');
+                const issueSuccess = ref('');
+
+                const selectedCoupon = computed(() =>
+                    coupons.value.find(c => c.id === issueForm.value.couponId) || null
+                );
+
+                function selectForIssue(coupon) {
+                    issueForm.value.couponId = coupon.id;
+                    issueError.value = '';
+                    issueSuccess.value = '';
+                    document.getElementById('issue-section').scrollIntoView({ behavior: 'smooth' });
+                }
+
+                const issuedPairs = new Set(issueLog.value.map(r => r.couponName + '|' + r.userId));
+
+                function issueCoupon() {
+                    issueError.value = '';
+                    issueSuccess.value = '';
+                    const userId = issueForm.value.userId;
+                    if (!userId) { issueError.value = '请输入目标用户 ID。'; return; }
+                    if (!/^user_\d+$/.test(userId)) { issueError.value = '用户 ID 格式不正确，应形如 user_1003。'; return; }
+                    if (issuedPairs.has(selectedCoupon.value.name + '|' + userId)) {
+                        issueError.value = `用户 ${userId} 已持有「${selectedCoupon.value.name}」，请勿重复发放。`;
+                        return;
+                    }
+
+                    const now = new Date();
+                    const time = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0')
+                        + ' ' + String(now.getHours()).padStart(2, '0') + ':' + String(now.getMinutes()).padStart(2, '0');
+                    issueLog.value.unshift({
+                        id: Date.now(),
+                        time,
+                        couponName: selectedCoupon.value.name,
+                        userId,
+                        operator: '王琳'
+                    });
+                    issuedPairs.add(selectedCoupon.value.name + '|' + userId);
+                    selectedCoupon.value.issuedCount += 1;
+                    issueSuccess.value = `已将「${selectedCoupon.value.name}」发放给用户 ${userId}，该券即刻可在结算页参与最优推荐。`;
+                    issueForm.value.userId = '';
+                }
+
+                function formatValue(coupon) {
+                    return coupon.type === 'FLAT' ? '减 ¥' + (coupon.valueCents / 100) : coupon.value + ' 折';
+                }
+
+                return { coupons, issueLog, form, createError, createCoupon, issueForm, issueError, issueSuccess, selectedCoupon, selectForIssue, issueCoupon, formatValue };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

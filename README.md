@@ -42,7 +42,7 @@
 | **Working Loop** | `specs/`, `design.md`, `tasks.md`, `verify.md` | 确保实现遵循契约，并将认知沉淀回基线 |
 
 ### 🔄 Working Loop (端到端大循环)
-流程遵循：`规划基线 -> 需求探索 (/opsx:explore) -> 方案提案 (/opsx:propose) -> 原型设计 (/opsx:prototype) -> 业务故事 (/opsx:story) -> 开发实现 -> 基线同步 (/opsx:sync) -> 归档 (/opsx:archive)`。
+流程遵循：`规划基线 -> 需求探索 (/opsx:explore) -> 方案提案 (/opsx:propose) -> 原型设计 (/opsx:prototype) -> 业务故事 (/opsx:Story) -> 开发实现 -> 基线同步 (/opsx:sync) -> 归档 (/opsx:archive)`。
 
 ---
 

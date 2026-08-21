@@ -1,11 +1,11 @@
-# `/opsx:story`
+# `/opsx:Story`
 
 Generate a business-facing story document for the current change.
 
 ## Usage
 
 ```bash
-/opsx:story <change-name>
+/opsx:Story <change-name>
 ```
 
 ## Description

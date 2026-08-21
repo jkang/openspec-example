@@ -15,9 +15,10 @@
       "id": "story-coupon-admin-panel",
       "title": "B 端极简运营后台",
       "description": "实现优惠券规则配置界面及手动单人发券功能。",
-      "status": "planned",
+      "status": "in_progress",
+      "changeName": "story-coupon-admin-panel",
       "priority": "medium"
     }
   ],
-  "updatedAt": "2026-08-19T14:40:00Z"
+  "updatedAt": "2026-08-21T00:00:00Z"
 }

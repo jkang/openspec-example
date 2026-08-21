@@ -53,7 +53,7 @@ I'll create the prototype artifact:
 4. **Summarize and Recommend Next Step**
    
    After approval, recommend the next step:
-   - Run `/opsx:story` to generate the business acceptance criteria.
+   - Run `/opsx:Story` to generate the business acceptance criteria.
 
 **Output**
 

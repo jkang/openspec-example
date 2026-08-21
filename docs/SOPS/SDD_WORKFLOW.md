@@ -48,7 +48,7 @@ graph TD
     F2 -->|是| F3[原型 /opsx:prototype]
     F3 --> F4{视觉/交互确认?}
     F4 -->|否| F3
-    F4 -->|是| F5[业务故事评审 /opsx:story]
+    F4 -->|是| F5[业务故事评审 /opsx:Story]
     F2 -->|否| F5
     F5 --> F6[规格与设计与任务清单 /opsx:spec-design]
 
@@ -103,7 +103,7 @@ graph TD
   - **流程对齐约束**: 必须包含 `Process Alignment` 章节明确受影响的流程节点 ID。
   - **蓝图对齐约束**: 必须包含 `Service Blueprint Alignment` 章节，显式引用受影响的 `SB-STAGE-*` 与 `SB-<LANE>-*` 节点，并说明是新增、修改还是复用既有蓝图结构。
   - 对于史诗类型，生成提案后应停止，等待拆分。
-  - 对于功能类型，引导用户进入下一步（涉及 UI 先 `/opsx:prototype` 并完成确认，再 `/opsx:story`，随后进入 `/opsx:spec-design`；不涉及 UI 则直接 `/opsx:story`，随后进入 `/opsx:spec-design`）。
+  - 对于功能类型，引导用户进入下一步（涉及 UI 先 `/opsx:prototype` 并完成确认，再 `/opsx:Story`，随后进入 `/opsx:spec-design`；不涉及 UI 则直接 `/opsx:Story`，随后进入 `/opsx:spec-design`）。
   - 对于缺陷修复类型，引导用户进入下一步（涉及 UI 先 `/opsx:prototype` 并完成确认，随后进入 `/opsx:spec-design`；不涉及 UI 则直接进入 `/opsx:spec-design`，并在设计中包含根因分析）。
   - 对于技术债类型，引导用户进入下一步（若有外部行为变更则进入 `/opsx:spec-design`；若无外部行为变更则配置 `skip_specs: true`，生成设计与任务清单后再进入 `/opsx:apply`）。
   
@@ -115,7 +115,7 @@ graph TD
   - 原型是 UI 逻辑的唯一事实来源，确认后方可进入下一步。
 
 ### 4. 业务评审阶段 (Story)
-- **指令**: `/opsx:story <name>`
+- **指令**: `/opsx:Story <name>`
 - **目标**: 生成端到端的验收文档 `story.md`。
 - **强制约束 (Hard Constraint)**:
   - **时机**: 必须在提案之后执行；若涉及 UI，必须在原型确认后执行。

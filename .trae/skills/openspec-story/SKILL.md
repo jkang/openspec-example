@@ -27,7 +27,7 @@ I'll create the story artifact:
 1. **Verify pre-requisites**
    
    Ensure `proposal.md` exists.
-   If the task type is Tech Debt, advise the user to skip `/opsx:story` unless they explicitly want a business review document.
+   If the task type is Tech Debt, advise the user to skip `/opsx:Story` unless they explicitly want a business review document.
    Check if the change involves UI (from `ideas/idea.md` or `prototype.html`).
    **Mandatory Rule**: If UI is involved, `prototype.html` MUST exist and have been approved before running this.
 
