@@ -32,7 +32,7 @@
           >运营后台</button>
         </div>
         <button v-if="viewMode === 'store'" @click="isCartOpen = !isCartOpen" class="relative py-1 px-2 border border-slate-200 hover:bg-slate-50">
-          BAG
+          购物车
           <span v-if="cartTotalItems > 0" class="absolute -top-1 -right-1 w-4 h-4 bg-slate-900 text-white text-[10px] flex items-center justify-center">
             {{ cartTotalItems }}
           </span>
@@ -46,8 +46,7 @@
       <!-- 左侧商品网格 -->
       <section class="flex-1 overflow-y-auto p-8 bg-slate-50 scrollbar-hide">
         <div v-if="filteredProducts.length === 0" class="h-full flex flex-col items-center justify-center text-slate-400 space-y-4">
-          <p class="text-sm uppercase tracking-widest font-bold">No Results Found</p>
-          <p class="text-xs">未找到相关商品</p>
+          <p class="text-sm">未找到相关商品</p>
         </div>
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div 
@@ -76,7 +75,7 @@
                 @click="addToCart(product)"
                 class="mt-auto w-full py-2 bg-slate-900 text-white text-xs font-bold tracking-widest uppercase hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
               >
-                ADD TO CART
+                加入购物车
               </button>
             </div>
           </div>
@@ -88,13 +87,13 @@
         :class="['w-80 flex-shrink-0 bg-white border-l border-slate-200 flex flex-col transition-all duration-300 transform', isCartOpen ? 'translate-x-0' : 'translate-x-full absolute right-0 h-full z-20 md:relative md:translate-x-0']"
       >
         <div class="p-6 border-b border-slate-200 flex items-center justify-between">
-          <h2 class="font-semibold tracking-tight uppercase text-xs">Cart ({{ cartTotalItems }})</h2>
-          <button @click="isCartOpen = false" class="md:hidden text-xs font-bold text-slate-400">CLOSE</button>
+          <h2 class="font-semibold tracking-tight uppercase text-xs">购物车 ({{ cartTotalItems }})</h2>
+          <button @click="isCartOpen = false" class="md:hidden text-xs font-bold text-slate-400">关闭</button>
         </div>
 
         <div class="flex-1 overflow-y-auto p-6 scrollbar-hide space-y-6">
           <div v-if="cart.length === 0" class="h-full flex flex-col items-center justify-center text-slate-400 space-y-2">
-            <p class="text-[10px] uppercase tracking-widest">Empty</p>
+            <p class="text-[10px]">购物车为空</p>
           </div>
           <div v-for="item in cart" :key="item.id" class="flex gap-4">
             <div class="w-16 h-16 flex-shrink-0 border border-slate-200 bg-slate-50 overflow-hidden">
@@ -103,7 +102,7 @@
             <div class="flex-1 flex flex-col justify-between py-1">
               <div class="flex justify-between">
                 <h4 class="text-xs font-medium truncate pr-2">{{ item.name }}</h4>
-                <button @click="removeFromCart(item.productId)" class="text-[10px] text-slate-300 hover:text-red-500 font-bold uppercase">Del</button>
+                <button @click="removeFromCart(item.productId)" class="text-[10px] text-slate-300 hover:text-red-500 font-bold">删除</button>
               </div>
               <div class="flex justify-between items-end">
                 <span class="text-xs font-semibold">¥{{ (item.priceCents * item.quantity / 100).toFixed(2) }}</span>
@@ -167,7 +166,7 @@
             :disabled="isProcessing || cart.length === 0"
             class="w-full py-4 bg-slate-900 text-white text-xs font-bold tracking-[0.3em] uppercase hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-all"
           >
-            {{ isProcessing ? 'Processing...' : 'Complete Checkout' }}
+            {{ isProcessing ? '处理中...' : '确认结算' }}
           </button>
         </div>
       </aside>
@@ -278,7 +277,7 @@
                   <td class="py-4">{{ coupon.minSpendCents === 0 ? '无门槛' : '满 ¥' + (coupon.minSpendCents / 100) }}</td>
                   <td class="py-4 font-mono">{{ coupon.expiryDate || '—' }}</td>
                   <td class="py-4">
-                    <span class="text-xs font-bold text-slate-900">{{ coupon.status }}</span>
+                    <span class="text-xs font-bold text-slate-900">{{ statusLabel(coupon.status) }}</span>
                   </td>
                   <td class="py-4 font-mono">{{ coupon.issuedCount }}</td>
                   <td class="py-4 text-right">
@@ -360,7 +359,7 @@
                   <td class="py-3 font-medium">{{ record.couponName }}</td>
                   <td class="py-3 font-mono">{{ record.userId }}</td>
                   <td class="py-3 text-slate-600">{{ record.operator }}</td>
-                  <td class="py-3"><span class="text-xs font-bold text-slate-900">UNUSED</span></td>
+                  <td class="py-3"><span class="text-xs font-bold text-slate-900">未使用</span></td>
                 </tr>
               </tbody>
             </table>
@@ -375,7 +374,7 @@
       <div class="w-full max-w-xs bg-white border border-slate-200 p-8 space-y-6 text-center">
         <!-- 成功文字标识 -->
         <div class="flex justify-center">
-          <div class="text-2xl font-black tracking-tighter text-slate-900 border-4 border-slate-900 px-2 py-1">SUCCESS</div>
+          <div class="text-2xl font-black tracking-tighter text-slate-900 border-4 border-slate-900 px-2 py-1">下单成功</div>
         </div>
 
         <!-- 文字信息 -->
@@ -736,6 +735,14 @@ const fetchIssuances = async () => {
 
 const formatAdminValue = (coupon) =>
   coupon.type === 'FLAT' ? `减 ¥${coupon.value / 100}` : `${coupon.value} 折`
+
+// 券状态枚举中文映射（展示层本地化，领域契约保持英文枚举）
+const statusLabel = (status) => ({
+  ACTIVE: '生效中',
+  USED: '已使用',
+  UNUSED: '未使用',
+  EXPIRED: '已过期'
+}[status] || status)
 
 const createCoupon = async () => {
   createError.value = ''
