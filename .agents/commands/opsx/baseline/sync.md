@@ -27,5 +27,5 @@ description: 统一同步所有业务基线文档 (Blueprint, Process Flow, Doma
 
 ## 使用场景
 - 在手动修改了 `design.md` 或 `story.md` 后，希望立即刷新基线视图。
-- 在规格同步之后，确保基线文档已达到最新状态。
+- 在 `/opsx:sync` (规格同步) 之后，确保基线文档已达到最新状态。
 - 定期维护基线文档的渲染一致性。

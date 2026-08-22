@@ -12,6 +12,21 @@
 - `.agents/`: 通用 Agent 协作指令。
 *严禁仅修改其中之一，这会导致不同 AI 工具间的协作漂移。*
 
+### 🧑💻 SDD 团队角色 (Team Roles)
+
+本项目以 4 人团队形态模拟最新软件团队，角色定义**跨工具同步**，各工具按自身机制加载：
+
+| 角色 | 职责 | opencode | Cursor | Trae / 通用 |
+| :--- | :--- | :--- | :--- | :--- |
+| **lead** (Tech Lead/架构师, primary) | 编排交付、架构设计、流程收尾，用户唯一入口 | `.opencode/agents/lead.md` | `.cursor/agents/lead.md` | `.trae/skills/sdd-team/lead/` (sdd-team-lead) |
+| **pm** (产品经理) | 产品感/路线图/探索/业务评审 | `.opencode/agents/pm.md` | `.cursor/agents/pm.md` | `.trae/skills/sdd-team/pm/` (sdd-team-pm) |
+| **engineer** (全栈工程师) | 交互原型/代码实施 | `.opencode/agents/engineer.md` | `.cursor/agents/engineer.md` | `.trae/skills/sdd-team/engineer/` (sdd-team-engineer) |
+| **qa** (质量工程师) | 验证门禁/对抗审查 | `.opencode/agents/qa.md` | `.cursor/agents/qa.md` | `.trae/skills/sdd-team/qa/` (sdd-team-qa) |
+
+- **同步规则**：任何对团队角色定义（职责、约束、协作契约）的修改，必须同步更新上述 4 处（`.opencode/agents/`、`.cursor/agents/`、`.trae/skills/sdd-team/`、`.agents/skills/sdd-team/`，其中后两者内容必须一致）。
+- **编排契约**：`lead` 是用户与团队的唯一对话入口，通过任务委派调度 pm/engineer/qa；每个 HITL 检查点（原型确认、story 评审、归档放行）必须暂停征求用户确认。
+- **唯一事实来源**：角色职责的权威内容以 `.opencode/agents/*.md` 为基准（含权限与 mode 配置），其余位置为格式适配副本。
+
 ## 📚 治理与深链接 (Governance & Deep Links)
 
 在编写任何代码或提出方案之前，你**必须**查阅相关的治理文档：
