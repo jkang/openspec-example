@@ -69,3 +69,20 @@ sequenceDiagram
   - `OrderSummary` (显示商品列表)
   - `CouponSelector` (显示可用券列表，包含“当前最优”标记)
   - `SettlementBar` (显示原价、减免、实付及提交按钮)
+
+
+## Service Blueprint Sync Assessment
+
+> **追溯补录说明**：本变更归档时 SOP 尚未强制要求该章节，此处按当前治理标准补记当时应执行的判定。
+
+- **Needs Sync: Yes**
+- **触发项**: capability 分布变化——新增 `PERCENTAGE` 折扣券结算能力，`SB-OPS-03`/`SB-BACKSTAGE-03` 的 capability 语义扩展（满减 → 满减+折扣双类型）；`SB-CUSTOMER-03` 新增"最优方案自动推荐"交互
+- **计划更新部位**: `docs/baseline/service_blueprint.html` 的 `SB-STAGE-03`（结算确认）、`SB-OPS-03`、`SB-BACKSTAGE-03` 活动描述
+- **实际状态**: 已随 `/opsx:sync` 完成回流（基线 HTML 已包含折扣券结算语义）
+
+## Domain Model Sync Assessment
+
+- **Needs Sync: Yes**
+- **触发项**: Coupon 聚合状态机扩展——新增 `PERCENTAGE` 类型折扣算法（`discountRate` 字段）、`getBestCoupon` 最优推荐领域服务进入 `L3-03` 规则流
+- **计划更新部位**: `docs/baseline/domain_model.html` 的 Coupon Context（bc-coupon）状态机与 `BC -> Capability` 映射
+- **实际状态**: 已随 `/opsx:sync` 完成回流（Coupon Context 已含折扣券与最优推荐语义）

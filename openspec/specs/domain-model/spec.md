@@ -110,3 +110,11 @@ And 每个条目包含 { id, productId, quantity }
 Given 需要记录订单商品信息
 When 提供条目信息 { productId, priceCents, quantity }
 Then 条目记录商品 ID、下单时单价和购买数量
+
+## Governance Mapping
+
+- **Bounded Context**: Shared / Cross（`domain_model.html` BC → Capability 映射表：`bc-shared → cap-domain`）
+- **Capability Taxonomy**: `domain-model`（复用既有映射，无新增 taxonomy）
+- **Process Alignment**: 横切支撑：共享领域对象结构定义（覆盖全部 L1-L3 节点）
+- **Service Blueprint**: 横切支撑：全部 SB-STAGE-*（共享领域模型）
+- **实现版本**: Node.js / Python（共享类型与领域定义）

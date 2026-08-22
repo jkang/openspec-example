@@ -216,5 +216,9 @@ marimo/_lsp/
 __marimo__/
 
 # OpenCode / OpenWork
-.opencode/
+# 忽略 opencode 的本地私有内容，但团队资产（agents/skills/commands）必须纳入版本控制
+.opencode/*
+!.opencode/agents/
+!.opencode/skills/
+!.opencode/commands/
 opencode.jsonc

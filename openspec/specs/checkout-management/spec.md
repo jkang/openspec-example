@@ -1,6 +1,6 @@
 # Checkout Management Specification
 
-## Overview
+## Purpose
 
 结算管理能力负责处理用户从选择商品到确认购买的转换过程，确保购物车中的商品能够正确、安全地转化为系统中的正式订单，并维护交易的一致性。
 
@@ -83,3 +83,11 @@
 #### Scenario: 结算后清空购物车
 - **WHEN** 结算流程成功结束并生成订单后
 - **THEN** 再次查询该购物车时，结果应当为空
+
+## Governance Mapping
+
+- **Bounded Context**: Order Context（`domain_model.html` BC → Capability 映射表：`bc-order → cap-checkout`）
+- **Capability Taxonomy**: `checkout-management`（复用既有映射，无新增 taxonomy）
+- **Process Alignment**: L1-04 下单结算；L2-01 进入结算；L2-04 确认应付金额
+- **Service Blueprint**: SB-STAGE-03（结算确认）、SB-STAGE-04（提交订单）、SB-CUSTOMER-03/04
+- **实现版本**: Node.js / Python（后端 API）＋ Frontend（结算交互）

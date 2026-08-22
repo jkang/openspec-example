@@ -1,6 +1,6 @@
 # Catalog Management Specification
 
-## Overview
+## Purpose
 
 商品目录管理能力，涵盖商品的查询、上架与库存管理。商品是电商系统的核心资源，所有交易流程均以商品数据为基础。
 
@@ -122,3 +122,11 @@ Given 商品库存为 5
 When 尝试扣减 6 个库存
 Then 抛出 OUT_OF_STOCK 错误
 And 库存保持不变
+
+## Governance Mapping
+
+- **Bounded Context**: Catalog Context（`domain_model.html` BC → Capability 映射表：`bc-catalog → cap-catalog`）
+- **Capability Taxonomy**: `catalog-management`（复用既有映射，无新增 taxonomy）
+- **Process Alignment**: L1-01 触达与发现；L1-02 评估与决策（商品元数据支撑）
+- **Service Blueprint**: SB-STAGE-01（触达与发现）、SB-STAGE-02（选购与加购）、SB-CUSTOMER-01/02
+- **实现版本**: Node.js / Python（后端 API）＋ Frontend（商品展示）

@@ -20,3 +20,11 @@ TBD - created by archiving change add-product-get-by-id. Update Purpose after ar
 - **WHEN** 客户端发送 `GET /api/products/{id}`，且该 ID 对应的商品不存在
 - **THEN** 系统返回 404 状态码及错误信息 `{"code": "NOT_FOUND", "message": "Product not found"}`
 
+
+## Governance Mapping
+
+- **Bounded Context**: Catalog Context（`domain_model.html` BC → Capability 映射表：`bc-catalog → cap-prodquery`）
+- **Capability Taxonomy**: `product-query`（复用既有映射，无新增 taxonomy）
+- **Process Alignment**: L1-01 触达与发现；L1-02 评估与决策（搜索与详情查询支撑）
+- **Service Blueprint**: SB-STAGE-01（触达与发现）、SB-STAGE-02（选购与加购）、SB-CUSTOMER-01/02
+- **实现版本**: Node.js / Python（后端 API）＋ Frontend（商品详情）

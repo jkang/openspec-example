@@ -90,3 +90,11 @@
 #### Scenario: 结算成功后自动清空
 - **WHEN** 收到结算成功的信号时
 - **THEN** 系统 MUST 移除该用户购物车中的所有商品项
+
+## Governance Mapping
+
+- **Bounded Context**: Cart Context（`domain_model.html` BC → Capability 映射表：`bc-cart → cap-cart`）
+- **Capability Taxonomy**: `cart-management`（复用既有映射，无新增 taxonomy）
+- **Process Alignment**: L1-03 加购与准备（购物车一致性）
+- **Service Blueprint**: SB-STAGE-02（选购与加购）、SB-CUSTOMER-02
+- **实现版本**: Node.js / Python（后端 API）＋ Frontend（购物车交互）

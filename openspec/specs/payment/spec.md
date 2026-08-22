@@ -1,6 +1,6 @@
 # Payment Specification
 
-## Overview
+## Purpose
 
 支付能力，涵盖订单支付与状态流转。支付是完成交易的最后一步，将订单从待支付状态转为已支付状态。
 
@@ -50,3 +50,11 @@ Given 订单状态已为 PAID
 When 再次执行支付操作
 Then 返回幂等成功或提示已支付
 And 不产生重复扣款
+
+## Governance Mapping
+
+- **Bounded Context**: Order Context（`domain_model.html` BC → Capability 映射表：`bc-order → cap-payment`）
+- **Capability Taxonomy**: `payment`（复用既有映射，无新增 taxonomy）
+- **Process Alignment**: L1-05 支付确认；L2-06 发起支付；L3-05 支付成功后核销
+- **Service Blueprint**: SB-STAGE-05（模拟支付）、SB-CUSTOMER-05、SB-BACKSTAGE-05
+- **实现版本**: Node.js / Python（后端 API）

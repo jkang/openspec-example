@@ -1,6 +1,6 @@
 # Error Handling Specification
 
-## Overview
+## Purpose
 
 统一错误处理能力，定义系统的标准错误响应格式和错误码体系。确保所有业务异常均以一致的结构返回给客户端，便于前端处理和调试。
 
@@ -65,3 +65,11 @@ Given 购物车商品数量超过上限
 When 系统返回错误
 Then 错误码为 MAX_QUANTITY_EXCEEDED
 And HTTP 状态码为 400
+
+## Governance Mapping
+
+- **Bounded Context**: Shared / Cross（`domain_model.html` BC → Capability 映射表：`bc-shared → cap-error`）
+- **Capability Taxonomy**: `error-handling`（复用既有映射，无新增 taxonomy）
+- **Process Alignment**: 横切支撑：全局错误码与异常处理规范（覆盖全部 L1-L3 节点）
+- **Service Blueprint**: 横切支撑：全部 SB-STAGE-*（全局错误响应）
+- **实现版本**: Node.js / Python（统一错误响应中间件）＋ Frontend（错误提示）

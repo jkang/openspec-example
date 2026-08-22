@@ -121,3 +121,11 @@
 - **WHEN** 发送 POST /api/checkout 仅携带 { userId }
 - **THEN** 系统自动应用“9折”券并完成结算
 - **AND** 返回的订单中包含已应用的 `couponId` 和计算后的 `actualPaidCents`
+
+## Governance Mapping
+
+- **Bounded Context**: Order Context（`domain_model.html` BC → Capability 映射表：`bc-order → cap-order`）
+- **Capability Taxonomy**: `order-management`（复用既有映射，无新增 taxonomy）
+- **Process Alignment**: L1-04 下单结算；L2-05 提交订单；L3-04 订单绑定与占用
+- **Service Blueprint**: SB-STAGE-04（提交订单）、SB-CUSTOMER-04、SB-BACKSTAGE-04
+- **实现版本**: Node.js / Python（后端 API）
