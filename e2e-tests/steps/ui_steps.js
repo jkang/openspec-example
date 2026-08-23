@@ -62,12 +62,6 @@ Then('系统应展示包含订单号的成功模态框', async function () {
   expect(modalText).to.match(/#\S+/);
 });
 
-Then('模态框中应有"继续购物"按钮', async function () {
-  const button = this.page.locator('button:has-text("继续购物")');
-  await button.waitFor();
-  expect(await button.isVisible()).to.be.true;
-});
-
 // ---------- 优惠券结算 ----------
 
 Then('结算侧边栏应自动推荐{string}为最优方案', async function (couponName) {
@@ -144,4 +138,121 @@ Then('最近发放记录顶部应出现该条记录', async function () {
   expect(text).to.contain(couponName);
   expect(text).to.contain(userId);
   expect(text).to.contain('王琳');
+});
+
+// ==================== 订单生命周期 (Phase 3) ====================
+
+// ---------- 下单与模拟支付 ----------
+
+Then('成功模态框应显示订单状态{string}', async function (statusZh) {
+  const modal = this.page.locator('div.fixed.inset-0');
+  await modal.waitFor();
+  const text = await modal.textContent();
+  expect(text).to.contain('订单状态');
+  expect(text).to.contain(statusZh);
+});
+
+Then('模态框中应有{string}按钮', async function (label) {
+  const button = this.page.locator('div.fixed.inset-0 button:has-text("' + label + '")');
+  await button.waitFor();
+  expect(await button.isVisible()).to.be.true;
+});
+
+When('用户点击"模拟支付"', async function () {
+  await this.page.locator('div.fixed.inset-0 button:has-text("模拟支付")').click();
+  // 等待支付完成反馈（"已支付成功"）
+  await this.page.waitForSelector('text=已支付成功，库存已扣减', { timeout: 10000 });
+});
+
+Then('模态框应显示{string}', async function (expected) {
+  const modal = this.page.locator('div.fixed.inset-0');
+  await modal.waitFor();
+  const text = await modal.textContent();
+  expect(text).to.contain(expected);
+});
+
+// ---------- C 端下单/支付前置 ----------
+
+Given('用户通过 C 端完成一笔已支付订单', async function () {
+  await this.page.goto(STORE_URL);
+  await this.page.waitForSelector('button:has-text("加入购物车")');
+  await this.page.locator('button:has-text("加入购物车")').first().click();
+  await this.page.waitForSelector('header button:has-text("购物车") span');
+  await this.page.locator('button:has-text("确认结算")').click();
+  await this.page.waitForSelector('div.fixed.inset-0 button:has-text("模拟支付")', { timeout: 10000 });
+  await this.page.locator('div.fixed.inset-0 button:has-text("模拟支付")').click();
+  await this.page.waitForSelector('text=已支付成功，库存已扣减', { timeout: 10000 });
+  // 关闭弹窗，回到店铺
+  await this.page.locator('button:has-text("继续购物")').click();
+});
+
+Given('用户通过 C 端创建一笔待支付订单', async function () {
+  await this.page.goto(STORE_URL);
+  await this.page.waitForSelector('button:has-text("加入购物车")');
+  await this.page.locator('button:has-text("加入购物车")').first().click();
+  await this.page.waitForSelector('header button:has-text("购物车") span');
+  await this.page.locator('button:has-text("确认结算")').click();
+  await this.page.waitForSelector('div.fixed.inset-0 button:has-text("模拟支付")', { timeout: 10000 });
+  await this.page.locator('button:has-text("继续购物")').click();
+});
+
+// ---------- B 端订单列表 ----------
+
+When('用户进入运营后台订单列表', async function () {
+  await this.page.locator('button:has-text("运营后台")').click();
+  await this.page.locator('nav a:has-text("订单列表")').click();
+  await this.page.waitForSelector('section h2:has-text("订单列表")');
+  await this.page.waitForSelector('tbody tr', { timeout: 10000 });
+});
+
+Then('订单列表应包含该订单且状态为{string}', async function (statusZh) {
+  const firstRow = this.page.locator('tbody tr').first();
+  await firstRow.waitFor();
+  const text = await firstRow.textContent();
+  expect(text).to.contain(statusZh);
+});
+
+When('运营人员对该订单执行{string}', async function (action) {
+  const firstRow = this.page.locator('tbody tr').first();
+  await firstRow.locator('button:has-text("' + action + '")').click();
+});
+
+Then('订单列表该订单状态应变为{string}', async function (statusZh) {
+  await this.page.waitForSelector('tbody tr:has-text("' + statusZh + '")', { timeout: 10000 });
+});
+
+When('运营人员对该订单点击{string}并确认', async function (action) {
+  const firstRow = this.page.locator('tbody tr').first();
+  await firstRow.locator('button:has-text("' + action + '")').click();
+  await this.page.waitForSelector('button:has-text("确认取消")');
+  await this.page.locator('button:has-text("确认取消")').click();
+});
+
+// ---------- C 端我的订单 ----------
+
+When('用户点击"我的订单"', async function () {
+  await this.page.locator('header button:has-text("我的订单")').click();
+  await this.page.waitForSelector('h2:has-text("我的订单")');
+  await this.page.waitForSelector('main section', { timeout: 10000 });
+});
+
+Then('我的订单列表应包含该订单且状态为{string}', async function (statusZh) {
+  const firstSection = this.page.locator('main section').first();
+  const text = await firstSection.textContent();
+  expect(text).to.contain(statusZh);
+});
+
+When('用户展开该订单详情', async function () {
+  const firstSection = this.page.locator('main section').first();
+  await firstSection.locator('button:has-text("查看详情")').click();
+  await this.page.waitForSelector('text=商品总额');
+});
+
+Then('订单详情应显示状态轨迹并高亮{string}', async function (statusZh) {
+  const firstSection = this.page.locator('main section').first();
+  const text = await firstSection.textContent();
+  expect(text).to.contain('商品总额');
+  expect(text).to.contain('待支付');
+  expect(text).to.contain('已支付');
+  expect(text).to.contain(statusZh);
 });

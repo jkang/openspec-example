@@ -15,16 +15,16 @@
       "id": "story-order-admin",
       "title": "B 端订单管理",
       "description": "运营后台订单管理：订单列表（状态过滤/搜索）、订单详情（商品快照/金额明细/优惠券）、发货操作（PAID→SHIPPED）、取消操作（PENDING_PAYMENT→CANCELLED）。",
-      "status": "in_progress",
-      "changeName": "story-order-admin",
+      "status": "done",
+      "changeName": "2026-08-23-story-order-admin",
       "priority": "high"
     },
     {
       "id": "story-order-customer",
       "title": "C 端订单状态展示",
       "description": "结算成功弹窗展示订单状态；买家可查看订单状态（待支付/已支付/已发货/已完成）。",
-      "status": "planned",
-      "changeName": null,
+      "status": "done",
+      "changeName": "2026-08-23-story-order-customer",
       "priority": "medium"
     }
   ],

@@ -421,4 +421,28 @@ describe('订单状态机与模拟支付 (@unit)', () => {
     // 完成后不可再迁移
     assert.throws(() => orders.markShipped(order.id), /ORDER_STATUS_INVALID/)
   })
+
+  it('按用户查询订单：归属隔离 + 倒序', () => {
+    const p = catalog.addProduct({ name: 'F', priceCents: 100, stock: 99 })
+    cart.addToCart('user_a', p.id, 1)
+    const o1 = orders.createOrder('user_a')
+    cart.addToCart('user_b', p.id, 1)
+    const o2 = orders.createOrder('user_b')
+    cart.addToCart('user_a', p.id, 1)
+    const o3 = orders.createOrder('user_a')
+
+    const mine = orders.listByUser('user_a')
+    assert.strictEqual(mine.length, 2)
+    // 倒序: 后创建的在前
+    assert.strictEqual(mine[0].id, o3.id)
+    assert.strictEqual(mine[1].id, o1.id)
+    // 归属隔离
+    assert.ok(!mine.some(o => o.id === o2.id))
+    // 订单含 createdAt
+    assert.ok(o1.createdAt)
+  })
+
+  it('按用户查询：无订单用户返回空数组', () => {
+    assert.deepStrictEqual(orders.listByUser('user_nobody'), [])
+  })
 })

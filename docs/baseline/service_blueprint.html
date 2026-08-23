@@ -690,7 +690,8 @@
                             <p class="cell-block-title">客户动作</p>
                             <ul class="activity-list">
                                 <li>查看 Checkout Success 页面</li>
-                                <li>确认订单详情</li>
+                                <li>查看「我的订单」列表与实时状态（待支付/已支付/已发货/已完成/已取消）</li>
+                                <li>确认订单详情（商品快照/金额/状态轨迹）</li>
                                 <li>继续购物，重新回到商品浏览</li>
                             </ul>
                         </div>
@@ -831,8 +832,9 @@
                             <p class="cell-block-title">核心活动</p>
                             <ul class="activity-list">
                                 <li>查看成功交易结果</li>
+                                <li>查看订单列表/详情（订单号/金额/商品快照）</li>
+                                <li>发货（PAID→SHIPPED）与取消（仅待支付→CANCELLED）</li>
                                 <li>以订单数据复盘营销效果</li>
-                                <li>推动用户回到下一轮浏览</li>
                             </ul>
                         </div>
                         <div class="cell-block">
@@ -840,7 +842,7 @@
                             <div class="capability-list">
                                 <div class="capability" data-capability="order-management">
                                     <span class="capability-name">order-management</span>
-                                    <span class="capability-desc">订单查询与结果可见性</span>
+                                    <span class="capability-desc">订单查询/发货/取消（B 端管理）</span>
                                 </div>
                                 <div class="capability support" data-capability="frontend-ui">
                                     <span class="capability-name">frontend-ui</span>
@@ -939,6 +941,8 @@
                                 <li>创建订单并写入 `PENDING_PAYMENT`（下单仅校验库存，不扣减）</li>
                                 <li>持久化 `discountCents / actualPaidCents` 并绑定优惠券</li>
                                 <li>成功后清空购物车并保证幂等</li>
+                                <li>`/api/admin/orders` 列表（状态过滤/搜索）与 ship/cancel 接口</li>
+                                <li>`GET /api/orders?userId=` 按用户查询我的订单（归属隔离，倒序）</li>
                             </ul>
                         </div>
                         <div class="cell-block">
@@ -946,7 +950,7 @@
                             <div class="capability-list">
                                 <div class="capability" data-capability="order-management">
                                     <span class="capability-name">order-management</span>
-                                    <span class="capability-desc">订单创建、查询、总价计算；取消（仅待支付）</span>
+                                    <span class="capability-desc">订单创建、查询、总价计算；取消（仅待支付）；B 端列表/发货</span>
                                 </div>
                                 <div class="capability" data-capability="catalog-management">
                                     <span class="capability-name">catalog-management</span>

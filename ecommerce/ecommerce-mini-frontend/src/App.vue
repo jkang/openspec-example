@@ -15,8 +15,11 @@
           class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-none focus:outline-none focus:border-slate-400 transition-colors text-sm"
         >
       </div>
+      <div v-else-if="viewMode === 'orders'" class="flex-1 mx-8 text-sm text-slate-500">
+        当前路径: <span class="text-slate-900 font-medium">我的订单</span>
+      </div>
       <div v-else class="flex-1 mx-8 text-sm text-slate-500">
-        当前路径: <span class="text-slate-900 font-medium">{{ { product: '交易管理 / 商品管理', category: '交易管理 / 分类管理', coupon: '营销中心 / 优惠券管理' }[adminTab] }}</span>
+        当前路径: <span class="text-slate-900 font-medium">{{ { order: '交易管理 / 订单列表', product: '交易管理 / 商品管理', category: '交易管理 / 分类管理', coupon: '营销中心 / 优惠券管理' }[adminTab] }}</span>
       </div>
 
       <div class="flex items-center gap-6 text-sm font-medium">
@@ -31,13 +34,17 @@
             :class="['px-3 py-1 border-l border-slate-200 transition-colors', viewMode === 'admin' ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 hover:bg-slate-50']"
           >运营后台</button>
         </div>
+        <button v-if="viewMode === 'store' || viewMode === 'orders'" @click="switchViewMode('orders')"
+                :class="['py-1 px-2 border transition-colors', viewMode === 'orders' ? 'border-slate-900 text-slate-900' : 'border-slate-200 hover:bg-slate-50']">
+          我的订单
+        </button>
         <button v-if="viewMode === 'store'" @click="isCartOpen = !isCartOpen" class="relative py-1 px-2 border border-slate-200 hover:bg-slate-50">
           购物车
           <span v-if="cartTotalItems > 0" class="absolute -top-1 -right-1 w-4 h-4 bg-slate-900 text-white text-[10px] flex items-center justify-center">
             {{ cartTotalItems }}
           </span>
         </button>
-        <span v-else class="text-sm text-slate-500 font-normal">运营专员: 王琳</span>
+        <span v-if="viewMode === 'admin'" class="text-sm text-slate-500 font-normal">运营专员: 王琳</span>
       </div>
     </header>
 
@@ -179,13 +186,60 @@
       </aside>
     </main>
 
+    <!-- 主内容区 (C 端我的订单) -->
+    <main v-else-if="viewMode === 'orders'" class="flex-1 overflow-y-auto p-8 bg-slate-50 scrollbar-hide">
+      <div class="max-w-3xl mx-auto space-y-6">
+        <h2 class="text-xl font-bold tracking-tight border-b-2 border-slate-900 pb-4">我的订单</h2>
+
+        <section v-for="o in myOrders" :key="o.id" class="bg-white border border-slate-200">
+          <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+            <div>
+              <div class="font-mono text-sm text-slate-500">#{{ o.id }}</div>
+              <div class="text-xs text-slate-400 mt-1">{{ formatOrderTime(o.createdAt) }}</div>
+            </div>
+            <div class="flex items-center gap-4">
+              <span class="text-xs font-bold border border-slate-200 px-2 py-1">{{ orderStatusLabel(o.status) }}</span>
+              <button @click="toggleMyOrder(o)" class="border border-slate-200 px-3 py-1 text-xs font-medium hover:bg-slate-50 transition-colors">{{ expandedMyOrderId === o.id ? '收起' : '查看详情' }}</button>
+            </div>
+          </div>
+          <div class="px-6 py-3 flex items-center justify-between text-sm">
+            <span class="text-slate-700">{{ o.items[0].name }}<template v-if="o.items.length > 1"> 等 {{ o.items.reduce((n, i) => n + i.quantity, 0) }} 件</template></span>
+            <span class="font-mono font-bold">¥{{ (o.actualPaidCents / 100).toFixed(2) }}</span>
+          </div>
+
+          <div v-if="expandedMyOrderId === o.id" class="border-t border-slate-200 px-6 py-4 space-y-3">
+            <div class="grid grid-cols-2 gap-3 text-sm">
+              <div><span class="text-slate-500">商品总额:</span> <span class="font-mono">¥{{ (o.totalCents / 100).toFixed(2) }}</span></div>
+              <div><span class="text-slate-500">优惠券:</span> <span class="font-mono">{{ o.couponId || '无' }}</span></div>
+              <div><span class="text-slate-500">折扣:</span> <span class="font-mono">-¥{{ (o.discountCents / 100).toFixed(2) }}</span></div>
+              <div><span class="text-slate-500">实付:</span> <span class="font-mono font-bold">¥{{ (o.actualPaidCents / 100).toFixed(2) }}</span></div>
+            </div>
+            <div class="flex items-center gap-1 text-[10px] text-slate-500 mt-2">
+              <span v-for="(s, i) in ['待支付', '已支付', '已发货', '已完成']" :key="i"
+                    :class="['px-2 py-1 border', orderStep(o.status) >= i ? 'border-slate-900 text-slate-900 font-bold' : 'border-slate-200']">{{ s }}</span>
+              <span v-if="o.status === 'CANCELLED'" class="ml-2 px-2 py-1 border border-slate-900 text-slate-900 font-bold">已取消</span>
+            </div>
+            <div class="flex flex-col gap-1 mt-2 text-sm">
+              <div v-for="it in o.items" :key="it.productId" class="flex justify-between text-slate-600">
+                <span>{{ it.name }} × {{ it.quantity }}</span>
+                <span class="font-mono">¥{{ (it.priceCents * it.quantity / 100).toFixed(2) }}</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <div v-if="myOrders.length === 0" class="border border-slate-200 bg-white py-12 text-center text-sm text-slate-400">暂无订单</div>
+      </div>
+    </main>
+
     <!-- 主内容区 (B 端运营后台) -->
     <main v-else class="flex-1 flex overflow-hidden">
       <!-- 左侧导航 -->
       <aside class="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0">
         <nav class="flex-1 py-4">
           <div class="px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">交易管理</div>
-          <a class="flex items-center px-6 py-3 border-l-4 border-transparent text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer">订单列表</a>
+          <a @click="adminTab = 'order'"
+             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'order' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']">订单列表</a>
           <a @click="adminTab = 'product'"
              :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'product' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']">商品管理</a>
           <a @click="adminTab = 'category'"
@@ -482,7 +536,7 @@
           </div><!-- /商品管理 tab -->
 
           <!-- ===== 分类管理 tab ===== -->
-          <div v-else>
+          <div v-else-if="adminTab === 'category'">
 
             <!-- 章节一: 分类列表 -->
             <section class="bg-white border border-slate-200 p-8">
@@ -551,6 +605,99 @@
 
           </div><!-- /分类管理 tab -->
 
+          <!-- ===== 订单列表 tab ===== -->
+          <div v-else>
+
+            <!-- 章节一: 订单列表 -->
+            <section class="bg-white border border-slate-200 p-8">
+              <div class="flex items-center justify-between mb-6 border-b border-slate-200 pb-4">
+                <h2 class="text-lg font-bold">订单列表</h2>
+                <input v-model.trim="orderKeyword" type="text" placeholder="搜索订单号 / 用户 ID..."
+                       class="w-64 border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+              </div>
+
+              <!-- 状态过滤 -->
+              <div class="flex items-center gap-2 mb-6 flex-wrap">
+                <button v-for="f in orderFilters" :key="f.value" @click="orderFilter = f.value"
+                        :class="['px-4 py-2 border text-sm font-medium transition-colors', orderFilter === f.value ? 'bg-slate-900 text-white' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50']">
+                  {{ f.label }}<span v-if="f.value !== 'ALL'" class="ml-1 text-xs opacity-60">{{ adminOrdersCount[f.value] || 0 }}</span>
+                </button>
+              </div>
+
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="text-left text-slate-500 border-b border-slate-200">
+                    <th class="pb-3 font-medium">订单号</th>
+                    <th class="pb-3 font-medium">用户</th>
+                    <th class="pb-3 font-medium">商品数</th>
+                    <th class="pb-3 font-medium">实付</th>
+                    <th class="pb-3 font-medium">状态</th>
+                    <th class="pb-3 font-medium text-right">操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="o in filteredAdminOrders" :key="o.id" class="border-b border-slate-200">
+                    <td class="py-3 font-mono font-medium text-slate-900">{{ o.id }}</td>
+                    <td class="py-3 font-mono text-slate-600">{{ o.userId }}</td>
+                    <td class="py-3">{{ o.items.reduce((n, i) => n + i.quantity, 0) }} 件</td>
+                    <td class="py-3 font-mono">¥{{ (o.actualPaidCents / 100).toFixed(2) }}</td>
+                    <td class="py-3"><span class="text-xs font-bold border border-slate-200 px-2 py-1">{{ orderStatusLabel(o.status) }}</span></td>
+                    <td class="py-3 text-right">
+                      <button @click="toggleOrderDetail(o)" class="border border-slate-200 text-slate-700 px-3 py-1 text-xs font-medium hover:bg-slate-50 transition-colors">{{ expandedOrderId === o.id ? '收起' : '详情' }}</button>
+                      <button v-if="o.status === 'PENDING_PAYMENT'" @click="pendingCancelOrder = o" class="border border-slate-200 text-slate-700 px-3 py-1 text-xs font-medium hover:bg-slate-50 transition-colors ml-2">取消</button>
+                      <button v-if="o.status === 'PAID'" @click="shipOrder(o)" class="bg-slate-900 text-white px-3 py-1 text-xs font-medium ml-2">发货</button>
+                    </td>
+                  </tr>
+                  <tr v-if="filteredAdminOrders.length === 0">
+                    <td colspan="6" class="py-8 text-center text-slate-400">暂无订单</td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+
+            <!-- 章节二: 订单详情 -->
+            <section v-if="expandedAdminOrder" class="bg-white border border-slate-200 p-8">
+              <h2 class="text-lg font-bold mb-6 border-b border-slate-200 pb-4">订单详情 #{{ expandedAdminOrder.id }}</h2>
+              <div class="grid grid-cols-2 gap-6 mb-6 text-sm">
+                <div><span class="text-slate-500">用户:</span> <span class="font-mono">{{ expandedAdminOrder.userId }}</span></div>
+                <div><span class="text-slate-500">状态:</span> <span class="font-bold">{{ orderStatusLabel(expandedAdminOrder.status) }}</span></div>
+                <div><span class="text-slate-500">商品总额:</span> <span class="font-mono">¥{{ (expandedAdminOrder.totalCents / 100).toFixed(2) }}</span></div>
+                <div><span class="text-slate-500">优惠券:</span> <span class="font-mono">{{ expandedAdminOrder.couponId || '无' }}</span></div>
+                <div><span class="text-slate-500">折扣:</span> <span class="font-mono">-¥{{ (expandedAdminOrder.discountCents / 100).toFixed(2) }}</span></div>
+                <div><span class="text-slate-500">实付:</span> <span class="font-mono font-bold">¥{{ (expandedAdminOrder.actualPaidCents / 100).toFixed(2) }}</span></div>
+              </div>
+              <table class="w-full text-sm border border-slate-200">
+                <thead>
+                  <tr class="bg-slate-50 text-slate-500">
+                    <th class="py-2 px-4 text-left font-medium">商品</th>
+                    <th class="py-2 px-4 text-left font-medium">单价</th>
+                    <th class="py-2 px-4 text-left font-medium">数量</th>
+                    <th class="py-2 px-4 text-left font-medium">小计</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="it in expandedAdminOrder.items" :key="it.productId" class="border-t border-slate-200">
+                    <td class="py-2 px-4">{{ it.name }}</td>
+                    <td class="py-2 px-4 font-mono">¥{{ (it.priceCents / 100).toFixed(2) }}</td>
+                    <td class="py-2 px-4">{{ it.quantity }}</td>
+                    <td class="py-2 px-4 font-mono">¥{{ (it.priceCents * it.quantity / 100).toFixed(2) }}</td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+
+            <!-- 章节三: 取消确认 -->
+            <section v-if="pendingCancelOrder" class="bg-white border border-slate-200 p-8">
+              <h2 class="text-lg font-bold mb-4 border-b border-slate-200 pb-4">取消确认</h2>
+              <p class="text-sm text-slate-700 mb-6">确认取消订单「<span class="font-mono font-medium text-slate-900">{{ pendingCancelOrder.id }}</span>」吗？该订单未扣库存/未核销券，取消后进入「已取消」终态。</p>
+              <div class="flex items-center space-x-3">
+                <button @click="doCancelOrder" class="bg-slate-900 text-white px-6 py-2 text-sm font-medium hover:bg-slate-700 transition-colors">确认取消</button>
+                <button @click="pendingCancelOrder = null" class="border border-slate-200 text-slate-600 px-6 py-2 text-sm font-medium">返回</button>
+              </div>
+            </section>
+
+          </div><!-- /订单列表 tab -->
+
         </div>
       </div>
     </main>
@@ -597,6 +744,11 @@
         <div v-else-if="lastOrderStatus === 'PAID'" class="border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
           已支付成功，库存已扣减，等待商家发货。
         </div>
+
+        <button v-if="lastOrderStatus === 'PAID'" @click="goToMyOrders"
+                class="w-full py-2 px-4 border border-slate-900 text-slate-900 font-semibold hover:bg-slate-50 transition-colors uppercase text-xs tracking-widest">
+          查看订单
+        </button>
 
         <!-- 操作按钮 -->
         <button 
@@ -914,6 +1066,11 @@ const resetCheckoutState = () => {
   payOrderError.value = ''
 }
 
+const goToMyOrders = () => {
+  resetCheckoutState()
+  switchViewMode('orders')
+}
+
 // ==================== 模拟支付 ====================
 const orderStatusLabel = (s) => ({
   PENDING_PAYMENT: '待支付',
@@ -964,13 +1121,36 @@ const switchViewMode = (mode) => {
     fetchCoupons()
     fetchCategories()
   }
+  if (mode === 'orders') {
+    fetchMyOrders()
+  }
   if (mode === 'admin') {
     fetchAdminCoupons()
     fetchIssuances()
     fetchAdminProducts()
     fetchCategories()
+    fetchAdminOrders()
   }
 }
+
+// ==================== C 端我的订单 ====================
+const myOrders = ref([])
+const expandedMyOrderId = ref(null)
+
+const fetchMyOrders = async () => {
+  try {
+    const response = await fetch(`${API_BASE}/api/orders?userId=${encodeURIComponent(currentUserId.value)}`)
+    if (response.ok) {
+      myOrders.value = await response.json()
+    }
+  } catch (e) {
+    console.error('获取我的订单失败:', e)
+  }
+}
+
+const toggleMyOrder = (o) => { expandedMyOrderId.value = expandedMyOrderId.value === o.id ? null : o.id }
+const orderStep = (s) => ({ PENDING_PAYMENT: 0, PAID: 1, SHIPPED: 2, COMPLETED: 3 }[s] ?? -1)
+const formatOrderTime = (t) => t ? String(t).replace('T', ' ').slice(0, 16) : ''
 
 const fetchAdminCoupons = async () => {
   try {
@@ -1161,6 +1341,86 @@ const doDeleteCategory = async () => {
     await Promise.all([fetchCategories(), fetchAdminProducts()])
   } catch (e) {
     categoryError.value = `网络错误: ${e.message}`
+  }
+}
+
+// ==================== B 端订单管理 ====================
+const adminOrders = ref([])
+const orderFilter = ref('ALL')
+const orderKeyword = ref('')
+const expandedOrderId = ref(null)
+const pendingCancelOrder = ref(null)
+
+const orderFilters = [
+  { label: '全部', value: 'ALL' },
+  { label: '待支付', value: 'PENDING_PAYMENT' },
+  { label: '已支付', value: 'PAID' },
+  { label: '已发货', value: 'SHIPPED' },
+  { label: '已完成', value: 'COMPLETED' },
+  { label: '已取消', value: 'CANCELLED' }
+]
+
+const adminOrdersCount = computed(() => {
+  const count = {}
+  adminOrders.value.forEach(o => { count[o.status] = (count[o.status] || 0) + 1 })
+  return count
+})
+
+const filteredAdminOrders = computed(() => {
+  let list = adminOrders.value
+  if (orderFilter.value !== 'ALL') list = list.filter(o => o.status === orderFilter.value)
+  if (orderKeyword.value.trim()) {
+    const k = orderKeyword.value.trim().toLowerCase()
+    list = list.filter(o => o.id.toLowerCase().includes(k) || o.userId.toLowerCase().includes(k))
+  }
+  return list
+})
+
+const expandedAdminOrder = computed(() => adminOrders.value.find(o => o.id === expandedOrderId.value) || null)
+
+const fetchAdminOrders = async () => {
+  try {
+    const response = await fetch(`${API_BASE}/api/admin/orders`)
+    if (response.ok) {
+      adminOrders.value = await response.json()
+    }
+  } catch (e) {
+    console.error('获取订单列表失败:', e)
+  }
+}
+
+const toggleOrderDetail = (o) => { expandedOrderId.value = expandedOrderId.value === o.id ? null : o.id }
+
+const shipOrder = async (o) => {
+  try {
+    const response = await fetch(`${API_BASE}/api/admin/orders/${o.id}/ship`, { method: 'POST' })
+    if (!response.ok) {
+      const err = await response.json()
+      alert(err.message || err.detail || '发货失败')
+      return
+    }
+    expandedOrderId.value = null
+    await fetchAdminOrders()
+  } catch (e) {
+    alert(`网络错误: ${e.message}`)
+  }
+}
+
+const doCancelOrder = async () => {
+  if (!pendingCancelOrder.value) return
+  const id = pendingCancelOrder.value.id
+  try {
+    const response = await fetch(`${API_BASE}/api/admin/orders/${id}/cancel`, { method: 'POST' })
+    if (!response.ok) {
+      const err = await response.json()
+      alert(err.message || err.detail || '取消失败')
+      return
+    }
+    pendingCancelOrder.value = null
+    expandedOrderId.value = null
+    await fetchAdminOrders()
+  } catch (e) {
+    alert(`网络错误: ${e.message}`)
   }
 }
 

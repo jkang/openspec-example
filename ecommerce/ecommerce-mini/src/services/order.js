@@ -59,7 +59,8 @@ export class OrderService {
       discountCents,
       actualPaidCents,
       couponId: effectiveCouponId,
-      items: orderItems
+      items: orderItems,
+      createdAt: new Date().toISOString()
     }
     this.orderRepo.save(order)
 
@@ -102,5 +103,38 @@ export class OrderService {
     order.status = 'COMPLETED'
     this.orderRepo.save(order)
     return order
+  }
+
+  /** B 端订单列表：状态过滤（白名单）+ 关键词搜索（订单号/用户 ID） */
+  listAdmin({ status, keyword } = {}) {
+    let orders = this.orderRepo.findAll()
+
+    if (status && status !== 'ALL') {
+      orders = orders.filter(o => o.status === status)
+    }
+
+    if (keyword && String(keyword).trim()) {
+      const k = String(keyword).trim().toLowerCase()
+      orders = orders.filter(o =>
+        o.id.toLowerCase().includes(k) || o.userId.toLowerCase().includes(k)
+      )
+    }
+
+    return orders
+  }
+
+  /** C 端按用户查询订单：仅返回该用户订单，按创建时间倒序（同毫秒按保存顺序倒序） */
+  listByUser(userId) {
+    return this.orderRepo
+      .findAll()
+      .map((order, index) => ({ order, index }))
+      .filter(x => x.order.userId === userId)
+      .sort((a, b) => {
+        const ta = a.order.createdAt || ''
+        const tb = b.order.createdAt || ''
+        if (ta !== tb) return tb.localeCompare(ta)
+        return b.index - a.index // createdAt 相同（同毫秒）时，后保存的在前
+      })
+      .map(x => x.order)
   }
 }

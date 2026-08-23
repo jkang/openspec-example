@@ -431,3 +431,140 @@ describe('模拟支付 API (@api)', () => {
     assert.strictEqual((await res.json()).code, 'ORDER_NOT_FOUND')
   })
 })
+
+describe('B 端订单管理 API (@api)', () => {
+  let apiBase = ''
+  let apiStop = () => {}
+
+  before(async () => {
+    const { server } = createServer()
+    await new Promise(resolve => server.listen(0, () => resolve(undefined)))
+    const address = server.address()
+    const port = address && typeof address === 'object' ? address.port : 0
+    apiBase = `http://127.0.0.1:${port}`
+    apiStop = () => server.close()
+  })
+  after(() => apiStop())
+
+  const post = (path, body) => fetch(`${apiBase}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  })
+
+  async function createAndPay(userId, productId) {
+    await post('/api/cart/items', { userId, productId, quantity: 1 })
+    const order = await (await post('/api/orders', { userId })).json()
+    return order
+  }
+
+  it('订单列表: 全量 + 状态过滤 + 关键词搜索', async () => {
+    const pending = await createAndPay('user_admin1', '1')
+    const paidOrder = await createAndPay('user_admin2', '2')
+    await post(`/api/payments/${paidOrder.id}`)
+
+    // 全量（含种子与新建）
+    const all = await (await fetch(`${apiBase}/api/admin/orders`)).json()
+    assert.ok(all.length >= 2)
+
+    // 状态过滤 PAID
+    const paid = await (await fetch(`${apiBase}/api/admin/orders?status=PAID`)).json()
+    assert.ok(paid.length >= 1)
+    assert.ok(paid.every(o => o.status === 'PAID'))
+
+    // 关键词搜索订单号
+    const byKeyword = await (await fetch(`${apiBase}/api/admin/orders?keyword=${pending.id}`)).json()
+    assert.strictEqual(byKeyword.length, 1)
+    assert.strictEqual(byKeyword[0].id, pending.id)
+    assert.strictEqual(pending.status, 'PENDING_PAYMENT')
+  })
+
+  it('发货: PAID → SHIPPED；非 PAID 被拒绝', async () => {
+    const pending = await createAndPay('user_admin3', '1')
+    // 非 PAID 发货被拒
+    const badShip = await post(`/api/admin/orders/${pending.id}/ship`)
+    assert.strictEqual(badShip.status, 400)
+    assert.strictEqual((await badShip.json()).code, 'ORDER_STATUS_INVALID')
+
+    // 支付后发货成功
+    await post(`/api/payments/${pending.id}`)
+    const shipRes = await post(`/api/admin/orders/${pending.id}/ship`)
+    assert.strictEqual(shipRes.status, 200)
+    assert.strictEqual((await shipRes.json()).status, 'SHIPPED')
+  })
+
+  it('取消: 待支付可取消；已支付被拒绝', async () => {
+    const pending = await createAndPay('user_admin4', '1')
+    const cancelRes = await post(`/api/admin/orders/${pending.id}/cancel`)
+    assert.strictEqual(cancelRes.status, 200)
+    assert.strictEqual((await cancelRes.json()).status, 'CANCELLED')
+
+    // 已支付不可取消
+    const paidOrder = await createAndPay('user_admin5', '2')
+    await post(`/api/payments/${paidOrder.id}`)
+    const badCancel = await post(`/api/admin/orders/${paidOrder.id}/cancel`)
+    assert.strictEqual(badCancel.status, 400)
+    assert.strictEqual((await badCancel.json()).code, 'ORDER_NOT_CANCELLABLE')
+  })
+
+  it('操作不存在订单返回 404', async () => {
+    const shipRes = await post('/api/admin/orders/order_nope/ship')
+    assert.strictEqual(shipRes.status, 404)
+    assert.strictEqual((await shipRes.json()).code, 'ORDER_NOT_FOUND')
+  })
+})
+
+describe('C 端我的订单 API (@api)', () => {
+  let apiBase = ''
+  let apiStop = () => {}
+
+  before(async () => {
+    const { server } = createServer()
+    await new Promise(resolve => server.listen(0, () => resolve(undefined)))
+    const address = server.address()
+    const port = address && typeof address === 'object' ? address.port : 0
+    apiBase = `http://127.0.0.1:${port}`
+    apiStop = () => server.close()
+  })
+  after(() => apiStop())
+
+  const post = (path, body) => fetch(`${apiBase}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  })
+
+  it('按用户查询订单（归属隔离 + 倒序）', async () => {
+    const p1 = await (await post('/api/products', { name: '测试商品甲', priceCents: 1000, stock: 99 })).json()
+    const p2 = await (await post('/api/products', { name: '测试商品乙', priceCents: 2000, stock: 99 })).json()
+
+    // user_my 下两单
+    await post('/api/cart/items', { userId: 'user_my', productId: p1.id, quantity: 1 })
+    const o1 = await (await post('/api/orders', { userId: 'user_my' })).json()
+    await post('/api/cart/items', { userId: 'user_my', productId: p2.id, quantity: 1 })
+    const o2 = await (await post('/api/orders', { userId: 'user_my' })).json()
+    // 其他用户下一单
+    await post('/api/cart/items', { userId: 'user_other', productId: p1.id, quantity: 1 })
+    const o3 = await (await post('/api/orders', { userId: 'user_other' })).json()
+
+    const mine = await (await fetch(`${apiBase}/api/orders?userId=user_my`)).json()
+    assert.strictEqual(mine.length, 2)
+    // 倒序（后创建在前）
+    assert.strictEqual(mine[0].id, o2.id)
+    assert.strictEqual(mine[1].id, o1.id)
+    // 归属隔离: 不含 o3
+    assert.ok(!mine.some(o => o.id === o3.id))
+    // 订单含 createdAt
+    assert.ok(mine[0].createdAt)
+  })
+
+  it('无 userId 参数返回 400', async () => {
+    const res = await fetch(`${apiBase}/api/orders`)
+    assert.strictEqual(res.status, 400)
+  })
+
+  it('无订单用户返回空数组', async () => {
+    const res = await (await fetch(`${apiBase}/api/orders?userId=user_nobody`)).json()
+    assert.deepStrictEqual(res, [])
+  })
+})

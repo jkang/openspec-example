@@ -10,7 +10,7 @@
 | Node 测试 | `./init.sh test:all` (Node 部分) | ✅ PASS | 56 passed, 0 failed（新增 10 用例：状态机/支付/取消/幂等） |
 | Python 测试 | `./init.sh test:all` (Python 部分) | ✅ PASS | 12 passed, 0 failed |
 | 前端构建 | `./init.sh vue:start` | ✅ PASS | Vite ready, `npm run build` 通过 |
-| E2E 全链路 | `./init.sh e2e:run` | ✅ PASS | 6 scenarios / 25 steps 全绿 |
+| E2E 全链路 | `./init.sh e2e:run` | ✅ PASS | 10 scenarios / 46 steps 全绿（含 Phase 3 订单生命周期 4 场景） |
 
 ## 证据记录
 
@@ -28,4 +28,4 @@
 
 ### 说明
 - 库存/券扣减时机已按用户确认语义修正：**下单不扣、支付成功后扣**（domain_model Policy 对齐）。
-- 基线回流（task 6：domain_model / service_blueprint）属 `/opsx:sync` 阶段。
+- 基线回流（domain_model / service_blueprint）已在 `/opsx:sync` 阶段完成。

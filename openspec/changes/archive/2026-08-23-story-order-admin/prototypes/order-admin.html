@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订单管理 - 极简电商 ADMIN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        * { border-radius: 0 !important; box-shadow: none !important; }
+        body { background-color: #f8fafc; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .border-slate-200 { border-color: #e2e8f0; }
+        input:focus, select:focus { outline: none; border-color: #0f172a; }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div id="app" class="flex min-h-screen">
+        <!-- 左侧导航 -->
+        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0">
+            <div class="h-16 flex items-center px-6 border-b border-slate-200">
+                <h1 class="text-xl font-bold tracking-tight">极简电商 ADMIN</h1>
+            </div>
+            <nav class="flex-1 py-4">
+                <div class="px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">交易管理</div>
+                <a class="flex items-center px-6 py-3 border-l-4 border-slate-900 bg-slate-50 text-slate-900 font-medium cursor-pointer">订单列表</a>
+                <a class="flex items-center px-6 py-3 border-l-4 border-transparent text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer">商品管理</a>
+                <a class="flex items-center px-6 py-3 border-l-4 border-transparent text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer">分类管理</a>
+                <div class="mt-8 px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">营销中心</div>
+                <a class="flex items-center px-6 py-3 border-l-4 border-transparent text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer">优惠券管理</a>
+            </nav>
+        </aside>
+
+        <!-- 右侧内容区 -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0">
+                <div class="text-slate-600">当前路径: <span class="text-slate-900 font-medium">交易管理 / 订单列表</span></div>
+                <div class="flex items-center space-x-4"><span class="text-sm text-slate-500">运营专员: 王琳</span></div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-8">
+                <div class="max-w-6xl mx-auto space-y-8">
+
+                    <!-- 章节一: 订单列表 -->
+                    <section class="bg-white border border-slate-200 p-8">
+                        <div class="flex items-center justify-between mb-6 border-b border-slate-200 pb-4">
+                            <h2 class="text-lg font-bold">订单列表</h2>
+                            <div class="flex items-center gap-3">
+                                <input v-model.trim="keyword" type="text" placeholder="搜索订单号 / 用户 ID..."
+                                       class="w-56 border border-slate-200 px-3 py-2 text-sm bg-white">
+                            </div>
+                        </div>
+
+                        <!-- 状态过滤 -->
+                        <div class="flex items-center gap-2 mb-6 flex-wrap">
+                            <button v-for="f in statusFilters" :key="f.value" @click="activeFilter = f.value"
+                                    :class="['px-4 py-2 border text-sm font-medium transition-colors', activeFilter === f.value ? 'bg-slate-900 text-white' : 'border-slate-200 text-slate-600']">
+                                {{ f.label }}<span v-if="f.value !== 'ALL'" class="ml-1 text-xs opacity-60">{{ countByStatus(f.value) }}</span>
+                            </button>
+                        </div>
+
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="border-b border-slate-200 text-slate-500">
+                                    <th class="py-2 pr-4 font-medium">订单号</th>
+                                    <th class="py-2 px-4 font-medium">用户</th>
+                                    <th class="py-2 px-4 font-medium">商品数</th>
+                                    <th class="py-2 px-4 font-medium">实付</th>
+                                    <th class="py-2 px-4 font-medium">状态</th>
+                                    <th class="py-2 px-4 font-medium text-right">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="o in filteredOrders" :key="o.id" class="border-b border-slate-200 hover:bg-slate-50 transition-colors">
+                                    <td class="py-3 pr-4 font-mono font-medium text-slate-900">{{ o.id }}</td>
+                                    <td class="py-3 px-4 font-mono text-slate-600">{{ o.userId }}</td>
+                                    <td class="py-3 px-4">{{ o.items.reduce((n,i) => n + i.quantity, 0) }} 件</td>
+                                    <td class="py-3 px-4 font-mono">¥{{ (o.actualPaidCents / 100).toFixed(2) }}</td>
+                                    <td class="py-3 px-4">
+                                        <span class="text-xs font-bold border border-slate-200 px-2 py-1">{{ statusLabel(o.status) }}</span>
+                                    </td>
+                                    <td class="py-3 px-4 text-right space-x-2">
+                                        <button @click="toggleDetail(o)" class="px-3 py-1 border border-slate-200 text-slate-700 text-xs font-medium hover:bg-slate-50">{{ expandedId === o.id ? '收起' : '详情' }}</button>
+                                        <button v-if="o.status === 'PENDING_PAYMENT'" @click="pendingCancel = o" class="px-3 py-1 border border-slate-200 text-slate-700 text-xs font-medium hover:bg-slate-50">取消</button>
+                                        <button v-if="o.status === 'PAID'" @click="ship(o)" class="px-3 py-1 bg-slate-900 text-white text-xs font-medium">发货</button>
+                                    </td>
+                                </tr>
+                                <tr v-if="filteredOrders.length === 0">
+                                    <td colspan="6" class="py-8 text-center text-slate-400">暂无订单</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <!-- 章节二: 订单详情 -->
+                    <section v-if="expandedOrder" class="bg-white border border-slate-200 p-8">
+                        <h2 class="text-lg font-bold mb-6 border-b border-slate-200 pb-4">订单详情 #{{ expandedOrder.id }}</h2>
+                        <div class="grid grid-cols-2 gap-6 mb-6 text-sm">
+                            <div><span class="text-slate-500">用户:</span> <span class="font-mono">{{ expandedOrder.userId }}</span></div>
+                            <div><span class="text-slate-500">状态:</span> <span class="font-bold">{{ statusLabel(expandedOrder.status) }}</span></div>
+                            <div><span class="text-slate-500">商品总额:</span> <span class="font-mono">¥{{ (expandedOrder.totalCents / 100).toFixed(2) }}</span></div>
+                            <div><span class="text-slate-500">优惠券:</span> <span class="font-mono">{{ expandedOrder.couponId || '无' }}</span></div>
+                            <div><span class="text-slate-500">折扣:</span> <span class="font-mono">-¥{{ (expandedOrder.discountCents / 100).toFixed(2) }}</span></div>
+                            <div><span class="text-slate-500">实付:</span> <span class="font-mono font-bold">¥{{ (expandedOrder.actualPaidCents / 100).toFixed(2) }}</span></div>
+                        </div>
+                        <table class="w-full text-sm border border-slate-200">
+                            <thead>
+                                <tr class="bg-slate-50 text-slate-500">
+                                    <th class="py-2 px-4 text-left font-medium">商品</th>
+                                    <th class="py-2 px-4 text-left font-medium">单价</th>
+                                    <th class="py-2 px-4 text-left font-medium">数量</th>
+                                    <th class="py-2 px-4 text-left font-medium">小计</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="it in expandedOrder.items" :key="it.productId" class="border-t border-slate-200">
+                                    <td class="py-2 px-4">{{ it.name }}</td>
+                                    <td class="py-2 px-4 font-mono">¥{{ (it.priceCents / 100).toFixed(2) }}</td>
+                                    <td class="py-2 px-4">{{ it.quantity }}</td>
+                                    <td class="py-2 px-4 font-mono">¥{{ (it.priceCents * it.quantity / 100).toFixed(2) }}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <!-- 章节三: 取消确认 -->
+                    <section v-if="pendingCancel" class="bg-white border border-slate-200 p-8">
+                        <h2 class="text-lg font-bold mb-4 border-b border-slate-200 pb-4">取消确认</h2>
+                        <p class="text-sm text-slate-700 mb-6">确认取消订单「<span class="font-mono font-medium text-slate-900">{{ pendingCancel.id }}</span>」吗？该订单未扣库存/未核销券，取消后进入「已取消」终态。</p>
+                        <div class="flex items-center space-x-3">
+                            <button @click="doCancel" class="px-4 py-2 bg-slate-900 text-white text-sm font-medium">确认取消</button>
+                            <button @click="pendingCancel = null" class="px-4 py-2 border border-slate-200 text-slate-600 text-sm font-medium">返回</button>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+        createApp({
+            setup() {
+                const orders = ref([
+                    { id: 'order_kx9f2m7q', userId: 'user_1001', status: 'PENDING_PAYMENT', totalCents: 29900, discountCents: 1000, actualPaidCents: 28900, couponId: 'FLAT10', items: [{ productId: '1', name: '极简机械键盘', priceCents: 29900, quantity: 1 }] },
+                    { id: 'order_ab2c8d3e', userId: 'user_1002', status: 'PAID', totalCents: 8900, discountCents: 0, actualPaidCents: 8900, couponId: null, items: [{ productId: '2', name: '无线办公鼠标', priceCents: 8900, quantity: 1 }] },
+                    { id: 'order_mn5x7y9z', userId: 'user_1003', status: 'SHIPPED', totalCents: 6800, discountCents: 0, actualPaidCents: 6800, couponId: null, items: [{ productId: '5', name: '铝合金笔记本支架', priceCents: 6800, quantity: 1 }] },
+                    { id: 'order_qw1er2ty', userId: 'user_1004', status: 'COMPLETED', totalCents: 4500, discountCents: 0, actualPaidCents: 4500, couponId: null, items: [{ productId: '4', name: '桌面收纳架', priceCents: 4500, quantity: 1 }] },
+                    { id: 'order_zx9cv8bn', userId: 'user_1005', status: 'CANCELLED', totalCents: 12800, discountCents: 0, actualPaidCents: 12800, couponId: null, items: [{ productId: '6', name: '桌面拾音氛围灯', priceCents: 12800, quantity: 1 }] }
+                ]);
+
+                const activeFilter = ref('ALL');
+                const keyword = ref('');
+                const expandedId = ref(null);
+                const pendingCancel = ref(null);
+
+                const statusFilters = [
+                    { label: '全部', value: 'ALL' },
+                    { label: '待支付', value: 'PENDING_PAYMENT' },
+                    { label: '已支付', value: 'PAID' },
+                    { label: '已发货', value: 'SHIPPED' },
+                    { label: '已完成', value: 'COMPLETED' },
+                    { label: '已取消', value: 'CANCELLED' }
+                ];
+
+                const statusLabel = (s) => ({ PENDING_PAYMENT: '待支付', PAID: '已支付', SHIPPED: '已发货', COMPLETED: '已完成', CANCELLED: '已取消' }[s] || s);
+                const countByStatus = (s) => orders.value.filter(o => o.status === s).length;
+
+                const filteredOrders = computed(() => {
+                    let list = orders.value
+                    if (activeFilter.value !== 'ALL') list = list.filter(o => o.status === activeFilter.value)
+                    if (keyword.value.trim()) {
+                        const k = keyword.value.trim().toLowerCase()
+                        list = list.filter(o => o.id.toLowerCase().includes(k) || o.userId.toLowerCase().includes(k))
+                    }
+                    return list
+                });
+
+                const expandedOrder = computed(() => orders.value.find(o => o.id === expandedId.value) || null);
+
+                function toggleDetail(o) { expandedId.value = expandedId.value === o.id ? null : o.id }
+                function ship(o) {
+                    o.status = 'SHIPPED'
+                    expandedId.value = null
+                }
+                function doCancel() {
+                    if (!pendingCancel.value) return
+                    pendingCancel.value.status = 'CANCELLED'
+                    pendingCancel.value = null
+                    expandedId.value = null
+                }
+
+                return { orders, activeFilter, keyword, expandedId, pendingCancel, statusFilters, statusLabel, countByStatus, filteredOrders, expandedOrder, toggleDetail, ship, doCancel };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

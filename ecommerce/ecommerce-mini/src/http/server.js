@@ -230,6 +230,24 @@ export function createServer() {
         return sendJson(res, 200, order)
       }
 
+      if (pathname === '/api/admin/orders' && req.method === 'GET') {
+        const status = url.searchParams.get('status')
+        const keyword = url.searchParams.get('keyword')
+        return sendJson(res, 200, orderService.listAdmin({ status, keyword }))
+      }
+
+      if (pathname.startsWith('/api/admin/orders/') && pathname.endsWith('/ship') && req.method === 'POST') {
+        const id = pathname.split('/')[4]
+        const order = orderService.markShipped(id)
+        return sendJson(res, 200, order)
+      }
+
+      if (pathname.startsWith('/api/admin/orders/') && pathname.endsWith('/cancel') && req.method === 'POST') {
+        const id = pathname.split('/')[4]
+        const order = orderService.cancelOrder(id)
+        return sendJson(res, 200, order)
+      }
+
       if (pathname === '/api/coupons' && req.method === 'GET') {
         const userId = url.searchParams.get('userId')
         return sendJson(res, 200, couponService.list(userId))
@@ -263,10 +281,17 @@ export function createServer() {
       }
       
       if (pathname.startsWith('/api/orders/') && req.method === 'GET') {
-          const id = pathname.split('/').pop()
-          const order = orderRepo.findById(id)
-          if (!order) return sendError(res, 'NOT_FOUND', 'Order not found', 404)
-          return sendJson(res, 200, order)
+        const id = pathname.split('/').pop()
+        const order = orderRepo.findById(id)
+        if (!order) return sendError(res, 'NOT_FOUND', 'Order not found', 404)
+        return sendJson(res, 200, order)
+      }
+
+      if (pathname === '/api/orders' && req.method === 'GET') {
+        // 按用户查询我的订单（带 userId 参数）；否则回落 404
+        const userId = url.searchParams.get('userId')
+        if (!userId) return sendError(res, 'BAD_REQUEST', 'userId is required', 400)
+        return sendJson(res, 200, orderService.listByUser(userId))
       }
 
       sendError(res, 'NOT_FOUND', 'Endpoint not found', 404)
