@@ -8,6 +8,7 @@ import { OrderService } from '../services/order.js'
 import { CouponService } from '../services/coupon.js'
 import { AdminCouponService } from '../services/adminCoupon.js'
 import { CategoryService } from '../services/category.js'
+import { PaymentService } from '../services/payment.js'
 
 // 注入初始商品数据
 const initialProducts = [
@@ -105,6 +106,7 @@ export function createServer() {
   const adminCouponService = new AdminCouponService(couponRepo, issuanceRepo)
   const orderService = new OrderService(cartRepo, orderRepo, productRepo, couponService)
   const categoryService = new CategoryService(categoryRepo, productRepo)
+  const paymentService = new PaymentService(orderRepo, productRepo, couponService)
 
   const server = http.createServer(async (req, res) => {
     // Handle CORS preflight
@@ -222,6 +224,12 @@ export function createServer() {
         return sendJson(res, 200, order)
       }
 
+      if (pathname.startsWith('/api/payments/') && req.method === 'POST') {
+        const id = pathname.split('/').pop()
+        const order = paymentService.pay(id)
+        return sendJson(res, 200, order)
+      }
+
       if (pathname === '/api/coupons' && req.method === 'GET') {
         const userId = url.searchParams.get('userId')
         return sendJson(res, 200, couponService.list(userId))
@@ -280,6 +288,14 @@ export function createServer() {
         return sendError(res, 'CATEGORY_NAME_REQUIRED', '分类名称不能为空', 400)
       if (e.message === 'CATEGORY_NOT_FOUND')
         return sendError(res, 'CATEGORY_NOT_FOUND', '分类不存在', 404)
+      if (e.message === 'ORDER_STATUS_INVALID')
+        return sendError(res, 'ORDER_STATUS_INVALID', '非法的订单状态流转', 400)
+      if (e.message === 'ORDER_NOT_CANCELLABLE')
+        return sendError(res, 'ORDER_NOT_CANCELLABLE', '该订单当前不可取消', 400)
+      if (e.message === 'ORDER_ALREADY_PAID')
+        return sendError(res, 'ORDER_ALREADY_PAID', '该订单已支付，请勿重复支付', 200)
+      if (e.message === 'ORDER_NOT_FOUND')
+        return sendError(res, 'ORDER_NOT_FOUND', '订单不存在', 404)
       if (e.message === 'COUPON_NOT_FOUND')
         return sendError(res, 'COUPON_NOT_FOUND', '优惠券不存在', 404)
       if (e.message === 'COUPON_ALREADY_USED')

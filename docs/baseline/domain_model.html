@@ -579,32 +579,39 @@
             {
                 id: 'order',
                 name: 'Order',
-                desc: '订单状态机体现了支付确认、取消与库存扣减闭环，是最核心的交易状态对象。',
+                desc: '订单状态机体现支付确认、发货、履约完成与取消闭环，是最核心的交易状态对象。',
                 canvas: { width: 1040, height: 520, nodeWidth: 190, nodeHeight: 74 },
                 states: [
-                    { id: 'pending', label: 'PENDING', desc: '订单已创建，等待支付', x: 70, y: 110 },
-                    { id: 'paid', label: 'PAID', desc: '支付确认成功', x: 360, y: 110 },
-                    { id: 'completed', label: 'COMPLETED', desc: '库存扣减完成，闭环', x: 650, y: 110 },
-                    { id: 'cancelled', label: 'CANCELLED', desc: '超时未付或主动取消', x: 360, y: 320 }
+                    { id: 'pending', label: 'PENDING_PAYMENT', desc: '订单已创建（下单不扣库存），等待支付', x: 40, y: 100 },
+                    { id: 'paid', label: 'PAID', desc: '支付确认成功（扣库存、核销券）', x: 260, y: 100 },
+                    { id: 'shipped', label: 'SHIPPED', desc: '商家已发货', x: 480, y: 100 },
+                    { id: 'completed', label: 'COMPLETED', desc: '履约完成，终态', x: 700, y: 100 },
+                    { id: 'cancelled', label: 'CANCELLED', desc: '仅待支付可取消，终态', x: 480, y: 300 }
                 ],
                 transitions: [
                     {
                         from: 'pending',
                         to: 'paid',
                         event: 'PaymentConfirmed',
-                        rule: '支付确认后锁定 actualPaidCents；计算折扣时对百分比结果执行 +0.00001 补偿后向下取整。'
+                        rule: '支付成功时二次校验库存后扣减库存并核销优惠券；锁定 actualPaidCents；计算折扣时对百分比结果执行 +0.00001 补偿后向下取整。'
                     },
                     {
                         from: 'pending',
                         to: 'cancelled',
                         event: 'OrderCancelled',
-                        rule: '未支付超时或用户取消时进入 CANCELLED；不得触发库存扣减。'
+                        rule: '仅 PENDING_PAYMENT 可取消；未扣库存、未核销券，无释放动作。'
                     },
                     {
                         from: 'paid',
+                        to: 'shipped',
+                        event: 'OrderShipped',
+                        rule: '商家发货后进入 SHIPPED。'
+                    },
+                    {
+                        from: 'shipped',
                         to: 'completed',
-                        event: 'OrderStockDeducted',
-                        rule: '库存扣减是支付后的异步后置动作；只有扣减成功才进入 COMPLETED。'
+                        event: 'OrderCompleted',
+                        rule: '履约完成后进入 COMPLETED 终态，不可再迁移。'
                     }
                 ]
             },
@@ -747,8 +754,10 @@
                 ['Cart', 'ValidateCart', '执行 Session 一致性校验。'],
                 ['Coupon', 'ApplyBestCoupon', '在可用券中选出最优券。'],
                 ['Coupon', 'IssueCoupon', '运营以 ACTIVE 模板为蓝本向指定用户发放券实例。'],
-                ['Order', 'PlaceOrder', '基于购物车快照生成订单。'],
-                ['Order', 'ConfirmPayment', '确认支付并触发后续履约动作。']
+                ['Order', 'PlaceOrder', '基于购物车快照生成订单（下单不扣库存）。'],
+                ['Order', 'PayOrder', '模拟支付：扣减库存、核销券、订单 → PAID。'],
+                ['Order', 'ConfirmPayment', '确认支付并触发后续履约动作。'],
+                ['Order', 'CancelOrder', '取消待支付订单 → CANCELLED。']
             ],
             events: [
                 ['Catalog', 'ProductSearched', '用户完成商品搜索。'],
@@ -757,6 +766,10 @@
                 ['Coupon', 'CouponApplied', '优惠券被成功应用。'],
                 ['Coupon', 'CouponIssued', '优惠券实例已发放并归属指定用户。'],
                 ['Order', 'OrderPlaced', '订单已生成。'],
+                ['Order', 'OrderPaid', '支付成功，库存已扣减、券已核销。'],
+                ['Order', 'OrderShipped', '商家已发货。'],
+                ['Order', 'OrderCompleted', '订单已完成。'],
+                ['Order', 'OrderCancelled', '订单已取消（仅待支付可取消）。'],
                 ['Order', 'OrderPaymentConfirmed', '支付确认完成。'],
                 ['Order', 'OrderStockDeducted', '库存扣减成功。']
             ],
@@ -766,7 +779,8 @@
                 ['Coupon', '发放归属', '发放的实例仅对持有人可见并参与其最优券推荐。'],
                 ['Order', '精度补偿', '百分比折扣结果执行 +0.00001 后向下取整。'],
                 ['Cart', '一致性校验', 'Session 用户与购物车归属必须一致。'],
-                ['Catalog', '库存扣减时机', '只有 PaymentConfirmed 后才扣减库存。']
+                ['Catalog', '库存扣减时机', '下单仅校验库存；PaymentConfirmed 后二次校验并扣减库存；取消（未支付）不涉及库存。'],
+                ['Order', '支付幂等', '已 PAID 订单重复支付返回幂等提示，不重复扣库存/核销券。']
             ],
             readModels: [
                 ['Catalog', '商品搜索结果', '供买家浏览与筛选。'],

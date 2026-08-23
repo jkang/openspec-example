@@ -8,21 +8,22 @@
 
 ### Requirement: 订单创建
 
-系统 SHALL 支持从用户购物车结算生成订单，过程中处理库存扣减与购物车清空。为了提高结算的可靠性，系统 SHALL 验证结算请求中的价格一致性。
+系统 SHALL 支持从用户购物车结算生成订单，过程中校验库存充足、计算金额与折扣，**但不扣减库存、不核销优惠券**（扣减与核销在支付成功时执行）。为了提高结算的可靠性，系统 SHALL 验证结算请求中的价格一致性。
 
 **Priority**: P0 (Critical)
 
-**Rationale**: 订单创建是交易的核心流程，涉及多模块协调（Cart -> Catalog -> Order）。
+**Rationale**: 订单创建是交易的核心流程，涉及多模块协调（Cart -> Catalog -> Order）。库存与券的占用时机为"支付成功"，避免未支付订单长期占着库存。
 
 #### Scenario: 成功创建订单
-- **GIVEN** 用户购物车中有商品
-- **AND** 商品库存充足
+- **GIVEN** 用户购物车中有商品（库存充足）
+- **AND** 用户持有可用优惠券
 - **WHEN** 发送 POST /api/orders 携带 { userId } 或通过结算接口触发
 - **THEN** 返回状态码 201
-- **AND** 返回新创建的订单 Order
-- **AND** 订单状态为 PENDING_PAYMENT
+- **AND** 返回新创建的订单 Order，状态为 PENDING_PAYMENT
+- **AND** 订单含正确金额（totalCents / discountCents / actualPaidCents）与优惠券绑定
 - **AND** 购物车被清空
-- **AND** 库存被扣减
+- **AND** 商品库存 SHALL NOT 变化（未扣减）
+- **AND** 优惠券 SHALL NOT 被核销（仍为未使用）
 
 #### Scenario: 创建订单时购物车为空
 - **GIVEN** 用户购物车为空
@@ -42,6 +43,28 @@
 - **WHEN** 重复发送相同的 POST /api/orders 请求
 - **THEN** 返回相同的订单信息
 - **AND** 不重复创建订单
+
+---
+
+### Requirement: 订单取消
+
+系统 SHALL 支持取消订单，但仅限 `PENDING_PAYMENT` 状态。取消后订单进入 `CANCELLED` 终态；因下单未扣库存/未核销券，取消时 SHALL 无库存与券的变化。已支付（PAID）及之后状态的订单 SHALL NOT 可取消。
+
+**Priority**: P1
+
+**Rationale**: 取消是订单生命周期闭环的必要动作；语义与"下单不扣、支付才扣"一致。
+
+#### Scenario: 取消待支付订单
+- **GIVEN** 订单状态为 PENDING_PAYMENT
+- **WHEN** 执行取消操作
+- **THEN** 订单状态变为 CANCELLED（终态）
+- **AND** 库存与优惠券均无变化（未扣/未核销）
+
+#### Scenario: 已支付订单不可取消
+- **GIVEN** 订单状态为 PAID（或更后续状态）
+- **WHEN** 尝试取消
+- **THEN** 拒绝，返回错误码 `ORDER_NOT_CANCELLABLE`
+- **AND** 订单状态不变
 
 ---
 

@@ -1,0 +1,32 @@
+{
+  "epicKey": "order-lifecycle",
+  "title": "订单生命周期与履约闭环 (Phase 3)",
+  "description": "让订单从模拟数据变为可处理的工作流：下单 → 支付 → 发货 → 完成 / 取消。库存改为支付成功后扣减（下单仅校验），取消释放关联资源。B 端可真实管理订单（列表/详情/发货/取消），C 端可见订单状态。",
+  "stories": [
+    {
+      "id": "story-order-payment",
+      "title": "订单状态机与模拟支付",
+      "description": "订单状态扩展为 PENDING_PAYMENT → PAID → SHIPPED → COMPLETED / CANCELLED；实现 POST /api/payments/:orderId（幂等）；库存与优惠券核销改为支付成功时执行，取消（PENDING_PAYMENT）释放库存。",
+      "status": "done",
+      "changeName": "2026-08-23-story-order-payment",
+      "priority": "high"
+    },
+    {
+      "id": "story-order-admin",
+      "title": "B 端订单管理",
+      "description": "运营后台订单管理：订单列表（状态过滤/搜索）、订单详情（商品快照/金额明细/优惠券）、发货操作（PAID→SHIPPED）、取消操作（PENDING_PAYMENT→CANCELLED）。",
+      "status": "in_progress",
+      "changeName": "story-order-admin",
+      "priority": "high"
+    },
+    {
+      "id": "story-order-customer",
+      "title": "C 端订单状态展示",
+      "description": "结算成功弹窗展示订单状态；买家可查看订单状态（待支付/已支付/已发货/已完成）。",
+      "status": "planned",
+      "changeName": null,
+      "priority": "medium"
+    }
+  ],
+  "updatedAt": "2026-08-23"
+}

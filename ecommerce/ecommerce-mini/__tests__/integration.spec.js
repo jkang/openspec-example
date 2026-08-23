@@ -374,3 +374,60 @@ describe('分类管理 API (@api)', () => {
     assert.strictEqual((await res.json()).code, 'CATEGORY_NOT_FOUND')
   })
 })
+
+describe('模拟支付 API (@api)', () => {
+  let apiBase = ''
+  let apiStop = () => {}
+
+  before(async () => {
+    const { server } = createServer()
+    await new Promise(resolve => server.listen(0, () => resolve(undefined)))
+    const address = server.address()
+    const port = address && typeof address === 'object' ? address.port : 0
+    apiBase = `http://127.0.0.1:${port}`
+    apiStop = () => server.close()
+  })
+  after(() => apiStop())
+
+  const post = (path, body) => fetch(`${apiBase}${path}`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  })
+
+  it('下单不扣库存，支付成功后扣减并推进状态', async () => {
+    // 加购商品 1 (键盘, 库存 99)
+    await post('/api/cart/items', { userId: 'user_pay', productId: '1', quantity: 1 })
+    // 下单
+    const orderRes = await post('/api/orders', { userId: 'user_pay' })
+    assert.strictEqual(orderRes.status, 201)
+    const order = await orderRes.json()
+    assert.strictEqual(order.status, 'PENDING_PAYMENT')
+    // 库存未扣
+    const p1 = await (await fetch(`${apiBase}/api/products/1`)).json()
+    assert.strictEqual(p1.stock, 99)
+    // 支付
+    const payRes = await post(`/api/payments/${order.id}`)
+    assert.strictEqual(payRes.status, 200)
+    const paid = await payRes.json()
+    assert.strictEqual(paid.status, 'PAID')
+    // 库存已扣
+    const p2 = await (await fetch(`${apiBase}/api/products/1`)).json()
+    assert.strictEqual(p2.stock, 98)
+  })
+
+  it('重复支付返回幂等提示 (200 ORDER_ALREADY_PAID)', async () => {
+    await post('/api/cart/items', { userId: 'user_pay2', productId: '2', quantity: 1 })
+    const order = await (await post('/api/orders', { userId: 'user_pay2' })).json()
+    await post(`/api/payments/${order.id}`)
+    const dup = await post(`/api/payments/${order.id}`)
+    assert.strictEqual(dup.status, 200)
+    assert.strictEqual((await dup.json()).code, 'ORDER_ALREADY_PAID')
+  })
+
+  it('支付不存在订单返回 404', async () => {
+    const res = await post('/api/payments/order_nope')
+    assert.strictEqual(res.status, 404)
+    assert.strictEqual((await res.json()).code, 'ORDER_NOT_FOUND')
+  })
+})

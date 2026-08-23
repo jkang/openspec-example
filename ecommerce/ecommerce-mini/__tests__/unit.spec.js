@@ -7,6 +7,7 @@ import { OrderService } from '../src/services/order.js'
 import { CouponService } from '../src/services/coupon.js'
 import { AdminCouponService } from '../src/services/adminCoupon.js'
 import { CategoryService } from '../src/services/category.js'
+import { PaymentService } from '../src/services/payment.js'
 import { validateCouponRule, validateIssue } from '../src/domain/logic.js'
 
 describe('领域与服务单元测试', () => {
@@ -48,14 +49,21 @@ describe('领域与服务单元测试', () => {
     assert.strictEqual(c.items[0].quantity, 2)
   })
 
-  it('下单扣减库存', () => {
+  it('下单不扣库存，支付成功后扣减', () => {
     const p = catalog.addProduct({ name: 'Hat', priceCents: 100, stock: 10 })
     cart.addToCart('u1', p.id, 2)
     const order = orders.createOrder('u1')
-    
+
     assert.ok(order.id)
     assert.strictEqual(order.totalCents, 200)
     assert.strictEqual(order.actualPaidCents, 200)
+    // 下单不扣库存
+    assert.strictEqual(catalog.getProduct(p.id).stock, 10)
+
+    // 支付成功后扣减
+    const payment = new PaymentService(orderRepo, productRepo, coupon)
+    const paid = payment.pay(order.id)
+    assert.strictEqual(paid.status, 'PAID')
     assert.strictEqual(catalog.getProduct(p.id).stock, 8)
   })
 
@@ -95,7 +103,8 @@ describe('领域与服务单元测试', () => {
     
     assert.ok(order.id)
     assert.strictEqual(order.totalCents, 500)
-    assert.strictEqual(catalog.getProduct(p.id).stock, 4)
+    // 下单不扣库存（支付后才扣）
+    assert.strictEqual(catalog.getProduct(p.id).stock, 5)
     assert.strictEqual(cart.getCart('u2').items.length, 0)
   })
 
@@ -317,5 +326,99 @@ describe('优惠券运营后台领域校验 (@unit)', () => {
     assert.ok(couponService.list('user_1003').some(c => c.id === instance.id))
     assert.ok(!couponService.list('user_1004').some(c => c.id === instance.id))
     assert.ok(!couponService.list('user_1003').some(c => c.id === template.id))
+  })
+})
+
+describe('订单状态机与模拟支付 (@unit)', () => {
+  let productRepo
+  let cartRepo
+  let orderRepo
+  let couponRepo
+  let catalog
+  let cart
+  let coupon
+  let orders
+  let payment
+
+  beforeEach(() => {
+    productRepo = new ProductRepo()
+    cartRepo = new CartRepo()
+    orderRepo = new OrderRepo()
+    couponRepo = new CouponRepo()
+    catalog = new CatalogService(productRepo, new CategoryRepo())
+    cart = new CartService(cartRepo, productRepo)
+    coupon = new CouponService(couponRepo)
+    orders = new OrderService(cartRepo, orderRepo, productRepo, coupon)
+    payment = new PaymentService(orderRepo, productRepo, coupon)
+  })
+
+  it('支付成功：扣库存 + 核销券 + 状态 PAID', () => {
+    const p = catalog.addProduct({ name: '键盘', priceCents: 25900, stock: 99 })
+    couponRepo.save({ id: 'FLAT10', name: '满 50 减 10', type: 'FLAT', value: 1000, minSpendCents: 5000, status: 'UNUSED', userId: null })
+    cart.addToCart('u1', p.id, 1)
+    const order = orders.createOrder('u1')
+    assert.strictEqual(order.couponId, 'FLAT10')
+    assert.strictEqual(catalog.getProduct(p.id).stock, 99) // 下单不扣
+
+    const paid = payment.pay(order.id)
+    assert.strictEqual(paid.status, 'PAID')
+    assert.strictEqual(catalog.getProduct(p.id).stock, 98) // 支付后扣
+    // 券被核销
+    assert.ok(couponRepo.findById('FLAT10').status !== 'UNUSED')
+  })
+
+  it('重复支付已支付订单：幂等拒绝', () => {
+    const p = catalog.addProduct({ name: 'A', priceCents: 100, stock: 5 })
+    cart.addToCart('u1', p.id, 1)
+    const order = orders.createOrder('u1')
+    payment.pay(order.id)
+    assert.throws(() => payment.pay(order.id), /ORDER_ALREADY_PAID/)
+    // 库存不再重复扣
+    assert.strictEqual(catalog.getProduct(p.id).stock, 4)
+  })
+
+  it('支付时库存不足：拒绝且订单保持 PENDING_PAYMENT', () => {
+    const p = catalog.addProduct({ name: 'B', priceCents: 100, stock: 1 })
+    cart.addToCart('u1', p.id, 1)
+    const order = orders.createOrder('u1')
+    // 模拟支付前库存被他人扣光
+    catalog.deductStock(p.id, 1)
+    assert.throws(() => payment.pay(order.id), /OUT_OF_STOCK/)
+    assert.strictEqual(order.status, 'PENDING_PAYMENT')
+  })
+
+  it('取消仅限待支付订单', () => {
+    const p = catalog.addProduct({ name: 'C', priceCents: 100, stock: 5 })
+    cart.addToCart('u1', p.id, 1)
+    const order = orders.createOrder('u1')
+    const cancelled = orders.cancelOrder(order.id)
+    assert.strictEqual(cancelled.status, 'CANCELLED')
+    // 库存无变化（未扣）
+    assert.strictEqual(catalog.getProduct(p.id).stock, 5)
+  })
+
+  it('已支付订单不可取消', () => {
+    const p = catalog.addProduct({ name: 'D', priceCents: 100, stock: 5 })
+    cart.addToCart('u1', p.id, 1)
+    const order = orders.createOrder('u1')
+    payment.pay(order.id)
+    assert.throws(() => orders.cancelOrder(order.id), /ORDER_NOT_CANCELLABLE/)
+  })
+
+  it('状态机非法迁移被拒绝', () => {
+    const p = catalog.addProduct({ name: 'E', priceCents: 100, stock: 5 })
+    cart.addToCart('u1', p.id, 1)
+    const order = orders.createOrder('u1')
+    // 未支付直接发货 → 非法
+    assert.throws(() => orders.markShipped(order.id), /ORDER_STATUS_INVALID/)
+    assert.strictEqual(order.status, 'PENDING_PAYMENT')
+    // 正常链路: 支付→发货→完成
+    payment.pay(order.id)
+    orders.markShipped(order.id)
+    assert.strictEqual(order.status, 'SHIPPED')
+    orders.markCompleted(order.id)
+    assert.strictEqual(order.status, 'COMPLETED')
+    // 完成后不可再迁移
+    assert.throws(() => orders.markShipped(order.id), /ORDER_STATUS_INVALID/)
   })
 })

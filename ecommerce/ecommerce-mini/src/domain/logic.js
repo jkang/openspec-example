@@ -50,6 +50,29 @@ export function assertCategoryActive(category) {
 }
 
 /**
+ * 订单状态机迁移表（唯一事实来源）
+ * key: 当前状态；value: 允许迁移到的状态集合
+ */
+export const ORDER_TRANSITIONS = {
+  PENDING_PAYMENT: ['PAID', 'CANCELLED'],
+  PAID: ['SHIPPED'],
+  SHIPPED: ['COMPLETED'],
+  COMPLETED: [],
+  CANCELLED: []
+}
+
+/**
+ * 校验订单状态迁移合法性
+ * @param {"PENDING_PAYMENT"|"PAID"|"SHIPPED"|"COMPLETED"|"CANCELLED"} from
+ * @param {"PENDING_PAYMENT"|"PAID"|"SHIPPED"|"COMPLETED"|"CANCELLED"} to
+ * @throws {Error} ORDER_STATUS_INVALID 非法迁移
+ */
+export function assertOrderTransition(from, to) {
+  const allowed = ORDER_TRANSITIONS[from] || []
+  if (!allowed.includes(to)) throw new Error('ORDER_STATUS_INVALID')
+}
+
+/**
  * 计算折扣金额
  * @param {number} totalCents 订单总额
  * @param {import("./types.js").Coupon} coupon 优惠券

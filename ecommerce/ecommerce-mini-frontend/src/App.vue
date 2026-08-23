@@ -575,6 +575,27 @@
             <p class="text-[10px] text-slate-400 uppercase tracking-wider">订单编号</p>
             <p class="text-sm font-mono font-bold text-slate-900">#{{ lastOrderId }}</p>
           </div>
+          <div class="flex justify-between items-center">
+            <p class="text-[10px] text-slate-400 uppercase tracking-wider">订单状态</p>
+            <p class="text-sm font-bold text-slate-900">{{ orderStatusLabel(lastOrderStatus) }}</p>
+          </div>
+          <div class="flex justify-between items-center">
+            <p class="text-[10px] text-slate-400 uppercase tracking-wider">实付金额</p>
+            <p class="text-sm font-mono font-bold text-slate-900">¥{{ (lastOrderPaidCents / 100).toFixed(2) }}</p>
+          </div>
+        </div>
+
+        <!-- 模拟支付区域 -->
+        <div v-if="lastOrderStatus === 'PENDING_PAYMENT'" class="space-y-2">
+          <p class="text-xs text-slate-500">订单已创建，库存将在支付成功后扣减。</p>
+          <button @click="payLastOrder" :disabled="payingOrder"
+                  class="w-full py-2 px-4 bg-slate-900 text-white text-sm font-bold uppercase tracking-widest hover:bg-slate-800 transition-colors disabled:opacity-50">
+            {{ payingOrder ? '支付中...' : '模拟支付' }}
+          </button>
+          <p v-if="payOrderError" class="text-xs text-slate-900 border border-slate-200 bg-slate-50 px-2 py-1">{{ payOrderError }}</p>
+        </div>
+        <div v-else-if="lastOrderStatus === 'PAID'" class="border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+          已支付成功，库存已扣减，等待商家发货。
         </div>
 
         <!-- 操作按钮 -->
@@ -603,6 +624,10 @@ const isCartOpen = ref(true)
 const isProcessing = ref(false)
 const isCheckoutSuccess = ref(false)
 const lastOrderId = ref('')
+const lastOrderStatus = ref('')
+const lastOrderPaidCents = ref(0)
+const payingOrder = ref(false)
+const payOrderError = ref('')
 
 // 视图模式: store (C 端店铺) / admin (B 端运营后台)
 const viewMode = ref('store')
@@ -866,6 +891,8 @@ const checkout = async () => {
     if (response.ok) {
       const order = await response.json()
       lastOrderId.value = order.id
+      lastOrderStatus.value = order.status || 'PENDING_PAYMENT'
+      lastOrderPaidCents.value = order.actualPaidCents || 0
       isCheckoutSuccess.value = true
       cart.value = []
     } else {
@@ -882,6 +909,37 @@ const checkout = async () => {
 const resetCheckoutState = () => {
   isCheckoutSuccess.value = false
   lastOrderId.value = ''
+  lastOrderStatus.value = ''
+  lastOrderPaidCents.value = 0
+  payOrderError.value = ''
+}
+
+// ==================== 模拟支付 ====================
+const orderStatusLabel = (s) => ({
+  PENDING_PAYMENT: '待支付',
+  PAID: '已支付',
+  SHIPPED: '已发货',
+  COMPLETED: '已完成',
+  CANCELLED: '已取消'
+}[s] || s)
+
+const payLastOrder = async () => {
+  if (!lastOrderId.value) return
+  payingOrder.value = true
+  payOrderError.value = ''
+  try {
+    const response = await fetch(`${API_BASE}/api/payments/${lastOrderId.value}`, { method: 'POST' })
+    const data = await response.json()
+    if (!response.ok) {
+      payOrderError.value = data.message || data.detail || '支付失败'
+      return
+    }
+    lastOrderStatus.value = data.status || 'PAID'
+  } catch (e) {
+    payOrderError.value = `网络错误: ${e.message}`
+  } finally {
+    payingOrder.value = false
+  }
 }
 
 // ==================== B 端运营后台 ====================

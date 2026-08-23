@@ -41,7 +41,7 @@
 /**
  * @typedef {Object} Order
  * @property {string} id
- * @property {"PENDING_PAYMENT" | "PAID"} status
+ * @property {"PENDING_PAYMENT" | "PAID" | "SHIPPED" | "COMPLETED" | "CANCELLED"} status
  * @property {number} totalCents
  * @property {number} discountCents
  * @property {number} actualPaidCents

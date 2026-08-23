@@ -667,8 +667,8 @@
                         <div class="cell-block">
                             <p class="cell-block-title">客户动作</p>
                             <ul class="activity-list">
-                                <li>完成模拟支付</li>
-                                <li>确认订单由待支付变为已支付</li>
+                                <li>完成模拟支付（结算成功弹窗「模拟支付」按钮）</li>
+                                <li>确认订单由待支付变为已支付（库存已扣减反馈）</li>
                             </ul>
                         </div>
                         <div class="cell-block">
@@ -676,7 +676,7 @@
                             <div class="capability-list">
                                 <div class="capability" data-capability="payment">
                                     <span class="capability-name">payment</span>
-                                    <span class="capability-desc">支付成功与状态流转</span>
+                                    <span class="capability-desc">模拟支付交互；支付成功与状态流转</span>
                                 </div>
                                 <div class="capability" data-capability="order-management">
                                     <span class="capability-name">order-management</span>
@@ -936,8 +936,8 @@
                         <div class="cell-block">
                             <p class="cell-block-title">核心活动</p>
                             <ul class="activity-list">
-                                <li>创建订单并写入 `PENDING_PAYMENT`</li>
-                                <li>扣减库存，持久化 `discountCents / actualPaidCents`</li>
+                                <li>创建订单并写入 `PENDING_PAYMENT`（下单仅校验库存，不扣减）</li>
+                                <li>持久化 `discountCents / actualPaidCents` 并绑定优惠券</li>
                                 <li>成功后清空购物车并保证幂等</li>
                             </ul>
                         </div>
@@ -946,7 +946,7 @@
                             <div class="capability-list">
                                 <div class="capability" data-capability="order-management">
                                     <span class="capability-name">order-management</span>
-                                    <span class="capability-desc">订单创建、查询、总价计算</span>
+                                    <span class="capability-desc">订单创建、查询、总价计算；取消（仅待支付）</span>
                                 </div>
                                 <div class="capability" data-capability="catalog-management">
                                     <span class="capability-name">catalog-management</span>
@@ -963,9 +963,10 @@
                         <div class="cell-block">
                             <p class="cell-block-title">核心活动</p>
                             <ul class="activity-list">
-                                <li>`POST /api/payments/:orderId` 推进支付</li>
-                                <li>订单状态遵循 `PENDING_PAYMENT → PAID`</li>
-                                <li>重复支付时保持幂等语义</li>
+                                <li>`POST /api/payments/:orderId` 推进支付（已落地）</li>
+                                <li>支付成功时扣减库存、核销优惠券，状态 → PAID</li>
+                                <li>状态机：`PENDING_PAYMENT → PAID → SHIPPED → COMPLETED` / `CANCELLED`</li>
+                                <li>重复支付时保持幂等语义；支付时二次校验库存</li>
                             </ul>
                         </div>
                         <div class="cell-block">
@@ -973,7 +974,7 @@
                             <div class="capability-list">
                                 <div class="capability" data-capability="payment">
                                     <span class="capability-name">payment</span>
-                                    <span class="capability-desc">支付接口与支付校验</span>
+                                    <span class="capability-desc">支付接口与支付校验；扣库存/核销券</span>
                                 </div>
                                 <div class="capability support" data-capability="domain-model">
                                     <span class="capability-name">domain-model</span>

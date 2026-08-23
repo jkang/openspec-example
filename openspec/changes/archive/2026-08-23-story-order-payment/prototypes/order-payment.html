@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模拟支付 - 极简电商</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        * { border-radius: 0 !important; box-shadow: none !important; }
+        body { background-color: #f8fafc; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .border-slate-200 { border-color: #e2e8f0; }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-8">
+    <div id="app" class="w-full max-w-md bg-white border border-slate-200 p-8 space-y-6">
+        <!-- 头部 -->
+        <div class="flex items-center justify-between border-b border-slate-200 pb-4">
+            <h1 class="text-xl font-bold tracking-tight">极简电商 · 结算成功</h1>
+        </div>
+
+        <!-- 订单信息 -->
+        <div class="space-y-3">
+            <div class="flex justify-between items-center">
+                <span class="text-sm text-slate-500">订单编号</span>
+                <span class="text-sm font-mono font-bold">#{{ order.id }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-sm text-slate-500">实付金额</span>
+                <span class="text-lg font-bold">¥{{ (order.actualPaidCents / 100).toFixed(2) }}</span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="text-sm text-slate-500">订单状态</span>
+                <span class="text-xs font-bold border border-slate-200 px-2 py-1">{{ statusLabel(order.status) }}</span>
+            </div>
+            <div v-if="order.couponName" class="flex justify-between items-center">
+                <span class="text-sm text-slate-500">已用优惠券</span>
+                <span class="text-sm text-slate-700">{{ order.couponName }}</span>
+            </div>
+        </div>
+
+        <!-- 商品快照 -->
+        <div class="border border-slate-200 divide-y divide-slate-200">
+            <div v-for="item in order.items" :key="item.productId" class="flex justify-between px-4 py-3 text-sm">
+                <span class="text-slate-700">{{ item.name }} × {{ item.quantity }}</span>
+                <span class="font-medium">¥{{ (item.priceCents * item.quantity / 100).toFixed(2) }}</span>
+            </div>
+        </div>
+
+        <!-- 支付区域 -->
+        <div class="border-t border-slate-200 pt-6 space-y-4">
+            <template v-if="order.status === 'PENDING_PAYMENT'">
+                <p class="text-sm text-slate-500">订单已创建，库存将在支付成功后扣减。请完成模拟支付。</p>
+                <button @click="payOrder" :disabled="paying"
+                        class="w-full py-3 bg-slate-900 text-white text-sm font-bold tracking-widest uppercase hover:bg-slate-800 transition-colors disabled:opacity-50">
+                    {{ paying ? '支付中...' : '模拟支付' }}
+                </button>
+            </template>
+            <div v-else-if="order.status === 'PAID'" class="border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+                已支付成功，库存已扣减，等待商家发货。
+            </div>
+            <div v-if="payError" class="border border-slate-900 bg-slate-50 px-4 py-3 text-sm text-slate-900">{{ payError }}</div>
+        </div>
+
+        <!-- 状态流转轨迹 -->
+        <div class="border-t border-slate-200 pt-4">
+            <p class="text-xs text-slate-400 uppercase font-bold mb-3">订单状态流转</p>
+            <div class="flex items-center gap-1 text-[10px] text-slate-500">
+                <span :class="['px-2 py-1 border', statusStep >= 0 ? 'border-slate-900 text-slate-900 font-bold' : 'border-slate-200']">待支付</span>
+                <span>→</span>
+                <span :class="['px-2 py-1 border', statusStep >= 1 ? 'border-slate-900 text-slate-900 font-bold' : 'border-slate-200']">已支付</span>
+                <span>→</span>
+                <span :class="['px-2 py-1 border', statusStep >= 2 ? 'border-slate-900 text-slate-900 font-bold' : 'border-slate-200']">已发货</span>
+                <span>→</span>
+                <span :class="['px-2 py-1 border', statusStep >= 3 ? 'border-slate-900 text-slate-900 font-bold' : 'border-slate-200']">已完成</span>
+            </div>
+            <p class="text-xs text-slate-400 mt-2">取消仅限「待支付」状态，取消后订单进入「已取消」终态。</p>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref } = Vue;
+        createApp({
+            setup() {
+                const order = ref({
+                    id: 'order_kx9f2m7q',
+                    status: 'PENDING_PAYMENT',
+                    actualPaidCents: 25900,
+                    couponName: '满 50 减 10',
+                    items: [
+                        { productId: '1', name: '极简机械键盘', priceCents: 25900, quantity: 1 }
+                    ]
+                });
+                const paying = ref(false);
+                const payError = ref('');
+                const statusStep = ref(0); // 0=待支付, 1=已支付, ...
+
+                const statusLabel = (s) => ({ PENDING_PAYMENT: '待支付', PAID: '已支付', SHIPPED: '已发货', COMPLETED: '已完成', CANCELLED: '已取消' }[s] || s);
+
+                function payOrder() {
+                    payError.value = '';
+                    paying.value = true;
+                    // 模拟支付耗时
+                    setTimeout(() => {
+                        paying.value = false;
+                        order.value.status = 'PAID';
+                        statusStep.value = 1;
+                    }, 800);
+                }
+
+                return { order, paying, payError, statusStep, statusLabel, payOrder };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
