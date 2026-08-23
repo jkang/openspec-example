@@ -1,11 +1,12 @@
 import { describe, it, beforeEach } from 'node:test'
 import assert from 'node:assert'
-import { ProductRepo, CartRepo, OrderRepo, CouponRepo, IssuanceRepo } from '../src/repo/memoryRepo.js'
+import { ProductRepo, CartRepo, OrderRepo, CouponRepo, IssuanceRepo, CategoryRepo } from '../src/repo/memoryRepo.js'
 import { CatalogService } from '../src/services/catalog.js'
 import { CartService } from '../src/services/cart.js'
 import { OrderService } from '../src/services/order.js'
 import { CouponService } from '../src/services/coupon.js'
 import { AdminCouponService } from '../src/services/adminCoupon.js'
+import { CategoryService } from '../src/services/category.js'
 import { validateCouponRule, validateIssue } from '../src/domain/logic.js'
 
 describe('领域与服务单元测试', () => {
@@ -13,20 +14,24 @@ describe('领域与服务单元测试', () => {
   let cartRepo
   let orderRepo
   let couponRepo
+  let categoryRepo
   let catalog
   let cart
   let coupon
   let orders
+  let categories
 
   beforeEach(() => {
     productRepo = new ProductRepo()
     cartRepo = new CartRepo()
     orderRepo = new OrderRepo()
     couponRepo = new CouponRepo()
-    catalog = new CatalogService(productRepo)
+    categoryRepo = new CategoryRepo()
+    catalog = new CatalogService(productRepo, categoryRepo)
     cart = new CartService(cartRepo, productRepo)
     coupon = new CouponService(couponRepo)
     orders = new OrderService(cartRepo, orderRepo, productRepo, coupon)
+    categories = new CategoryService(categoryRepo, productRepo)
   })
 
   it('商品上架与列表', () => {
@@ -140,6 +145,97 @@ describe('领域与服务单元测试', () => {
     // Search + sort combination: only "A" contains 'a'
     const combo = catalog.list('a', 'price_desc')
     assert.deepStrictEqual(combo.map(p => p.priceCents), [300])
+  })
+
+  it('商品修改: 局部更新价格与库存后生效', () => {
+    const p = catalog.addProduct({ name: '极简机械键盘', priceCents: 29900, stock: 99, imageUrl: 'u.jpg' })
+    const updated = catalog.updateProduct(p.id, { priceCents: 27900, stock: 50 })
+    assert.strictEqual(updated.priceCents, 27900)
+    assert.strictEqual(updated.stock, 50)
+    // 未提供字段保持不变
+    assert.strictEqual(updated.name, '极简机械键盘')
+    assert.strictEqual(catalog.getProduct(p.id).priceCents, 27900)
+  })
+
+  it('商品修改: 非法价格与负库存被拒绝', () => {
+    const p = catalog.addProduct({ name: 'A', priceCents: 100, stock: 5 })
+    assert.throws(() => catalog.updateProduct(p.id, { priceCents: 0 }), /INVALID_PRICE/)
+    assert.throws(() => catalog.updateProduct(p.id, { stock: -1 }), /INVALID_STOCK/)
+    // 原值不变
+    assert.strictEqual(catalog.getProduct(p.id).priceCents, 100)
+    assert.strictEqual(catalog.getProduct(p.id).stock, 5)
+  })
+
+  it('商品修改: 不存在或已删除商品抛 PRODUCT_NOT_FOUND', () => {
+    assert.throws(() => catalog.updateProduct('nope', { priceCents: 100 }), /PRODUCT_NOT_FOUND/)
+    const p = catalog.addProduct({ name: 'B', priceCents: 100, stock: 5 })
+    catalog.deleteProduct(p.id)
+    assert.throws(() => catalog.updateProduct(p.id, { priceCents: 200 }), /PRODUCT_NOT_FOUND/)
+  })
+
+  it('商品删除: 软删除后从列表消失且不可查', () => {
+    const p = catalog.addProduct({ name: '桌面收纳架', priceCents: 4500, stock: 10 })
+    assert.strictEqual(catalog.list().length, 1)
+    const removed = catalog.deleteProduct(p.id)
+    assert.strictEqual(removed.status, 'deleted')
+    assert.strictEqual(catalog.list().length, 0)
+    assert.strictEqual(catalog.getProduct(p.id), undefined)
+  })
+
+  it('商品删除: 重复删除已下架商品抛 PRODUCT_NOT_FOUND', () => {
+    const p = catalog.addProduct({ name: 'C', priceCents: 100, stock: 1 })
+    catalog.deleteProduct(p.id)
+    assert.throws(() => catalog.deleteProduct(p.id), /PRODUCT_NOT_FOUND/)
+  })
+
+  it('商品状态归一: 缺省 status 视为 active 并进入列表', () => {
+    const p = catalog.addProduct({ name: 'D', priceCents: 100, stock: 1 })
+    assert.strictEqual(p.status, 'active')
+    assert.strictEqual(catalog.list().length, 1)
+  })
+
+  it('分类: 新增后出现在列表（按排序号）', () => {
+    const c1 = categories.create({ name: '键鼠外设', sortOrder: 2 })
+    const c2 = categories.create({ name: '显示设备', sortOrder: 1 })
+    assert.strictEqual(c1.status, 'active')
+    const list = categories.list()
+    assert.strictEqual(list.length, 2)
+    assert.deepStrictEqual(list.map(c => c.name), ['显示设备', '键鼠外设'])
+  })
+
+  it('分类: 同名 active 分类被拒绝', () => {
+    categories.create({ name: '键鼠外设' })
+    assert.throws(() => categories.create({ name: '键鼠外设' }), /CATEGORY_NAME_EXISTS/)
+  })
+
+  it('分类: 软删除后从列表消失', () => {
+    const c = categories.create({ name: '音频设备' })
+    categories.delete(c.id)
+    assert.strictEqual(categories.list().length, 0)
+    assert.strictEqual(c.status, 'deleted')
+  })
+
+  it('分类: 删除后该分类商品 categoryId 置空', () => {
+    const c = categories.create({ name: '键鼠外设' })
+    const p = catalog.addProduct({ name: '机械键盘', priceCents: 29900, stock: 10, categoryId: c.id })
+    assert.strictEqual(p.categoryId, c.id)
+    categories.delete(c.id)
+    // 商品 categoryId 被清空，仍可在售
+    assert.strictEqual(catalog.getProduct(p.id).categoryId, null)
+  })
+
+  it('商品: 按分类过滤列表', () => {
+    const kb = categories.create({ name: '键鼠外设' })
+    const disp = categories.create({ name: '显示设备' })
+    catalog.addProduct({ name: '键盘', priceCents: 100, stock: 1, categoryId: kb.id })
+    catalog.addProduct({ name: '鼠标', priceCents: 50, stock: 1, categoryId: kb.id })
+    catalog.addProduct({ name: '显示器', priceCents: 200, stock: 1, categoryId: disp.id })
+    const filtered = catalog.list(undefined, undefined, kb.id)
+    assert.deepStrictEqual(filtered.map(p => p.name).sort(), ['键盘', '鼠标'])
+  })
+
+  it('商品: 挂不存在的分类被拒绝', () => {
+    assert.throws(() => catalog.addProduct({ name: 'X', priceCents: 100, stock: 1, categoryId: 'cat-nope' }), /CATEGORY_NOT_FOUND/)
   })
 })
 

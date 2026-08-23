@@ -3,6 +3,53 @@ export function calculateTotal(items) {
 }
 
 /**
+ * 商品新增/修改校验（运营后台）
+ * @param {{ priceCents?: number, stock?: number }} input
+ * @throws {Error} INVALID_PRICE priceCents 必须 > 0
+ * @throws {Error} INVALID_STOCK stock 必须 >= 0
+ */
+export function validateProductInput(input) {
+  if (typeof input.priceCents === 'number' && input.priceCents <= 0) {
+    throw new Error('INVALID_PRICE')
+  }
+  if (typeof input.stock === 'number' && input.stock < 0) {
+    throw new Error('INVALID_STOCK')
+  }
+}
+
+/**
+ * 商品状态归一：缺省 status 视为 active
+ * @param {import("./types.js").Product | undefined} product
+ * @returns {"active" | "deleted"}
+ */
+export function normalizeStatus(product) {
+  return product && product.status ? product.status : 'active'
+}
+
+/**
+ * 分类唯一性校验：同名 active 分类拒绝
+ * @param {import("./types.js").Category[]} categories 全量分类
+ * @param {string} name 待校验名称
+ * @param {string} [excludeId] 编辑时排除自身
+ * @throws {Error} CATEGORY_NAME_EXISTS
+ */
+export function assertCategoryNameUnique(categories, name, excludeId) {
+  const dup = categories.some(c =>
+    c.name === name && normalizeStatus(c) === 'active' && c.id !== excludeId
+  )
+  if (dup) throw new Error('CATEGORY_NAME_EXISTS')
+}
+
+/**
+ * 分类有效性校验：id 存在且 active
+ * @param {import("./types.js").Category | undefined} category
+ * @throws {Error} CATEGORY_NOT_FOUND
+ */
+export function assertCategoryActive(category) {
+  if (!category || normalizeStatus(category) === 'deleted') throw new Error('CATEGORY_NOT_FOUND')
+}
+
+/**
  * 计算折扣金额
  * @param {number} totalCents 订单总额
  * @param {import("./types.js").Coupon} coupon 优惠券

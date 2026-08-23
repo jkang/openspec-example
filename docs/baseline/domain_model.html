@@ -500,7 +500,7 @@
                 </div>
             </section>
 
-            <div class="footer-note">Last Updated: 2026-08-21</div>
+            <div class="footer-note">Last Updated: 2026-08-23</div>
         </div>
     </div>
 
@@ -684,7 +684,8 @@
         const domainGraph = {
             canvas: { width: 1180, height: 560, nodeWidth: 220, nodeHeight: 120 },
             nodes: [
-                { id: 'product', title: 'Product', subtitle: '目录上下文中的商品根实体', meta: ['id', 'name', 'priceCents', 'stock'], x: 70, y: 70 },
+                { id: 'product', title: 'Product', subtitle: '目录上下文中的商品根实体（含上架/下架状态）', meta: ['id', 'name', 'priceCents', 'stock', 'status', 'categoryId'], x: 70, y: 70 },
+                { id: 'category', title: 'Category', subtitle: '商品分类，目录组织结构维度', meta: ['id', 'name', 'sortOrder', 'status'], x: 70, y: 180 },
                 { id: 'cart', title: 'Cart', subtitle: '购物车根实体，持有会话归属', meta: ['userId', 'sessionId', 'items'], x: 370, y: 70 },
                 { id: 'cartItem', title: 'CartItem', subtitle: '购物车项，记录价格快照', meta: ['productId', 'quantity', 'unitPriceCents'], x: 670, y: 70 },
                 { id: 'coupon', title: 'Coupon', subtitle: '优惠券根实体，控制核销规则', meta: ['type', 'value', 'minSpendCents', 'status', 'userId', 'templateId'], x: 70, y: 320 },
@@ -723,6 +724,12 @@
                     rule: 'OrderItem 仅引用 productId；priceCents 固化为下单时事实。'
                 },
                 {
+                    from: 'product',
+                    to: 'category',
+                    label: '归属 0..1',
+                    rule: 'Product.categoryId 指向 Category；null 表示未分类，删除分类后置空。'
+                },
+                {
                     from: 'order',
                     to: 'coupon',
                     label: '关联 0..1',
@@ -734,6 +741,8 @@
         const stormingMatrix = {
             commands: [
                 ['Catalog', 'SearchProduct', '搜索商品目录，返回可购买商品集合。'],
+                ['Catalog', 'CreateCategory', '运营新增商品分类（name/sortOrder）。'],
+                ['Catalog', 'DeleteCategory', '运营软删除分类，关联商品 categoryId 置空。'],
                 ['Cart', 'AddToCart', '将商品快照写入购物车。'],
                 ['Cart', 'ValidateCart', '执行 Session 一致性校验。'],
                 ['Coupon', 'ApplyBestCoupon', '在可用券中选出最优券。'],
@@ -771,10 +780,17 @@
         const aggregateCatalog = [
             {
                 title: 'Catalog Aggregate',
-                root: 'Product (id, name, description, priceCents, stock, categoryId)',
+                root: 'Product (id, name, description, priceCents, stock, categoryId, status)',
                 entities: '当前聚合以内聚 Product 为主，库存事实直接维护在根实体。',
                 values: 'Price, StockStatus',
-                invariant: 'priceCents 必须是 cents 整数；stock 不得为负。'
+                invariant: 'priceCents 必须是 cents 整数；stock 不得为负；categoryId 可空，删除分类后置空。'
+            },
+            {
+                title: 'Category Aggregate',
+                root: 'Category (id, name, sortOrder, status)',
+                entities: '平铺单层分类，不做多级树。',
+                values: 'SortOrder',
+                invariant: 'name 非空且 active 范围内唯一；status 软删除后关联商品 categoryId 置空。'
             },
             {
                 title: 'Cart Aggregate',

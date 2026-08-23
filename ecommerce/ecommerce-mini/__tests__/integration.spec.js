@@ -212,3 +212,165 @@ describe('优惠券运营后台 API (@api)', () => {
     assert.strictEqual(holderOrder.actualPaidCents, 8000)
   })
 })
+
+describe('商品管理 API (@api)', () => {
+  let apiBase = ''
+  let apiStop = () => {}
+
+  before(async () => {
+    const { server } = createServer()
+    await new Promise(resolve => server.listen(0, () => resolve(undefined)))
+    const address = server.address()
+    const port = address && typeof address === 'object' ? address.port : 0
+    apiBase = `http://127.0.0.1:${port}`
+    apiStop = () => server.close()
+  })
+  after(() => apiStop())
+
+  const send = (path, method, body) => fetch(`${apiBase}${path}`, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  })
+
+  it('PUT 修改商品成功且列表更新', async () => {
+    const res = await send('/api/products/1', 'PUT', { priceCents: 27900, stock: 50 })
+    assert.strictEqual(res.status, 200)
+    const updated = await res.json()
+    assert.strictEqual(updated.priceCents, 27900)
+    assert.strictEqual(updated.stock, 50)
+    // 未提供字段保留
+    assert.strictEqual(updated.name, '极简机械键盘')
+
+    const list = await (await fetch(`${apiBase}/api/products`)).json()
+    const item = list.find(p => p.id === '1')
+    assert.strictEqual(item.priceCents, 27900)
+  })
+
+  it('PUT 非法价格返回 400 INVALID_PRICE', async () => {
+    const res = await send('/api/products/1', 'PUT', { priceCents: 0 })
+    assert.strictEqual(res.status, 400)
+    assert.strictEqual((await res.json()).code, 'INVALID_PRICE')
+  })
+
+  it('PUT 负库存返回 400 INVALID_STOCK', async () => {
+    const res = await send('/api/products/1', 'PUT', { stock: -1 })
+    assert.strictEqual(res.status, 400)
+    assert.strictEqual((await res.json()).code, 'INVALID_STOCK')
+  })
+
+  it('PUT 不存在商品返回 404 PRODUCT_NOT_FOUND', async () => {
+    const res = await send('/api/products/nope', 'PUT', { priceCents: 100 })
+    assert.strictEqual(res.status, 404)
+    assert.strictEqual((await res.json()).code, 'PRODUCT_NOT_FOUND')
+  })
+
+  it('DELETE 软删除后从列表移除且不可查', async () => {
+    const res = await send('/api/products/4', 'DELETE')
+    assert.strictEqual(res.status, 200)
+    const removed = await res.json()
+    assert.strictEqual(removed.status, 'deleted')
+
+    // 列表不再包含
+    const list = await (await fetch(`${apiBase}/api/products`)).json()
+    assert.ok(!list.some(p => p.id === '4'))
+    // 按 ID 查询为 404
+    const getRes = await fetch(`${apiBase}/api/products/4`)
+    assert.strictEqual(getRes.status, 404)
+  })
+
+  it('DELETE 不存在或已删除返回 404 PRODUCT_NOT_FOUND', async () => {
+    const never = await send('/api/products/nope', 'DELETE')
+    assert.strictEqual(never.status, 404)
+    assert.strictEqual((await never.json()).code, 'PRODUCT_NOT_FOUND')
+
+    // 已删除的商品再次删除
+    const again = await send('/api/products/4', 'DELETE')
+    assert.strictEqual(again.status, 404)
+    assert.strictEqual((await again.json()).code, 'PRODUCT_NOT_FOUND')
+  })
+})
+
+describe('分类管理 API (@api)', () => {
+  let apiBase = ''
+  let apiStop = () => {}
+
+  before(async () => {
+    const { server } = createServer()
+    await new Promise(resolve => server.listen(0, () => resolve(undefined)))
+    const address = server.address()
+    const port = address && typeof address === 'object' ? address.port : 0
+    apiBase = `http://127.0.0.1:${port}`
+    apiStop = () => server.close()
+  })
+  after(() => apiStop())
+
+  const send = (path, method, body) => fetch(`${apiBase}${path}`, {
+    method,
+    headers: { 'Content-Type': 'application/json' },
+    body: body ? JSON.stringify(body) : undefined,
+  })
+
+  it('分类 CRUD 全流程: 新增/列表/编辑/删除', async () => {
+    // 种子分类存在
+    const list0 = await (await fetch(`${apiBase}/api/categories`)).json()
+    assert.ok(list0.length >= 4)
+
+    // 新增
+    const createRes = await send('/api/categories', 'POST', { name: '数码配件', sortOrder: 5 })
+    assert.strictEqual(createRes.status, 201)
+    const created = await createRes.json()
+    assert.strictEqual(created.status, 'active')
+    assert.strictEqual(created.name, '数码配件')
+
+    // 编辑
+    const putRes = await send(`/api/categories/${created.id}`, 'PUT', { name: '数码周边', sortOrder: 1 })
+    assert.strictEqual(putRes.status, 200)
+    assert.strictEqual((await putRes.json()).name, '数码周边')
+
+    // 删除
+    const delRes = await send(`/api/categories/${created.id}`, 'DELETE')
+    assert.strictEqual(delRes.status, 200)
+    const list = await (await fetch(`${apiBase}/api/categories`)).json()
+    assert.ok(!list.some(c => c.id === created.id))
+  })
+
+  it('同名分类被拒绝 (409 CATEGORY_NAME_EXISTS)', async () => {
+    const res = await send('/api/categories', 'POST', { name: '键鼠外设' })
+    assert.strictEqual(res.status, 409)
+    assert.strictEqual((await res.json()).code, 'CATEGORY_NAME_EXISTS')
+  })
+
+  it('删除分类后商品 categoryId 置空且仍可查询', async () => {
+    // 种子商品 6 (桌面拾音氛围灯) 属于 cat-audio
+    await send('/api/categories/cat-audio', 'DELETE')
+    // 列表不再含 cat-audio
+    const list = await (await fetch(`${apiBase}/api/categories`)).json()
+    assert.ok(!list.some(c => c.id === 'cat-audio'))
+    // 商品 6 categoryId 置空
+    const product = await (await fetch(`${apiBase}/api/products/6`)).json()
+    assert.strictEqual(product.categoryId, null)
+  })
+
+  it('商品列表按分类过滤 (GET /api/products?categoryId=)', async () => {
+    const res = await fetch(`${apiBase}/api/products?categoryId=cat-keyboard`)
+    assert.strictEqual(res.status, 200)
+    const list = await res.json()
+    assert.strictEqual(list.length, 2)
+    assert.ok(list.every(p => p.categoryId === 'cat-keyboard'))
+    assert.deepStrictEqual(list.map(p => p.id).sort(), ['1', '2'])
+  })
+
+  it('分类与名称组合过滤', async () => {
+    const res = await fetch(`${apiBase}/api/products?categoryId=cat-desk&name=支架`)
+    const list = await res.json()
+    assert.strictEqual(list.length, 1)
+    assert.strictEqual(list[0].name, '铝合金笔记本支架')
+  })
+
+  it('商品挂不存在分类被拒绝 (400 CATEGORY_NOT_FOUND)', async () => {
+    const res = await send('/api/products/1', 'PUT', { categoryId: 'cat-nope' })
+    assert.strictEqual(res.status, 404)
+    assert.strictEqual((await res.json()).code, 'CATEGORY_NOT_FOUND')
+  })
+})

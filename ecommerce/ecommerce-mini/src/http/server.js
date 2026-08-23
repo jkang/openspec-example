@@ -1,39 +1,48 @@
 import http from 'http'
 import fs from 'fs'
 import path from 'path'
-import { ProductRepo, CartRepo, OrderRepo, CouponRepo, IssuanceRepo } from '../repo/memoryRepo.js'
+import { ProductRepo, CartRepo, OrderRepo, CouponRepo, IssuanceRepo, CategoryRepo } from '../repo/memoryRepo.js'
 import { CatalogService } from '../services/catalog.js'
 import { CartService } from '../services/cart.js'
 import { OrderService } from '../services/order.js'
 import { CouponService } from '../services/coupon.js'
 import { AdminCouponService } from '../services/adminCoupon.js'
+import { CategoryService } from '../services/category.js'
 
 // 注入初始商品数据
 const initialProducts = [
   { 
     id: '1', name: '极简机械键盘', description: '84键紧凑布局，红轴', priceCents: 29900, stock: 99,
-    imageUrl: 'https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?auto=format&fit=crop&q=80&w=800'
+    imageUrl: 'https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?auto=format&fit=crop&q=80&w=800', categoryId: 'cat-keyboard'
   },
   { 
     id: '2', name: '无线办公鼠标', description: '静音按键，人体工学设计', priceCents: 8900, stock: 99,
-    imageUrl: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&q=80&w=800'
+    imageUrl: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&q=80&w=800', categoryId: 'cat-keyboard'
   },
   { 
     id: '3', name: '高清显示器', description: '27英寸 4K分辨率', priceCents: 129900, stock: 99,
-    imageUrl: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&q=80&w=800'
+    imageUrl: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&q=80&w=800', categoryId: 'cat-display'
   },
   { 
     id: '4', name: '桌面收纳架', description: '实木材质，双层结构', priceCents: 4500, stock: 99,
-    imageUrl: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&q=80&w=800'
+    imageUrl: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&q=80&w=800', categoryId: 'cat-desk'
   },
   { 
     id: '5', name: '铝合金笔记本支架', description: '折叠便携，多档调节', priceCents: 6800, stock: 99,
-    imageUrl: 'https://images.unsplash.com/photo-1527443154391-507e9dc6c5cc?auto=format&fit=crop&q=80&w=800'
+    imageUrl: 'https://images.unsplash.com/photo-1527443154391-507e9dc6c5cc?auto=format&fit=crop&q=80&w=800', categoryId: 'cat-desk'
   },
   { 
     id: '6', name: '桌面拾音氛围灯', description: 'RGB色彩，支持音频同步', priceCents: 12800, stock: 99,
-    imageUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252728f?auto=format&fit=crop&q=80&w=800'
+    imageUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252728f?auto=format&fit=crop&q=80&w=800', categoryId: 'cat-audio'
   }
+]
+
+// 注入初始分类数据
+const initialCategories = [
+  { id: 'cat-keyboard', name: '键鼠外设', sortOrder: 1, status: 'active' },
+  { id: 'cat-display', name: '显示设备', sortOrder: 2, status: 'active' },
+  { id: 'cat-desk', name: '桌面收纳', sortOrder: 3, status: 'active' },
+  { id: 'cat-audio', name: '音频设备', sortOrder: 4, status: 'active' }
 ]
 
 // 注入初始优惠券数据
@@ -60,7 +69,7 @@ const sendJson = (res, status, data) => {
   res.writeHead(status, { 
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type'
   })
   res.end(JSON.stringify(data))
@@ -70,7 +79,7 @@ const sendError = (res, code, message, status = 500) => {
   res.writeHead(status, { 
     'Content-Type': 'application/json',
     'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
     'Access-Control-Allow-Headers': 'Content-Type'
   })
   res.end(JSON.stringify({ code, message }))
@@ -83,23 +92,26 @@ export function createServer() {
   const orderRepo = new OrderRepo()
   const couponRepo = new CouponRepo()
   const issuanceRepo = new IssuanceRepo()
+  const categoryRepo = new CategoryRepo()
 
   // 克隆种子对象，避免跨 server 实例共享引用导致状态污染
   initialProducts.forEach(p => productRepo.save({ ...p }))
   initialCoupons.forEach(c => couponRepo.save({ ...c }))
+  initialCategories.forEach(c => categoryRepo.save({ ...c }))
 
-  const catalogService = new CatalogService(productRepo)
+  const catalogService = new CatalogService(productRepo, categoryRepo)
   const cartService = new CartService(cartRepo, productRepo)
   const couponService = new CouponService(couponRepo)
   const adminCouponService = new AdminCouponService(couponRepo, issuanceRepo)
   const orderService = new OrderService(cartRepo, orderRepo, productRepo, couponService)
+  const categoryService = new CategoryService(categoryRepo, productRepo)
 
   const server = http.createServer(async (req, res) => {
     // Handle CORS preflight
     if (req.method === 'OPTIONS') {
       res.writeHead(204, {
         'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+        'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type'
       })
       res.end()
@@ -119,15 +131,41 @@ export function createServer() {
         orderRepo.orders.clear()
         couponRepo.coupons.clear()
         issuanceRepo.issuances.clear()
+        categoryRepo.categories.clear()
         initialProducts.forEach(p => productRepo.save({ ...p }))
         initialCoupons.forEach(c => couponRepo.save({ ...c }))
+        initialCategories.forEach(c => categoryRepo.save({ ...c }))
         return sendJson(res, 200, { ok: true })
       }
 
       if (pathname === '/api/products' && req.method === 'GET') {
         const name = url.searchParams.get('name')
         const sort = url.searchParams.get('sort')
-        return sendJson(res, 200, catalogService.list(name, sort))
+        const categoryId = url.searchParams.get('categoryId')
+        return sendJson(res, 200, catalogService.list(name, sort, categoryId))
+      }
+
+      if (pathname === '/api/categories' && req.method === 'GET') {
+        return sendJson(res, 200, categoryService.list())
+      }
+
+      if (pathname === '/api/categories' && req.method === 'POST') {
+        const body = await readJson(req)
+        const category = categoryService.create(body)
+        return sendJson(res, 201, category)
+      }
+
+      if (pathname.startsWith('/api/categories/') && req.method === 'PUT') {
+        const id = pathname.split('/').pop()
+        const body = await readJson(req)
+        const category = categoryService.update(id, body)
+        return sendJson(res, 200, category)
+      }
+
+      if (pathname.startsWith('/api/categories/') && req.method === 'DELETE') {
+        const id = pathname.split('/').pop()
+        const category = categoryService.delete(id)
+        return sendJson(res, 200, category)
       }
 
       if (pathname === '/api/products' && req.method === 'POST') {
@@ -140,6 +178,19 @@ export function createServer() {
         const id = pathname.split('/').pop()
         const product = catalogService.getProduct(id)
         if (!product) return sendError(res, 'NOT_FOUND', 'Product not found', 404)
+        return sendJson(res, 200, product)
+      }
+
+      if (pathname.startsWith('/api/products/') && req.method === 'PUT') {
+        const id = pathname.split('/').pop()
+        const body = await readJson(req)
+        const product = catalogService.updateProduct(id, body)
+        return sendJson(res, 200, product)
+      }
+
+      if (pathname.startsWith('/api/products/') && req.method === 'DELETE') {
+        const id = pathname.split('/').pop()
+        const product = catalogService.deleteProduct(id)
         return sendJson(res, 200, product)
       }
 
@@ -219,6 +270,16 @@ export function createServer() {
         return sendError(res, 'OUT_OF_STOCK', '库存不足', 409)
       if (e.message === 'PRODUCT_NOT_FOUND')
         return sendError(res, 'PRODUCT_NOT_FOUND', '商品不存在', 404)
+      if (e.message === 'INVALID_PRICE')
+        return sendError(res, 'INVALID_PRICE', '价格必须大于 0 元', 400)
+      if (e.message === 'INVALID_STOCK')
+        return sendError(res, 'INVALID_STOCK', '库存不能为负数', 400)
+      if (e.message === 'CATEGORY_NAME_EXISTS')
+        return sendError(res, 'CATEGORY_NAME_EXISTS', '分类名称已存在', 409)
+      if (e.message === 'CATEGORY_NAME_REQUIRED')
+        return sendError(res, 'CATEGORY_NAME_REQUIRED', '分类名称不能为空', 400)
+      if (e.message === 'CATEGORY_NOT_FOUND')
+        return sendError(res, 'CATEGORY_NOT_FOUND', '分类不存在', 404)
       if (e.message === 'COUPON_NOT_FOUND')
         return sendError(res, 'COUPON_NOT_FOUND', '优惠券不存在', 404)
       if (e.message === 'COUPON_ALREADY_USED')

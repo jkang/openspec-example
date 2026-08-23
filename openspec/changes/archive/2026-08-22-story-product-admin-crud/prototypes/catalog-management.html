@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>商品管理 - 极简电商 ADMIN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        /* 强制执行 FRONTEND.md 规范 */
+        * {
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            border-radius: 0;
+        }
+        body {
+            background-color: #f8fafc; /* slate-50 */
+            color: #0f172a; /* slate-900 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .border-slate-200 {
+            border-color: #e2e8f0;
+        }
+        input:focus, select:focus {
+            outline: none;
+            border-color: #0f172a;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div id="app" class="flex min-h-screen">
+        <!-- 左侧导航栏 -->
+        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0">
+            <div class="h-16 flex items-center px-6 border-b border-slate-200">
+                <h1 class="text-xl font-bold tracking-tight">极简电商 ADMIN</h1>
+            </div>
+            <nav class="flex-1 py-4">
+                <div class="px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">交易管理</div>
+                <a href="#" class="flex items-center px-6 py-3 border-l-4 border-transparent text-slate-600 hover:bg-slate-50 transition-colors">订单列表</a>
+                <a href="#" class="flex items-center px-6 py-3 border-l-4 border-slate-900 bg-slate-50 text-slate-900 font-medium">商品管理</a>
+                <div class="mt-8 px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">营销中心</div>
+                <a href="#" class="flex items-center px-6 py-3 border-l-4 border-transparent text-slate-600 hover:bg-slate-50 transition-colors">优惠券管理</a>
+            </nav>
+        </aside>
+
+        <!-- 右侧内容区 -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0">
+                <div class="text-slate-600">当前路径: <span class="text-slate-900 font-medium">交易管理 / 商品管理</span></div>
+                <div class="flex items-center space-x-4">
+                    <span class="text-sm text-slate-500">运营专员: 王琳</span>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-8">
+                <div class="max-w-6xl mx-auto space-y-8">
+
+                    <!-- 章节一: 商品列表 -->
+                    <section class="bg-white border border-slate-200 p-8">
+                        <div class="flex items-center justify-between mb-6 border-b border-slate-200 pb-4">
+                            <h2 class="text-lg font-bold">商品列表</h2>
+                            <button @click="openCreate" class="px-4 py-2 bg-slate-900 text-white text-sm font-medium">+ 新增商品</button>
+                        </div>
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="border-b border-slate-200 text-slate-500">
+                                    <th class="py-2 pr-4 font-medium">商品</th>
+                                    <th class="py-2 px-4 font-medium">价格</th>
+                                    <th class="py-2 px-4 font-medium">库存</th>
+                                    <th class="py-2 px-4 font-medium">状态</th>
+                                    <th class="py-2 px-4 font-medium text-right">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr v-for="p in visibleProducts" :key="p.id" class="border-b border-slate-200 hover:bg-slate-50 transition-colors">
+                                    <td class="py-3 pr-4">
+                                        <div class="flex items-center space-x-3">
+                                            <img :src="p.imageUrl" :alt="p.name" class="w-10 h-10 object-cover border border-slate-200 shrink-0">
+                                            <div>
+                                                <div class="font-medium text-slate-900">{{ p.name }}</div>
+                                                <div class="text-xs text-slate-500">{{ p.description }}</div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td class="py-3 px-4">¥{{ formatCents(p.priceCents) }}</td>
+                                    <td class="py-3 px-4">{{ p.stock }}</td>
+                                    <td class="py-3 px-4">
+                                        <span :class="['text-xs font-medium px-2 py-1 border', p.status === 'active' ? 'border-slate-200 text-slate-700' : 'border-slate-200 text-slate-400']">
+                                            {{ p.status === 'active' ? '上架中' : '已下架' }}
+                                        </span>
+                                    </td>
+                                    <td class="py-3 px-4 text-right space-x-2">
+                                        <button @click="openEdit(p)" class="px-3 py-1 border border-slate-200 text-slate-700 text-xs font-medium hover:bg-slate-50">编辑</button>
+                                        <button @click="confirmDelete(p)" class="px-3 py-1 border border-slate-200 text-slate-700 text-xs font-medium hover:bg-slate-50">删除</button>
+                                    </td>
+                                </tr>
+                                <tr v-if="visibleProducts.length === 0">
+                                    <td colspan="5" class="py-8 text-center text-slate-400">暂无数据</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </section>
+
+                    <!-- 章节二: 新增 / 编辑商品 -->
+                    <section ref="editSection" class="bg-white border border-slate-200 p-8">
+                        <h2 class="text-lg font-bold mb-6 border-b border-slate-200 pb-4">{{ form.id ? '编辑商品' : '新增商品' }}</h2>
+                        <form @submit.prevent="saveProduct" class="space-y-6">
+                            <div class="grid grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">商品名称</label>
+                                    <input v-model.trim="form.name" type="text" placeholder="例如: 极简机械键盘"
+                                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">价格（元）</label>
+                                    <input v-model="form.priceYuan" type="number" step="0.01" min="0.01" placeholder="例如: 299.00"
+                                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">库存</label>
+                                    <input v-model.number="form.stock" type="number" min="0" placeholder="例如: 99"
+                                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">图片链接</label>
+                                    <input v-model.trim="form.imageUrl" type="text" placeholder="例如: https://images.unsplash.com/..."
+                                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-slate-700 mb-2">商品描述</label>
+                                <input v-model.trim="form.description" type="text" placeholder="例如: 84键紧凑布局，红轴"
+                                       class="w-full border border-slate-200 px-3 py-2 text-sm bg-white">
+                            </div>
+
+                            <div v-if="formError" class="text-sm text-red-600">{{ formError }}</div>
+
+                            <div class="flex items-center space-x-3">
+                                <button type="submit" class="px-4 py-2 bg-slate-900 text-white text-sm font-medium">{{ form.id ? '保存修改' : '新增商品' }}</button>
+                                <button type="button" @click="resetForm" class="px-4 py-2 border border-slate-200 text-slate-600 text-sm font-medium">清空</button>
+                            </div>
+                        </form>
+                    </section>
+
+                    <!-- 章节三: 删除确认 -->
+                    <section v-if="pendingDelete" ref="deleteSection" class="bg-white border border-slate-200 p-8">
+                        <h2 class="text-lg font-bold mb-4 border-b border-slate-200 pb-4">删除确认</h2>
+                        <p class="text-sm text-slate-700 mb-6">确认下架商品「<span class="font-medium text-slate-900">{{ pendingDelete.name }}</span>」吗？该商品将从 C 端商店与列表中移除，历史订单不受影响。</p>
+                        <div class="flex items-center space-x-3">
+                            <button @click="doDelete" class="px-4 py-2 bg-slate-900 text-white text-sm font-medium">确认删除（下架）</button>
+                            <button @click="pendingDelete = null" class="px-4 py-2 border border-slate-200 text-slate-600 text-sm font-medium">取消</button>
+                        </div>
+                    </section>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+
+        createApp({
+            setup() {
+                // ---- 商品列表 (真实业务数据示例, 与 C 端 App.vue 兜底数据一致) ----
+                const products = ref([
+                    { id: '1', name: '极简机械键盘', description: '84键紧凑布局，红轴', priceCents: 29900, stock: 99, imageUrl: 'https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?auto=format&fit=crop&q=80&w=800', status: 'active' },
+                    { id: '2', name: '无线办公鼠标', description: '静音按键，人体工学设计', priceCents: 8900, stock: 99, imageUrl: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&q=80&w=800', status: 'active' },
+                    { id: '3', name: '高清显示器', description: '27英寸 4K分辨率', priceCents: 129900, stock: 99, imageUrl: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&q=80&w=800', status: 'active' },
+                    { id: '4', name: '桌面收纳架', description: '实木材质，双层结构', priceCents: 4500, stock: 99, imageUrl: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&q=80&w=800', status: 'active' },
+                    { id: '5', name: '铝合金笔记本支架', description: '折叠便携，多档调节', priceCents: 6800, stock: 99, imageUrl: 'https://images.unsplash.com/photo-1527443154391-507e9dc6c5cc?auto=format&fit=crop&q=80&w=800', status: 'active' },
+                    { id: '6', name: '桌面拾音氛围灯', description: 'RGB色彩，支持音频同步', priceCents: 12800, stock: 99, imageUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252728f?auto=format&fit=crop&q=80&w=800', status: 'active' }
+                ]);
+
+                // 软删除语义: 列表默认只展示 active 商品
+                const visibleProducts = computed(() => products.value.filter(p => p.status === 'active'));
+
+                // ---- 表单状态 ----
+                const form = ref({ id: null, name: '', priceYuan: '', stock: 0, imageUrl: '', description: '' });
+                const formError = ref('');
+                const pendingDelete = ref(null);
+
+                function formatCents(cents) {
+                    return (cents / 100).toFixed(2);
+                }
+
+                function openCreate() {
+                    resetForm();
+                    scrollToEdit();
+                }
+
+                function openEdit(p) {
+                    form.value = {
+                        id: p.id,
+                        name: p.name,
+                        priceYuan: (p.priceCents / 100).toFixed(2),
+                        stock: p.stock,
+                        imageUrl: p.imageUrl,
+                        description: p.description
+                    };
+                    formError.value = '';
+                    scrollToEdit();
+                }
+
+                function confirmDelete(p) {
+                    pendingDelete.value = p;
+                    // 滚动到删除确认区
+                    setTimeout(() => document.getElementById('delete-section')?.scrollIntoView({ behavior: 'smooth' }), 0);
+                }
+
+                function doDelete() {
+                    if (!pendingDelete.value) return;
+                    // 软删除: 置 status = deleted, 列表展示依赖 visibleProducts 过滤
+                    const target = products.value.find(p => p.id === pendingDelete.value.id);
+                    if (target) target.status = 'deleted';
+                    pendingDelete.value = null;
+                }
+
+                function saveProduct() {
+                    formError.value = '';
+                    const name = form.value.name;
+                    const priceYuan = parseFloat(form.value.priceYuan);
+                    const stock = parseInt(form.value.stock, 10);
+                    const imageUrl = form.value.imageUrl;
+
+                    if (!name) { formError.value = '请填写商品名称。'; return; }
+                    if (isNaN(priceYuan) || priceYuan <= 0) { formError.value = '价格必须大于 0 元。'; return; }
+                    if (isNaN(stock) || stock < 0) { formError.value = '库存不能为负数。'; return; }
+                    if (!imageUrl) { formError.value = '请填写商品图片链接。'; return; }
+
+                    const priceCents = Math.round(priceYuan * 100);
+
+                    if (form.value.id) {
+                        // 修改
+                        const target = products.value.find(p => p.id === form.value.id);
+                        if (target) {
+                            target.name = name;
+                            target.priceCents = priceCents;
+                            target.stock = stock;
+                            target.imageUrl = imageUrl;
+                            target.description = form.value.description;
+                        }
+                    } else {
+                        // 新增
+                        products.value.push({
+                            id: String(products.value.length + 1),
+                            name,
+                            description: form.value.description,
+                            priceCents,
+                            stock,
+                            imageUrl,
+                            status: 'active'
+                        });
+                    }
+                    resetForm();
+                }
+
+                function resetForm() {
+                    form.value = { id: null, name: '', priceYuan: '', stock: 0, imageUrl: '', description: '' };
+                    formError.value = '';
+                    pendingDelete.value = null;
+                }
+
+                function scrollToEdit() {
+                    setTimeout(() => document.querySelector('section')[1]?.scrollIntoView({ behavior: 'smooth' }), 0);
+                }
+
+                return { products, visibleProducts, form, formError, pendingDelete, openCreate, openEdit, confirmDelete, doDelete, saveProduct, resetForm, formatCents };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

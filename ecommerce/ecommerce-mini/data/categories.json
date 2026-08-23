@@ -1,0 +1,6 @@
+[
+  { "id": "cat-keyboard", "name": "键鼠外设", "sortOrder": 1, "status": "active" },
+  { "id": "cat-display", "name": "显示设备", "sortOrder": 2, "status": "active" },
+  { "id": "cat-desk", "name": "桌面收纳", "sortOrder": 3, "status": "active" },
+  { "id": "cat-audio", "name": "音频设备", "sortOrder": 4, "status": "active" }
+]

@@ -472,7 +472,7 @@
                     所有能力命名优先对齐 `domain_model.html` 中的 Capability taxonomy。
                 </p>
             </div>
-            <div class="meta">Baseline / Last Updated: 2026-08-21</div>
+            <div class="meta">Baseline / Last Updated: 2026-08-23</div>
         </div>
 
         <div class="intro-grid">
@@ -577,7 +577,7 @@
                             <div class="capability-list">
                                 <div class="capability" data-capability="catalog-management">
                                     <span class="capability-name">catalog-management</span>
-                                    <span class="capability-desc">商品列表、排序、库存可见性</span>
+                                    <span class="capability-desc">商品列表、排序、库存可见性；分类筛选条（仅展示上架商品）</span>
                                 </div>
                                 <div class="capability" data-capability="product-query">
                                     <span class="capability-name">product-query</span>
@@ -721,6 +721,8 @@
                             <ul class="activity-list">
                                 <li>录入商品名称、价格、图片、库存</li>
                                 <li>维护可售商品池与展示顺序</li>
+                                <li>修改商品价格、库存、详情；下架失效商品</li>
+                                <li>维护分类（新增/编辑/下架）；给商品挂分类</li>
                             </ul>
                         </div>
                         <div class="cell-block">
@@ -728,7 +730,7 @@
                             <div class="capability-list">
                                 <div class="capability" data-capability="catalog-management">
                                     <span class="capability-name">catalog-management</span>
-                                    <span class="capability-desc">商品上架、库存维护、图片字段</span>
+                                    <span class="capability-desc">商品上架、修改（改）、删除/下架（软删除）；分类管理</span>
                                 </div>
                             </div>
                         </div>
@@ -739,6 +741,7 @@
                             <ul class="activity-list">
                                 <li>关注高库存商品的转化表现</li>
                                 <li>确保商品仍然可售、价格有效</li>
+                                <li>价格/库存修改后即时反映到 C 端</li>
                             </ul>
                         </div>
                         <div class="cell-block">
@@ -746,7 +749,7 @@
                             <div class="capability-list">
                                 <div class="capability" data-capability="catalog-management">
                                     <span class="capability-name">catalog-management</span>
-                                    <span class="capability-desc">价格与库存事实维护</span>
+                                    <span class="capability-desc">价格与库存事实维护（修改即时生效）</span>
                                 </div>
                                 <div class="capability planned" data-capability="error-handling">
                                     <span class="capability-name">error-handling</span>
@@ -796,7 +799,7 @@
                                 </div>
                                 <div class="capability" data-capability="catalog-management">
                                     <span class="capability-name">catalog-management</span>
-                                    <span class="capability-desc">库存扣减原子性</span>
+                                    <span class="capability-desc">库存扣减原子性；软删除下架不影响历史订单</span>
                                 </div>
                             </div>
                         </div>
@@ -860,6 +863,8 @@
                                 <li>`GET /api/products` 支持搜索与排序</li>
                                 <li>`GET /api/products/{id}` 返回完整商品详情</li>
                                 <li>返回 `imageUrl / stock / priceCents` 等权威字段</li>
+                                <li>列表/搜索仅返回 active 商品；`PUT`/`DELETE /api/products/{id}` 维护目录</li>
+                                <li>`/api/categories` 分类持久化；删除分类时商品 categoryId 置空</li>
                             </ul>
                         </div>
                         <div class="cell-block">
@@ -867,7 +872,7 @@
                             <div class="capability-list">
                                 <div class="capability" data-capability="catalog-management">
                                     <span class="capability-name">catalog-management</span>
-                                    <span class="capability-desc">商品列表与库存事实</span>
+                                    <span class="capability-desc">商品列表/搜索过滤 active；软删除持久化；分类接口</span>
                                 </div>
                                 <div class="capability" data-capability="product-query">
                                     <span class="capability-name">product-query</span>
@@ -945,7 +950,7 @@
                                 </div>
                                 <div class="capability" data-capability="catalog-management">
                                     <span class="capability-name">catalog-management</span>
-                                    <span class="capability-desc">库存扣减不可为负</span>
+                                    <span class="capability-desc">库存扣减不可为负；商品 status 软删除</span>
                                 </div>
                                 <div class="capability" data-capability="cart-management">
                                     <span class="capability-name">cart-management</span>

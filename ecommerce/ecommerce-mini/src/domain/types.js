@@ -5,6 +5,17 @@
  * @property {number} priceCents
  * @property {number} stock
  * @property {string} [imageUrl]
+ * @property {string} [description]
+ * @property {"active" | "deleted"} [status] 上架/下架状态；缺省视为 active
+ * @property {string|null} [categoryId] 所属分类；null 表示未分类
+ */
+
+/**
+ * @typedef {Object} Category
+ * @property {string} id
+ * @property {string} name
+ * @property {number} [sortOrder] 排序号（越小越靠前）
+ * @property {"active" | "deleted"} [status] 分类状态；缺省视为 active
  */
 
 /**

@@ -16,7 +16,7 @@
         >
       </div>
       <div v-else class="flex-1 mx-8 text-sm text-slate-500">
-        当前路径: <span class="text-slate-900 font-medium">营销中心 / 优惠券管理</span>
+        当前路径: <span class="text-slate-900 font-medium">{{ { product: '交易管理 / 商品管理', category: '交易管理 / 分类管理', coupon: '营销中心 / 优惠券管理' }[adminTab] }}</span>
       </div>
 
       <div class="flex items-center gap-6 text-sm font-medium">
@@ -45,6 +45,13 @@
     <main v-if="viewMode === 'store'" class="flex-1 flex overflow-hidden">
       <!-- 左侧商品网格 -->
       <section class="flex-1 overflow-y-auto p-8 bg-slate-50 scrollbar-hide">
+        <!-- 分类筛选条 -->
+        <div class="flex items-center gap-2 flex-wrap mb-6">
+          <button @click="selectedCategory = null"
+                  :class="['px-4 py-2 border text-xs font-medium transition-colors', selectedCategory === null ? 'bg-slate-900 text-white' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50']">全部</button>
+          <button v-for="c in activeCategories" :key="c.id" @click="selectedCategory = c.id"
+                  :class="['px-4 py-2 border text-xs font-medium transition-colors', selectedCategory === c.id ? 'bg-slate-900 text-white' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50']">{{ c.name }}</button>
+        </div>
         <div v-if="filteredProducts.length === 0" class="h-full flex flex-col items-center justify-center text-slate-400 space-y-4">
           <p class="text-sm">未找到相关商品</p>
         </div>
@@ -179,15 +186,22 @@
         <nav class="flex-1 py-4">
           <div class="px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">交易管理</div>
           <a class="flex items-center px-6 py-3 border-l-4 border-transparent text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer">订单列表</a>
-          <a class="flex items-center px-6 py-3 border-l-4 border-transparent text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer">商品管理</a>
+          <a @click="adminTab = 'product'"
+             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'product' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']">商品管理</a>
+          <a @click="adminTab = 'category'"
+             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'category' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']">分类管理</a>
           <div class="mt-8 px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">营销中心</div>
-          <a class="flex items-center px-6 py-3 border-l-4 border-slate-900 bg-slate-50 text-slate-900 font-medium cursor-pointer">优惠券管理</a>
+          <a @click="adminTab = 'coupon'"
+             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'coupon' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']">优惠券管理</a>
         </nav>
       </aside>
 
       <!-- 右侧内容区 -->
       <div class="flex-1 overflow-y-auto p-8 bg-slate-50">
         <div class="max-w-5xl mx-auto space-y-8">
+
+          <!-- ===== 优惠券管理 tab ===== -->
+          <div v-if="adminTab === 'coupon'">
 
           <!-- 章节一: 新建优惠券规则 -->
           <section class="bg-white border border-slate-200 p-8" id="create-section">
@@ -365,6 +379,178 @@
             </table>
           </section>
 
+          </div><!-- /优惠券管理 tab -->
+
+          <!-- ===== 商品管理 tab ===== -->
+          <div v-else-if="adminTab === 'product'">
+
+            <!-- 章节一: 商品列表 -->
+            <section class="bg-white border border-slate-200 p-8">
+              <div class="flex items-center justify-between mb-6 border-b border-slate-200 pb-4">
+                <h2 class="text-lg font-bold">商品列表</h2>
+                <button @click="openCreateProduct" class="bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700 transition-colors">+ 新增商品</button>
+              </div>
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="text-left text-slate-500 border-b border-slate-200">
+                    <th class="pb-3 font-medium">商品</th>
+                    <th class="pb-3 font-medium">价格</th>
+                    <th class="pb-3 font-medium">库存</th>
+                    <th class="pb-3 font-medium">状态</th>
+                    <th class="pb-3 font-medium text-right">操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="p in adminProducts" :key="p.id" class="border-b border-slate-200">
+                    <td class="py-3">
+                      <div class="flex items-center space-x-3">
+                        <img :src="p.imageUrl" :alt="p.name" class="w-10 h-10 object-cover border border-slate-200 shrink-0">
+                        <div>
+                          <div class="font-medium text-slate-900">{{ p.name }}</div>
+                          <div class="text-xs text-slate-500">{{ p.description }}</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="py-3 font-mono">¥{{ (p.priceCents / 100).toFixed(2) }}</td>
+                    <td class="py-3">{{ p.stock }}</td>
+                    <td class="py-3"><span class="text-xs font-bold text-slate-900">{{ productStatusLabel(p.status) }}</span></td>
+                    <td class="py-3 text-right">
+                      <button @click="openEditProduct(p)" class="border border-slate-200 text-slate-700 px-3 py-1 text-xs font-medium hover:bg-slate-50 transition-colors">编辑</button>
+                      <button @click="pendingDeleteProduct = p" class="border border-slate-200 text-slate-700 px-3 py-1 text-xs font-medium hover:bg-slate-50 transition-colors ml-2">删除</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+
+            <!-- 章节二: 新增 / 编辑商品 -->
+            <section class="bg-white border border-slate-200 p-8">
+              <h2 class="text-lg font-bold mb-6 border-b border-slate-200 pb-4">{{ productForm.id ? '编辑商品' : '新增商品' }}</h2>
+              <form @submit.prevent="saveProduct" class="space-y-6">
+                <div class="grid grid-cols-2 gap-6">
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">商品名称</label>
+                    <input v-model.trim="productForm.name" type="text" placeholder="例如: 极简机械键盘"
+                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">价格（元）</label>
+                    <input v-model="productForm.priceYuan" type="number" step="0.01" min="0.01" placeholder="例如: 299.00"
+                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">库存</label>
+                    <input v-model.number="productForm.stock" type="number" min="0" placeholder="例如: 99"
+                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">图片链接</label>
+                    <input v-model.trim="productForm.imageUrl" type="text" placeholder="例如: https://images.unsplash.com/..."
+                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">分类</label>
+                    <select v-model="productForm.categoryId" class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                      <option :value="null">未分类</option>
+                      <option v-for="c in activeCategories" :key="c.id" :value="c.id">{{ c.name }}</option>
+                    </select>
+                  </div>
+                </div>
+                <div>
+                  <label class="block text-sm font-medium text-slate-700 mb-2">商品描述</label>
+                  <input v-model.trim="productForm.description" type="text" placeholder="例如: 84键紧凑布局，红轴"
+                         class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                </div>
+                <div v-if="productError" class="border border-slate-900 bg-slate-50 px-4 py-3 text-sm text-slate-900">{{ productError }}</div>
+                <div class="flex items-center space-x-3 border-t border-slate-200 pt-6">
+                  <button type="submit" class="bg-slate-900 text-white px-6 py-2 text-sm font-medium hover:bg-slate-700 transition-colors">{{ productForm.id ? '保存修改' : '新增商品' }}</button>
+                  <button type="button" @click="resetProductForm" class="border border-slate-200 text-slate-600 px-6 py-2 text-sm font-medium">清空</button>
+                </div>
+              </form>
+            </section>
+
+            <!-- 章节三: 删除确认 -->
+            <section v-if="pendingDeleteProduct" class="bg-white border border-slate-200 p-8">
+              <h2 class="text-lg font-bold mb-4 border-b border-slate-200 pb-4">删除确认</h2>
+              <p class="text-sm text-slate-700 mb-6">确认下架商品「<span class="font-medium text-slate-900">{{ pendingDeleteProduct.name }}</span>」吗？该商品将从 C 端商店与列表中移除，历史订单不受影响。</p>
+              <div class="flex items-center space-x-3">
+                <button @click="doDeleteProduct" class="bg-slate-900 text-white px-6 py-2 text-sm font-medium hover:bg-slate-700 transition-colors">确认删除（下架）</button>
+                <button @click="pendingDeleteProduct = null" class="border border-slate-200 text-slate-600 px-6 py-2 text-sm font-medium">取消</button>
+              </div>
+            </section>
+
+          </div><!-- /商品管理 tab -->
+
+          <!-- ===== 分类管理 tab ===== -->
+          <div v-else>
+
+            <!-- 章节一: 分类列表 -->
+            <section class="bg-white border border-slate-200 p-8">
+              <div class="flex items-center justify-between mb-6 border-b border-slate-200 pb-4">
+                <h2 class="text-lg font-bold">分类列表</h2>
+                <button @click="openCreateCategory" class="bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700 transition-colors">+ 新增分类</button>
+              </div>
+              <table class="w-full text-sm">
+                <thead>
+                  <tr class="text-left text-slate-500 border-b border-slate-200">
+                    <th class="pb-3 font-medium">排序</th>
+                    <th class="pb-3 font-medium">分类名称</th>
+                    <th class="pb-3 font-medium">商品数</th>
+                    <th class="pb-3 font-medium">状态</th>
+                    <th class="pb-3 font-medium text-right">操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="c in adminCategories" :key="c.id" class="border-b border-slate-200">
+                    <td class="py-3 text-slate-500">{{ c.sortOrder }}</td>
+                    <td class="py-3 font-medium text-slate-900">{{ c.name }}</td>
+                    <td class="py-3">{{ countByCategory(c.id) }}</td>
+                    <td class="py-3"><span class="text-xs font-bold text-slate-900">{{ c.status === 'deleted' ? '已下架' : '生效中' }}</span></td>
+                    <td class="py-3 text-right">
+                      <button @click="openEditCategory(c)" class="border border-slate-200 text-slate-700 px-3 py-1 text-xs font-medium hover:bg-slate-50 transition-colors">编辑</button>
+                      <button @click="pendingDeleteCategory = c" class="border border-slate-200 text-slate-700 px-3 py-1 text-xs font-medium hover:bg-slate-50 transition-colors ml-2">删除</button>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </section>
+
+            <!-- 章节二: 新增/编辑分类 -->
+            <section class="bg-white border border-slate-200 p-8">
+              <h2 class="text-lg font-bold mb-6 border-b border-slate-200 pb-4">{{ categoryForm.id ? '编辑分类' : '新增分类' }}</h2>
+              <form @submit.prevent="saveCategory" class="space-y-6">
+                <div class="grid grid-cols-2 gap-6">
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">分类名称</label>
+                    <input v-model.trim="categoryForm.name" type="text" placeholder="例如: 键鼠外设"
+                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                  </div>
+                  <div>
+                    <label class="block text-sm font-medium text-slate-700 mb-2">排序号（越小越靠前）</label>
+                    <input v-model.number="categoryForm.sortOrder" type="number" min="0" placeholder="例如: 1"
+                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                  </div>
+                </div>
+                <div v-if="categoryError" class="border border-slate-900 bg-slate-50 px-4 py-3 text-sm text-slate-900">{{ categoryError }}</div>
+                <div class="flex items-center space-x-3 border-t border-slate-200 pt-6">
+                  <button type="submit" class="bg-slate-900 text-white px-6 py-2 text-sm font-medium hover:bg-slate-700 transition-colors">{{ categoryForm.id ? '保存修改' : '新增分类' }}</button>
+                  <button type="button" @click="resetCategoryForm" class="border border-slate-200 text-slate-600 px-6 py-2 text-sm font-medium">清空</button>
+                </div>
+              </form>
+            </section>
+
+            <!-- 章节三: 删除确认 -->
+            <section v-if="pendingDeleteCategory" class="bg-white border border-slate-200 p-8">
+              <h2 class="text-lg font-bold mb-4 border-b border-slate-200 pb-4">删除确认</h2>
+              <p class="text-sm text-slate-700 mb-6">确认删除分类「<span class="font-medium text-slate-900">{{ pendingDeleteCategory.name }}</span>」吗？该分类将从 C 端筛选条移除，其下 {{ countByCategory(pendingDeleteCategory.id) }} 个商品将变为「未分类」，不影响销售。</p>
+              <div class="flex items-center space-x-3">
+                <button @click="doDeleteCategory" class="bg-slate-900 text-white px-6 py-2 text-sm font-medium hover:bg-slate-700 transition-colors">确认删除（下架）</button>
+                <button @click="pendingDeleteCategory = null" class="border border-slate-200 text-slate-600 px-6 py-2 text-sm font-medium">取消</button>
+              </div>
+            </section>
+
+          </div><!-- /分类管理 tab -->
+
         </div>
       </div>
     </main>
@@ -411,6 +597,8 @@ const products = ref([])
 const cart = ref([])
 const API_BASE = '' // 使用相对路径，通过 Vite 代理转发到后端
 const searchQuery = ref('')
+// C 端分类筛选（null = 全部）
+const selectedCategory = ref(null)
 const isCartOpen = ref(true)
 const isProcessing = ref(false)
 const isCheckoutSuccess = ref(false)
@@ -545,14 +733,20 @@ watch(() => cart.value, () => {
   recommendBestCoupon()
 }, { deep: true })
 
-// 搜索过滤逻辑
+// 搜索过滤逻辑（分类 + 关键词组合）
 const filteredProducts = computed(() => {
-  if (!searchQuery.value.trim()) return products.value
-  const query = searchQuery.value.toLowerCase().trim()
-  return products.value.filter(p => 
-    p.name.toLowerCase().includes(query) || 
-    p.description.toLowerCase().includes(query)
-  )
+  let list = products.value
+  if (selectedCategory.value !== null) {
+    list = list.filter(p => p.categoryId === selectedCategory.value)
+  }
+  if (searchQuery.value.trim()) {
+    const query = searchQuery.value.toLowerCase().trim()
+    list = list.filter(p =>
+      (p.name && p.name.toLowerCase().includes(query)) ||
+      (p.description && p.description.toLowerCase().includes(query))
+    )
+  }
+  return list
 })
 
 // 购物车逻辑
@@ -691,6 +885,7 @@ const resetCheckoutState = () => {
 }
 
 // ==================== B 端运营后台 ====================
+const adminTab = ref('coupon') // 'coupon' | 'product'
 const adminCoupons = ref([])
 const issueLog = ref([])
 const couponForm = ref({ name: '', type: 'FLAT', value: '', minSpend: '', expiryDate: '' })
@@ -705,9 +900,17 @@ const selectedIssueCoupon = computed(() =>
 
 const switchViewMode = (mode) => {
   viewMode.value = mode
+  if (mode === 'store') {
+    // 切回 C 端时重新拉取商品与分类，使后台改动即时反映到店铺
+    fetchProducts()
+    fetchCoupons()
+    fetchCategories()
+  }
   if (mode === 'admin') {
     fetchAdminCoupons()
     fetchIssuances()
+    fetchAdminProducts()
+    fetchCategories()
   }
 }
 
@@ -815,12 +1018,186 @@ const issueCoupon = async () => {
   }
 }
 
+// ==================== B 端商品管理 ====================
+const adminProducts = ref([])
+const productForm = ref({ id: null, name: '', priceYuan: '', stock: 0, imageUrl: '', description: '', categoryId: null })
+const productError = ref('')
+const pendingDeleteProduct = ref(null)
+
+// ==================== B 端分类管理 ====================
+const adminCategories = ref([])
+const categoryForm = ref({ id: null, name: '', sortOrder: 0 })
+const categoryError = ref('')
+const pendingDeleteCategory = ref(null)
+
+// active 分类（C 端筛选条 / 商品表单下拉共用）
+const activeCategories = computed(() => adminCategories.value.filter(c => c.status !== 'deleted'))
+
+const productStatusLabel = (status) => (status === 'deleted' ? '已下架' : '上架中')
+
+const fetchAdminProducts = async () => {
+  try {
+    const response = await fetch(`${API_BASE}/api/products`)
+    if (response.ok) {
+      adminProducts.value = await response.json()
+    }
+  } catch (e) {
+    console.error('获取商品列表失败:', e)
+  }
+}
+
+const fetchCategories = async () => {
+  try {
+    const response = await fetch(`${API_BASE}/api/categories`)
+    if (response.ok) {
+      adminCategories.value = await response.json()
+    }
+  } catch (e) {
+    console.error('获取分类列表失败:', e)
+  }
+}
+
+const countByCategory = (id) => adminProducts.value.filter(p => p.categoryId === id).length
+
+const openCreateCategory = () => { categoryForm.value = { id: null, name: '', sortOrder: 0 }; categoryError.value = '' }
+const openEditCategory = (c) => { categoryForm.value = { id: c.id, name: c.name, sortOrder: c.sortOrder }; categoryError.value = '' }
+const resetCategoryForm = () => { openCreateCategory(); pendingDeleteCategory.value = null }
+
+const saveCategory = async () => {
+  categoryError.value = ''
+  const name = categoryForm.value.name
+  if (!name) { categoryError.value = '请填写分类名称。'; return }
+  const payload = { name, sortOrder: categoryForm.value.sortOrder || 0 }
+  try {
+    const url = categoryForm.value.id
+      ? `${API_BASE}/api/categories/${categoryForm.value.id}`
+      : `${API_BASE}/api/categories`
+    const response = await fetch(url, {
+      method: categoryForm.value.id ? 'PUT' : 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    })
+    if (!response.ok) {
+      const err = await response.json()
+      categoryError.value = err.message || err.detail || '保存失败'
+      return
+    }
+    resetCategoryForm()
+    await Promise.all([fetchCategories(), fetchAdminProducts()])
+  } catch (e) {
+    categoryError.value = `网络错误: ${e.message}`
+  }
+}
+
+const doDeleteCategory = async () => {
+  if (!pendingDeleteCategory.value) return
+  const id = pendingDeleteCategory.value.id
+  try {
+    const response = await fetch(`${API_BASE}/api/categories/${id}`, { method: 'DELETE' })
+    if (!response.ok) {
+      const err = await response.json()
+      categoryError.value = err.message || err.detail || '删除失败'
+      return
+    }
+    pendingDeleteCategory.value = null
+    await Promise.all([fetchCategories(), fetchAdminProducts()])
+  } catch (e) {
+    categoryError.value = `网络错误: ${e.message}`
+  }
+}
+
+const openCreateProduct = () => {
+  resetProductForm()
+}
+
+const openEditProduct = (p) => {
+  productForm.value = {
+    id: p.id,
+    name: p.name,
+    priceYuan: (p.priceCents / 100).toFixed(2),
+    stock: p.stock,
+    imageUrl: p.imageUrl || '',
+    description: p.description || '',
+    categoryId: p.categoryId || null
+  }
+  productError.value = ''
+}
+
+const resetProductForm = () => {
+  productForm.value = { id: null, name: '', priceYuan: '', stock: 0, imageUrl: '', description: '', categoryId: null }
+  productError.value = ''
+  pendingDeleteProduct.value = null
+}
+
+const saveProduct = async () => {
+  productError.value = ''
+  const name = productForm.value.name
+  const priceYuan = parseFloat(productForm.value.priceYuan)
+  const stock = parseInt(productForm.value.stock, 10)
+  const imageUrl = productForm.value.imageUrl
+
+  if (!name) { productError.value = '请填写商品名称。'; return }
+  if (isNaN(priceYuan) || priceYuan <= 0) { productError.value = '价格必须大于 0 元。'; return }
+  if (isNaN(stock) || stock < 0) { productError.value = '库存不能为负数。'; return }
+  if (!imageUrl) { productError.value = '请填写商品图片链接。'; return }
+
+  const priceCents = Math.round(priceYuan * 100)
+  const payload = { name, priceCents, stock, imageUrl, description: productForm.value.description, categoryId: productForm.value.categoryId ?? null }
+
+  try {
+    if (productForm.value.id) {
+      const response = await fetch(`${API_BASE}/api/products/${productForm.value.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      if (!response.ok) {
+        const err = await response.json()
+        productError.value = err.message || err.detail || '保存失败'
+        return
+      }
+    } else {
+      const response = await fetch(`${API_BASE}/api/products`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      })
+      if (!response.ok) {
+        const err = await response.json()
+        productError.value = err.message || err.detail || '新增失败'
+        return
+      }
+    }
+    resetProductForm()
+    await fetchAdminProducts()
+  } catch (e) {
+    productError.value = `网络错误: ${e.message}`
+  }
+}
+
+const doDeleteProduct = async () => {
+  if (!pendingDeleteProduct.value) return
+  const id = pendingDeleteProduct.value.id
+  try {
+    const response = await fetch(`${API_BASE}/api/products/${id}`, { method: 'DELETE' })
+    if (!response.ok) {
+      const err = await response.json()
+      productError.value = err.message || err.detail || '删除失败'
+      return
+    }
+    pendingDeleteProduct.value = null
+    await fetchAdminProducts()
+  } catch (e) {
+    productError.value = `网络错误: ${e.message}`
+  }
+}
+
 onMounted(() => {
   fetchProducts()
   fetchCoupons()
   fetchCart()
-})
-</script>
+  fetchCategories()
+})</script>
 
 <style>
 .scrollbar-hide::-webkit-scrollbar {

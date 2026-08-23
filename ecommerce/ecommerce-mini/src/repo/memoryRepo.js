@@ -16,6 +16,24 @@ export class ProductRepo {
   }
 }
 
+export class CategoryRepo {
+  constructor() {
+    this.categories = new Map()
+  }
+
+  save(category) {
+    this.categories.set(category.id, category)
+  }
+
+  findAll() {
+    return Array.from(this.categories.values())
+  }
+
+  findById(id) {
+    return this.categories.get(id)
+  }
+}
+
 export class CartRepo {
   constructor() {
     this.carts = new Map()

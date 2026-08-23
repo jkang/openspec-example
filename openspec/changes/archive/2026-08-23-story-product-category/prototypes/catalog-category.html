@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>分类管理 - 极简电商 ADMIN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        * { border-radius: 0 !important; box-shadow: none !important; }
+        body { background-color: #f8fafc; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+        .border-slate-200 { border-color: #e2e8f0; }
+        input:focus, select:focus { outline: none; border-color: #0f172a; }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div id="app" class="flex min-h-screen">
+        <!-- 左侧导航 -->
+        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0">
+            <div class="h-16 flex items-center px-6 border-b border-slate-200">
+                <h1 class="text-xl font-bold tracking-tight">极简电商 ADMIN</h1>
+            </div>
+            <nav class="flex-1 py-4">
+                <div class="px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">交易管理</div>
+                <a href="#" @click.prevent="tab='product'" :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', tab==='product' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']">商品管理</a>
+                <a href="#" @click.prevent="tab='category'" :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', tab==='category' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']">分类管理</a>
+                <div class="mt-8 px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">营销中心</div>
+                <a href="#" class="flex items-center px-6 py-3 border-l-4 border-transparent text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer">优惠券管理</a>
+            </nav>
+        </aside>
+
+        <!-- 右侧内容区 -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0">
+                <div class="text-slate-600">当前路径: <span class="text-slate-900 font-medium">{{ tab === 'category' ? '交易管理 / 分类管理' : '交易管理 / 商品管理' }}</span></div>
+                <div class="flex items-center space-x-4"><span class="text-sm text-slate-500">运营专员: 王琳</span></div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-8">
+                <div class="max-w-6xl mx-auto space-y-8">
+
+                    <!-- ===== 分类管理 tab ===== -->
+                    <template v-if="tab === 'category'">
+                        <section class="bg-white border border-slate-200 p-8">
+                            <div class="flex items-center justify-between mb-6 border-b border-slate-200 pb-4">
+                                <h2 class="text-lg font-bold">分类列表</h2>
+                                <button @click="openCreate" class="bg-slate-900 text-white px-4 py-2 text-sm font-medium">+ 新增分类</button>
+                            </div>
+                            <table class="w-full text-left text-sm">
+                                <thead>
+                                    <tr class="border-b border-slate-200 text-slate-500">
+                                        <th class="py-2 pr-4 font-medium">排序</th>
+                                        <th class="py-2 pr-4 font-medium">分类名称</th>
+                                        <th class="py-2 px-4 font-medium">商品数</th>
+                                        <th class="py-2 px-4 font-medium">状态</th>
+                                        <th class="py-2 px-4 font-medium text-right">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="c in visibleCategories" :key="c.id" class="border-b border-slate-200 hover:bg-slate-50 transition-colors">
+                                        <td class="py-3 pr-4 text-slate-500">{{ c.sortOrder }}</td>
+                                        <td class="py-3 pr-4 font-medium text-slate-900">{{ c.name }}</td>
+                                        <td class="py-3 px-4">{{ countByCategory(c.id) }}</td>
+                                        <td class="py-3 px-4"><span class="text-xs font-medium border border-slate-200 px-2 py-1">{{ c.status === 'active' ? '生效中' : '已下架' }}</span></td>
+                                        <td class="py-3 px-4 text-right space-x-2">
+                                            <button @click="openEdit(c)" class="px-3 py-1 border border-slate-200 text-slate-700 text-xs font-medium hover:bg-slate-50">编辑</button>
+                                            <button @click="pendingDelete = c" class="px-3 py-1 border border-slate-200 text-slate-700 text-xs font-medium hover:bg-slate-50">删除</button>
+                                        </td>
+                                    </tr>
+                                    <tr v-if="visibleCategories.length === 0"><td colspan="5" class="py-8 text-center text-slate-400">暂无分类</td></tr>
+                                </tbody>
+                            </table>
+                        </section>
+
+                        <section class="bg-white border border-slate-200 p-8">
+                            <h2 class="text-lg font-bold mb-6 border-b border-slate-200 pb-4">{{ form.id ? '编辑分类' : '新增分类' }}</h2>
+                            <form @submit.prevent="saveCategory" class="space-y-6">
+                                <div class="grid grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-2">分类名称</label>
+                                        <input v-model.trim="form.name" type="text" placeholder="例如: 键鼠外设" class="w-full border border-slate-200 px-3 py-2 text-sm bg-white">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-2">排序号（越小越靠前）</label>
+                                        <input v-model.number="form.sortOrder" type="number" min="0" placeholder="例如: 1" class="w-full border border-slate-200 px-3 py-2 text-sm bg-white">
+                                    </div>
+                                </div>
+                                <div v-if="formError" class="text-sm text-red-600">{{ formError }}</div>
+                                <div class="flex items-center space-x-3">
+                                    <button type="submit" class="px-4 py-2 bg-slate-900 text-white text-sm font-medium">{{ form.id ? '保存修改' : '新增分类' }}</button>
+                                    <button type="button" @click="resetForm" class="px-4 py-2 border border-slate-200 text-slate-600 text-sm font-medium">清空</button>
+                                </div>
+                            </form>
+                        </section>
+
+                        <section v-if="pendingDelete" class="bg-white border border-slate-200 p-8">
+                            <h2 class="text-lg font-bold mb-4 border-b border-slate-200 pb-4">删除确认</h2>
+                            <p class="text-sm text-slate-700 mb-6">确认删除分类「<span class="font-medium text-slate-900">{{ pendingDelete.name }}</span>」吗？该分类将从 C 端筛选条移除，其下 {{ countByCategory(pendingDelete.id) }} 个商品将变为「未分类」，不影响销售。</p>
+                            <div class="flex items-center space-x-3">
+                                <button @click="doDelete" class="px-4 py-2 bg-slate-900 text-white text-sm font-medium">确认删除（下架）</button>
+                                <button @click="pendingDelete = null" class="px-4 py-2 border border-slate-200 text-slate-600 text-sm font-medium">取消</button>
+                            </div>
+                        </section>
+                    </template>
+
+                    <!-- ===== 商品管理 tab（体现分类挂载） ===== -->
+                    <template v-else>
+                        <section class="bg-white border border-slate-200 p-8">
+                            <h2 class="text-lg font-bold mb-6 border-b border-slate-200 pb-4">商品列表（含分类挂载）</h2>
+                            <table class="w-full text-left text-sm">
+                                <thead>
+                                    <tr class="border-b border-slate-200 text-slate-500">
+                                        <th class="py-2 pr-4 font-medium">商品</th>
+                                        <th class="py-2 px-4 font-medium">价格</th>
+                                        <th class="py-2 px-4 font-medium">分类</th>
+                                        <th class="py-2 px-4 font-medium text-right">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr v-for="p in products" :key="p.id" class="border-b border-slate-200">
+                                        <td class="py-3 pr-4 font-medium text-slate-900">{{ p.name }}</td>
+                                        <td class="py-3 px-4">¥{{ (p.priceCents / 100).toFixed(2) }}</td>
+                                        <td class="py-3 px-4">{{ categoryName(p.categoryId) }}</td>
+                                        <td class="py-3 px-4 text-right">
+                                            <button @click="editingProduct = { ...p }" class="px-3 py-1 border border-slate-200 text-slate-700 text-xs font-medium hover:bg-slate-50">编辑分类</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </section>
+
+                        <section v-if="editingProduct" class="bg-white border border-slate-200 p-8">
+                            <h2 class="text-lg font-bold mb-6 border-b border-slate-200 pb-4">编辑商品分类</h2>
+                            <div class="space-y-4 max-w-md">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">商品</label>
+                                    <div class="text-sm font-medium text-slate-900">{{ editingProduct.name }}</div>
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">所属分类</label>
+                                    <select v-model="editingProduct.categoryId" class="w-full border border-slate-200 px-3 py-2 text-sm bg-white">
+                                        <option :value="null">未分类</option>
+                                        <option v-for="c in visibleCategories" :key="c.id" :value="c.id">{{ c.name }}</option>
+                                    </select>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <button @click="saveProductCategory" class="px-4 py-2 bg-slate-900 text-white text-sm font-medium">保存</button>
+                                    <button @click="editingProduct = null" class="px-4 py-2 border border-slate-200 text-slate-600 text-sm font-medium">取消</button>
+                                </div>
+                            </div>
+                        </section>
+
+                        <!-- C 端筛选条预览 -->
+                        <section class="bg-white border border-slate-200 p-8">
+                            <h2 class="text-lg font-bold mb-6 border-b border-slate-200 pb-4">C 端首页分类筛选条（预览）</h2>
+                            <div class="flex items-center gap-2 flex-wrap">
+                                <button @click="cFilter = null" :class="['px-4 py-2 border text-sm font-medium transition-colors', cFilter === null ? 'bg-slate-900 text-white' : 'border-slate-200 text-slate-600']">全部</button>
+                                <button v-for="c in visibleCategories" :key="c.id" @click="cFilter = c.id" :class="['px-4 py-2 border text-sm font-medium transition-colors', cFilter === c.id ? 'bg-slate-900 text-white' : 'border-slate-200 text-slate-600']">{{ c.name }}</button>
+                            </div>
+                            <div class="mt-6 text-sm text-slate-500">当前筛选: <span class="text-slate-900 font-medium">{{ cFilter ? categoryName(cFilter) : '全部' }}</span> · 商品 {{ filteredForC.length }} 件</div>
+                            <div class="mt-4 flex flex-wrap gap-4">
+                                <div v-for="p in filteredForC" :key="p.id" class="border border-slate-200 p-4 w-48">
+                                    <img :src="p.imageUrl" :alt="p.name" class="w-full h-24 object-cover border border-slate-200">
+                                    <div class="mt-2 text-sm font-medium text-slate-900">{{ p.name }}</div>
+                                    <div class="text-sm text-slate-500">¥{{ (p.priceCents / 100).toFixed(2) }}</div>
+                                </div>
+                            </div>
+                        </section>
+                    </template>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+        createApp({
+            setup() {
+                const tab = ref('category');
+
+                // ---- 分类 (真实业务数据) ----
+                const categories = ref([
+                    { id: 'cat-keyboard', name: '键鼠外设', sortOrder: 1, status: 'active' },
+                    { id: 'cat-display', name: '显示设备', sortOrder: 2, status: 'active' },
+                    { id: 'cat-desk', name: '桌面收纳', sortOrder: 3, status: 'active' },
+                    { id: 'cat-audio', name: '音频设备', sortOrder: 4, status: 'active' }
+                ]);
+                const visibleCategories = computed(() => categories.value.filter(c => c.status === 'active'));
+
+                // ---- 商品 (含 categoryId) ----
+                const products = ref([
+                    { id: '1', name: '极简机械键盘', priceCents: 29900, imageUrl: 'https://images.unsplash.com/photo-1511467687858-23d96c32e4ae?auto=format&fit=crop&q=80&w=800', categoryId: 'cat-keyboard' },
+                    { id: '2', name: '无线办公鼠标', priceCents: 8900, imageUrl: 'https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?auto=format&fit=crop&q=80&w=800', categoryId: 'cat-keyboard' },
+                    { id: '3', name: '高清显示器', priceCents: 129900, imageUrl: 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?auto=format&fit=crop&q=80&w=800', categoryId: 'cat-display' },
+                    { id: '4', name: '桌面收纳架', priceCents: 4500, imageUrl: 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?auto=format&fit=crop&q=80&w=800', categoryId: 'cat-desk' },
+                    { id: '5', name: '铝合金笔记本支架', priceCents: 6800, imageUrl: 'https://images.unsplash.com/photo-1527443154391-507e9dc6c5cc?auto=format&fit=crop&q=80&w=800', categoryId: 'cat-desk' },
+                    { id: '6', name: '桌面拾音氛围灯', priceCents: 12800, imageUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252728f?auto=format&fit=crop&q=80&w=800', categoryId: 'cat-audio' }
+                ]);
+
+                const form = ref({ id: null, name: '', sortOrder: 0 });
+                const formError = ref('');
+                const pendingDelete = ref(null);
+                const editingProduct = ref(null);
+                const cFilter = ref(null);
+
+                const categoryName = (id) => categories.value.find(c => c.id === id)?.name || '未分类';
+                const countByCategory = (id) => products.value.filter(p => p.categoryId === id).length;
+
+                const filteredForC = computed(() =>
+                    products.value.filter(p => cFilter.value === null || p.categoryId === cFilter.value)
+                );
+
+                function openCreate() { form.value = { id: null, name: '', sortOrder: 0 }; formError.value = ''; }
+                function openEdit(c) { form.value = { id: c.id, name: c.name, sortOrder: c.sortOrder }; formError.value = ''; }
+                function resetForm() { openCreate(); pendingDelete.value = null; }
+
+                function saveCategory() {
+                    formError.value = '';
+                    if (!form.value.name) { formError.value = '请填写分类名称。'; return; }
+                    if (form.value.id) {
+                        const t = categories.value.find(c => c.id === form.value.id);
+                        if (t) { t.name = form.value.name; t.sortOrder = form.value.sortOrder; }
+                    } else {
+                        categories.value.push({ id: 'cat-' + Date.now(), name: form.value.name, sortOrder: form.value.sortOrder, status: 'active' });
+                    }
+                    resetForm();
+                }
+
+                function doDelete() {
+                    if (!pendingDelete.value) return;
+                    const t = pendingDelete.value;
+                    // 软删除分类 + 商品 categoryId 置空
+                    t.status = 'deleted';
+                    products.value.forEach(p => { if (p.categoryId === t.id) p.categoryId = null; });
+                    pendingDelete.value = null;
+                    editingProduct.value = null;
+                }
+
+                function saveProductCategory() {
+                    const t = products.value.find(p => p.id === editingProduct.value.id);
+                    if (t) t.categoryId = editingProduct.value.categoryId;
+                    editingProduct.value = null;
+                }
+
+                return { tab, categories, visibleCategories, products, form, formError, pendingDelete, editingProduct, cFilter,
+                         categoryName, countByCategory, filteredForC, openCreate, openEdit, resetForm, saveCategory, doDelete, saveProductCategory };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
