@@ -1,7 +1,7 @@
 ---
 name: Testing Strategy
 purpose: 定义自动化测试金字塔策略及 SDD 工作流中的执行约束
-updated_at: 2026-08-20
+updated_at: 2026-08-23
 ---
 
 # 自动化测试策略与金字塔 (Testing Strategy)
@@ -47,4 +47,12 @@ updated_at: 2026-08-20
 - 只有遇到 `@e2e` 时，才前往全局 `e2e-tests/features/` 和 `e2e-tests/steps/` 目录下编写 Playwright 自动化脚本。
 
 ### Archive 阶段的门禁 (Gating)
-归档前，必须通过 `init.sh e2e:run` 执行全局回归，确保没有破坏任何现存契约。
+
+归档前，必须执行以下 E2E 门禁（缺一不可）：
+
+1. **E2E 覆盖落地（强制）**: 变更 `specs/**/*.md` 中每一个标记 `@e2e` 的场景，**必须**在 `e2e-tests/features/` 下有对应的 Cucumber 场景（含 `steps/` 步骤定义），不得仅在后端测试覆盖。若 feature 文件中找不到对应场景，视为门禁不通过。
+2. **全局回归**: 运行 `./init.sh e2e:run`，全部场景通过。
+3. **场景数不得倒退**: E2E 场景数应随变更增长或持平（新增 `@e2e` 场景必然增加或修改 feature 场景）；仅运行旧场景、未覆盖新 `@e2e` 验收的场景，视为门禁不通过。
+4. **verify.md 记录**: `verify.md` 的 E2E 门禁行必须填写**实际场景数**（如 `10 scenarios / 46 steps`），严禁标注"E2E 未纳入"作为通过理由。
+
+> 背景: E2E 是测试金字塔的顶层（约占 10%），覆盖用户核心交易链路与跨端交互；它不应是"可选验证"。归档前旧场景全绿但新 `@e2e` 场景零覆盖，属于验收缺口。
