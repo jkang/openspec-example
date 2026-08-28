@@ -123,9 +123,9 @@ This is an **agent-driven** operation - you will read delta specs and directly e
 
    在完成 Spec 同步后，你必须执行业务基线回流，将变更中的业务认知沉淀到全局规划层：
    - **调用辅助技能**: 依次调用 `baseline/` 子目录下的辅助技能：
-     - `openspec-baseline-blueprint`: 根据 `proposal.md`、`story.md`、`specs/**/*.md`、`design.md` 与 `verify.md` 判断并更新 `service_blueprint.html` 中的阶段覆盖、泳道能力分布与 capability 状态。
-     - `openspec-baseline-process-flow`: 根据 `story.md` (L1/L2) 和 `specs/design.md` (L3) 更新 `business_process.html`。
-     - `openspec-baseline-domain-model`: 先基于 `proposal.md`、全部 delta `specs/**/*.md`、主 specs 合并结果与 `design.md` 判断是否需要更新 `docs/baseline/domain_model.html`；若需要，则回写图与清单，若不需要，则输出显式 no-op 理由。
+     - `blueprint`: 根据 `proposal.md`、`story.md`、`specs/**/*.md`、`design.md` 与 `verify.md` 判断并更新 `service_blueprint.html` 中的阶段覆盖、泳道能力分布与 capability 状态。
+     - `process-flow`: 根据 `story.md` (L1/L2) 和 `specs/design.md` (L3) 更新 `business_process.html`。
+     - `domain-model`: 先基于 `proposal.md`、全部 delta `specs/**/*.md`、主 specs 合并结果与 `design.md` 判断是否需要更新 `docs/baseline/domain_model.html`；若需要，则回写图与清单，若不需要，则输出显式 no-op 理由。
    - **Service Blueprint Sync Trigger**: 当且仅当存在以下任一变化时，执行 Service Blueprint 回流：
      - `SB-STAGE-*` 阶段覆盖发生新增、移除或调整
      - `SB-<LANE>-*` 节点中的 capability 分布发生新增、移除或重排
@@ -141,7 +141,7 @@ This is an **agent-driven** operation - you will read delta specs and directly e
      - Aggregate、状态机、对象关系、业务不变量发生变化
      - `design.md` 中的 `Domain Model Sync Assessment` 明确写为 `Needs Sync: Yes`
    - **Explicit No-op**: 若上述条件均不满足，必须在同步摘要中明确记录“无需更新 Domain Model”及理由，不能静默跳过。
-   - **自动化渲染**: 所有基线回流完成后，调用 `openspec-baseline-render` 校验基线 HTML 的索引与可视化完整性。
+   - **自动化渲染**: 所有基线回流完成后，调用 `render` 校验基线 HTML 的索引与可视化完整性。
 
 6. **Show summary**
 

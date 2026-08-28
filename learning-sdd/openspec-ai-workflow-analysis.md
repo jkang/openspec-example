@@ -2,56 +2,71 @@
 
 ## 1. 引言：软件工程的新范式
 
-在 AI 辅助编程（AI-Assisted Programming）日益普及的今天，开发者面临的核心挑战已从“如何写代码”转变为“如何与 AI 协作以获得确定性的结果”。传统的开发模式是 **需求 -> 人 -> 代码**，而 OpenSpec v2.0 倡导的新范式正在演变为一套“可分支的规格驱动闭环”：以规划层作为护栏，在探索阶段完成任务类型识别，然后按不同任务类型进入提案、原型、业务评审、规格与设计、实施、验证与归档的闭环
+在 AI 辅助编程（AI-Assisted Programming）日益普及的今天，开发者面临的核心挑战已从“如何写代码”转变为“如何与 AI 协作以获得确定性的结果”。传统的开发模式是 **需求 -> 人 -> 代码**，而 OpenSpec 倡导的新范式正在演变为一套“可分支的规格驱动闭环”：以规划层作为护栏，需求侧完成需求调研与探索，交付侧按任务类型进入提案、原型、业务评审、规格与设计、实施、验证、分层 Sync 与归档的闭环。
 
-本图与 [SDD_WORKFLOW.md](file:///Users/superkkk/MyCoding/OpenSpec-practice/docs/SOPS/SDD_WORKFLOW.md#L20-L68) 的 SDD 动态分支工作流保持一致
+本图与 [SDD_WORKFLOW.md](file:///Users/superkkk/MyCoding/OpenSpec-practice/docs/SOPS/SDD_WORKFLOW.md) 的 SDD 动态分支工作流保持一致，也与 [ai4se-sdd-proposal.md](./ai4se-sdd-proposal.md) 的总体流程一致。
 
 ```mermaid
 graph TD
-    A[产品感 /opsx:product-sense] --> B[路线图规划 /opsx:product-planning]
+    A[产品感 /opsx:planning:product-sense] --> B[路线图规划 /opsx:planning:product-planning]
     B --> C((上下文注入 config.yaml))
 
-    C --> D((探索阶段 /opsx:explore))
-    D --> E{确认任务类型}
+    C --> E{确认任务类型}
 
-    E -->|史诗| F[拆解为多个功能条目]
-    F --> G[生成 openspec/epic-KEY.story-list.json]
-    G --> H[提案 /opsx:propose]
+    E -->|史诗| R1[需求调研 /req:research]
+    R1 --> R2[探索 /req:explore<br/>To-Be 设计 + 候选 Capabilities]
+    R2 --> R3{涉及 UI 变更?}
+    R3 -->|是| R4[原型（Epic 整体）/req:prototype]
+    R4 --> R5{视觉/交互确认?}
+    R5 -->|否| R4
+    R5 -->|是| R6[需求拆分 /req:storymap<br/>覆盖对账]
+    R3 -->|否| R6
+    R6 --> R7[Story 交付物 /req:story<br/>业务面 + HITL]
+    R7 --> H[交接 /req:handoff<br/>合成开发侧 proposal]
 
-    E -->|功能| H
-    H --> I{涉及 UI 变更?}
-    I -->|是| J[原型 /opsx:prototype]
-    J --> K{视觉/交互确认?}
-    K -->|否| J
-    K -->|是| L[业务故事评审 /opsx:story]
-    I -->|否| L
-    L --> M[规格与设计与任务清单 /opsx:spec-design]
+    E -->|功能| F1[提案 /opsx:propose]
+    F1 --> F2{涉及 UI 变更?}
+    F2 -->|是| F3[原型 /opsx:prototype]
+    F3 --> F4{视觉/交互确认?}
+    F4 -->|否| F3
+    F4 -->|是| F5[业务故事评审 /opsx:story]
+    F2 -->|否| F5
+    F5 --> F6[规格与设计与任务清单 /opsx:spec-design]
 
-    E -->|缺陷修复| N[提案 /opsx:propose]
-    N --> O{涉及 UI 变更?}
-    O -->|是| J
-    O -->|否| P[规格与设计与任务清单（含根因分析） /opsx:spec-design]
-    K -->|是| P
+    E -->|缺陷修复| B1[提案 /opsx:propose]
+    B1 --> B2{涉及 UI 变更?}
+    B2 -->|是| B3[原型 /opsx:prototype]
+    B3 --> B4{视觉/交互确认?}
+    B4 -->|否| B3
+    B4 -->|是| B5[规格与设计与任务清单（含根因分析） /opsx:spec-design]
+    B2 -->|否| B5
 
-    E -->|技术债| Q[提案 /opsx:propose]
-    Q --> R{有外部行为变更?}
-    R -->|是| M
-    R -->|否| S[配置 skip_specs: true]
-    S --> T[设计与任务清单 /opsx:spec-design]
+    E -->|技术债| T1[提案 /opsx:propose]
+    T1 --> T2{有外部行为变更?}
+    T2 -->|是| T3[规格与设计与任务清单 /opsx:spec-design]
+    T2 -->|否| T4[配置 skip_specs: true]
+    T4 --> T5[设计与任务清单 /opsx:spec-design]
 
-    M --> U((实施阶段 /opsx:apply))
-    P --> U
-    T --> U
+    H --> U((实施阶段 /opsx:apply))
+    F6 --> U
+    B5 --> U
+    T3 --> U
+    T5 --> U
 
-    U --> V((验证门禁))
+    U --> V((验证门禁 /opsx:verify))
     V --> W{需要更新规划?}
     W -->|是| X[更新规划 /opsx:update]
     X --> U
-    W -->|否| Y[同步规格 /opsx:sync]
+    W -->|否| Y[Spec Sync /opsx:sync<br/>change 级]
 
     Y --> Z[归档 /opsx:archive]
-    Z --> AA((完成))
+
+    Z -->|Epic 还有下一个 Story| R7
+    Z -->|Epic 全部完成| K2[Baseline Sync /opsx:baseline/sync<br/>Epic 级 +HITL]
+    K2 --> AA((完成))
 ```
+
+> **分层 Sync 说明**：每个 change 归档前只做 **Spec Sync**（`/opsx:sync`，change 级）；**Baseline Sync**（`/opsx:baseline/sync`）在 Epic 全部 Story 归档后统一执行（+ Roadmap 更新）。
 
 本文以一个 **小型电商系统** 的从零构建到生产级演进为例，深度复盘基于 OpenSpec v2.0 的 AI 协同开发全流程。我们将展示 OpenSpec 如何作为“治理驱动的桥梁”，确保每一个变更都长在产品规划的护栏内。
 
@@ -63,8 +78,8 @@ graph TD
 
 **用户输入**:
 
-> `/opsx:product-sense` "定义积分商城的 Elevator Pitch..."
-> `/opsx:product-planning` "制定未来 3 个月的滚动路线图..."
+> `/opsx:planning:product-sense` "定义积分商城的 Elevator Pitch..."
+> `/opsx:planning:product-planning` "制定未来 3 个月的滚动路线图..."
 
 **AI 思考与动作**:
 
@@ -90,7 +105,7 @@ graph TD
 
 1.  **架构设计**: AI 分析出电商系统的核心上下文：商品 (Catalog)、用户 (User)、购物车 (Cart)、订单 (Order)、支付 (Payment)；
 2.  **生成交互式原型 (New!)**: 
-    - AI 调用 `openspec-prototype` 技能，生成基于 Vue 3 + Tailwind CSS 的 `prototypes/*.html` 单文件原型。
+    - AI 调用 `prototype` 技能（需求侧 `prod/prototype`），生成基于 Vue 3 + Tailwind CSS 的 `prototypes/*.html` 单文件原型。
     - 原型遵循 **Modern Flat** 极简规范（1px 边框、无阴影、无渐变），并使用真实的公开资源图片而非 AI 生成图，确保视觉专业度。
 3.  **断点确认机制 (Checkpoint)**: 
     - 流程在此处暂停。AI 通知用户预览原型：“*视觉效果和交互流程是否符合预期？*”

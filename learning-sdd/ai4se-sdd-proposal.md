@@ -142,7 +142,7 @@ flowchart TD
 | 节点 | 环节 | 命令 | Skill | 产物 | 主导 | HITL |
 | --- | --- | --- | --- | --- | --- | --- |
 | A | 规划基线（起点即含 roadmap·每阶段多 Epic） | `/opsx:planning:product-sense` / `product-planning` | `product-sense` / `product-planning` | `PRODUCT_SENSE.md` / `ROADMAP.md` | PM | — |
-| B | 业务基线 | `/opsx:baseline/sync` | `openspec-baseline-*`×4 | baseline 三件套 html | PM/Lead | — |
+| B | 业务基线 | `/opsx:baseline/sync` | `*`×4 | baseline 三件套 html | PM/Lead | — |
 | R | 适用范围路由 | 决策点 | — | 分流：Epic→需求侧；其余→交付侧 | Lead | — |
 | P1 | 需求调研 | `/req:research` | `research` | `research.md`（单 Epic） | PM | ✅ |
 | P2 | 探索 | `/req:explore` | `explore` | `idea.md`（To-Be Process/Journey + 候选 Capabilities） | PM | ✅ |
@@ -157,7 +157,7 @@ flowchart TD
 | D4 | 实施与验证 | `/opsx:apply` → `/opsx:verify` | `apply-change` / `verify` | 代码 + `verify.md` | Engineer | ✅ |
 | K1 | Spec Sync（change 级） | `/opsx:sync` | `sync-specs` | delta→`openspec/specs` | Lead | — |
 | L | 归档 | `/opsx:archive` | `archive-change` | 归档 + epic 队列更新 | Lead | — |
-| K2 | Baseline Sync（Epic 级） | `/opsx:baseline/sync` | `openspec-baseline-*`×4 | 统一回流 `docs/baseline/*.html` | Lead | ✅ |
+| K2 | Baseline Sync（Epic 级） | `/opsx:baseline/sync` | `*`×4 | 统一回流 `docs/baseline/*.html` | Lead | ✅ |
 | M | 周期回顾 | `/opsx:planning:product-planning` | `product-planning` | 更新 `ROADMAP.md` | PM | — |
 
 ---
@@ -194,7 +194,7 @@ flowchart TD
 - **skill 按域子目录组织**：`prod/`（产品/需求侧）、`opsx/`（交付侧）、`baseline/`（业务基线）。
 - **需求侧 skill 名**不带前缀：`research` / `explore` / `prototype` / `storymap` / `story` / `handoff`（+ 产品侧 `product-sense` / `product-planning` / `delivery-board`）。
 - **交付侧 skill 名**去 `openspec-` 前缀：`propose` / `spec-design` / `apply-change` / `verify` / `sync-specs` / `archive-change` / `update-change` / `explore` / `prototype` / `story`。
-- **baseline skill 保留 `openspec-baseline-*` 前缀**（独立域，不与 prod/opsx 混用）。
+- **baseline skill 去 `openspec-baseline-` 前缀**：`blueprint` / `domain-model` / `process-flow` / `render`（独立域，不与 prod/opsx 混用）。
 - 命令用**命名空间子目录**：需求侧 `/req:`（`.trae/commands/req/`），交付侧 `/opsx:`（`.trae/commands/opsx/`，含 `planning/`、`governance/`、`baseline/` 子目录）。
 
 ### 3.7 Lightweight 原则（保留）
@@ -211,7 +211,7 @@ flowchart TD
 │   └── skills/              # [基础] Skill 按域子目录组织（三目录同步）
 │       ├── prod/            #   产品/需求侧 skill（research/explore/prototype/storymap/story/handoff + product-sense/product-planning/delivery-board）
 │       ├── opsx/            #   交付侧 skill（propose/spec-design/apply-change/verify/sync-specs/archive-change/update-change/explore/prototype/story）
-│       └── baseline/        #   业务基线 skill（openspec-baseline-*，保留前缀）
+│       └── baseline/        #   业务基线 skill（*，保留前缀）
 ├── .cursor/                 # [基础] Cursor IDE 的 SDD 规则与门禁指令（skills/ 同 .agents 结构）
 ├── .trae/                   # [基础] Trae IDE 的 SDD 规则与门禁指令（skills/ 同 .agents 结构）
 │   └── commands/

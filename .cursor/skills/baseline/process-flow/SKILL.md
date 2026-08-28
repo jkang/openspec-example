@@ -1,5 +1,5 @@
 ---
-name: openspec-baseline-process-flow
+name: process-flow
 description: 维护业务基线中的 Core Business Process Flow 文档，沉淀 L1/L2/L3 分层流程。
 allowed-tools: Read, Write, SearchCodebase
 license: MIT
@@ -8,7 +8,7 @@ metadata:
   version: "1.0"
 ---
 
-# openspec-baseline-process-flow
+# process-flow
 
 > [!IMPORTANT]
 > - 本 Skill 的输出规范必须以 `docs/baseline/business_process.html` 的现有分层定义为准，不使用脱离业务基线的抽象模板。

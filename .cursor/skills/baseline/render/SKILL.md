@@ -1,5 +1,5 @@
 ---
-name: openspec-baseline-render
+name: render
 description: 校验并刷新业务基线 HTML 文档，确保索引、链接与可视化结构完整。
 allowed-tools: Read, Write, RunCommand
 license: MIT
@@ -8,7 +8,7 @@ metadata:
   version: "1.0"
 ---
 
-# openspec-baseline-render
+# render
 
 > [!IMPORTANT]
 > - 本 Skill 的职责是校验和刷新 `docs/baseline/` 下直接维护的 HTML 基线文档，不再承担 Markdown -> HTML 的渲染职责。

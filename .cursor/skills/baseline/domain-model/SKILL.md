@@ -1,5 +1,5 @@
 ---
-name: openspec-baseline-domain-model
+name: domain-model
 description: 维护业务基线中的 Domain Model 文档，基于 Event-Storming 与 DDD 沉淀领域知识。
 allowed-tools: Read, Write, SearchCodebase
 license: MIT
@@ -8,7 +8,7 @@ metadata:
   version: "1.0"
 ---
 
-# openspec-baseline-domain-model
+# domain-model
 
 > [!IMPORTANT]
 > - 本 Skill 的输出规范必须以 `docs/baseline/domain_model.html` 的现有 Event-Storming / DDD 定义为准，不使用脱离治理基线的抽象模板。

@@ -1,5 +1,5 @@
 ---
-name: openspec-baseline-blueprint
+name: blueprint
 description: 维护业务基线中的 Service Blueprint 文档，追踪旅程阶段、泳道能力分布与 capability 状态。
 allowed-tools: Read, Write, SearchCodebase
 license: MIT
@@ -8,7 +8,7 @@ metadata:
   version: "1.0"
 ---
 
-# openspec-baseline-blueprint
+# blueprint
 
 > [!IMPORTANT]
 > - 本 Skill 的输出规范必须以 `docs/baseline/service_blueprint.html` 与当前 `SKILL.md` 为唯一事实来源，不使用脱离基线事实的抽象模板。
