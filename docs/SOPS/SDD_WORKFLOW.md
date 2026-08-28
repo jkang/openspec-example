@@ -10,47 +10,59 @@ updated_at: 2026-08-28
 
 ## 需求侧工作区 (Requirements Workspace) - `openspec-requirements/`
 
-需求阶段独立于 `openspec/`（开发侧），形成 **`openspec-requirements/`** 需求侧工作区，供 PM 完成「产品规划 → 需求探索 → 需求拆分 → 原型 → StorySpecs」的需求漏斗，产出可交给开发的**冻结交付物**。
+需求阶段独立于 `openspec/`（开发侧），形成 **`openspec-requirements/`** 需求侧工作区，供 PM 完成「产品规划 → 需求探索 → 需求拆分 → 原型 → Story」的需求漏斗，产出可交给开发的**冻结交付物（Story，业务面）**。
 
-> 与 `openspec/` 平级目录，互相隔离。存量 16 个归档 change 与 `openspec/specs/` 主规格**完全不动**。
+> 与 `openspec/` 平级目录，互相隔离。存量 17 个归档 change + 2 个 story-list 与 `openspec/specs/` 主规格**完全不动**。
+
+### 适用范围路由（关键）
+
+| 需求类型 | 路径 |
+| --- | --- |
+| 大块 Epic（跨多能力、需拆分、需产品规划对齐） | ✅ 走需求侧漏斗 → `/opsx:handoff` |
+| 简单功能修改（如单个 UI 优化） | ⛔ 直走交付侧（`/opsx:propose` 起） |
+| Bug Fix | ⛔ 直走交付侧（精简规格，UI 变更才原型） |
+| Tech Debt / 重构 | ⛔ 直走交付侧（可 `skip_specs`） |
 
 ### 需求漏斗
 
 ```
-Product Planning (product-plan.md)
+Product Planning (phase-plan.md)
    │  ▼
 Epics (epic.md)                     ← planning/epics/<key>/
    │  ▼
 Explore → ideas (idea.md)           ← ideas/<idea-key>.md
    │  ▼
-Storymap (storymap.md)              ← storymaps/<key>/  (大需求拆分为多个 Story)
+Storymap (storymap.md)              ← storymaps/<key>/  (大需求拆分为多个 Story，含覆盖对账)
    │  ▼
-Stories → StorySpecs (story-specs.md)  ← stories/<key>/  (每个 Story 一个需求单元，唯一交付物)
+Story (story.md)                    ← stories/<key>/  (业务面冻结交付物；UI 故事先 req-prototype)
    │  ▼
-openspec-handoff                    ← 交接 → openspec/changes/<name>/ (开发侧从 design 起步)
+openspec-handoff                    ← 交接 → 合成开发侧 proposal → specs/design/tasks/apply/verify/sync/archive
 ```
 
 ### 阶段产物与指令
 
-- **① 产品规划** `/req:planning`）：产出 `planning/ROADMAP.md` 与一批 `planning/epics/<key>/epic.md`。必须对齐 `docs/ROADMAP.md` 阶段目标，产出前需 HITL 确认。
-- **② 需求探索** `/req:research`）：执行「结构化 6 步法」，产出 `ideas/<idea-key>.md`。必须 B/C 双端视角、治理映射对齐（`domain_model.html` / `business_process.html` / `service_blueprint.html`）。产出后需 HITL 确认。
-- **③ 需求拆分** `/req:breakdown`）：产出 `storymaps/<key>/storymap.md`，把一个 idea 拆成多个可独立交付的 Story（Role-Value-Goal 三要素 + 依赖 + 优先级）。产出后需 HITL 确认。
-- **④ 需求单元** `/req:story-specs`）：产出 `stories/<key>/story-specs.md` = 一个 Story 的最终交付物。含业务故事、业务规则、E2E 验收（Given/When/Then，映射 L1/L2 与 SB-STAGE-*/SB-CUSTOMER-*）、行为规格 delta specs（映射 Bounded Context / L3 / SB-<LANE>-*）、测试标签 (@unit/@api/@e2e)。产出后需 HITL 确认。
-- **原型** `/req:prototype`）：若涉及 UI，产出 `stories/<key>/prototypes/<capability>.html`，遵循 `docs/FRONTEND.md` 极简规范，产出后需 HITL 确认。
+- **① 产品规划** `/opsx:req-planning`）：产出 `planning/phase-plan.md`（只引用 `docs/ROADMAP.md`，不扩范围）与一批 `planning/epics/<key>/epic.md`。产出后需 HITL 确认。
+- **② 需求探索** `/opsx:req-research`）：执行「结构化 6 步法」，产出 `ideas/<idea-key>.md`。必须 B/C 双端视角、治理映射对齐（`domain_model.html` / `business_process.html` / `service_blueprint.html`）；**任务类型路由**（Bug Fix / Tech Debt / 简单功能 → 直走交付侧）。产出后需 HITL 确认。
+- **③ 需求拆分** `/opsx:req-breakdown`）：产出 `storymaps/<key>/storymap.md`。**覆盖对账（强制）**：Epic 每个 In Scope / Exit Criteria / B 端承诺项必须有 ≥1 个 Story 承接；粒度取**完整端到端功能**（不拆到行为/UI 细节级）。产出后需 HITL 确认。
+- **④ 需求单元** `/opsx:req-story`）：产出 `stories/<key>/story.md` = 需求侧唯一冻结交付物（**业务面**）。含用户场景（B/C 双端）、业务规则表、E2E 验收（Given/When/Then，映射 L1/L2 与 SB-STAGE-*/SB-CUSTOMER-*）、治理映射（Bounded Context / L3 / SB-<LANE>-*）。**不含行为规格**（specs 由开发侧在 proposal 后按 capability 拆分生成）。产出后需 HITL 确认。
+- **原型** `/opsx:req-prototype`）：若涉及 UI，产出 `stories/<key>/prototypes/<capability>.html`，遵循 `docs/FRONTEND.md` 极简规范，产出后需 HITL 确认。**UI 门禁**：涉及 UI 的 Story，无已确认原型禁止交接。
 
 ### 交接边界 (Handoff)
 
 - **指令**: `/opsx:handoff`（技能 `openspec-handoff`）
-- **目标**: 读取已确认的 `story-specs.md` 与 `specs/`，在开发侧 `openspec/changes/<name>/` 创建 change，导入 delta specs，并从 `design` 起步。
+- **目标**: 读取已确认的 `story.md`（业务面），在开发侧 `openspec/changes/<name>/` 创建 change 并**合成 `proposal.md`**（Why/What/Capabilities/Process & Blueprint Alignment/Impact），开发侧**从 proposal 起步**，随后按 capability 拆分生成行为规格 specs → design → tasks → apply → verify → sync → archive。
 - **强制约束**:
-  - 开发侧**不重复** explore/propose/prototype/story。
-  - 若开发中发现需求缺口，回关 `openspec-requirements` 的 `req-*` skill，不擅自改开发侧规划。
-  - 交接时在需求侧 `story-specs.md` 回填交接状态（changeName），同步更新 `epic.md` / `storymap.md` 拆分状态。
+  - 开发侧**不重复** explore / 需求拆分 / prototype / story 输出（均已前移到需求侧）。
+  - 行为规格（Story-specs）由开发侧在 proposal 之后按 capability 拆分生成，需求侧不生成 specs/。
+  - 若开发中发现需求缺口，回关 `openspec-requirements` 的 `req-*` skill，不擅自改需求侧规划。
+  - 若属 Epic：登记 `openspec/epic-<key>.story-list.json`（status=in_progress, changeName），保持 Epic 队列单轨。
+  - 交接时在需求侧 `story.md` 回填交接状态（changeName），同步更新 `epic.md` / `storymap.md`。
 
 ### 需求侧 Schema
 
-- **`req-sdd`**：定义于 `openspec-requirements/schemas/req-sdd.yaml`，是需求侧制品格式与生成指令的唯一事实来源。`openspec-requirements/config.yaml`（`schema: req-sdd`）为规则来源。
+- **`req-sdd`**：定义于 `openspec-requirements/schemas/req-sdd.yaml`（version 2），是需求侧制品格式与生成指令的唯一事实来源。`openspec-requirements/config.yaml`（`schema: req-sdd`）为规则来源。
 - Schema 优先：若 SOP 描述与 `req-sdd` schema 冲突，以 Schema 为准。
+- **验证兜底**：需求侧不受 `openspec` CLI validate 覆盖，制品质量由 QA 对抗审查兜底；涉及治理锚点必须真实引用 `docs/baseline/*.html`。
 
 ## 核心阶段与指令
 

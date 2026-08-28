@@ -23,7 +23,7 @@ metadata:
    - 禁止圆角（rounded-none）、禁止阴影（shadow-none）、禁止装饰性 Emoji
    - slate 色系（slate-50 背景 / slate-200 边框 / slate-900 强调色），1px 实线边框
    - 真实业务数据（严禁 foo/test 占位符），全中文
-4. **HITL**：产出后暂停确认，确认后方可进入 story-specs。
+4. **HITL**：产出后暂停确认，确认后方可进入 story。
 
 ## Guardrails
 
