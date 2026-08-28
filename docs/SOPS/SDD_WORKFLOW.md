@@ -71,17 +71,22 @@ handoff                            ← 交接 → 合成开发侧 proposal → s
 项目统一使用 `/opsx:` 前缀指令（由 Trae 技能提供）。
 
 ### 0. 规划层 (Planning Layer) - 全局治理
-在进入具体的变更开发前，必须明确产品感与路线图。
+在进入具体的变更开发前，必须明确产品感与路线图。规划层产出全局上下文，注入所有后续指令。
 
-- **指令**: `/opsx:product-sense`
+- **指令**: `/opsx:planning:product-sense`（skill: `prod/product-sense`）
   - **目标**: 维护 `docs/PRODUCT_SENSE.md`，明确 Elevator Pitch 和产品原则。
-- **指令**: `/opsx:product-planning`
-  - **目标**: 维护 `docs/ROADMAP.md`，执行每月滚动计划。
+- **指令**: `/opsx:planning:product-planning`（skill: `prod/product-planning`）
+  - **目标**: 维护 `docs/ROADMAP.md`，执行每月滚动计划。**ROADMAP 按阶段组织，每阶段条目即 Epic（一句话描述），一阶段可多 Epic**。
 - **业务基线管理 (Auxiliary Baseline Command)**:
   - **指令**: `/opsx:baseline/sync` - 统一同步并回流所有业务基线文档 (Blueprint, Process Flow, Domain Model) 并刷新渲染。
-  - **指令**: `/opsx:delivery-board` - 生成可视化交付看板 `docs/governance/delivery_board.html`。
+  - **指令**: `/opsx:governance:delivery-board`（skill: `prod/delivery-board`）- 生成可视化交付看板 `docs/governance/delivery_board.html`。
 - **补充治理文档**:
   - `.trae/skills/baseline/openspec-baseline-blueprint/SKILL.md` - 定义 `service_blueprint.html` 的稳定锚点、Planning 阶段引用方式、capability 口径与 Sync 触发/No-op 规则。
+- **Skill 组织（按域子目录）**:
+  - `prod/`：产品/需求侧（research/explore/prototype/storymap/story/handoff + product-sense/product-planning/delivery-board）
+  - `opsx/`：交付侧（propose/spec-design/apply-change/verify/sync-specs/archive-change/update-change/explore/prototype/story）
+  - `baseline/`：业务基线（openspec-baseline-*，保留前缀）
+  - 三目录同步：`.agents/`、`.trae/`、`.cursor/` 下 skills/ 结构一致。
 - **强制约束**:
   - 规划层产物是全局上下文，将自动注入所有后续指令。
   - 必须包含“未来 +1, +2 个月”的滚动预测。

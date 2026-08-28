@@ -78,17 +78,17 @@ flowchart TD
     %% ===== 交付侧 =====
     subgraph DevSide [交付侧 · Engineer 主导]
         direction TB
-        D1[提案<br/>/opsx:propose · skill: openspec-propose<br/>→ proposal.md（handoff 合成 或 直走）]
-        D2[行为规格<br/>/opsx:spec-design · skill: openspec-spec-design<br/>→ specs/*.md（Story-specs·按 capability·h3/h4）]
-        D3[设计<br/>/opsx:spec-design · skill: openspec-spec-design<br/>→ design.md + tasks.md]
-        D4[实施与验证 +HITL<br/>/opsx:apply · skill: openspec-apply-change<br/>→ 代码 + verify.md<br/>/opsx:verify · skill: openspec-verify]
+        D1[提案<br/>/opsx:propose · skill: propose<br/>→ proposal.md（handoff 合成 或 直走）]
+        D2[行为规格<br/>/opsx:spec-design · skill: spec-design<br/>→ specs/*.md（Story-specs·按 capability·h3/h4）]
+        D3[设计<br/>/opsx:spec-design · skill: spec-design<br/>→ design.md + tasks.md]
+        D4[实施与验证 +HITL<br/>/opsx:apply · skill: apply-change<br/>→ 代码 + verify.md<br/>/opsx:verify · skill: verify]
     end
 
     %% ===== 收尾层 =====
-    K1[Spec Sync · change 级<br/>/opsx:sync · skill: openspec-sync-specs<br/>→ delta specs 合并入 openspec/specs]
-    L([变更归档<br/>/opsx:archive · skill: openspec-archive-change<br/>→ 归档 + epic 队列更新])
+    K1[Spec Sync · change 级<br/>/opsx:sync · skill: sync-specs<br/>→ delta specs 合并入 openspec/specs]
+    L([变更归档<br/>/opsx:archive · skill: archive-change<br/>→ 归档 + epic 队列更新])
     K2[Baseline Sync +HITL · Epic 级<br/>/opsx:baseline/sync · skill: baseline/*<br/>→ 统一回流 docs/baseline + ROADMAP]
-    M[周期回顾<br/>/opsx:planning:product-planning · skill: openspec-product-planning<br/>→ 更新 ROADMAP]
+    M[周期回顾<br/>/opsx:planning:product-planning · skill: product-planning<br/>→ 更新 ROADMAP]
 
     %% ===== 流程连接 =====
     A ==> B
@@ -141,7 +141,7 @@ flowchart TD
 
 | 节点 | 环节 | 命令 | Skill | 产物 | 主导 | HITL |
 | --- | --- | --- | --- | --- | --- | --- |
-| A | 规划基线（起点即含 roadmap·每阶段多 Epic） | `/opsx:planning:product-sense` / `product-planning` | `openspec-product-sense` / `openspec-product-planning` | `PRODUCT_SENSE.md` / `ROADMAP.md` | PM | — |
+| A | 规划基线（起点即含 roadmap·每阶段多 Epic） | `/opsx:planning:product-sense` / `product-planning` | `product-sense` / `product-planning` | `PRODUCT_SENSE.md` / `ROADMAP.md` | PM | — |
 | B | 业务基线 | `/opsx:baseline/sync` | `openspec-baseline-*`×4 | baseline 三件套 html | PM/Lead | — |
 | R | 适用范围路由 | 决策点 | — | 分流：Epic→需求侧；其余→交付侧 | Lead | — |
 | P1 | 需求调研 | `/req:research` | `research` | `research.md`（单 Epic） | PM | ✅ |
@@ -151,14 +151,14 @@ flowchart TD
 | P3 | 需求拆分 | `/req:storymap` | `storymap` | `storymap.md`（覆盖对账） | PM | ✅ |
 | P6 | Story 交付 | `/req:story` | `story` | `story.md`（业务面） | PM | ✅ |
 | H1 | 交接 | `/req:handoff` | `handoff` | 合成开发侧 `proposal.md` | Lead/PM | — |
-| D1 | 提案 | `/opsx:propose` | `openspec-propose` | `proposal.md` | Engineer | — |
-| D2 | 行为规格 | `/opsx:spec-design` | `openspec-spec-design` | `specs/*.md`（Story-specs） | Engineer | — |
-| D3 | 设计 | `/opsx:spec-design` | `openspec-spec-design` | `design.md` + `tasks.md` | Engineer | — |
-| D4 | 实施与验证 | `/opsx:apply` → `/opsx:verify` | `openspec-apply-change` / `openspec-verify` | 代码 + `verify.md` | Engineer | ✅ |
-| K1 | Spec Sync（change 级） | `/opsx:sync` | `openspec-sync-specs` | delta→`openspec/specs` | Lead | — |
-| L | 归档 | `/opsx:archive` | `openspec-archive-change` | 归档 + epic 队列更新 | Lead | — |
+| D1 | 提案 | `/opsx:propose` | `propose` | `proposal.md` | Engineer | — |
+| D2 | 行为规格 | `/opsx:spec-design` | `spec-design` | `specs/*.md`（Story-specs） | Engineer | — |
+| D3 | 设计 | `/opsx:spec-design` | `spec-design` | `design.md` + `tasks.md` | Engineer | — |
+| D4 | 实施与验证 | `/opsx:apply` → `/opsx:verify` | `apply-change` / `verify` | 代码 + `verify.md` | Engineer | ✅ |
+| K1 | Spec Sync（change 级） | `/opsx:sync` | `sync-specs` | delta→`openspec/specs` | Lead | — |
+| L | 归档 | `/opsx:archive` | `archive-change` | 归档 + epic 队列更新 | Lead | — |
 | K2 | Baseline Sync（Epic 级） | `/opsx:baseline/sync` | `openspec-baseline-*`×4 | 统一回流 `docs/baseline/*.html` | Lead | ✅ |
-| M | 周期回顾 | `/opsx:planning:product-planning` | `openspec-product-planning` | 更新 `ROADMAP.md` | PM | — |
+| M | 周期回顾 | `/opsx:planning:product-planning` | `product-planning` | 更新 `ROADMAP.md` | PM | — |
 
 ---
 
@@ -191,8 +191,11 @@ flowchart TD
 - **Baseline Sync（Epic 级）**：**Epic 所有 Story 归档后**，统一回流 `docs/baseline/*.html` + Roadmap 判定。理由：避免单个 Story 中间态污染 baseline、避免反复改写、Roadmap 完成判定需 Epic Exit Criteria 全达成。
 
 ### 3.6 命名约定
-- skill 名不带前缀：`research` / `explore` / `storymap` / `prototype` / `story` / `handoff`。
-- 命令用**命名空间子目录**：需求侧 `/req:`（`.trae/commands/req/`），开发侧 `/opsx:`（`.trae/commands/opsx/`）。
+- **skill 按域子目录组织**：`prod/`（产品/需求侧）、`opsx/`（交付侧）、`baseline/`（业务基线）。
+- **需求侧 skill 名**不带前缀：`research` / `explore` / `prototype` / `storymap` / `story` / `handoff`（+ 产品侧 `product-sense` / `product-planning` / `delivery-board`）。
+- **交付侧 skill 名**去 `openspec-` 前缀：`propose` / `spec-design` / `apply-change` / `verify` / `sync-specs` / `archive-change` / `update-change` / `explore` / `prototype` / `story`。
+- **baseline skill 保留 `openspec-baseline-*` 前缀**（独立域，不与 prod/opsx 混用）。
+- 命令用**命名空间子目录**：需求侧 `/req:`（`.trae/commands/req/`），交付侧 `/opsx:`（`.trae/commands/opsx/`，含 `planning/`、`governance/`、`baseline/` 子目录）。
 
 ### 3.7 Lightweight 原则（保留）
 降低落地门槛、提升 AI 执行效能、在"混乱"与"过度治理"间寻找平衡。
@@ -205,8 +208,12 @@ flowchart TD
 
 ```text
 ├── .agents/                 # [基础] 跨工具通用的 Agent 技能定义
-├── .cursor/                 # [基础] Cursor IDE 的 SDD 规则与门禁指令
-├── .trae/                   # [基础] Trae IDE 的 SDD 规则与门禁指令
+│   └── skills/              # [基础] Skill 按域子目录组织（三目录同步）
+│       ├── prod/            #   产品/需求侧 skill（research/explore/prototype/storymap/story/handoff + product-sense/product-planning/delivery-board）
+│       ├── opsx/            #   交付侧 skill（propose/spec-design/apply-change/verify/sync-specs/archive-change/update-change/explore/prototype/story）
+│       └── baseline/        #   业务基线 skill（openspec-baseline-*，保留前缀）
+├── .cursor/                 # [基础] Cursor IDE 的 SDD 规则与门禁指令（skills/ 同 .agents 结构）
+├── .trae/                   # [基础] Trae IDE 的 SDD 规则与门禁指令（skills/ 同 .agents 结构）
 │   └── commands/
 │       ├── req/             # [基础] 需求侧命令空间 /req:*
 │       │   ├── research.md  # /req:research
@@ -215,7 +222,7 @@ flowchart TD
 │       │   ├── storymap.md  # /req:storymap
 │       │   ├── story.md     # /req:story
 │       │   └── handoff.md   # /req:handoff
-│       └── opsx/            # [基础] 交付侧命令空间 /opsx:*（既有）
+│       └── opsx/            # [基础] 交付侧命令空间 /opsx:*（含 planning/、governance/、baseline/ 子目录）
 ├── openspec/                # [基础] SDD 交付侧引擎工作区
 │   ├── config.yaml
 │   ├── specs/               # 主规格说明书（基线沉淀区）
