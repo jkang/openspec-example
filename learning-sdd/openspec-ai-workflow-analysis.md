@@ -24,34 +24,18 @@ graph TD
     R6 --> R7[Story 交付物 /req:story<br/>业务面 + HITL]
     R7 --> H[交接 /req:handoff<br/>合成开发侧 proposal]
 
-    E -->|功能| F1[提案 /opsx:propose]
+    E -->|功能 / BugFix / TechDebt| F1[提案 /opsx:propose]
     F1 --> F2{涉及 UI 变更?}
     F2 -->|是| F3[原型 /opsx:prototype]
     F3 --> F4{视觉/交互确认?}
     F4 -->|否| F3
-    F4 -->|是| F5[业务故事评审 /opsx:story]
-    F2 -->|否| F5
-    F5 --> F6[规格与设计与任务清单 /opsx:spec-design]
-
-    E -->|缺陷修复| B1[提案 /opsx:propose]
-    B1 --> B2{涉及 UI 变更?}
-    B2 -->|是| B3[原型 /opsx:prototype]
-    B3 --> B4{视觉/交互确认?}
-    B4 -->|否| B3
-    B4 -->|是| B5[规格与设计与任务清单（含根因分析） /opsx:spec-design]
-    B2 -->|否| B5
-
-    E -->|技术债| T1[提案 /opsx:propose]
-    T1 --> T2{有外部行为变更?}
-    T2 -->|是| T3[规格与设计与任务清单 /opsx:spec-design]
-    T2 -->|否| T4[配置 skip_specs: true]
-    T4 --> T5[设计与任务清单 /opsx:spec-design]
+    F4 -->|是| F6[规格与设计与任务清单 /opsx:spec-design]
+    F2 -->|否| F5{Tech Debt 无外部行为变更?}
+    F5 -->|是| F6[规格与设计与任务清单 /opsx:spec-design<br/>skip_specs: true]
+    F5 -->|否| F6
 
     H --> U((实施阶段 /opsx:apply))
     F6 --> U
-    B5 --> U
-    T3 --> U
-    T5 --> U
 
     U --> V((验证门禁 /opsx:verify))
     V --> W{需要更新规划?}
@@ -63,8 +47,7 @@ graph TD
 
     Z -->|Epic 还有下一个 Story| R7
     Z -->|Epic 全部完成| K2[Baseline Sync /opsx:baseline/sync<br/>Epic 级 +HITL]
-    K2 --> AA((完成))
-```
+    K2 --> AA((完成))```
 
 > **分层 Sync 说明**：每个 change 归档前只做 **Spec Sync**（`/opsx:sync`，change 级）；**Baseline Sync**（`/opsx:baseline/sync`）在 Epic 全部 Story 归档后统一执行（+ Roadmap 更新）。
 

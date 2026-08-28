@@ -7,7 +7,7 @@
 OpenSpec v2.0 是一次重大的**治理驱动 (Governance-Driven)** 变革，核心变化：
 
 - **引入规划层 (Planning Layer)** — 明确了「治理先行」的原则，通过 `PRODUCT_SENSE.md` 和 `ROADMAP.md` 为项目划定业务边界与演进护栏。
-- **Roadmap Alignment (规划对齐)** — 在 `/opsx:explore` 阶段增加了强制的路线图对齐校验，防止 AI 产生偏离阶段目标的冗余设计。
+- **Roadmap Alignment (规划对齐)** — 在需求探索（`/req:explore`）阶段增加了强制的路线图对齐校验，防止 AI 产生偏离阶段目标的冗余设计。
 - **指令集解耦与重构** — 将 `/opsx:propose` 进一步拆解为 `/opsx:prototype` (原型验证) 和 `/opsx:spec-design` (规格与设计)，增强了流程的灵活性与 HITL (人机协同) 深度。
 - **跨工具一致性体系** — 确立了 `.trae/`, `.cursor/`, `.agents/` 三端配置同步的强制规则，防止协作漂移。
 
@@ -89,7 +89,7 @@ OpenSpec v1.5.0 是三个版本积累的重大更新。详见 [v2.0 升级解读
 
 - **Schema 驱动** — 指令从硬编码 TypeScript 源码抽离为 `schema.yaml`，AI 通过 `openspec instructions --json` 动态获取上下文
 - **Stores (Beta)** — 规划成为独立的 Git 仓库，跨仓库统一管理
-- **Explore First** — `/opsx:explore` 提升为推荐工作流入口
+- **Explore First** — 需求探索（`/req:explore`）是需求漏斗的推荐入口
 
 本仓库跟进：
 

@@ -7,7 +7,7 @@ context: |
   治理文档 (唯一事实来源):
     - 流程 SOP: docs/SOPS/SDD_WORKFLOW.md (分支流转与指令规范)
     - 产品感: docs/PRODUCT_SENSE.md (Elevator Pitch 与业务导向)
-    - 产品路线图: docs/ROADMAP.md (当前阶段目标与 Explore 边界)
+    - 产品路线图: docs/ROADMAP.md (当前阶段目标与需求探索边界)
     - 前端规范: docs/FRONTEND.md (极简 UI 约束与浏览器验证闭环)
     - 后端架构: docs/ARCHITECTURE.md (Node.js/Python 四层架构设计)
     - 测试策略: docs/TESTING_STRATEGY.md (BDD 标签与 Cucumber E2E 规范)
@@ -22,17 +22,8 @@ planning:
   domain_model: docs/baseline/domain_model.html
 
 rules:
-  explore:
-    - 必须严格遵循 docs/SOPS/SDD_WORKFLOW.md 中的“结构化 6 步法”
-    - 必须包含 Roadmap Alignment (规划对齐) 校验，参考 docs/ROADMAP.md
-    - 必须参考 docs/baseline/domain_model.html 识别 Impacted Bounded Contexts 与 Candidate Capabilities
-    - 必须确认任务类型 (Epic/Story/Bug Fix/Tech Debt)
-    - 对于 Epic 类型，必须在 openspec/ 目录下创建 epic-<key>.story-list.json
-    - 必须参考 docs/baseline/domain_model.html 识别 Impacted Bounded Contexts 与 Candidate Capabilities
-    - 必须参考 docs/baseline/business_process.html 识别受影响的 L1/L2/L3 流程节点
-    - 必须参考 docs/baseline/service_blueprint.html 与 .trae/skills/baseline/blueprint/SKILL.md 识别受影响的 SB-STAGE-* 与 SB-<LANE>-* 节点
   proposal:
-    - 基于已确认的 idea.md 结论，明确说明 Why 和 What
+    - 基于用户输入（直走交付侧）或需求侧 handoff 合成（Epic 场景），明确说明 Why 和 What
     - 包含映射到 spec 文件夹名称的 Capabilities 章节，且必须与 Domain Model 映射对齐
     - 必须显式列出 Impacted Bounded Contexts；若出现未映射 capability，必须标记为新增 taxonomy 并说明理由
     - 必须包含 Process Alignment 章节，明确引用的流程节点 ID (如 L1-04, L2-03)
@@ -46,14 +37,6 @@ rules:
     - 数据要求：严禁使用空洞模板（foo/test），必须填充真实的业务数据示例
     - 交互界面：必须完全使用中文
     - 技术实现：使用 Vue 3 (CDN) + Tailwind CSS (CDN) 的可交互 HTML
-  story:
-    - 必须作为业务评审的 Single Source of Truth
-    - Tech Debt 通常跳过此阶段
-    - 如果涉及 UI 变更，必须在 prototype.html 确认后生成，并显式链接原型
-    - 验收标准必须覆盖端到端 (E2E) 旅程，使用 Given/When/Then 格式，并映射到 L1/L2 流程节点
-    - 验收标准必须同时映射到 service_blueprint.html 中的 SB-STAGE-* 与 SB-CUSTOMER-* 节点
-    - 必须包含业务规则表 (Business Rules)
-    - 必须链接到 proposal.md 及其对应的 capability specs
   specs:
     - 所有场景使用 Given/When/Then (Gherkin) 格式
     - 每个 Capability Spec 必须包含 Governance Mapping，引用 docs/baseline/domain_model.html 中的 Bounded Context 与 capability taxonomy
@@ -61,7 +44,7 @@ rules:
     - 每个 Capability Spec 必须显式标注关联的 Service Blueprint 节点（至少包含 SB-STAGE-* 与 SB-<LANE>-*）
     - 必须从 prototype.html 中提取交互逻辑记录为 Scenario
     - 按照 docs/TESTING_STRATEGY.md 打上测试标签 (@unit, @api, @e2e)
-    - 如果存在 story.md，必须与 story.md 定义的 E2E 旅程保持逻辑一致
+    - 若为 handoff 场景，必须与 proposal 中链接的需求侧 story.md 的 E2E 验收标准保持逻辑一致
     - 规范性需求语言使用 SHALL 或 MUST
   design:
     - 包含架构图 (Mermaid 或 ASCII)

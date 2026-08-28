@@ -37,9 +37,7 @@ metadata:
 - `docs/baseline/service_blueprint.html`
 - `docs/baseline/domain_model.html`
 - `docs/baseline/business_process.html`
-- `ideas/idea.md`
 - `proposal.md`
-- `story.md`
 - `specs/**/*.md`
 - `design.md`
 - `verify.md`
@@ -114,9 +112,9 @@ Service Blueprint 中出现的 capability 必须遵循以下规则：
 - 影响哪些泳道节点
 - 是新增、修改还是仅复用现有 capability 布局
 
-### Story / story.md
+### 需求侧 Story（若 handoff）
 
-E2E 旅程必须同时映射：
+需求侧 `story.md` 的 E2E 旅程必须同时映射：
 
 - `business_process.html` 中的 L1/L2 节点
 - `service_blueprint.html` 中的 `SB-STAGE-*` 与 `SB-CUSTOMER-*`
@@ -149,8 +147,8 @@ E2E 旅程必须同时映射：
      - `SB-<LANE>-*` capability 分布变化
      - capability 状态在“已落地 / 规划中 / 横切支撑”之间变化
      - 新增或修改跨阶段支撑能力
-     - `story.md` 新增或修改了需要体现到蓝图的 E2E 旅程阶段映射
-     - `story.md`、`proposal.md` 或 `specs/**/*.md` 引入新的 blueprint 引用节点
+     - 需求侧 `story.md`（若 handoff）新增或修改了需要体现到蓝图的 E2E 旅程阶段映射
+     - `proposal.md` 或 `specs/**/*.md` 引入新的 blueprint 引用节点
      - `design.md` 中 `Service Blueprint Sync Assessment` 写为 `Needs Sync: Yes`
    - 若未命中，必须输出显式 no-op 理由，并列出已检查的依据文件。
 3. **定位蓝图节点**:

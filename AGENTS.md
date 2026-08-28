@@ -55,8 +55,7 @@
 - `openspec-requirements/`: **[需求侧工作区]** 需求漏斗（仅大块 Epic）：`research/<epic-key>.md` → `ideas/<idea-key>.md` → `prototypes/<epic-key>/` → `storymaps/<epic-key>/` → `stories/<story-key>/story.md`（业务面冻结交付物）。Schema 见 `openspec-requirements/schemas/req-sdd.yaml`，规则见 `openspec-requirements/config.yaml`。
 - **适用范围路由**：大块 Epic 走需求侧漏斗（`/req:research` → `/req:explore` → `/req:prototype`(UI, Epic整体) → `/req:storymap` → `/req:story` → `/req:handoff`）；Bug Fix / Tech Debt / 简单功能修改**直走交付侧**（`/opsx:propose` 起）。
 - **分层 Sync**：每个 change 只做 Spec Sync（`/opsx:sync`，change 级）；Baseline Sync（`/opsx:baseline/sync`）在 Epic 全部 Story 归档后统一执行。
-- `openspec/changes/ideas/`: 通过 `/opsx:explore` 产生的原始想法（开发侧直走任务）。
-- `openspec/changes/`: 活跃的执行计划 (提案 Proposal、设计 Design、任务 Tasks、原型 Prototypes)。
+- `openspec/changes/`: 活跃的执行计划 (提案 Proposal、设计 Design、任务 Tasks、原型 Prototypes)。开发侧从 proposal 起步（直走交付侧 `/opsx:propose`，或需求侧 `/req:handoff` 合成）；不再有独立的开发侧探索/Story 阶段。
 - `openspec/changes/archive/`: 已完成并归档的执行计划。
 - `openspec/specs/`: 主产品规格说明 (Gherkin 格式)。
 

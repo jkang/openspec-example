@@ -192,7 +192,7 @@ flowchart TD
 ### 3.6 命名约定
 - **skill 按域子目录组织**：`prod/`（产品/需求侧）、`opsx/`（交付侧）、`baseline/`（业务基线）。
 - **需求侧 skill 名**不带前缀：`research` / `explore` / `prototype` / `storymap` / `story` / `handoff`（+ 产品侧 `product-sense` / `product-planning` / `delivery-board`）。
-- **交付侧 skill 名**去 `openspec-` 前缀：`propose` / `spec-design` / `apply-change` / `verify` / `sync-specs` / `archive-change` / `update-change` / `explore` / `prototype` / `story`。
+- **交付侧 skill 名**去 `openspec-` 前缀：`propose` / `spec-design` / `apply-change` / `verify` / `sync-specs` / `archive-change` / `update-change` / `prototype`。（`explore`/`story` 已前移需求侧，交付侧不再保留）
 - **baseline skill 去 `openspec-baseline-` 前缀**：`blueprint` / `domain-model` / `process-flow` / `render`（独立域，不与 prod/opsx 混用）。
 - 命令用**命名空间子目录**：需求侧 `/req:`（`.trae/commands/req/`），交付侧 `/opsx:`（`.trae/commands/opsx/`，含 `planning/`、`governance/`、`baseline/` 子目录）。
 
@@ -209,7 +209,7 @@ flowchart TD
 ├── .agents/                 # [基础] 跨工具通用的 Agent 技能定义
 │   └── skills/              # [基础] Skill 按域子目录组织（三目录同步）
 │       ├── prod/            #   产品/需求侧 skill（research/explore/prototype/storymap/story/handoff + product-sense/product-planning/delivery-board）
-│       ├── opsx/            #   交付侧 skill（propose/spec-design/apply-change/verify/sync-specs/archive-change/update-change/explore/prototype/story）
+│       ├── opsx/            #   交付侧 skill（propose/spec-design/apply-change/verify/sync-specs/archive-change/update-change/prototype）
 │       └── baseline/        #   业务基线 skill（blueprint/domain-model/process-flow/render）
 ├── .cursor/                 # [基础] Cursor IDE 的 SDD 规则与门禁指令（skills/ 同 .agents 结构）
 ├── .trae/                   # [基础] Trae IDE 的 SDD 规则与门禁指令（skills/ 同 .agents 结构）

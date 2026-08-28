@@ -12,7 +12,7 @@ metadata:
 
 # product-planning
 
-**Description:** Use this skill to update `docs/ROADMAP.md`. It provides the temporal and structural context for the SDD workflow, ensuring that `/opsx:explore` stays within the defined phase boundaries.
+**Description:** Use this skill to update `docs/ROADMAP.md`. It provides the temporal and structural context for the SDD workflow, ensuring that the requirements exploration (`/req:explore`) stays within the defined phase boundaries.
 
 ## The Workflow
 
@@ -48,5 +48,5 @@ The output must be the updated `docs/ROADMAP.md` file, following the structure:
 ## Guardrails
 
 - **Rolling Refresh**: This document should be updated at least monthly or whenever an Epic is completed/archived.
-- **Strict Boundaries**: The "Out of Scope" and "Explore Guardrails" sections are hard constraints for `/opsx:explore`.
+- **Strict Boundaries**: The "Out of Scope" and "Explore Guardrails" sections are hard constraints for the requirements exploration (`/req:explore`).
 - **HITL**: Confirm the "Current Phase" and "Exit Criteria" with the user.

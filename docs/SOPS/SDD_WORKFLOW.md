@@ -141,32 +141,23 @@ graph TD
 > **分层 Sync 说明**：每个 change 归档前只做 **Spec Sync**（`/opsx:sync`，change 级）；**Baseline Sync**（`/opsx:baseline/sync`）在 Epic 全部 Story 归档后统一执行（+ Roadmap 更新）。
 > **简化说明**：Bug Fix / Tech Debt / 简单功能修改**直走 `/opsx:propose`**（不再有独立的 `/opsx:explore` 与 `/opsx:story` 阶段——需求澄清已前移到需求侧，直走任务的业务意图直接在提案中明确）。
 
-### 1. 探索阶段 (Explore)
-- **指令**: `/opsx:explore`（**仅用于直走交付侧任务**：Bug Fix / Tech Debt / 简单功能修改）
-- **目标**: 在没有任何制品前，通过对话澄清需求，探索代码库，权衡方案。
-- **适用范围说明**: 大块 Epic 需求**不走此阶段**——走需求侧漏斗（`/req:research` → `/req:explore` → ...）。本阶段仅服务直走交付侧的任务类型。
-- **强制约束 (Hard Constraint)**:
-  - 必须严格遵循"结构化 6 步法"。
-  - **任务类型确认 (Task Classification)**: 必须确认是史诗、功能、缺陷修复还是技术债。
-    - **史诗** → 引导走需求侧漏斗（`/req:research` 起），不在本阶段创建 story-list（由 handoff 时登记）。
-    - **功能 / 缺陷修复 / 技术债** → 继续本阶段，产出 `ideas/idea.md` 后进入提案。
-  - **治理映射对齐**: 必须参考 `docs/baseline/domain_model.html` 识别 `Impacted Bounded Contexts`，参考 `docs/baseline/business_process.html` 识别受影响的 `L1/L2/L3` 流程节点，并参考 `docs/baseline/service_blueprint.html` 与 `.trae/skills/baseline/blueprint/SKILL.md` 识别受影响的 `SB-STAGE-*` 与 `SB-<LANE>-*` 节点。
-  - **规划对齐 (Roadmap Alignment)**: 在 `ideas/idea.md` 中必须显式写一段"与当前阶段目标对齐说明"，引用 `docs/ROADMAP.md` 中的目标。
-  - **唯一输出**: 必须生成 `ideas/idea.md` (相对于变更目录) 作为后续提案的唯一源头。
-  - 不得在没有 `ideas/idea.md` 的情况下跳过此阶段进入提案。
-  
+### 1. 探索与业务评审前移说明 (Explore & Story 已前移)
+- 开发侧**不再有独立的 `/opsx:explore` 与 `/opsx:story` 阶段**。
+- **大块 Epic 需求**：探索（`/req:explore` 产出 idea.md）与业务评审（`/req:story` 产出 story.md）在**需求侧**完成，经 `/req:handoff` 合成开发侧 proposal 后进入交付侧。
+- **直走交付侧任务**（Bug Fix / Tech Debt / 简单功能修改）：不经过独立探索阶段，业务意图在 `/opsx:propose` 提案中直接明确。
+
 ### 2. 提案阶段 (Propose)
-- **指令**: `/opsx:propose <name>`（**仅用于直走交付侧任务**）
-- **目标**: 根据 `idea.md` 生成变更提案 `proposal.md`。
-- **适用范围说明**: 大块 Epic **不走本阶段**——由需求侧 `/req:handoff` 合成开发侧 `proposal.md` 后，开发侧从 proposal 起步。本阶段仅服务直走交付侧任务（功能/缺陷修复/技术债）或 handoff 之后的开发侧流程。
+- **指令**: `/opsx:propose <name>`（**用于直走交付侧任务**；Epic 场景由 `/req:handoff` 合成 proposal）
+- **目标**: 生成变更提案 `proposal.md`。
+- **适用范围说明**: 
+  - **直走交付侧任务**（功能/缺陷修复/技术债）：基于用户输入/当前需求直接创建提案，**不依赖 `idea.md`**。
+  - **handoff 场景**（需求侧 Epic Story）：由 `/req:handoff` 合成 proposal，开发侧从 proposal 起步。
 - **强制约束 (Hard Constraint)**:
-  - 必须基于 `idea.md` 的任务类型明确后续路径。
   - **治理映射引用**: `proposal.md` 中的 `Capabilities` 必须与 `Domain Model` 映射对齐，且必须显式列出受影响的 `Bounded Contexts`。
   - **Taxonomy 扩展约束**: 如果 proposal 中出现 `domain_model.html` 尚未收录的 capability 或边界映射，必须明确标记为"新增 taxonomy"并说明理由。
   - **流程对齐约束**: 必须包含 `Process Alignment` 章节明确受影响的流程节点 ID。
   - **蓝图对齐约束**: 必须包含 `Service Blueprint Alignment` 章节，显式引用受影响的 `SB-STAGE-*` 与 `SB-<LANE>-*` 节点，并说明是新增、修改还是复用既有蓝图结构。
-  - 对于功能类型，引导用户进入下一步（涉及 UI 先 `/opsx:prototype` 并完成确认，再 `/opsx:story`，随后进入 `/opsx:spec-design`；不涉及 UI 则直接 `/opsx:story`，随后进入 `/opsx:spec-design`）。
-  - 对于缺陷修复类型，引导用户进入下一步（涉及 UI 先 `/opsx:prototype` 并完成确认，随后进入 `/opsx:spec-design`；不涉及 UI 则直接进入 `/opsx:spec-design`，并在设计中包含根因分析）。
+  - 对于功能/缺陷修复类型，引导用户进入下一步（涉及 UI 先 `/opsx:prototype` 并完成确认，随后进入 `/opsx:spec-design`；不涉及 UI 则直接 `/opsx:spec-design`，缺陷修复须在设计中包含根因分析）。
   - 对于技术债类型，引导用户进入下一步（若有外部行为变更则进入 `/opsx:spec-design`；若无外部行为变更则配置 `skip_specs: true`，生成设计与任务清单后再进入 `/opsx:apply`）。
   
 ### 3. 原型验证阶段 (Prototype) - 可选
@@ -178,16 +169,14 @@ graph TD
   - 生成原型后，必须通过 `AskUserQuestion` 获取人类确认。
   - 原型是 UI 逻辑的唯一事实来源，确认后方可进入下一步。
 
-### 4. 业务评审阶段 (Story)
-- **指令**:
-  - **需求侧（业务面交付物）**: `/req:story` —— 产出 `stories/<story-key>/story.md`（纯业务面，需求侧唯一冻结交付物），HITL 确认后经 `/req:handoff` 交接给开发侧。
-  - **交付侧（直走任务）**: `/opsx:story <name>` —— 生成端到端的验收文档 `story.md`。
-- **目标**: 生成端到端的验收文档。
+### 4. 业务评审阶段 (Story) - 需求侧
+- **指令**: `/req:story` —— 产出 `stories/<story-key>/story.md`（纯业务面，需求侧唯一冻结交付物），HITL 确认后经 `/req:handoff` 交接给开发侧。
+- **适用范围**: 需求侧漏斗阶段（大块 Epic）。开发侧不生成 story.md（业务评审已在需求侧完成）。
 - **强制约束 (Hard Constraint)**:
-  - **时机**: 必须在提案之后执行；若涉及 UI，必须在原型确认后执行。
+  - **时机**: 必须在 storymap 拆分之后执行；若涉及 UI，必须在原型确认后执行。
   - **内容**: 必须包含跨模块的 E2E 旅程及业务规则表。验收标准应优先参考流程基线中的 `L1/L2` 节点。
   - **蓝图引用**: 每条 E2E 旅程必须同时映射到 `service_blueprint.html` 中的 `SB-STAGE-*` 与 `SB-CUSTOMER-*` 节点。
-  - **HITL 检查点**: 生成后必须由用户确认验收标准，方可进入模块规格设计。
+  - **HITL 检查点**: 生成后必须由用户确认验收标准，方可进入 `/req:handoff` 交接。
 
 ### 5. 规范与设计阶段 (Spec-Design)
 - **指令**: `/opsx:spec-design <name>`
@@ -294,5 +283,5 @@ graph TD
 
 ## 异常处理与防漂移
 - **Schema 优先**: `openspec/schemas/spec-driven.yaml` 是开发侧每个制品的生成说明 (Instruction) 和内容格式的唯一事实来源；`openspec-requirements/schemas/req-sdd.yaml` 是需求侧的唯一事实来源。如果 SOP 描述与 Schema 有出入，请以 Schema 为准。
-- **MANDATORY CHECK**: 如果直接收到 `/opsx:propose`，但 `idea.md` 不存在或未达标，必须强制退回 `/opsx:explore` 阶段。
+- **MANDATORY CHECK**: 直走交付侧任务若直接收到 `/opsx:propose`，必须先确认用户意图清晰（不依赖 `idea.md`）；若需求含糊影响范围/行为，必须与用户澄清后再创建提案。
 - **适用范围检查**: 若任务为大块 Epic，必须引导走需求侧漏斗（`/req:research` 起），不得直接在交付侧 `/opsx:propose` 起步；若需求侧 `story.md` 未确认，禁止执行 `/req:handoff`。
