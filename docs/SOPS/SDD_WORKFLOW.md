@@ -117,7 +117,7 @@ graph TD
     F2 -->|是| F3[原型 /opsx:prototype]
     F3 --> F4{视觉/交互确认?}
     F4 -->|否| F3
-    F4 -->|是| F5[业务故事评审 /opsx:Story]
+    F4 -->|是| F5[业务故事评审 /opsx:story]
     F2 -->|否| F5
     F5 --> F6[规格与设计与任务清单 /opsx:spec-design]
 
@@ -180,7 +180,7 @@ graph TD
   - **Taxonomy 扩展约束**: 如果 proposal 中出现 `domain_model.html` 尚未收录的 capability 或边界映射，必须明确标记为"新增 taxonomy"并说明理由。
   - **流程对齐约束**: 必须包含 `Process Alignment` 章节明确受影响的流程节点 ID。
   - **蓝图对齐约束**: 必须包含 `Service Blueprint Alignment` 章节，显式引用受影响的 `SB-STAGE-*` 与 `SB-<LANE>-*` 节点，并说明是新增、修改还是复用既有蓝图结构。
-  - 对于功能类型，引导用户进入下一步（涉及 UI 先 `/opsx:prototype` 并完成确认，再 `/opsx:Story`，随后进入 `/opsx:spec-design`；不涉及 UI 则直接 `/opsx:Story`，随后进入 `/opsx:spec-design`）。
+  - 对于功能类型，引导用户进入下一步（涉及 UI 先 `/opsx:prototype` 并完成确认，再 `/opsx:story`，随后进入 `/opsx:spec-design`；不涉及 UI 则直接 `/opsx:story`，随后进入 `/opsx:spec-design`）。
   - 对于缺陷修复类型，引导用户进入下一步（涉及 UI 先 `/opsx:prototype` 并完成确认，随后进入 `/opsx:spec-design`；不涉及 UI 则直接进入 `/opsx:spec-design`，并在设计中包含根因分析）。
   - 对于技术债类型，引导用户进入下一步（若有外部行为变更则进入 `/opsx:spec-design`；若无外部行为变更则配置 `skip_specs: true`，生成设计与任务清单后再进入 `/opsx:apply`）。
   
@@ -196,7 +196,7 @@ graph TD
 ### 4. 业务评审阶段 (Story)
 - **指令**:
   - **需求侧（业务面交付物）**: `/req:story` —— 产出 `stories/<story-key>/story.md`（纯业务面，需求侧唯一冻结交付物），HITL 确认后经 `/req:handoff` 交接给开发侧。
-  - **交付侧（直走任务）**: `/opsx:Story <name>` —— 生成端到端的验收文档 `story.md`。
+  - **交付侧（直走任务）**: `/opsx:story <name>` —— 生成端到端的验收文档 `story.md`。
 - **目标**: 生成端到端的验收文档。
 - **强制约束 (Hard Constraint)**:
   - **时机**: 必须在提案之后执行；若涉及 UI，必须在原型确认后执行。
