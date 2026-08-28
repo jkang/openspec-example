@@ -307,7 +307,7 @@ flowchart TD
 
 - **OpenSpec 示例项目**: [https://github.com/jkang/openspec-example.git](https://github.com/jkang/openspec-example.git)
 - **轻量版提案（起步最小集）**: `learning-sdd/ai4se-lightweight-sdd-proposal.md`
-- **完整版流程讨论稿**: `learning-sdd/ai4se-lightweight-sdd-flow-v2-draft.md`
+- **流程对齐讨论稿（历史）**: `learning-sdd/ai4se-lightweight-sdd-flow-v2-draft.md`
 - **实施计划**: `learning-sdd/ai4se-sdd-implementation-plan.md`
 - **SDD 工作流 SOP**: 参考本代码库 `docs/SOPS/SDD_WORKFLOW.md`
 - **需求侧工作区**: 参考本代码库 `openspec-requirements/`
