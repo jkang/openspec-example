@@ -7,7 +7,7 @@ Story 是需求侧唯一冻结交付物（业务面）。
 需求侧不生成 specs/，行为规格一律由开发侧在 proposal 之后产出。
 -->
 
-> Story Key: `<story-key>` | 优先级: P0/P1/P2 | 依赖: `<依赖 story 或 无>`
+> Story Key: `story-<epic-key>-<功能>`（命名规范） | 优先级: P0/P1/P2 | 依赖: `<依赖 story 或 无>`
 > 关联 Storymap: `epics/<epic-key>/storymap.md`
 > 关联 Idea: `epics/<epic-key>/idea.md`
 > 关联原型（Epic 整体）: `epics/<epic-key>/prototypes/*.html`

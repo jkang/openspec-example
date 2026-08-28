@@ -25,10 +25,10 @@ storymap 用于把大需求（Epic 级）拆分为多个可独立交付的 Story
 
 ## Story 拆分明细
 
-| Story ID | 标题 | 角色 (Role) | 价值 (Value) | 目标 (Goal) | 依赖 | 优先级 | 状态 |
+| Story ID | 标题 | 角色 (Role) | 价值 (Value) | 目标 (Goal) | 依赖 | 优先级 | 状态(注1) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| story-xxx-01 |  |  |  |  |  | P0 | planned |
-| story-xxx-02 |  |  |  |  |  | P0 | planned |
+| story-<epic-key>-<功能1> |  |  |  |  |  | P0 | ready |
+| story-<epic-key>-<功能2> |  |  |  |  |  | P0 | ready |
 
 ## 覆盖对账 (Coverage Reconciliation)
 <!--
@@ -39,9 +39,9 @@ storymap 用于把大需求（Epic 级）拆分为多个可独立交付的 Story
 
 | Epic 承诺项（来自 idea/research） | 承接 Story | 覆盖状态 |
 | --- | --- | --- |
-| Exit Criteria ① ... | story-xxx-01 | ✅ 覆盖 / ❌ 未覆盖 |
-| Candidate Capability: ... | story-xxx-02 | ✅ 覆盖 / ❌ 未覆盖 |
-| In Scope: B 端 ... | story-xxx-03 | ✅ 覆盖 / ❌ 未覆盖 |
+| Exit Criteria ① ... | story-<epic-key>-<功能1> | ✅ 覆盖 / ❌ 未覆盖 |
+| Candidate Capability: ... | story-<epic-key>-<功能2> | ✅ 覆盖 / ❌ 未覆盖 |
+| In Scope: B 端 ... | story-<epic-key>-<功能3> | ✅ 覆盖 / ❌ 未覆盖 |
 
 ## 治理映射对齐
 <!--
@@ -55,3 +55,5 @@ storymap 用于把大需求（Epic 级）拆分为多个可独立交付的 Story
 <!--
 - epics/<epic-key>/stories/<story-key>/story.md
 -->
+
+> 注1：Story 状态由需求侧 STATUS.md 维护（ready/handoff/dev-in-progress/done）；storymap 中仅记录初始状态 ready，in_progress/done 由开发侧归档后 lead 回填。

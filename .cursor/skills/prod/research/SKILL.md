@@ -29,11 +29,12 @@ metadata:
    - 疑问与待澄清项
    - 调研结论（是否足够支撑进入 explore）
 5. **生成 research.md**：按 `openspec-requirements/templates/research.md` 产出。
-6. **HITL**：产出后暂停征求用户确认，确认后才可进入 `explore`。
+6. **初始化 STATUS.md**：创建 `epics/<epic-key>/STATUS.md`（按 `templates/STATUS.md`），research 置 done，后续阶段状态待各阶段更新。
+7. **HITL**：产出后暂停征求用户确认，确认后才可进入 `explore`。
 
 ## Guardrails
 
 - 只写需求侧调研制品，不写代码。
 - 只收集，不转化（不写 To-Be 设计、不识别最终 capabilities——那是 explore 的事）。
 - **访谈原始记录必须内嵌进 research.md**（不建独立文件），作为证据来源。
-- 产出后必须 HITL 确认。
+- 产出后必须 HITL 确认；**未确认不得进入下一阶段（强制门禁）**。

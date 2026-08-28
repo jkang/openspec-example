@@ -33,8 +33,16 @@ metadata:
    - 在 proposal 中链接需求侧 `story.md` 作为业务评审依据。
 4. **开发侧 story 阶段跳过**：业务评审已在需求侧完成（story.md 等价于开发侧 story.md），开发侧不再生成 story.md。
 5. **登记 Epic 队列（若属 Epic）**：更新 `openspec/epic-<key>.story-list.json`，将对应 Story 置为 `in_progress` 并记录 `changeName`。
-6. **回填需求侧状态**：在需求侧 `story.md` 的「交接状态」勾选"已交接"并记录 `changeName`；同步更新对应 `storymap.md`。
+6. **回填需求侧状态**：
+   - 在需求侧 `epics/<epic-key>/stories/<story-key>/story.md` 的「交接状态」勾选"已交接"并记录 `changeName`。
+   - 更新 `epics/<epic-key>/STATUS.md`：该 Story 状态置 `handoff`；若全部 Story 已交接，Epic 生命周期置 `all-handoff`。
+   - 同步更新 `storymap.md`。
 7. **进入开发侧流程**：从 `proposal` 起步 → 按 capability 拆分生成行为规格 `specs/`（Story-specs，h3/h4 格式）→ design → tasks → apply → verify。
+
+## 交接策略（逐个 vs 批量）
+
+- **默认：逐 Story 交接**——每个 Story 对应一个独立 change（`openspec/changes/<name>/`），走完 需求→交接→开发→归档 再交接下一个。粒度清晰、依赖可控。
+- **可选：批量交接**——若多个 Story 无强依赖且已全部产出，可一次性 `/req:handoff` 全部交接（各生成独立 change，或按需合并）。**批量交接需用户明确选择**，且每个 Story 仍对应独立 change 的验收闭环。
 
 ## 分层 Sync 提示
 

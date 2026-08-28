@@ -27,10 +27,18 @@ metadata:
    - 真实业务数据（严禁 foo/test 占位符），全中文
 4. **HITL**：产出后暂停确认，确认后方可进入 storymap 拆分。
 
+## 验证降级路径（浏览器不可用时）
+
+- **首选**：通过浏览器验证原型（Chrome DevTools / webapp-testing）检查视觉约束与交互。
+- **降级路径（若 MCP 浏览器实例不可用/被占用）**：
+  1. 使用独立浏览器上下文（如 `--isolated`）重试；
+  2. 仍不可用时，按 `docs/FRONTEND.md` 自检清单**人工/静态审查**：无圆角（`border-radius:0`）、无阴影（`box-shadow:none`）、slate 色系（#f8fafc/#e2e8f0/#0f172a）、真实中文数据、无 foo/test 占位符、Vue3+Tailwind CDN 加载正常；
+  3. 将审查结果与待用户确认项一并呈报（HITL 不因工具不可用而跳过）。
+
 ## Guardrails
 
 - 只写需求侧原型，不写业务代码。
 - 原型为 Epic 整体，一次完成，不按 Story 拆散。
 - 原型确认后是 UI 逻辑唯一事实来源。
 - 涉及 UI 的 Epic 无已确认原型不得拆分/交接。
-- 产出后必须 HITL 确认。
+- 产出后必须 HITL 确认；**未确认不得进入下一阶段（强制门禁）**。

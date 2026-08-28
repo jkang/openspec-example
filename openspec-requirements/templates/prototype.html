@@ -3,40 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= 页面名称 %> · <%= Epic 名称 %> 原型</title>
+  <title>页面名称 · Epic 名称 原型</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          borderRadius: { none: '0' },
-          boxShadow: { none: '0 0 #0000' },
-        }
-      }
-    }
-  </script>
-  <!-- 极简 UI 规范：无圆角 / 无阴影 / slate 色系 / 1px 实线边框 -->
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <style>
+    /* 极简 UI 规范：无圆角 / 无阴影 / slate 色系 / 1px 实线边框 */
     * { border-radius: 0 !important; box-shadow: none !important; }
-    body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
+    body { background-color: #f8fafc; color: #0f172a; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
+    .border-slate-200 { border-color: #e2e8f0; }
+    input:focus, select:focus { outline: none; border-color: #0f172a; }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-900">
-  <div class="max-w-4xl mx-auto p-8">
-    <!-- 页面头部 -->
-    <header class="border border-slate-200 bg-white p-6 mb-8">
-      <h1 class="text-xl font-bold mb-2"><%= 页面主标题 %></h1>
-      <p class="text-sm text-slate-600"><%= 页面副标题 / 说明 %></p>
+<body class="min-h-screen">
+  <div id="app">
+    <!-- 页面头部：替换为真实业务内容 -->
+    <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8">
+      <div class="flex items-center gap-2">
+        <div class="w-8 h-8 bg-slate-900 text-white flex items-center justify-center text-xs font-bold">M</div>
+        <h1 class="text-lg font-semibold">页面主标题</h1>
+      </div>
     </header>
 
-    <!-- 主内容区：按需替换为真实业务内容 -->
-    <main class="border border-slate-200 bg-white p-6">
-      <!-- TODO: 替换为真实的 Epic 整体原型交互内容 -->
-      <div class="text-sm text-slate-600">
-        本页面为 Epic 整体原型的一部分。请填充真实业务数据与交互逻辑
-        （遵循 docs/FRONTEND.md：真实数据 / 全中文 / 无圆角 / slate 色系）。
-      </div>
+    <!-- 主内容区：替换为真实交互逻辑（真实中文数据，符合 docs/FRONTEND.md） -->
+    <main class="max-w-3xl mx-auto p-8">
+      <!-- 在此填充页面交互内容 -->
     </main>
   </div>
+
+  <script>
+    // 在此填充 Vue 交互逻辑（真实业务数据，全中文）
+  </script>
 </body>
 </html>

@@ -41,4 +41,4 @@ metadata:
 - B/C 双端视角（强约束）；To-Be Process / To-Be Journey 是必填章节。
 - 候选 Capabilities 是强约束（否则 handoff/specs 无 capability 依据）。
 - 任务类型路由是强约束：小需求不得滞留需求漏斗。
-- 产出后必须 HITL 确认。
+- 产出后必须 HITL 确认；**未确认不得进入下一阶段（强制门禁）**。

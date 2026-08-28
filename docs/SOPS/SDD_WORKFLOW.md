@@ -261,6 +261,12 @@ graph TD
 
 大块 Epic 需求走需求侧漏斗（`/req:research → explore → prototype → storymap → story`），当 Story 确认并经 `/req:handoff` 交接给开发侧时，引入 `openspec/epic-<key>.story-list.json` 进行跨 change 编排（**登记时机：handoff 时**，而非 Explore 阶段）。
 
+### 0. 需求侧状态源：STATUS.md
+- **`openspec-requirements/epics/<epic-key>/STATUS.md`** 是需求侧 Epic 生命周期的**唯一状态源**（阶段状态 / Story 交付状态 / Epic 生命周期），由需求侧 skill（research/explore/prototype/storymap/story/handoff）自动更新。
+- **Story 状态流转**：`ready → handoff（/req:handoff 交接后）→ dev-in-progress（开发侧 change 创建）→ done（开发侧归档后由 lead 回填）`。
+- **Epic 生命周期**：`active（research 创建目录时）→ all-handoff（全部 Story 已交接）→ all-done（全部 Story 开发侧已归档）→ archived（归档至 archive/）`。
+- **状态 owner**：需求侧 skill 负责阶段状态与 handoff 状态；开发侧归档后由 `lead` 回填 done/archived（解决跨侧信息孤岛）。
+
 ### 1. JSON 结构规范
 ```json
 {
@@ -280,13 +286,13 @@ graph TD
   "updatedAt": "2026-08-21T00:00:00Z"
 }
 ```
-字段说明：`id` 为 Story 唯一标识（用于跨 change 编排）；`changeName` 在 Propose 启动时记录对应 change 名称；`status` 取值 `planned` / `in_progress` / `done`。
+字段说明：`id` 为 Story 唯一标识（= 需求侧 Story ID，`story-<epic-key>-<功能>`，用于跨 change 编排）；`changeName` 在 handoff 时记录对应 change 名称；`status` 取值 `planned` / `in_progress` / `done`。
 
 ### 2. 状态流转
-- **需求侧 storymap**: 拆解出 Story 清单，状态 `planned`（需求侧 storymap.md 中维护）。
-- **Handoff**: `/req:handoff` 交接第一个 Story 时创建 `story-list.json`，登记全部 Story（`planned`），被交接 Story 置为 `in_progress` 并记录 `changeName`。
-- **Archive**: 每次 Story 归档完成后，AI 必须更新该 Story 状态为 `done`（即更新 progress），并提示下一个 `planned` 任务。同时执行孤儿对账：若存在 `in_progress` 状态的 Story 但其 `changeName` 对应的 change 已归档（不再是活跃 change），一并修正为 `done`。
-- **Epic 完成归档**: 当所有 Story 状态均为 `done` 时，AI 必须将该 `story-list.json` 归档至 `openspec/changes/archive/YYYY-MM-DD-epic-<key>.story-list.json`（保留 Epic 交付记录，禁止删除），并宣布 Epic 完成，提示执行 Baseline Sync + Roadmap 更新。
+- **需求侧 storymap**: 拆解出 Story 清单（Story ID = `story-<epic-key>-<功能>`），状态 `ready`（在 STATUS.md 中维护）。
+- **Handoff**: `/req:handoff` 交接第一个 Story 时创建 `story-list.json`，登记全部 Story（`planned`），被交接 Story 置为 `in_progress` 并记录 `changeName`；同步更新 STATUS.md（Story → handoff，全部交接 → all-handoff）。
+- **Archive**: 每次 Story 归档完成后，AI 必须更新该 Story 状态为 `done`（即更新 progress），并提示下一个 `planned` 任务。同时执行孤儿对账：若存在 `in_progress` 状态的 Story 但其 `changeName` 对应的 change 已归档（不再是活跃 change），一并修正为 `done`。开发侧归档后，`lead` 回填需求侧 STATUS.md（Story → done）。
+- **Epic 完成归档**: 当所有 Story 状态均为 `done` 时，AI 必须将该 `story-list.json` 归档至 `openspec/changes/archive/YYYY-MM-DD-epic-<key>.story-list.json`（保留 Epic 交付记录，禁止删除），并宣布 Epic 完成，提示执行需求侧 Epic 归档（`epics/<key>/` → `archive/`）+ Baseline Sync + Roadmap 更新。
 
 ## 异常处理与防漂移
 - **Schema 优先**: `openspec/schemas/spec-driven.yaml` 是开发侧每个制品的生成说明 (Instruction) 和内容格式的唯一事实来源；`openspec-requirements/schemas/req-sdd.yaml` 是需求侧的唯一事实来源。如果 SOP 描述与 Schema 有出入，请以 Schema 为准。

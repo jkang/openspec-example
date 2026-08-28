@@ -16,7 +16,7 @@ artifacts:
       4. **不做转化**：不转化为产品设计思路（那是 explore/idea 的职责）。
       5. **治理提示**：可初步留意候选 Bounded Contexts（不强制，explore 阶段深化）。
 
-      该文档是 explore 的输入源，产出后需用户确认（HITL）。
+      该文档是 explore 的输入源。**HITL 强制门禁**：产出后必须暂停征求用户确认；未确认不得进入下一阶段（explore）。
     requires: []
 
   - id: explore
@@ -39,12 +39,12 @@ artifacts:
       7. **治理映射对齐**：参考 `business_process.html`（L1/L2/L3）、`service_blueprint.html`（SB-STAGE-*/SB-<LANE>-*）。
       8. **需求拆分建议 + 架构影响分析**。
 
-      产出后需用户确认（HITL），确认后才可进入 prototype 或 storymap。
+      **HITL 强制门禁**：产出后必须暂停征求用户确认；未确认不得进入下一阶段（prototype/storymap）。
     requires:
       - research
 
   - id: prototype
-    generates: epics/<epic-key>/prototypes/*.html
+    generates: epics/<epic-key>/prototypes/<page>.html（按页面命名，如 account-register.html）
     description: 交互式 UI/UX 原型（Epic 整体，一次完成），用于前端需求验证
     template: prototype.html
     instruction: |
@@ -58,7 +58,7 @@ artifacts:
         - 真实业务数据（严禁 foo/test 占位符），全中文
         - Vue 3 (CDN) + Tailwind CSS (CDN)
 
-      产出后必须等待用户确认（HITL），确认后方可进入 storymap。涉及 UI 的 Epic 无已确认原型不得拆分/交接。
+      **HITL 强制门禁**：产出后必须等待用户确认；未确认不得进入下一阶段（storymap）。涉及 UI 的 Epic 无已确认原型不得拆分/交接。
     requires:
       - explore
 
@@ -76,7 +76,7 @@ artifacts:
       4. **依赖与优先级**：明确各 Story 依赖关系与 P0/P1/P2 优先级。
       5. **治理映射对齐**：参考治理基线识别 Bounded Contexts / 流程节点 / 蓝图节点。
 
-      产出后需用户确认（HITL），确认每个 Story 可进入 story。
+      **HITL 强制门禁**：产出后必须暂停征求用户确认；未确认不得进入下一阶段（story）。
     requires:
       - explore
 
@@ -87,6 +87,8 @@ artifacts:
     instruction: |
       调用 `story` skill 生成需求单元交付物（业务面）。
 
+      **命名规范**：Story ID = `story-<epic-key>-<功能>`（如 `story-account-system-register`），目录 = `stories/story-<epic-key>-<功能>/story.md`；与开发侧 change 命名（`story-<name>`）风格一致。
+
       **强制要求**：本交付物必须基于已确认的 `epics/<epic-key>/idea.md` 与 `epics/<epic-key>/storymap.md`。若缺失，停止并回退。
 
       **内容要求（纯业务面，不含行为规格）**：
@@ -94,13 +96,13 @@ artifacts:
         - 业务规则表。
         - E2E 验收标准（Given/When/Then），映射到 `business_process.html` 的 L1/L2 与 `service_blueprint.html` 的 SB-STAGE-*/SB-CUSTOMER-*。
         - 治理映射对齐（Bounded Context / L3 节点 / SB-<LANE>-*）。
-        - 若涉及 UI，引用【已确认】的 Epic 整体原型 `epics/<epic-key>/prototypes/<capability>.html`。
+        - 若涉及 UI，引用【已确认】的 Epic 整体原型 `epics/<epic-key>/prototypes/<page>.html`。
 
       **⚠️ 行为规格（Story-specs）不由本阶段生成**：行为规格（按 capability 拆分的 specs，h3/h4 格式）由开发侧在 handoff 合成 proposal 之后产出。需求侧不生成 specs/。
 
       **UI 门禁**：涉及 UI 的 Story，若无已确认的 Epic 整体原型，禁止勾选「待开发交接」。
 
-      **交接**：产出后通过 `/req:handoff`（skill: handoff）交给开发侧，这是需求侧唯一冻结交付物。
+      **交接**：**HITL 强制门禁**：产出后必须由用户确认验收标准；未确认禁止交接（`/req:handoff`）。交接后这是需求侧唯一冻结交付物。
     requires:
       - storymap
 
