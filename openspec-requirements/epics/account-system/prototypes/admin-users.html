@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>B 端用户管理 · 用户账户体系 原型</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          borderRadius: { none: '0' },
+          boxShadow: { none: '0 0 #0000' },
+        }
+      }
+    }
+  </script>
+  <!-- 极简 UI 规范：无圆角 / 无阴影 / slate 色系 / 1px 实线边框 -->
+  <style>
+    * { border-radius: 0 !important; box-shadow: none !important; }
+    body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <div id="app" class="max-w-4xl mx-auto p-8">
+    <!-- 页面头部 -->
+    <header class="border border-slate-200 bg-white p-6 mb-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-bold mb-2">用户管理</h1>
+          <p class="text-sm text-slate-600">查看用户基础信息与订单归属，支持按手机号 / 昵称检索。本入口仅运营角色可见。</p>
+        </div>
+        <span class="border border-slate-200 px-3 py-1 text-xs text-slate-600">当前角色：运营 · 陈运营</span>
+      </div>
+    </header>
+
+    <!-- 检索区 -->
+    <main class="border border-slate-200 bg-white p-6 mb-8">
+      <div class="flex gap-3 items-end">
+        <div class="flex-1">
+          <label class="block text-sm font-medium mb-2">关键词</label>
+          <input v-model.trim="keyword" type="text" placeholder="按手机号或昵称搜索，例如 138 或 林晓明"
+            class="w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-slate-900" />
+        </div>
+        <button @click="searchUsers" class="border border-slate-900 bg-slate-900 text-white px-6 py-2 text-sm hover:bg-slate-700">搜索</button>
+        <button @click="resetSearch" class="border border-slate-200 px-6 py-2 text-sm text-slate-600">重置</button>
+      </div>
+      <p class="text-xs text-slate-500 mt-3">共 {{ filteredUsers.length }} 位用户</p>
+    </main>
+
+    <!-- 用户列表 -->
+    <main class="border border-slate-200 bg-white p-6 mb-8">
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-slate-200 text-left text-slate-600">
+            <th class="py-2 pr-4 font-medium">用户 ID</th>
+            <th class="py-2 pr-4 font-medium">昵称</th>
+            <th class="py-2 pr-4 font-medium">手机号</th>
+            <th class="py-2 pr-4 font-medium">订单数</th>
+            <th class="py-2 pr-4 font-medium">注册日期</th>
+            <th class="py-2 pr-4 font-medium">状态</th>
+            <th class="py-2 font-medium">操作</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="u in filteredUsers" :key="u.id" class="border-b border-slate-200">
+            <td class="py-2 pr-4 font-mono text-xs">{{ u.id }}</td>
+            <td class="py-2 pr-4">{{ u.nickname }}</td>
+            <td class="py-2 pr-4">{{ u.phone }}</td>
+            <td class="py-2 pr-4">{{ u.orderCount }}</td>
+            <td class="py-2 pr-4">{{ u.createdAt }}</td>
+            <td class="py-2 pr-4">
+              <span class="border px-2 py-0.5 text-xs" :class="u.status === '正常' ? 'border-slate-200' : 'border-red-200 text-red-700'">
+                {{ u.status }}
+              </span>
+            </td>
+            <td class="py-2">
+              <button @click="toggleUser(u)" class="text-sm underline underline-offset-4 text-slate-900">
+                {{ u.status === '正常' ? '禁用' : '启用' }}
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </main>
+
+    <!-- 用户详情（选中用户） -->
+    <main v-if="selectedUser" class="border border-slate-200 bg-white p-6">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-sm font-semibold">用户详情：{{ selectedUser.nickname }}</h2>
+        <button @click="selectedUser = null" class="text-sm text-slate-600 underline underline-offset-4">关闭</button>
+      </div>
+      <div class="grid grid-cols-4 gap-4 text-sm mb-6">
+        <div class="border border-slate-200 p-3">
+          <p class="text-slate-500 mb-1">用户 ID</p>
+          <p class="font-mono text-xs">{{ selectedUser.id }}</p>
+        </div>
+        <div class="border border-slate-200 p-3">
+          <p class="text-slate-500 mb-1">手机号</p>
+          <p>{{ selectedUser.phone }}</p>
+        </div>
+        <div class="border border-slate-200 p-3">
+          <p class="text-slate-500 mb-1">注册日期</p>
+          <p>{{ selectedUser.createdAt }}</p>
+        </div>
+        <div class="border border-slate-200 p-3">
+          <p class="text-slate-500 mb-1">累计订单</p>
+          <p>{{ selectedUser.orderCount }} 笔</p>
+        </div>
+      </div>
+      <h3 class="text-sm font-semibold mb-3">该用户的订单</h3>
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-slate-200 text-left text-slate-600">
+            <th class="py-2 pr-4 font-medium">订单号</th>
+            <th class="py-2 pr-4 font-medium">商品</th>
+            <th class="py-2 pr-4 font-medium">实付金额</th>
+            <th class="py-2 font-medium">状态</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="o in selectedUser.orders" :key="o.id" class="border-b border-slate-200">
+            <td class="py-2 pr-4 font-mono text-xs">{{ o.id }}</td>
+            <td class="py-2 pr-4">{{ o.item }}</td>
+            <td class="py-2 pr-4">¥{{ o.amount }}</td>
+            <td class="py-2">{{ o.status }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </main>
+
+    <!-- 权限说明 -->
+    <footer class="border border-slate-200 bg-white p-6 mt-8">
+      <h2 class="text-sm font-semibold mb-3">权限与敏感信息约束</h2>
+      <ul class="text-sm text-slate-600 space-y-1 list-disc list-inside">
+        <li>用户管理入口仅「运营」角色可见；客服账号无权限访问。</li>
+        <li>手机号为敏感信息，列表默认展示完整号码仅供运营内部使用（原型为演示完整展示）。</li>
+        <li>禁用用户后，该用户现有会话立即失效，无法继续下单。</li>
+      </ul>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script>
+    const { createApp } = Vue;
+    const users = [
+      {
+        id: 'U00001', nickname: '林晓明', phone: '13888217536', orderCount: 3,
+        createdAt: '2026-08-20', status: '正常',
+        orders: [
+          { id: 'OD20260820001', item: '纯棉圆领T恤（白色 / M）', amount: '89.00', status: '已发货' },
+          { id: 'OD20260821002', item: '牛仔裤（深蓝 / 32）', amount: '159.00', status: '待支付' },
+          { id: 'OD20260825003', item: '运动鞋（灰色 / 42）', amount: '329.00', status: '已完成' }
+        ]
+      },
+      {
+        id: 'U00002', nickname: '陈晓芸', phone: '13912345678', orderCount: 1,
+        createdAt: '2026-08-21', status: '正常',
+        orders: [
+          { id: 'OD20260819004', item: '保温杯（黑色 / 500ml）', amount: '69.00', status: '已完成' }
+        ]
+      },
+      {
+        id: 'U00003', nickname: '王强', phone: '15876543210', orderCount: 0,
+        createdAt: '2026-08-22', status: '已禁用',
+        orders: []
+      },
+      {
+        id: 'U00004', nickname: '李娜', phone: '13755554433', orderCount: 5,
+        createdAt: '2026-08-23', status: '正常',
+        orders: [
+          { id: 'OD20260817005', item: '帆布鞋（米白 / 38）', amount: '129.00', status: '已完成' },
+          { id: 'OD20260823006', item: '防晒衣（浅灰 / L）', amount: '199.00', status: '待支付' }
+        ]
+      }
+    ];
+
+    createApp({
+      data() {
+        return {
+          allUsers: users,
+          filtered: users,
+          keyword: '',
+          selectedUser: null
+        };
+      },
+      computed: {
+        filteredUsers() {
+          return this.filtered;
+        }
+      },
+      methods: {
+        searchUsers() {
+          const kw = this.keyword;
+          this.filtered = this.allUsers.filter(u => !kw || u.phone.includes(kw) || u.nickname.includes(kw));
+        },
+        resetSearch() {
+          this.keyword = '';
+          this.filtered = this.allUsers;
+        },
+        toggleUser(u) {
+          u.status = u.status === '正常' ? '已禁用' : '正常';
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>

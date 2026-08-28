@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>会话保持与我的订单 · 用户账户体系 原型</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          borderRadius: { none: '0' },
+          boxShadow: { none: '0 0 #0000' },
+        }
+      }
+    }
+  </script>
+  <!-- 极简 UI 规范：无圆角 / 无阴影 / slate 色系 / 1px 实线边框 -->
+  <style>
+    * { border-radius: 0 !important; box-shadow: none !important; }
+    body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <div id="app" class="max-w-4xl mx-auto p-8">
+    <!-- 页面头部：登录态展示 -->
+    <header class="border border-slate-200 bg-white p-6 mb-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-bold mb-2">会话与我的订单</h1>
+          <p class="text-sm text-slate-600">演示登录会话保持（刷新不掉）、订单按用户归属与退出登录</p>
+        </div>
+        <div v-if="loggedIn" class="text-sm flex items-center gap-3">
+          <span class="border border-slate-200 px-3 py-1 bg-slate-50">{{ currentUser.nickname }}</span>
+          <span class="text-slate-500">{{ maskedPhone }}</span>
+          <button @click="logout" class="border border-slate-900 bg-slate-900 text-white px-3 py-1 hover:bg-slate-700">退出登录</button>
+        </div>
+        <div v-else class="text-sm flex items-center gap-3">
+          <a href="account-login.html" class="border border-slate-900 text-slate-900 px-3 py-1">去登录</a>
+          <a href="account-register.html" class="text-slate-600 underline underline-offset-4">注册新账户</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- 未登录：引导登录 -->
+    <main v-if="!loggedIn" class="border border-slate-200 bg-white p-10 text-center">
+      <p class="text-sm text-slate-600 mb-4">未登录状态：无法查看「我的订单」，也无法下单。</p>
+      <p class="text-sm text-slate-500 mb-6">这是本阶段的核心业务约束（未登录不可下单 / 查看我的订单）。</p>
+      <a href="account-login.html" class="inline-block border border-slate-900 bg-slate-900 text-white px-6 py-2 text-sm">立即登录</a>
+    </main>
+
+    <!-- 已登录：会话信息 + 我的订单 -->
+    <template v-else>
+      <main class="border border-slate-200 bg-white p-6 mb-8">
+        <h2 class="text-sm font-semibold mb-3">会话状态</h2>
+        <div class="grid grid-cols-3 gap-4 text-sm">
+          <div class="border border-slate-200 p-4">
+            <p class="text-slate-500 mb-1">会话凭证</p>
+            <p class="font-mono text-xs break-all">{{ sessionToken }}</p>
+          </div>
+          <div class="border border-slate-200 p-4">
+            <p class="text-slate-500 mb-1">登录时间</p>
+            <p>{{ currentUser.loginAt }}</p>
+          </div>
+          <div class="border border-slate-200 p-4">
+            <p class="text-slate-500 mb-1">持久化</p>
+            <p>已保存至本地，刷新不掉</p>
+          </div>
+        </div>
+        <div class="mt-4 border border-slate-200 bg-slate-50 p-3 text-xs text-slate-600">
+          提示：点击浏览器「刷新」按钮，登录态仍然保持。退出登录后会话将被销毁。
+        </div>
+      </main>
+
+      <!-- 我的订单 -->
+      <main class="border border-slate-200 bg-white p-6">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-sm font-semibold">我的订单（仅展示当前登录用户）</h2>
+          <span class="text-xs text-slate-500">共 {{ myOrders.length }} 笔</span>
+        </div>
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-slate-200 text-left text-slate-600">
+              <th class="py-2 pr-4 font-medium">订单号</th>
+              <th class="py-2 pr-4 font-medium">商品</th>
+              <th class="py-2 pr-4 font-medium">实付金额</th>
+              <th class="py-2 pr-4 font-medium">下单时间</th>
+              <th class="py-2 font-medium">状态</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="o in myOrders" :key="o.id" class="border-b border-slate-200">
+              <td class="py-2 pr-4 font-mono text-xs">{{ o.id }}</td>
+              <td class="py-2 pr-4">{{ o.item }}</td>
+              <td class="py-2 pr-4">¥{{ o.amount }}</td>
+              <td class="py-2 pr-4">{{ o.createdAt }}</td>
+              <td class="py-2"><span class="border border-slate-200 px-2 py-0.5 text-xs">{{ o.status }}</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </main>
+    </template>
+
+    <!-- 全局用户数据说明 -->
+    <footer class="border border-slate-200 bg-white p-6 mt-8">
+      <h2 class="text-sm font-semibold mb-3">数据归属示例</h2>
+      <p class="text-sm text-slate-600 mb-2">登录用户「林晓明」（138****7536）可见自己的 3 笔订单；其他用户订单不出现在其列表。</p>
+      <p class="text-xs text-slate-500">归属隔离：GET /api/orders?userId= 仅返回当前会话 userId 的订单，见 service_blueprint.html SB-BACKSTAGE-04。</p>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script>
+    const { createApp } = Vue;
+    const orderStore = {
+      '13888217536': [
+        { id: 'OD20260820001', item: '纯棉圆领T恤（白色 / M）', amount: '89.00', createdAt: '2026-08-20 14:32', status: '已发货' },
+        { id: 'OD20260821002', item: '牛仔裤（深蓝 / 32）', amount: '159.00', createdAt: '2026-08-21 09:15', status: '待支付' },
+        { id: 'OD20260825003', item: '运动鞋（灰色 / 42）', amount: '329.00', createdAt: '2026-08-25 20:08', status: '已完成' }
+      ],
+      '13912345678': [
+        { id: 'OD20260819004', item: '保温杯（黑色 / 500ml）', amount: '69.00', createdAt: '2026-08-19 11:20', status: '已完成' }
+      ]
+    };
+
+    createApp({
+      data() {
+        return {
+          loggedIn: false,
+          currentUser: null,
+          sessionToken: '',
+          myOrders: []
+        };
+      },
+      computed: {
+        maskedPhone() {
+          return this.currentUser ? this.currentUser.phone.replace(/^(\d{3})\d{4}(\d{4})$/, '$1****$2') : '';
+        }
+      },
+      created() {
+        const saved = localStorage.getItem('account_session_user');
+        if (saved) {
+          this.currentUser = JSON.parse(saved);
+          this.loggedIn = true;
+          this.sessionToken = 'sess_' + this.currentUser.phone.replace(/^(\d{3})\d{4}(\d{4})$/, '$1_$2') + '_abc123def';
+          this.myOrders = orderStore[this.currentUser.phone] || [];
+        }
+      },
+      methods: {
+        logout() {
+          localStorage.removeItem('account_session_user');
+          this.loggedIn = false;
+          this.currentUser = null;
+          this.myOrders = [];
+          this.sessionToken = '';
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>

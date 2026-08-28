@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用户登录 · 用户账户体系 原型</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          borderRadius: { none: '0' },
+          boxShadow: { none: '0 0 #0000' },
+        }
+      }
+    }
+  </script>
+  <!-- 极简 UI 规范：无圆角 / 无阴影 / slate 色系 / 1px 实线边框 -->
+  <style>
+    * { border-radius: 0 !important; box-shadow: none !important; }
+    body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <div id="app" class="max-w-4xl mx-auto p-8">
+    <!-- 页面头部 -->
+    <header class="border border-slate-200 bg-white p-6 mb-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-bold mb-2">登录</h1>
+          <p class="text-sm text-slate-600">登录后可下单、查看「我的订单」，购物车将跟随你的账户</p>
+        </div>
+        <div class="text-sm text-slate-600">
+          还没有账户？<a href="account-register.html" class="text-slate-900 underline underline-offset-4">立即注册</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- 登录表单 -->
+    <main class="border border-slate-200 bg-white p-6">
+      <div class="max-w-xl mx-auto">
+        <div v-if="loggedIn" class="border border-slate-200 bg-slate-50 p-4 mb-6 text-sm">
+          <p class="font-semibold mb-1">登录成功，{{ currentUser.nickname }}</p>
+          <p class="text-slate-600">会话已创建并保持，刷新页面不会退出登录。</p>
+          <div class="mt-4 flex gap-3">
+            <a href="account-session.html" class="inline-block border border-slate-900 bg-slate-900 text-white px-4 py-2 text-sm">进入会话页演示</a>
+          </div>
+        </div>
+
+        <form v-else @submit.prevent="submitLogin" class="space-y-5">
+          <div>
+            <label class="block text-sm font-medium mb-2">手机号</label>
+            <input v-model.trim="form.phone" type="tel" maxlength="11" placeholder="请输入注册手机号，例如 13888217536"
+              class="w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-slate-900" />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2">密码</label>
+            <input v-model="form.password" :type="showPassword ? 'text' : 'password'" placeholder="请输入密码"
+              class="w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-slate-900" />
+            <div class="mt-1 flex items-center justify-between">
+              <p class="text-sm text-slate-500">忘记密码请联系平台客服（本阶段暂不提供自助找回）</p>
+              <label class="text-sm text-slate-600 cursor-pointer">
+                <input type="checkbox" v-model="showPassword" class="mr-1" /> 显示密码
+              </label>
+            </div>
+          </div>
+
+          <div v-if="serverError" class="border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            {{ serverError }}
+          </div>
+
+          <button type="submit"
+            class="w-full border border-slate-900 bg-slate-900 text-white py-2 text-sm hover:bg-slate-700">
+            登录
+          </button>
+
+          <p class="text-xs text-slate-500">登录即创建持久会话，你可以在任意设备查看自己的订单。</p>
+        </form>
+      </div>
+    </main>
+
+    <!-- 登录提示上下文 -->
+    <footer class="border border-slate-200 bg-white p-6 mt-8">
+      <h2 class="text-sm font-semibold mb-3">为什么需要登录？</h2>
+      <ul class="text-sm text-slate-600 space-y-1 list-disc list-inside">
+        <li>订单将归属于你的账户，「我的订单」只展示你自己的订单。</li>
+        <li>购物车跟随账户，换设备不丢失。</li>
+        <li>未登录时无法下单与查看订单，系统会引导你先登录。</li>
+      </ul>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script>
+    const { createApp } = Vue;
+    createApp({
+      data() {
+        return {
+          form: { phone: '', password: '' },
+          showPassword: false,
+          loggedIn: false,
+          serverError: '',
+          currentUser: null
+        };
+      },
+      created() {
+        const saved = localStorage.getItem('account_session_user');
+        if (saved) {
+          this.currentUser = JSON.parse(saved);
+          this.loggedIn = true;
+        }
+      },
+      methods: {
+        submitLogin() {
+          this.serverError = '';
+          // 演示账号校验
+          const accounts = {
+            '13888217536': { password: '123456', nickname: '林晓明' },
+            '13912345678': { password: '123456', nickname: '陈晓芸' }
+          };
+          const account = accounts[this.form.phone];
+          if (!account || account.password !== this.form.password) {
+            this.serverError = '手机号或密码不正确，请重试。';
+            return;
+          }
+          if (this.form.phone === '15876543210') {
+            this.serverError = '该账户已被禁用，如有疑问请联系平台客服。';
+            return;
+          }
+          this.currentUser = {
+            phone: this.form.phone,
+            nickname: account.nickname,
+            loginAt: new Date().toLocaleString('zh-CN')
+          };
+          localStorage.setItem('account_session_user', JSON.stringify(this.currentUser));
+          this.loggedIn = true;
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>

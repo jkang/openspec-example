@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>用户注册 · 用户账户体系 原型</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          borderRadius: { none: '0' },
+          boxShadow: { none: '0 0 #0000' },
+        }
+      }
+    }
+  </script>
+  <!-- 极简 UI 规范：无圆角 / 无阴影 / slate 色系 / 1px 实线边框 -->
+  <style>
+    * { border-radius: 0 !important; box-shadow: none !important; }
+    body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900">
+  <div id="app" class="max-w-4xl mx-auto p-8">
+    <!-- 页面头部 -->
+    <header class="border border-slate-200 bg-white p-6 mb-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-xl font-bold mb-2">注册新账户</h1>
+          <p class="text-sm text-slate-600">手机号 + 密码即可完成注册，注册成功将自动登录</p>
+        </div>
+        <div class="text-sm text-slate-600">
+          已有账户？<a href="account-login.html" class="text-slate-900 underline underline-offset-4">直接登录</a>
+        </div>
+      </div>
+    </header>
+
+    <!-- 注册表单 -->
+    <main class="border border-slate-200 bg-white p-6">
+      <div class="max-w-xl mx-auto">
+        <div v-if="registered" class="border border-slate-200 bg-slate-50 p-4 mb-6 text-sm">
+          <p class="font-semibold mb-1">注册成功，已自动登录</p>
+          <p class="text-slate-600">欢迎回来，{{ form.nickname }}。你可以继续结算购物车，或前往「我的订单」。</p>
+          <div class="mt-4 flex gap-3">
+            <a href="account-session.html" class="inline-block border border-slate-900 bg-slate-900 text-white px-4 py-2 text-sm">进入会话页演示</a>
+            <a href="account-login.html" class="inline-block border border-slate-200 px-4 py-2 text-sm text-slate-600">返回登录页</a>
+          </div>
+        </div>
+
+        <form v-else @submit.prevent="submitRegister" class="space-y-5">
+          <div>
+            <label class="block text-sm font-medium mb-2">手机号</label>
+            <input v-model.trim="form.phone" type="tel" maxlength="11" placeholder="请输入 11 位手机号，例如 13888217536"
+              class="w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-slate-900" />
+            <p v-if="errors.phone" class="text-sm text-red-600 mt-1">{{ errors.phone }}</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2">昵称</label>
+            <input v-model.trim="form.nickname" type="text" maxlength="20" placeholder="例如：林晓明（可稍后修改）"
+              class="w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-slate-900" />
+            <p v-if="errors.nickname" class="text-sm text-red-600 mt-1">{{ errors.nickname }}</p>
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium mb-2">密码</label>
+            <input v-model="form.password" :type="showPassword ? 'text' : 'password'" maxlength="32" placeholder="设置密码，至少 6 位"
+              class="w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-slate-900" />
+            <div class="mt-1 flex items-center justify-between">
+              <p v-if="errors.password" class="text-sm text-red-600">{{ errors.password }}</p>
+              <label class="text-sm text-slate-600 cursor-pointer">
+                <input type="checkbox" v-model="showPassword" class="mr-1" /> 显示密码
+              </label>
+            </div>
+          </div>
+
+          <div v-if="serverError" class="border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+            {{ serverError }}
+          </div>
+
+          <button type="submit"
+            class="w-full border border-slate-900 bg-slate-900 text-white py-2 text-sm hover:bg-slate-700">
+            注册并登录
+          </button>
+
+          <p class="text-xs text-slate-500">注册即表示同意平台服务条款与隐私政策。手机号将作为登录凭证，请妥善保管。</p>
+        </form>
+      </div>
+    </main>
+
+    <!-- 已有用户参考 -->
+    <footer class="border border-slate-200 bg-white p-6 mt-8">
+      <h2 class="text-sm font-semibold mb-3">已注册用户示例（演示数据）</h2>
+      <table class="w-full text-sm">
+        <thead>
+          <tr class="border-b border-slate-200 text-left text-slate-600">
+            <th class="py-2 pr-4 font-medium">手机号</th>
+            <th class="py-2 pr-4 font-medium">昵称</th>
+            <th class="py-2 pr-4 font-medium">注册日期</th>
+            <th class="py-2 font-medium">状态</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="u in demoUsers" :key="u.phone" class="border-b border-slate-200">
+            <td class="py-2 pr-4">{{ u.phone }}</td>
+            <td class="py-2 pr-4">{{ u.nickname }}</td>
+            <td class="py-2 pr-4">{{ u.createdAt }}</td>
+            <td class="py-2"><span class="text-slate-600">{{ u.status }}</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </footer>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script>
+    const { createApp } = Vue;
+    createApp({
+      data() {
+        return {
+          form: { phone: '', nickname: '', password: '' },
+          showPassword: false,
+          registered: false,
+          serverError: '',
+          errors: {},
+          demoUsers: [
+            { phone: '13888217536', nickname: '林晓明', createdAt: '2026-08-20', status: '正常' },
+            { phone: '13912345678', nickname: '陈晓芸', createdAt: '2026-08-21', status: '正常' },
+            { phone: '15876543210', nickname: '王强', createdAt: '2026-08-22', status: '已禁用' }
+          ]
+        };
+      },
+      methods: {
+        submitRegister() {
+          this.errors = {};
+          this.serverError = '';
+          // 前端校验
+          if (!/^1\d{10}$/.test(this.form.phone)) {
+            this.errors.phone = '请输入 11 位有效手机号';
+          }
+          if (!this.form.nickname) {
+            this.errors.nickname = '请输入昵称';
+          }
+          if (!this.form.password || this.form.password.length < 6) {
+            this.errors.password = '密码至少 6 位';
+          }
+          if (Object.keys(this.errors).length > 0) return;
+          // 模拟已注册用户冲突（演示手机号唯一性校验）
+          if (this.form.phone === '13912345678') {
+            this.serverError = '该手机号已注册，请直接登录。';
+            return;
+          }
+          // 模拟注册成功：自动登录，写入会话
+          localStorage.setItem('account_session_user', JSON.stringify({
+            phone: this.form.phone,
+            nickname: this.form.nickname,
+            loginAt: new Date().toLocaleString('zh-CN')
+          }));
+          this.registered = true;
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
