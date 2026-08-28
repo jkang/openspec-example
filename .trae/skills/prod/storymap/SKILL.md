@@ -13,12 +13,12 @@ metadata:
 
 ## 产物
 
-- `openspec-requirements/storymaps/<epic-key>/storymap.md`
+- `openspec-requirements/epics/<epic-key>/storymap.md`
 
 ## 输入
 
-- 已确认的 `ideas/<idea-key>.md`
-- 已确认的 `prototypes/<epic-key>/*.html`（若涉及 UI，Epic 整体原型）
+- 已确认的 `epics/<epic-key>/idea.md`
+- 已确认的 `epics/<epic-key>/prototypes/*.html`（若涉及 UI，Epic 整体原型）
 
 ## 拆分粒度原则
 
@@ -30,7 +30,7 @@ metadata:
 ## 覆盖对账（强制）
 
 拆分**前**：
-1. 读 `ideas/<idea-key>.md`，列出全部承诺项（In Scope + Exit Criteria + **候选 Capabilities** + B 端承诺）。
+1. 读 `epics/<epic-key>/idea.md`，列出全部承诺项（In Scope + Exit Criteria + **候选 Capabilities** + B 端承诺）。
 
 拆分**后**：
 2. 逐项对账：每个承诺项必须有 ≥1 个 Story 承接。
@@ -39,7 +39,7 @@ metadata:
 
 ## 步骤
 
-1. **读上下文**：读已确认的 `ideas/<idea-key>.md`、`research/<epic-key>.md` 与 `prototypes/<epic-key>/*.html`（若 UI）。
+1. **读上下文**：读已确认的 `epics/<epic-key>/idea.md`、`epics/<epic-key>/research.md` 与 `epics/<epic-key>/prototypes/*.html`（若 UI）。
 2. **应用规则**：读 `openspec-requirements/config.yaml` 的 `rules.storymap`。
 3. **生成 storymap.md**：按 `openspec-requirements/templates/storymap.md` 产出（拆分明细表 + 覆盖对账表 + 治理映射）。
 4. **HITL**：产出后暂停确认，确认后每个 Story 可进入 story。

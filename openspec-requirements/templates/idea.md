@@ -1,7 +1,7 @@
 # Idea: <Epic/需求名称>
 
 > 关联 Epic: `<epic-key>`（来自 `docs/ROADMAP.md`）
-> 关联调研: `research/<epic-key>.md`
+> 关联调研: `epics/<epic-key>/research.md`
 > 产出后需用户确认（HITL）
 
 <!--

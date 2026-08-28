@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户注册 - 极简电商</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        * { border-radius: 0 !important; box-shadow: none !important; }
+        body { background-color: #f8fafc; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .border-slate-200 { border-color: #e2e8f0; }
+        input:focus, select:focus { outline: none; border-color: #0f172a; }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div id="app">
+        <!-- 顶部导航 -->
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-slate-900 flex items-center justify-center text-white text-xs font-bold">M</div>
+                <h1 class="text-lg font-semibold tracking-tight uppercase">Minimal Store</h1>
+            </div>
+            <div class="flex items-center gap-6 text-sm font-medium">
+                <template v-if="!registered">
+                    <a class="py-1 px-2 border border-slate-200 hover:bg-slate-50 cursor-pointer" @click="gotoLogin">已有账户？去登录</a>
+                </template>
+                <template v-else>
+                    <span class="py-1 px-2 border border-slate-900 bg-slate-50">张采购</span>
+                    <button class="py-1 px-2 border border-slate-200 hover:bg-slate-50" @click="logout">退出登录</button>
+                </template>
+            </div>
+        </header>
+
+        <main class="max-w-xl mx-auto p-8">
+            <!-- 注册表单视图 -->
+            <section v-if="!registered" class="bg-white border border-slate-200">
+                <div class="px-8 py-6 border-b border-slate-200">
+                    <h2 class="text-xl font-bold tracking-tight">创建账户</h2>
+                    <p class="text-sm text-slate-500 mt-1">注册成功后自动登录，可继续逛店与下单。邮箱全局唯一。</p>
+                </div>
+                <div class="px-8 py-6 space-y-5">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">邮箱</label>
+                        <input v-model.trim="form.email" @blur="validate('email')" type="email" placeholder="buyer@trade-demo.com"
+                               class="w-full border border-slate-200 px-3 py-2 text-sm bg-white">
+                        <p v-if="errors.email" class="text-xs text-slate-900 mt-1 font-medium">{{ errors.email }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">密码</label>
+                        <input v-model="form.password" @blur="validate('password')" type="password" placeholder="至少 6 位，含字母和数字"
+                               class="w-full border border-slate-200 px-3 py-2 text-sm bg-white">
+                        <p v-if="errors.password" class="text-xs text-slate-900 mt-1 font-medium">{{ errors.password }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">确认密码</label>
+                        <input v-model="form.confirm" @blur="validate('confirm')" type="password" placeholder="再次输入密码"
+                               class="w-full border border-slate-200 px-3 py-2 text-sm bg-white">
+                        <p v-if="errors.confirm" class="text-xs text-slate-900 mt-1 font-medium">{{ errors.confirm }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">昵称</label>
+                        <input v-model.trim="form.nickname" @blur="validate('nickname')" type="text" placeholder="张采购"
+                               class="w-full border border-slate-200 px-3 py-2 text-sm bg-white">
+                        <p v-if="errors.nickname" class="text-xs text-slate-900 mt-1 font-medium">{{ errors.nickname }}</p>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">手机号</label>
+                        <input v-model.trim="form.phone" @blur="validate('phone')" type="tel" placeholder="13800001234"
+                               class="w-full border border-slate-200 px-3 py-2 text-sm bg-white">
+                        <p v-if="errors.phone" class="text-xs text-slate-900 mt-1 font-medium">{{ errors.phone }}</p>
+                    </div>
+
+                    <button @click="submit" :disabled="submitting"
+                            class="w-full bg-slate-900 text-white py-2.5 text-sm font-medium hover:bg-slate-700 disabled:opacity-60">
+                        {{ submitting ? '注册中...' : '注册并自动登录' }}
+                    </button>
+
+                    <div v-if="serverMsg" class="border border-slate-900 bg-slate-50 px-4 py-3 text-sm">
+                        <span class="font-bold">{{ serverMsg }}</span>
+                        <button class="ml-4 border border-slate-200 px-2 py-1 text-xs font-medium hover:bg-slate-50" @click="gotoLogin">直接登录</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 注册成功视图（自动登录） -->
+            <section v-else class="bg-white border border-slate-200">
+                <div class="px-8 py-6 border-b border-slate-200">
+                    <h2 class="text-xl font-bold tracking-tight">注册成功，已自动登录</h2>
+                    <p class="text-sm text-slate-500 mt-1">账户状态：ACTIVE（可用）· 会话令牌已下发（有效期 30 天）</p>
+                </div>
+                <div class="px-8 py-6 space-y-4 text-sm">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div><span class="text-slate-500">邮箱:</span> <span class="font-mono">{{ form.email }}</span></div>
+                        <div><span class="text-slate-500">昵称:</span> <span class="font-bold">{{ form.nickname }}</span></div>
+                        <div><span class="text-slate-500">手机号:</span> <span class="font-mono">{{ form.phone }}</span></div>
+                        <div><span class="text-slate-500">账户状态:</span> <span class="font-bold">ACTIVE</span></div>
+                    </div>
+                    <div class="border border-slate-200 bg-slate-50 px-4 py-3">
+                        <p class="font-medium">返回原操作：</p>
+                        <p class="text-slate-600 mt-1">你正在浏览「MacBook Pro 14英寸」（priceCents 1299900，库存 12），点击「加入购物车」继续加购与下单。</p>
+                    </div>
+                    <button class="border border-slate-900 bg-slate-50 px-4 py-2 text-sm font-medium hover:bg-slate-100" @click="gotoStore">
+                        返回商品页继续购物
+                    </button>
+                    <p class="text-xs text-slate-400">B 端联动：新注册账户自动进入后台「用户管理」用户池（状态 ACTIVE），运营可随时查看与启停。</p>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        const { createApp, ref, reactive } = Vue;
+
+        // 模拟已存在的用户池（邮箱唯一性校验依据）
+        const EXISTING_EMAILS = ['buyer@trade-demo.com', 'ops@trade-demo.com', 'chen@trade-demo.com'];
+
+        createApp({
+            setup() {
+                const form = reactive({ email: '', password: '', confirm: '', nickname: '', phone: '' });
+                const errors = reactive({});
+                const serverMsg = ref('');
+                const registered = ref(false);
+                const submitting = ref(false);
+
+                const validators = {
+                    email() {
+                        if (!form.email) return '请填写邮箱';
+                        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) return '请输入正确的邮箱格式';
+                        if (EXISTING_EMAILS.includes(form.email.toLowerCase())) return '该邮箱已注册，请直接登录';
+                        return '';
+                    },
+                    password() {
+                        if (!form.password) return '请填写密码';
+                        if (form.password.length < 6 || !/[a-zA-Z]/.test(form.password) || !/[0-9]/.test(form.password))
+                            return '密码需至少 6 位，且同时包含字母和数字';
+                        return '';
+                    },
+                    confirm() {
+                        if (!form.confirm) return '请再次输入密码';
+                        if (form.confirm !== form.password) return '两次输入的密码不一致';
+                        return '';
+                    },
+                    nickname() {
+                        if (!form.nickname) return '请填写昵称（≤20 字符）';
+                        if (form.nickname.length > 20) return '昵称不能超过 20 个字符';
+                        return '';
+                    },
+                    phone() {
+                        if (!form.phone) return '请填写手机号';
+                        if (!/^1\d{10}$/.test(form.phone)) return '请输入正确的 11 位手机号';
+                        return '';
+                    }
+                };
+
+                const validate = (field) => { errors[field] = validators[field](); };
+                const validateAll = () => Object.keys(validators).forEach(f => validate(f));
+
+                const submit = () => {
+                    serverMsg.value = '';
+                    validateAll();
+                    if (Object.values(errors).some(Boolean)) return;
+                    submitting.value = true;
+                    // 模拟后端：创建 User(status=ACTIVE) + 下发会话令牌（30 天有效）
+                    setTimeout(() => {
+                        submitting.value = false;
+                        registered.value = true;
+                        errors.value = {};
+                    }, 400);
+                };
+
+                const logout = () => { registered.value = false; Object.assign(form, { email: '', password: '', confirm: '', nickname: '', phone: '' }); };
+                const gotoLogin = () => alert('原型演示：跳转「用户登录」页（prototypes/account-system/account-login.html）');
+                const gotoStore = () => alert('原型演示：跳转商品页继续加购/下单（会话保持见 account-session.html）');
+
+                return { form, errors, serverMsg, registered, submitting, validate, submit, logout, gotoLogin, gotoStore };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

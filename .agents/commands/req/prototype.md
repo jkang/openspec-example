@@ -8,7 +8,7 @@ tags: ["req-sdd", "prototype", "ui"]
 
 为涉及 UI 的 Epic 生成交互式 HTML 原型（`req-sdd` 漏斗第 3 步，在 storymap 之前，Epic 整体一次完成）。
 
-**产物**: `openspec-requirements/prototypes/<epic-key>/<capability>.html`
+**产物**: `openspec-requirements/epics/<epic-key>/prototypes/<capability>.html`
 
 **步骤**
 1. 加载 `prototype` skill。

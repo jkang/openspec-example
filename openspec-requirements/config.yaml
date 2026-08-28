@@ -34,9 +34,9 @@ rules:
     - 只负责收集：Epic 背景 / 调研对象 / **访谈原始记录（内嵌，每条含 对象/时间方式/原始摘录/关键信号）** / 原始需求信息 / 业务约束线索 / 疑问待澄清项 / 调研结论
     - 访谈原始记录是 research.md 的内嵌组成部分（不建独立文件），保留一手证据
     - 不做产品设计转化（那是 explore 的职责）
-    - 产出到 research/<epic-key>.md
+    - 产出到 epics/<epic-key>/research.md（research 先执行，据调研结果识别 Epic 并创建 epics/<epic-key>/ 目录）
   explore:
-    - 必须基于已确认的 research/<epic-key>.md
+    - 必须基于已确认的 epics/<epic-key>/research.md
     - 必须包含 To-Be Process（目标流程）与 To-Be Journey（目标旅程）业务设计
     - 必须识别候选 Capabilities（对齐 docs/baseline/domain_model.html 的 BC→Capability 映射，新增 taxonomy 显式标注）
     - 必须包含 B/C 双端视角（B 端如何配置/生命周期/权限；C 端交互）

@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会话与个人区 - 极简电商</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        * { border-radius: 0 !important; box-shadow: none !important; }
+        body { background-color: #f8fafc; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .border-slate-200 { border-color: #e2e8f0; }
+        input:focus, select:focus { outline: none; border-color: #0f172a; }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div id="app">
+        <!-- 顶部导航 -->
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-slate-900 flex items-center justify-center text-white text-xs font-bold">M</div>
+                <h1 class="text-lg font-semibold tracking-tight uppercase">Minimal Store</h1>
+            </div>
+            <div class="flex items-center gap-6 text-sm font-medium">
+                <template v-if="currentUser">
+                    <span class="py-1 px-2 border border-slate-900 bg-slate-50">{{ currentUser.nickname }}</span>
+                    <button class="py-1 px-2 border border-slate-200 hover:bg-slate-50" @click="logout">退出登录</button>
+                </template>
+                <template v-else>
+                    <button class="py-1 px-2 border border-slate-200 hover:bg-slate-50" @click="promptLogin('浏览')">登录</button>
+                    <button class="py-1 px-2 border border-slate-900 bg-slate-50 hover:bg-slate-100" @click="promptLogin('注册')">注册</button>
+                </template>
+            </div>
+        </header>
+
+        <!-- 会话状态条（演示用） -->
+        <div class="bg-white border-b border-slate-200">
+            <div class="max-w-3xl mx-auto px-8 py-2 flex items-center justify-between text-xs text-slate-500">
+                <span>
+                    会话演示：
+                    <template v-if="currentUser">已登录 · 令牌有效（{{ currentUser.email }}）· 有效期 30 天 · 刷新不掉登录态</template>
+                    <template v-else>游客态（未登录）· 受保护操作将被拦截并引导登录</template>
+                </span>
+                <span class="flex items-center gap-3">
+                    <button class="border border-slate-200 px-2 py-0.5 hover:bg-slate-50" @click="simulateRefresh">模拟刷新页面</button>
+                    <button v-if="currentUser && currentUser.status === 'ACTIVE'" class="border border-slate-200 px-2 py-0.5 hover:bg-slate-50" @click="simulateDisable">
+                        模拟：运营在后台禁用本账户
+                    </button>
+                </span>
+            </div>
+        </div>
+
+        <main class="max-w-3xl mx-auto p-8 space-y-6">
+            <!-- 全局提示（会话失效等） -->
+            <div v-if="notice" class="border border-slate-900 bg-slate-50 px-4 py-3 text-sm">
+                <span class="font-bold">{{ notice }}</span>
+            </div>
+
+            <!-- 商品详情视图 -->
+            <section class="bg-white border border-slate-200">
+                <div class="px-8 py-6 border-b border-slate-200">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-xl font-bold tracking-tight">MacBook Pro 14英寸</h2>
+                        <span class="text-xs font-bold border border-slate-200 px-2 py-1">库存 12</span>
+                    </div>
+                    <div class="mt-4 flex items-center justify-between text-sm">
+                        <span class="font-mono font-bold text-lg">¥{{ (product.priceCents / 100).toFixed(2) }}</span>
+                        <button @click="tryAddToCart" class="bg-slate-900 text-white px-6 py-2.5 text-sm font-medium hover:bg-slate-700">
+                            加入购物车
+                        </button>
+                    </div>
+                </div>
+                <div class="px-8 py-4 flex items-center justify-between text-sm">
+                    <span class="text-slate-500">已选：1 件 · 结算金额</span>
+                    <button @click="tryPlaceOrder" class="border border-slate-900 bg-slate-50 px-6 py-2 text-sm font-medium hover:bg-slate-100">
+                        提交订单
+                    </button>
+                </div>
+            </section>
+
+            <!-- 我的订单视图（登录后可见） -->
+            <section class="bg-white border border-slate-200">
+                <div class="px-8 py-4 border-b border-slate-200 flex items-center justify-between">
+                    <div>
+                        <h3 class="font-bold">我的订单</h3>
+                        <p class="text-xs text-slate-400 mt-0.5">{{ currentUser ? '仅返回归属本人（userId 隔离）的订单' : '未登录不可查看，点击将被引导登录' }}</p>
+                    </div>
+                    <button @click="tryViewOrders" class="border border-slate-200 px-3 py-1.5 text-xs font-medium hover:bg-slate-50">查看我的订单</button>
+                </div>
+                <div v-if="currentUser && myOrders.length" v-for="o in myOrders" :key="o.id" class="px-8 py-3 border-b border-slate-200 last:border-b-0 flex items-center justify-between text-sm">
+                    <span class="text-slate-700">{{ o.name }}</span>
+                    <div class="flex items-center gap-4">
+                        <span class="font-mono font-bold">¥{{ (o.actualPaidCents / 100).toFixed(2) }}</span>
+                        <span class="text-xs font-bold border border-slate-200 px-2 py-1">{{ o.statusLabel }}</span>
+                    </div>
+                </div>
+                <div v-if="!currentUser" class="px-8 py-8 text-center text-sm text-slate-400">登录后可见属于你的订单</div>
+            </section>
+        </main>
+
+        <!-- 登录引导弹层（未登录拦截） -->
+        <div v-if="loginPrompt" class="fixed inset-0 bg-slate-900/40 flex items-center justify-center">
+            <div class="bg-white border border-slate-200 w-96">
+                <div class="px-6 py-4 border-b border-slate-200">
+                    <h3 class="font-bold">请先登录</h3>
+                    <p class="text-xs text-slate-500 mt-1">「{{ pendingAction }}」需要登录后继续，登录成功将自动返回原操作</p>
+                </div>
+                <div class="px-6 py-5 space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">邮箱</label>
+                        <input v-model="promptForm.email" type="email" placeholder="buyer@trade-demo.com"
+                               class="w-full border border-slate-200 px-3 py-2 text-sm bg-white">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">密码</label>
+                        <input v-model="promptForm.password" type="password" placeholder="trade1234"
+                               class="w-full border border-slate-200 px-3 py-2 text-sm bg-white">
+                    </div>
+                    <div v-if="promptError" class="border border-slate-900 bg-slate-50 px-3 py-2 text-sm"><span class="font-bold">{{ promptError }}</span></div>
+                    <div class="flex gap-3">
+                        <button @click="loginFromPrompt" class="flex-1 bg-slate-900 text-white py-2 text-sm font-medium hover:bg-slate-700">登录</button>
+                        <button @click="loginPrompt = false" class="flex-1 border border-slate-200 py-2 text-sm font-medium hover:bg-slate-50">取消</button>
+                    </div>
+                    <p class="text-center text-xs text-slate-500">还没有账户？<a class="underline cursor-pointer" @click="promptLogin('注册')">去注册</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+
+        const TOKEN_KEY = 'demo_session_token';
+        // 模拟用户池（会话令牌 → userId）
+        const USERS = {
+            'user_zhang': { id: 'user_zhang', email: 'buyer@trade-demo.com', nickname: '张采购', password: 'trade1234', status: 'ACTIVE' }
+        };
+        const PRODUCT = { id: 'p_mac14', name: 'MacBook Pro 14英寸', priceCents: 1299900, stock: 12 };
+
+        createApp({
+            setup() {
+                const token = ref(localStorage.getItem(TOKEN_KEY));
+                const notice = ref('');
+                const loginPrompt = ref(false);
+                const pendingAction = ref('');
+                const promptForm = ref({ email: '', password: '' });
+                const promptError = ref('');
+
+                // 鉴权：token → 用户；账户被禁用则会话失效
+                const currentUser = computed(() => {
+                    if (!token.value) return null;
+                    const user = USERS[token.value];
+                    if (!user || user.status !== 'ACTIVE') return null;
+                    return user;
+                });
+
+                const myOrders = [
+                    { name: 'MacBook Pro 14英寸', actualPaidCents: 1299900, statusLabel: '已支付' },
+                    { name: '极简机械键盘', actualPaidCents: 29900, statusLabel: '已发货' }
+                ];
+
+                const tryAddToCart = () => guard('加入购物车');
+                const tryPlaceOrder = () => guard('提交订单');
+                const tryViewOrders = () => guard('查看我的订单');
+
+                const guard = (action) => {
+                    if (currentUser.value) {
+                        if (action === '提交订单') { notice.value = '订单已提交，归属本人（userId = user_zhang）。'; }
+                        else if (action === '加入购物车') { notice.value = '已加入购物车（Session 一致，归属当前登录用户）。'; }
+                        else { notice.value = ''; }
+                        return;
+                    }
+                    pendingAction.value = action;
+                    promptForm.value = { email: 'buyer@trade-demo.com', password: 'trade1234' };
+                    promptError.value = '';
+                    loginPrompt.value = true;
+                };
+
+                const loginFromPrompt = () => {
+                    const user = USERS['user_zhang'];
+                    if (promptForm.value.email.trim().toLowerCase() !== user.email || promptForm.value.password !== user.password) {
+                        promptError.value = '邮箱或密码错误，请重试';
+                        return;
+                    }
+                    token.value = 'user_zhang';
+                    localStorage.setItem(TOKEN_KEY, 'user_zhang');
+                    loginPrompt.value = false;
+                    notice.value = '登录成功，已返回原操作（' + pendingAction.value + '）。';
+                };
+
+                const logout = () => {
+                    token.value = null;
+                    localStorage.removeItem(TOKEN_KEY);
+                    notice.value = '已退出登录，会话令牌立即失效。';
+                };
+
+                const simulateRefresh = () => { window.location.reload(); };
+
+                const simulateDisable = () => {
+                    // 模拟：B 端将账户置为 DISABLED → 下次鉴权会话失效
+                    USERS['user_zhang'].status = 'DISABLED';
+                    token.value = null;
+                    localStorage.removeItem(TOKEN_KEY);
+                    notice.value = '账户已被禁用，请联系管理员（B 端禁用后已颁发会话立即失效）。';
+                };
+
+                const promptLogin = (action) => {
+                    pendingAction.value = action;
+                    promptForm.value = { email: 'buyer@trade-demo.com', password: 'trade1234' };
+                    promptError.value = '';
+                    loginPrompt.value = true;
+                };
+
+                return {
+                    token, notice, loginPrompt, pendingAction, promptForm, promptError,
+                    currentUser, myOrders, product: PRODUCT,
+                    tryAddToCart, tryPlaceOrder, tryViewOrders, loginFromPrompt, logout,
+                    simulateRefresh, simulateDisable, promptLogin
+                };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

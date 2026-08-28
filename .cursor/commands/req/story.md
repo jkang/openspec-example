@@ -10,7 +10,7 @@ tags: ["req-sdd", "story", "deliverable"]
 
 **适用范围**: `req-sdd` 漏斗第 5 步。需求侧只产业务面；行为规格（Story-specs）由开发侧在 proposal 后生成。
 
-**产物**: `openspec-requirements/stories/<story-key>/story.md`
+**产物**: `openspec-requirements/epics/<epic-key>/stories/<story-key>/story.md`
 
 **步骤**
 1. 加载 `story` skill。

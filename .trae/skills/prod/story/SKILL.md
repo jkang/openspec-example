@@ -15,11 +15,11 @@ Story 是需求侧**唯一冻结交付物（业务面）**。开发侧经 `/req:
 
 ## 产物
 
-- `openspec-requirements/stories/<story-key>/story.md`（业务面冻结交付物）
+- `openspec-requirements/epics/<epic-key>/stories/<story-key>/story.md`（业务面冻结交付物）
 
 ## 步骤
 
-1. **读上下文**：读已确认的 `ideas/<idea-key>.md`、`storymaps/<epic-key>/storymap.md`、以及 `prototypes/<epic-key>/*.html`（若 UI 且已确认）。
+1. **读上下文**：读已确认的 `epics/<epic-key>/idea.md`、`storymaps/<epic-key>/storymap.md`、以及 `epics/<epic-key>/prototypes/*.html`（若 UI 且已确认）。
 2. **应用规则**：读 `openspec-requirements/config.yaml` 的 `rules.story`。
 3. **生成 story.md**：按 `openspec-requirements/templates/story.md` 产出（纯业务面）：
    - 用户场景（C 端 + B 端视角）/ 范围

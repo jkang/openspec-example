@@ -8,7 +8,7 @@ tags: ["req-sdd", "storymap", "breakdown"]
 
 执行需求侧拆分（`req-sdd` 漏斗第 4 步），产出带**覆盖对账**的 `storymap.md`。
 
-**产物**: `openspec-requirements/storymaps/<epic-key>/storymap.md`
+**产物**: `openspec-requirements/epics/<epic-key>/storymap.md`
 
 **步骤**
 1. 加载 `storymap` skill。

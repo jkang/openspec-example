@@ -15,11 +15,11 @@ metadata:
 
 ## 产物
 
-- `openspec-requirements/prototypes/<epic-key>/<capability>.html`
+- `openspec-requirements/epics/<epic-key>/prototypes/<capability>.html`
 
 ## 步骤
 
-1. **读上下文**：读已确认的 `ideas/<idea-key>.md`，确认涉及 UI。
+1. **读上下文**：读已确认的 `epics/<epic-key>/idea.md`，确认涉及 UI。
 2. **应用规则**：读 `openspec-requirements/config.yaml` 的 `rules.prototype` 与 `docs/FRONTEND.md`。
 3. **生成原型（Epic 整体）**：Vue 3 (CDN) + Tailwind CSS (CDN) 的可交互 HTML。
    - 禁止圆角（rounded-none）、禁止阴影（shadow-none）、禁止装饰性 Emoji

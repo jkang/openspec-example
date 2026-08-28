@@ -13,7 +13,7 @@ metadata:
 
 ## 输入
 
-- `openspec-requirements/stories/<story-key>/story.md`（已确认，业务面冻结交付物）
+- `openspec-requirements/epics/<epic-key>/stories/<story-key>/story.md`（已确认，业务面冻结交付物）
 
 ## 步骤
 
@@ -39,7 +39,11 @@ metadata:
 ## 分层 Sync 提示
 
 - 每个 change 归档前只做 **Spec Sync**（`/opsx:sync`，delta specs → `openspec/specs/`）。
-- **Baseline Sync**（`/opsx:baseline/sync` 回流 `docs/baseline/*.html`）在 **Epic 全部 Story 归档后**统一执行（`/req:handoff` 可在末 Story 交接时提示）。
+- **Baseline Sync**（`/opsx:baseline/sync` 回流 `docs/baseline/*.html`）在 **Epic 全部 Story 归档后**统一执行。
+
+## Epic 归档提示
+
+- 若本次交接的是该 Epic 的**最后一个 Story**（`epic-*.story-list.json` 中该 Epic 全部 done），提示执行 **需求侧 Epic 归档**：将 `openspec-requirements/epics/<epic-key>/` 整个目录移入 `openspec-requirements/archive/YYYY-MM-DD-<epic-key>/`（保留交付记录），随后触发 Baseline Sync + Roadmap 更新。
 
 ## 交接契约
 

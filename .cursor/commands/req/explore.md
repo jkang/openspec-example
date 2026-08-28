@@ -10,7 +10,7 @@ tags: ["req-sdd", "explore", "idea"]
 
 **适用范围**: 仅大块 Epic 需求。若确认为 Bug Fix / Tech Debt / 简单功能修改，引导直走交付侧。
 
-**产物**: `openspec-requirements/ideas/<idea-key>.md`
+**产物**: `openspec-requirements/epics/<epic-key>/idea.md`
 
 **步骤**
 1. 加载 `explore` skill。

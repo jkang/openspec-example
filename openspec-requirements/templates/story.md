@@ -8,9 +8,9 @@ Story 是需求侧唯一冻结交付物（业务面）。
 -->
 
 > Story Key: `<story-key>` | 优先级: P0/P1/P2 | 依赖: `<依赖 story 或 无>`
-> 关联 Storymap: `storymaps/<epic-key>/storymap.md`
-> 关联 Idea: `ideas/<idea-key>.md`
-> 关联原型（Epic 整体）: `prototypes/<epic-key>/*.html`
+> 关联 Storymap: `epics/<epic-key>/storymap.md`
+> 关联 Idea: `epics/<epic-key>/idea.md`
+> 关联原型（Epic 整体）: `epics/<epic-key>/prototypes/*.html`
 
 ## 用户场景 (User Scenario)
 <!--
@@ -32,7 +32,7 @@ Story 是需求侧唯一冻结交付物（业务面）。
 <!--
 如果涉及前端 UI，必须在此链接到【已确认】的原型文件。
 ⚠️ UI 门禁：涉及 UI 的 Story，若原型未生成并经用户 HITL 确认，禁止勾选下方「待开发交接」。
-- 原型链接：prototypes/<epic-key>/<capability>.html
+- 原型链接：epics/<epic-key>/prototypes/<capability>.html
 - 关键交互点：
 -->
 

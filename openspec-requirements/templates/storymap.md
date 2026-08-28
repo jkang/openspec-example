@@ -1,14 +1,14 @@
 # Storymap: <Epic 名称> 需求拆分
 
 > Epic Key: `<epic-key>`
-> 关联调研: `research/<epic-key>.md`
-> 关联 Idea: `ideas/<idea-key>.md`
-> 关联原型: `prototypes/<epic-key>/*.html`（Epic 整体，若涉及 UI）
+> 关联调研: `epics/<epic-key>/research.md`
+> 关联 Idea: `epics/<epic-key>/idea.md`
+> 关联原型: `epics/<epic-key>/prototypes/*.html`（Epic 整体，若涉及 UI）
 > 产出后需用户确认（HITL）
 
 <!--
 storymap 用于把大需求（Epic 级）拆分为多个可独立交付的 Story。
-每个 Story 对应 stories/<key>/story.md（业务面交付物）。
+每个 Story 对应 epics/<epic-key>/stories/<story-key>/story.md（业务面交付物）。
 要求：拆分必须【覆盖完整】（Epic 每个承诺项都要有 Story 承接），粒度取【完整端到端功能】。
 -->
 
@@ -53,5 +53,5 @@ storymap 用于把大需求（Epic 级）拆分为多个可独立交付的 Story
 
 ## 关联 Stories
 <!--
-- stories/<key>/story.md
+- epics/<epic-key>/stories/<story-key>/story.md
 -->

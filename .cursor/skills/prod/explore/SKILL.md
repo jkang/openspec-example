@@ -13,15 +13,15 @@ metadata:
 
 ## 产物
 
-- `openspec-requirements/ideas/<idea-key>.md`
+- `openspec-requirements/epics/<epic-key>/idea.md`
 
 ## 输入
 
-- 已确认的 `openspec-requirements/research/<epic-key>.md`（需求调研纪要）
+- 已确认的 `openspec-requirements/epics/<epic-key>/research.md`（需求调研纪要）
 
 ## 探索步骤
 
-1. **读上下文**：读已确认的 `research/<epic-key>.md` 与 `docs/ROADMAP.md`。
+1. **读上下文**：读已确认的 `epics/<epic-key>/research.md` 与 `docs/ROADMAP.md`。
 2. **应用规则**：读 `openspec-requirements/config.yaml` 的 `rules.explore`。
 3. **转化产出 idea.md**（按 `templates/idea.md`）：
    - **澄清业务意图**：目的、范围、业务规则（含 B 端视角：后台配置/生命周期/权限）。

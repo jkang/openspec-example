@@ -26,27 +26,27 @@ updated_at: 2026-08-28
 ### 需求漏斗（命令空间 `/req:`）
 
 ```
-Research (research.md)              ← research/<epic-key>.md  (针对单个 Epic 收集需求，HITL)
+Research (research.md)              ← epics/<epic-key>/research.md  (先调研→识别 Epic→创建 epics/<key>/，HITL)
    │  ▼
-Explore (idea.md)                   ← ideas/<idea-key>.md  (调研→产品设计思路 + To-Be 设计 + 候选 Capabilities，HITL)
+Explore (idea.md)                   ← epics/<epic-key>/idea.md  (调研→产品设计思路 + To-Be 设计 + 候选 Capabilities，HITL)
    │  ▼
-{涉及 UI?} ──是──▶ Prototype (Epic整体)  ← prototypes/<epic-key>/*.html  (HITL)
+{涉及 UI?} ──是──▶ Prototype (Epic整体)  ← epics/<epic-key>/prototypes/*.html  (HITL)
    │ 否（跳过原型）／ 原型完成
    ▼
-Storymap (storymap.md)              ← storymaps/<epic-key>/  (覆盖对账·端到端粒度，HITL)
+Storymap (storymap.md)              ← epics/<epic-key>/storymap.md  (覆盖对账·端到端粒度，HITL)
    │  ▼
-Story (story.md)                    ← stories/<story-key>/  (业务面冻结交付物，HITL)
+Story (story.md)                    ← epics/<epic-key>/stories/<story-key>/  (业务面冻结交付物，HITL)
    │  ▼
 handoff                            ← 交接 → 合成开发侧 proposal → specs/design/tasks/apply/verify
 ```
 
 ### 阶段产物与指令
 
-- **① 需求调研** `/req:research`）：产出 `research/<epic-key>.md`。针对 `docs/ROADMAP.md` 中的单个 Epic 收集需求信息（背景/对象/原始反馈/约束/疑问/结论）。**只收集不转化**。产出后需 HITL 确认。
-- **② 探索** `/req:explore`）：产出 `ideas/<idea-key>.md`。把调研信息**转化**为产品设计思路：澄清意图 / **To-Be Process** / **To-Be Journey** / 产品设计思路 / 任务类型路由 / **候选 Capabilities**（对齐 `domain_model.html`）/ 治理映射 / 拆分建议 / 架构影响。产出后需 HITL 确认。
-- **③ 原型（Epic 整体）** `/req:prototype`）：若涉及 UI，在拆分前对 **Epic 整体**产出 `prototypes/<epic-key>/*.html`，遵循 `docs/FRONTEND.md` 极简规范，产出后需 HITL 确认。**UI 门禁**：涉及 UI 的 Epic 无已确认原型不得拆分/交接。
-- **④ 需求拆分** `/req:storymap`）：产出 `storymaps/<epic-key>/storymap.md`。**覆盖对账（强制）**：Epic 每个承诺项（In Scope / Exit Criteria / B 端承诺 / 候选 Capability）必须有 ≥1 个 Story 承接；粒度取**完整端到端功能**（不拆到行为/UI 细节级）。产出后需 HITL 确认。
-- **⑤ 需求单元** `/req:story`）：产出 `stories/<story-key>/story.md` = 需求侧唯一冻结交付物（**业务面**）。含用户场景（B/C 双端）、业务规则表、E2E 验收（Given/When/Then，映射 L1/L2 与 SB-STAGE-*/SB-CUSTOMER-*）、治理映射（Bounded Context / L3 / SB-<LANE>-*）。**不含行为规格**（specs 由开发侧在 proposal 后按 capability 拆分生成）。产出后需 HITL 确认。
+- **① 需求调研** `/req:research`）：产出 `epics/<epic-key>/research.md`。**research 先执行，据调研结果识别 Epic 并创建 `epics/<epic-key>/` 目录**。针对 `docs/ROADMAP.md` 中的单个 Epic 收集需求信息（背景/对象/原始反馈/约束/疑问/结论）。**只收集不转化**。产出后需 HITL 确认。
+- **② 探索** `/req:explore`）：产出 `epics/<epic-key>/idea.md`。把调研信息**转化**为产品设计思路：澄清意图 / **To-Be Process** / **To-Be Journey** / 产品设计思路 / 任务类型路由 / **候选 Capabilities**（对齐 `domain_model.html`）/ 治理映射 / 拆分建议 / 架构影响。产出后需 HITL 确认。
+- **③ 原型（Epic 整体）** `/req:prototype`）：若涉及 UI，在拆分前对 **Epic 整体**产出 `epics/<epic-key>/prototypes/*.html`，遵循 `docs/FRONTEND.md` 极简规范，产出后需 HITL 确认。**UI 门禁**：涉及 UI 的 Epic 无已确认原型不得拆分/交接。
+- **④ 需求拆分** `/req:storymap`）：产出 `epics/<epic-key>/storymap.md`。**覆盖对账（强制）**：Epic 每个承诺项（In Scope / Exit Criteria / B 端承诺 / 候选 Capability）必须有 ≥1 个 Story 承接；粒度取**完整端到端功能**（不拆到行为/UI 细节级）。产出后需 HITL 确认。
+- **⑤ 需求单元** `/req:story`）：产出 `epics/<epic-key>/stories/<story-key>/story.md` = 需求侧唯一冻结交付物（**业务面**）。含用户场景（B/C 双端）、业务规则表、E2E 验收（Given/When/Then，映射 L1/L2 与 SB-STAGE-*/SB-CUSTOMER-*）、治理映射（Bounded Context / L3 / SB-<LANE>-*）。**不含行为规格**（specs 由开发侧在 proposal 后按 capability 拆分生成）。产出后需 HITL 确认。
 
 ### 交接边界 (Handoff)
 
@@ -162,7 +162,7 @@ graph TD
   
 ### 3. 原型验证阶段 (Prototype) - 可选
 - **指令**:
-  - **需求侧（Epic 整体）**: `/req:prototype` —— 对 Epic 整体做一次原型（拆分前完成），产出 `prototypes/<epic-key>/*.html`。HITL 确认后方可进入 `/req:storymap`。
+  - **需求侧（Epic 整体）**: `/req:prototype` —— 对 Epic 整体做一次原型（拆分前完成），产出 `epics/<epic-key>/prototypes/*.html`。HITL 确认后方可进入 `/req:storymap`。
   - **交付侧（直走任务）**: `/opsx:prototype <name>` —— 为功能或涉及 UI 变更的缺陷修复生成交互式 HTML 原型。
 - **目标**: 为涉及 UI 变更的变更生成交互式 HTML 原型。
 - **强制约束 (Hard Constraint) - HITL 检查点**:
@@ -170,7 +170,7 @@ graph TD
   - 原型是 UI 逻辑的唯一事实来源，确认后方可进入下一步。
 
 ### 4. 业务评审阶段 (Story) - 需求侧
-- **指令**: `/req:story` —— 产出 `stories/<story-key>/story.md`（纯业务面，需求侧唯一冻结交付物），HITL 确认后经 `/req:handoff` 交接给开发侧。
+- **指令**: `/req:story` —— 产出 `epics/<epic-key>/stories/<story-key>/story.md`（纯业务面，需求侧唯一冻结交付物），HITL 确认后经 `/req:handoff` 交接给开发侧。
 - **适用范围**: 需求侧漏斗阶段（大块 Epic）。开发侧不生成 story.md（业务评审已在需求侧完成）。
 - **强制约束 (Hard Constraint)**:
   - **时机**: 必须在 storymap 拆分之后执行；若涉及 UI，必须在原型确认后执行。
