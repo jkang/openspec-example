@@ -157,41 +157,47 @@ graph TD
 > **分层 Sync 说明**：每个 change 归档前只做 **Spec Sync**（`/opsx:sync`，change 级）；**Baseline Sync**（`/opsx:baseline/sync`）在 Epic 全部 Story 归档后统一执行（+ Roadmap 更新）。
 
 ### 1. 探索阶段 (Explore)
-- **指令**: `/opsx:explore`
+- **指令**: `/opsx:explore`（**仅用于直走交付侧任务**：Bug Fix / Tech Debt / 简单功能修改）
 - **目标**: 在没有任何制品前，通过对话澄清需求，探索代码库，权衡方案。
+- **适用范围说明**: 大块 Epic 需求**不走此阶段**——走需求侧漏斗（`/req:research` → `/req:explore` → ...）。本阶段仅服务直走交付侧的任务类型。
 - **强制约束 (Hard Constraint)**:
-  - 必须严格遵循“结构化 6 步法”。
+  - 必须严格遵循"结构化 6 步法"。
   - **任务类型确认 (Task Classification)**: 必须确认是史诗、功能、缺陷修复还是技术债。
+    - **史诗** → 引导走需求侧漏斗（`/req:research` 起），不在本阶段创建 story-list（由 handoff 时登记）。
+    - **功能 / 缺陷修复 / 技术债** → 继续本阶段，产出 `ideas/idea.md` 后进入提案。
   - **治理映射对齐**: 必须参考 `docs/baseline/domain_model.html` 识别 `Impacted Bounded Contexts`，参考 `docs/baseline/business_process.html` 识别受影响的 `L1/L2/L3` 流程节点，并参考 `docs/baseline/service_blueprint.html` 与 `.trae/skills/baseline/blueprint/SKILL.md` 识别受影响的 `SB-STAGE-*` 与 `SB-<LANE>-*` 节点。
-  - **规划对齐 (Roadmap Alignment)**: 在 `ideas/idea.md` 中必须显式写一段“与当前阶段目标对齐说明”，引用 `docs/ROADMAP.md` 中的目标。
-  - **史诗治理**: 如果是史诗，必须在 `openspec/` 目录下创建一个 `epic-<key>.story-list.json` 文件作为执行队列。
+  - **规划对齐 (Roadmap Alignment)**: 在 `ideas/idea.md` 中必须显式写一段"与当前阶段目标对齐说明"，引用 `docs/ROADMAP.md` 中的目标。
   - **唯一输出**: 必须生成 `ideas/idea.md` (相对于变更目录) 作为后续提案的唯一源头。
   - 不得在没有 `ideas/idea.md` 的情况下跳过此阶段进入提案。
   
 ### 2. 提案阶段 (Propose)
-- **指令**: `/opsx:propose <name>`
+- **指令**: `/opsx:propose <name>`（**仅用于直走交付侧任务**）
 - **目标**: 根据 `idea.md` 生成变更提案 `proposal.md`。
+- **适用范围说明**: 大块 Epic **不走本阶段**——由需求侧 `/req:handoff` 合成开发侧 `proposal.md` 后，开发侧从 proposal 起步。本阶段仅服务直走交付侧任务（功能/缺陷修复/技术债）或 handoff 之后的开发侧流程。
 - **强制约束 (Hard Constraint)**:
   - 必须基于 `idea.md` 的任务类型明确后续路径。
   - **治理映射引用**: `proposal.md` 中的 `Capabilities` 必须与 `Domain Model` 映射对齐，且必须显式列出受影响的 `Bounded Contexts`。
-  - **Taxonomy 扩展约束**: 如果 proposal 中出现 `domain_model.html` 尚未收录的 capability 或边界映射，必须明确标记为“新增 taxonomy”并说明理由。
+  - **Taxonomy 扩展约束**: 如果 proposal 中出现 `domain_model.html` 尚未收录的 capability 或边界映射，必须明确标记为"新增 taxonomy"并说明理由。
   - **流程对齐约束**: 必须包含 `Process Alignment` 章节明确受影响的流程节点 ID。
   - **蓝图对齐约束**: 必须包含 `Service Blueprint Alignment` 章节，显式引用受影响的 `SB-STAGE-*` 与 `SB-<LANE>-*` 节点，并说明是新增、修改还是复用既有蓝图结构。
-  - 对于史诗类型，生成提案后应停止，等待拆分。
   - 对于功能类型，引导用户进入下一步（涉及 UI 先 `/opsx:prototype` 并完成确认，再 `/opsx:Story`，随后进入 `/opsx:spec-design`；不涉及 UI 则直接 `/opsx:Story`，随后进入 `/opsx:spec-design`）。
   - 对于缺陷修复类型，引导用户进入下一步（涉及 UI 先 `/opsx:prototype` 并完成确认，随后进入 `/opsx:spec-design`；不涉及 UI 则直接进入 `/opsx:spec-design`，并在设计中包含根因分析）。
   - 对于技术债类型，引导用户进入下一步（若有外部行为变更则进入 `/opsx:spec-design`；若无外部行为变更则配置 `skip_specs: true`，生成设计与任务清单后再进入 `/opsx:apply`）。
   
 ### 3. 原型验证阶段 (Prototype) - 可选
-- **指令**: `/opsx:prototype <name>`
-- **目标**: 为功能或涉及 UI 变更的缺陷修复生成交互式 HTML 原型。
+- **指令**:
+  - **需求侧（Epic 整体）**: `/req:prototype` —— 对 Epic 整体做一次原型（拆分前完成），产出 `prototypes/<epic-key>/*.html`。HITL 确认后方可进入 `/req:storymap`。
+  - **交付侧（直走任务）**: `/opsx:prototype <name>` —— 为功能或涉及 UI 变更的缺陷修复生成交互式 HTML 原型。
+- **目标**: 为涉及 UI 变更的变更生成交互式 HTML 原型。
 - **强制约束 (Hard Constraint) - HITL 检查点**:
   - 生成原型后，必须通过 `AskUserQuestion` 获取人类确认。
   - 原型是 UI 逻辑的唯一事实来源，确认后方可进入下一步。
 
 ### 4. 业务评审阶段 (Story)
-- **指令**: `/opsx:Story <name>`
-- **目标**: 生成端到端的验收文档 `story.md`。
+- **指令**:
+  - **需求侧（业务面交付物）**: `/req:story` —— 产出 `stories/<story-key>/story.md`（纯业务面，需求侧唯一冻结交付物），HITL 确认后经 `/req:handoff` 交接给开发侧。
+  - **交付侧（直走任务）**: `/opsx:Story <name>` —— 生成端到端的验收文档 `story.md`。
+- **目标**: 生成端到端的验收文档。
 - **强制约束 (Hard Constraint)**:
   - **时机**: 必须在提案之后执行；若涉及 UI，必须在原型确认后执行。
   - **内容**: 必须包含跨模块的 E2E 旅程及业务规则表。验收标准应优先参考流程基线中的 `L1/L2` 节点。
@@ -202,6 +208,9 @@ graph TD
 - **指令**: `/opsx:spec-design <name>`
 - **目标**: 一口气生成 `specs`、`design.md` 和 `tasks.md`。
 - **BDD 测试分层防腐**: 在生成 `spec.md` 时，必须为每个 Gherkin Scenario 打上测试标签 (`@unit`, `@api`, 或 `@e2e`)，严格遵循[自动化测试策略](../TESTING_STRATEGY.md)。
+- **来源说明**:
+  - **handoff 场景**（需求侧 Epic Story）: 基于 `/req:handoff` 合成的 `proposal.md`（链接需求侧 `story.md`）起步，按 proposal 中 Capabilities 拆分生成 `specs/`（Story-specs）。
+  - **直走交付侧场景**: 基于 `/opsx:propose` 产出的 `proposal.md` 起步。
 - **强制约束 (Hard Constraint)**:
   - 必须参考已确认的 `proposal.md` 和 `prototype.html` (若有)。如果存在 `story.md`，必须确保 specs 与其 E2E 验收标准一致。
   - **治理追溯**: 每个 Capability Spec 必须显式引用 `docs/baseline/domain_model.html` 中的治理来源，记录其所属 `Bounded Context` 与 capability taxonomy。
@@ -269,7 +278,7 @@ graph TD
 
 ## Epic 队列管理 (Backlog Management)
 
-当 Explore 阶段识别为 Epic 时，引入 `openspec/epic-<key>.story-list.json` 进行跨 change 编排。
+大块 Epic 需求走需求侧漏斗（`/req:research → explore → prototype → storymap → story`），当 Story 确认并经 `/req:handoff` 交接给开发侧时，引入 `openspec/epic-<key>.story-list.json` 进行跨 change 编排（**登记时机：handoff 时**，而非 Explore 阶段）。
 
 ### 1. JSON 结构规范
 ```json
@@ -293,11 +302,12 @@ graph TD
 字段说明：`id` 为 Story 唯一标识（用于跨 change 编排）；`changeName` 在 Propose 启动时记录对应 change 名称；`status` 取值 `planned` / `in_progress` / `done`。
 
 ### 2. 状态流转
-- **Explore**: 创建文件，登记所有拆解出的 Story，状态为 `planned`。
-- **Propose**: AI 自动读取第一个 `planned` 状态的 Story 并建议启动。启动后更新状态为 `in_progress` 并记录 `changeName`。
+- **需求侧 storymap**: 拆解出 Story 清单，状态 `planned`（需求侧 storymap.md 中维护）。
+- **Handoff**: `/req:handoff` 交接第一个 Story 时创建 `story-list.json`，登记全部 Story（`planned`），被交接 Story 置为 `in_progress` 并记录 `changeName`。
 - **Archive**: 每次 Story 归档完成后，AI 必须更新该 Story 状态为 `done`（即更新 progress），并提示下一个 `planned` 任务。同时执行孤儿对账：若存在 `in_progress` 状态的 Story 但其 `changeName` 对应的 change 已归档（不再是活跃 change），一并修正为 `done`。
-- **Epic 完成归档**: 当所有 Story 状态均为 `done` 时，AI 必须将该 `story-list.json` 归档至 `openspec/changes/archive/YYYY-MM-DD-epic-<key>.story-list.json`（保留 Epic 交付记录，禁止删除），并宣布 Epic 完成。
+- **Epic 完成归档**: 当所有 Story 状态均为 `done` 时，AI 必须将该 `story-list.json` 归档至 `openspec/changes/archive/YYYY-MM-DD-epic-<key>.story-list.json`（保留 Epic 交付记录，禁止删除），并宣布 Epic 完成，提示执行 Baseline Sync + Roadmap 更新。
 
 ## 异常处理与防漂移
-- **Schema 优先**: `openspec/schemas/spec-driven.yaml` 是每个制品的生成说明 (Instruction) 和内容格式的唯一事实来源。如果 SOP 描述与 Schema 有出入，请以 Schema 为准。
+- **Schema 优先**: `openspec/schemas/spec-driven.yaml` 是开发侧每个制品的生成说明 (Instruction) 和内容格式的唯一事实来源；`openspec-requirements/schemas/req-sdd.yaml` 是需求侧的唯一事实来源。如果 SOP 描述与 Schema 有出入，请以 Schema 为准。
 - **MANDATORY CHECK**: 如果直接收到 `/opsx:propose`，但 `idea.md` 不存在或未达标，必须强制退回 `/opsx:explore` 阶段。
+- **适用范围检查**: 若任务为大块 Epic，必须引导走需求侧漏斗（`/req:research` 起），不得直接在交付侧 `/opsx:propose` 起步；若需求侧 `story.md` 未确认，禁止执行 `/req:handoff`。
