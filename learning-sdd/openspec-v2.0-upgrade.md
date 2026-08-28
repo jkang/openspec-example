@@ -1,5 +1,8 @@
 # 从意图驱动到规划先行：OpenSpec v2.0 的治理变革
 
+> **📌 历史快照**：本文档描述早期/轻量版流程（含已移除的 `/opsx:explore`、`/opsx:story` 等），当前流程以 `docs/SOPS/SDD_WORKFLOW.md` 与 `learning-sdd/ai4se-sdd-proposal.md` 为准。
+
+
 OpenSpec（[Fission-AI/OpenSpec](https://github.com/Fission-AI/OpenSpec)）在演进过程中，从 v1.8.0 的“指令驱动”进化到了 v2.0 的“**治理驱动**”。升级到 v2.0 后，AI 不仅仅是一个执行者，更成为了一个**具备产品感边界的协作伙伴**。
 
 ## 一、变革核心：Planning Layer (规划层)

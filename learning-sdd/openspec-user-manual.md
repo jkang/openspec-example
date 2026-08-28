@@ -1,5 +1,8 @@
 # OpenSpec 使用手册
 
+> **📌 历史快照**：本文档描述早期/轻量版流程（含已移除的 `/opsx:explore`、`/opsx:story` 等），当前流程以 `docs/SOPS/SDD_WORKFLOW.md` 与 `learning-sdd/ai4se-sdd-proposal.md` 为准。
+
+
 基于项目的实践经验总结。
 
 ## 目录

@@ -1,5 +1,8 @@
 # 轻量级 SDD 脚手架提案：把产品规划、原型与需求分析接到开发闭环
 
+> **📌 历史快照**：本文档描述早期/轻量版流程（含已移除的 `/opsx:explore`、`/opsx:story` 等），当前流程以 `docs/SOPS/SDD_WORKFLOW.md` 与 `learning-sdd/ai4se-sdd-proposal.md` 为准。
+
+
 > **提案目的**：给内部 AI4SE Council 一套可落地的基础方案，用较少的治理制品，把产品规划、交互原型、需求分析和规格驱动开发（SDD）接起来，支持端到端研发流程逐步达到 L3（Human in the Loop）到 L4（Human on the Loop）的成熟度。
 > **开源参考**：[openspec-example](https://github.com/jkang/openspec-example.git)
 

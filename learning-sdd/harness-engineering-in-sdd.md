@@ -1,5 +1,8 @@
 # Harness Engineering 与 OpenSpec 的深度融合实践
 
+> **📌 历史快照**：本文档描述早期/轻量版流程（含已移除的 `/opsx:explore`、`/opsx:story` 等），当前流程以 `docs/SOPS/SDD_WORKFLOW.md` 与 `learning-sdd/ai4se-sdd-proposal.md` 为准。
+
+
 本文档总结了 `openspec-practice` 项目是如何将 **Harness Engineering (驾驭工程)** 理念与 **OpenSpec 规格驱动开发 (SDD)** 框架深度结合的。
 
 ## 1. 什么是 Harness Engineering？

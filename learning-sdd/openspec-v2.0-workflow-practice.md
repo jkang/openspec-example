@@ -1,5 +1,8 @@
 # 规划先行，治理驱动：OpenSpec v2.0 完整工作流实践
 
+> **📌 历史快照**：本文档描述早期/轻量版流程（含已移除的 `/opsx:explore`、`/opsx:story` 等），当前流程以 `docs/SOPS/SDD_WORKFLOW.md` 与 `learning-sdd/ai4se-sdd-proposal.md` 为准。
+
+
 OpenSpec v2.0 引入了**规划层 (Planning Layer)**，将产品感定义与路线图规划置于所有开发动作之前。本文通过一个真实案例「商品搜索与价格排序」，演示 v2.0 的完整工作流（规划 -> 意图 -> Explore -> Propose -> 原型 -> Spec-Design -> Apply -> Sync -> Archive）的端到端实践。
 
 ## 一、阶段 0：规划层 (Planning Layer)

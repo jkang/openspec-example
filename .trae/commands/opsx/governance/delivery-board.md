@@ -14,7 +14,8 @@ tags: ["governance", "dashboard", "delivery", "visibility"]
 
 1. **Scan Data Sources**:
    - `docs/ROADMAP.md` (Planning)
-   - `openspec/changes/ideas/` (Exploring)
+   - `openspec-requirements/epics/` (Exploring · 需求侧活跃 Epic)
+   - `openspec-requirements/archive/` (Explored · 已完成 Epic)
    - `openspec/changes/` (Designing/Coding)
    - `openspec/changes/archive/` (Archived)
 2. **Execute Generator**:
