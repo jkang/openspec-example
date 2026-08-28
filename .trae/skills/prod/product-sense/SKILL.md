@@ -1,5 +1,5 @@
 ---
-name: openspec-product-sense
+name: product-sense
 description: Define or refine the Product Sense, including the Elevator Pitch, Key Goals, Non-goals, and Product Principles. Use this to establish the business foundation for the project.
 allowed-tools: Read, Write, SearchCodebase, Grep
 license: MIT
@@ -10,7 +10,7 @@ metadata:
   generatedBy: "1.9.0"
 ---
 
-# openspec-product-sense
+# product-sense
 
 **Description:** Use this skill to define or update the `docs/PRODUCT_SENSE.md` file. This establishes the high-level business intent and product vision that guides all subsequent SDD phases.
 

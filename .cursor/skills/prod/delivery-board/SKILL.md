@@ -1,5 +1,5 @@
 ---
-name: openspec-delivery-board
+name: delivery-board
 description: Generate a visual delivery board HTML showing the system's current status (Planning, Exploring, Designing, Coding, Archived). Invoke when users or PMs need to see project progress and baseline health.
 allowed-tools: Read, Write, SearchCodebase, Grep, LS, RunCommand
 license: MIT
@@ -8,7 +8,7 @@ metadata:
   version: "1.0"
 ---
 
-# openspec-delivery-board
+# delivery-board
 
 **Description:** This skill generates a comprehensive `docs/governance/delivery_board.html` dashboard by aggregating data from ROADMAP, active changes, archives, and verification reports.
 

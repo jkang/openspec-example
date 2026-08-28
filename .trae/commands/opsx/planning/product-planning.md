@@ -6,7 +6,7 @@ category: "Workflow"
 tags: ["product", "roadmap", "planning"]
 ---
 
-# openspec-product-planning
+# product-planning
 
 **Description:** Use this skill to update `docs/ROADMAP.md`. It provides the temporal and structural context for the SDD workflow, ensuring that `/opsx:explore` stays within the defined phase boundaries.
 

@@ -1,5 +1,5 @@
 ---
-name: openspec-product-planning
+name: product-planning
 description: Maintain the Product Roadmap, including rolling plans for the next 1, 2, and X months. Use this to define phase boundaries and exploration guardrails.
 allowed-tools: Read, Write, SearchCodebase, Grep, LS
 license: MIT
@@ -10,7 +10,7 @@ metadata:
   generatedBy: "1.9.0"
 ---
 
-# openspec-product-planning
+# product-planning
 
 **Description:** Use this skill to update `docs/ROADMAP.md`. It provides the temporal and structural context for the SDD workflow, ensuring that `/opsx:explore` stays within the defined phase boundaries.
 

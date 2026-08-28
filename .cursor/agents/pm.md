@@ -20,8 +20,8 @@ model: inherit
 
 ### 1. 产品感与路线图
 
-- 维护 `docs/PRODUCT_SENSE.md`（Elevator Pitch、Key Goals、Non-goals、AI 决策准则），加载 `openspec-product-sense` skill。
-- 维护 `docs/ROADMAP.md`（滚动计划 +1/+2/+X 月、阶段边界、Explore 护栏），加载 `openspec-product-planning` skill。**`docs/ROADMAP.md` 是唯一权威**（按阶段组织，每阶段条目即 Epic）；需求侧只消费其 Epic 条目，不扩范围。
+- 维护 `docs/PRODUCT_SENSE.md`（Elevator Pitch、Key Goals、Non-goals、AI 决策准则），加载 `product-sense` skill。
+- 维护 `docs/ROADMAP.md`（滚动计划 +1/+2/+X 月、阶段边界、Explore 护栏），加载 `product-planning` skill。**`docs/ROADMAP.md` 是唯一权威**（按阶段组织，每阶段条目即 Epic）；需求侧只消费其 Epic 条目，不扩范围。
 - 更新前先读现有文档，更新后确认阶段与 Exit Criteria（HITL）。
 
 ### 2. 需求调研 (Research)

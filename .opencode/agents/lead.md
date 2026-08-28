@@ -34,7 +34,7 @@ temperature: 0.2
 
 - 实施完成后执行 **Spec Sync**（加载 `sync-specs`，change 级）。
 - 归档变更并更新 epic 队列（加载 `archive-change` skill）；**Epic 末 Story 归档后触发 Baseline Sync**（`/opsx:baseline/sync` + `baseline/*` 四技能，含显式 no-op 判定）+ Roadmap 更新。
-- 刷新交付看板（加载 `openspec-delivery-board` skill）。
+- 刷新交付看板（加载 `delivery-board` skill）。
 - 执行跨工具一致性审计（对比 `.trae/` / `.cursor/` / `.agents/` 三目录的 skill 与命令是否同步，AGENTS.md 硬约束）。
 
 ## 约束
