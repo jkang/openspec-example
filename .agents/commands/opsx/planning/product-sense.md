@@ -6,7 +6,7 @@ category: "Workflow"
 tags: ["product", "planning", "strategy"]
 ---
 
-# openspec-product-sense
+# product-sense
 
 **Description:** Use this skill to define or update the `docs/PRODUCT_SENSE.md` file. This establishes the high-level business intent and product vision that guides all subsequent SDD phases.
 
