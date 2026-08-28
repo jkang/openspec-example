@@ -1,12 +1,56 @@
 ---
 name: SDD Workflow SOP
 purpose: 定义规格驱动开发的标准操作程序与指令规则
-updated_at: 2026-08-20
+updated_at: 2026-08-28
 ---
 
 # OpenSpec SDD Workflow SOP (v2.0)
 
 本文档定义了 OpenSpec-Practice 项目的规格驱动开发 (Spec-Driven Development, SDD) 标准操作程序。所有参与此项目的 AI Agent 必须严格遵循本流程。
+
+## 需求侧工作区 (Requirements Workspace) - `openspec-requirements/`
+
+需求阶段独立于 `openspec/`（开发侧），形成 **`openspec-requirements/`** 需求侧工作区，供 PM 完成「产品规划 → 需求探索 → 需求拆分 → 原型 → StorySpecs」的需求漏斗，产出可交给开发的**冻结交付物**。
+
+> 与 `openspec/` 平级目录，互相隔离。存量 16 个归档 change 与 `openspec/specs/` 主规格**完全不动**。
+
+### 需求漏斗
+
+```
+Product Planning (product-plan.md)
+   │  ▼
+Epics (epic.md)                     ← planning/epics/<key>/
+   │  ▼
+Explore → ideas (idea.md)           ← ideas/<idea-key>.md
+   │  ▼
+Storymap (storymap.md)              ← storymaps/<key>/  (大需求拆分为多个 Story)
+   │  ▼
+Stories → StorySpecs (story-specs.md)  ← stories/<key>/  (每个 Story 一个需求单元，唯一交付物)
+   │  ▼
+openspec-handoff                    ← 交接 → openspec/changes/<name>/ (开发侧从 design 起步)
+```
+
+### 阶段产物与指令
+
+- **① 产品规划** `/req:planning`）：产出 `planning/ROADMAP.md` 与一批 `planning/epics/<key>/epic.md`。必须对齐 `docs/ROADMAP.md` 阶段目标，产出前需 HITL 确认。
+- **② 需求探索** `/req:research`）：执行「结构化 6 步法」，产出 `ideas/<idea-key>.md`。必须 B/C 双端视角、治理映射对齐（`domain_model.html` / `business_process.html` / `service_blueprint.html`）。产出后需 HITL 确认。
+- **③ 需求拆分** `/req:breakdown`）：产出 `storymaps/<key>/storymap.md`，把一个 idea 拆成多个可独立交付的 Story（Role-Value-Goal 三要素 + 依赖 + 优先级）。产出后需 HITL 确认。
+- **④ 需求单元** `/req:story-specs`）：产出 `stories/<key>/story-specs.md` = 一个 Story 的最终交付物。含业务故事、业务规则、E2E 验收（Given/When/Then，映射 L1/L2 与 SB-STAGE-*/SB-CUSTOMER-*）、行为规格 delta specs（映射 Bounded Context / L3 / SB-<LANE>-*）、测试标签 (@unit/@api/@e2e)。产出后需 HITL 确认。
+- **原型** `/req:prototype`）：若涉及 UI，产出 `stories/<key>/prototypes/<capability>.html`，遵循 `docs/FRONTEND.md` 极简规范，产出后需 HITL 确认。
+
+### 交接边界 (Handoff)
+
+- **指令**: `/opsx:handoff`（技能 `openspec-handoff`）
+- **目标**: 读取已确认的 `story-specs.md` 与 `specs/`，在开发侧 `openspec/changes/<name>/` 创建 change，导入 delta specs，并从 `design` 起步。
+- **强制约束**:
+  - 开发侧**不重复** explore/propose/prototype/story。
+  - 若开发中发现需求缺口，回关 `openspec-requirements` 的 `req-*` skill，不擅自改开发侧规划。
+  - 交接时在需求侧 `story-specs.md` 回填交接状态（changeName），同步更新 `epic.md` / `storymap.md` 拆分状态。
+
+### 需求侧 Schema
+
+- **`req-sdd`**：定义于 `openspec-requirements/schemas/req-sdd.yaml`，是需求侧制品格式与生成指令的唯一事实来源。`openspec-requirements/config.yaml`（`schema: req-sdd`）为规则来源。
+- Schema 优先：若 SOP 描述与 `req-sdd` schema 冲突，以 Schema 为准。
 
 ## 核心阶段与指令
 

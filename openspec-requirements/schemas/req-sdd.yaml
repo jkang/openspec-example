@@ -1,0 +1,125 @@
+name: req-sdd
+version: 2
+description: 需求侧工作流（仅用于大块 Epic 需求） - 产品规划 (product-plan) → 史诗 (epic) → 探索 (idea) → 需求拆分 (storymap) → 需求单元交付物 (story)。需求侧只产出业务面 Story.md；行为规格（Story-specs，按 capability 拆分的 specs）由开发侧在 openspec-handoff 合成 proposal 之后生成。Bug Fix / Tech Debt / 简单功能修改不走本流程，直接进入交付侧。
+artifacts:
+  - id: product-plan
+    generates: planning/phase-plan.md
+    description: 产品规划层，产出本阶段目标、价值承诺、Explore 护栏与一批 Epics
+    template: product-plan.md
+    instruction: |
+      调用 `req-planning` 技能生成产品规划文档。
+
+      必须：
+      1. **阶段目标对齐**：与 `docs/ROADMAP.md`（唯一权威）当前阶段价值承诺对齐，只引用不扩范围。
+      2. **Explore 护栏**：明确本阶段探索边界（B/C 双端、零依赖、真实数据）。
+      3. **Epics Groomed**：产出本阶段规划拆分的一批 Epic（每个对应 `planning/epics/<key>/epic.md`）。
+      4. **治理映射对齐**：参考 `docs/baseline/domain_model.html`、`business_process.html`、`service_blueprint.html` 识别影响面。
+
+      该文档是需求漏斗的源，产出后需用户确认（HITL）。
+    requires: []
+
+  - id: epic
+    generates: planning/epics/<key>/epic.md
+    description: 一个 Epic 卡片，声明目标/范围/Exit Criteria 与治理映射
+    template: epic.md
+    instruction: |
+      调用 `req-planning` 技能为每个规划出的 Epic 生成卡片。
+
+      必须：
+      1. **目标/范围/Exit Criteria**：清晰声明，为后续 explore 提供边界。
+      2. **治理映射对齐**：参考 `docs/baseline/domain_model.html` 识别 Impacted Bounded Contexts 与 Candidate Capabilities；参考 `business_process.html` 识别 L1/L2/L3 节点；参考 `service_blueprint.html` 识别 SB-STAGE-*/SB-<LANE>-* 节点。
+      3. **拆分状态**：单选式记录该 Epic 在漏斗中的进度。
+
+      产出后需用户确认（HITL）。
+    requires:
+      - product-plan
+
+  - id: idea
+    generates: ideas/<idea-key>.md
+    description: Explore 产物，结构化探索带确认的原始需求/反馈
+    template: idea.md
+    instruction: |
+      调用 `req-research` 技能执行"结构化 6 步法"探索。
+
+      必须：
+      1. **澄清业务意图**：目的、范围、业务规则；B 端视角（后台配置/生命周期/权限）与 C 端视角。
+      2. **Roadmap 对齐**：引用 `docs/ROADMAP.md` 当前阶段目标。
+      3. **业务设计思路**：业务逻辑流转与用户价值。
+      4. **任务类型确认与路由**：Epic / Feature / Bug Fix / Tech Debt。
+         - 若为 Bug Fix / Tech Debt / 简单功能修改：直接路由到交付侧，不继续需求漏斗。
+      5. **治理映射对齐**：参考 `docs/baseline/domain_model.html` (Bounded Context)，`business_process.html` (L1/L2/L3)，`service_blueprint.html` (SB-STAGE-*/SB-<LANE>-*)。
+      6. **需求拆分建议 + 架构影响分析**。
+
+      产出后需用户确认（HITL），确认后才可进入 storymap。
+    requires:
+      - epic
+
+  - id: storymap
+    generates: storymaps/<key>/storymap.md
+    description: 大需求/复杂 idea 拆分映射，把一个需求拆成多个 Story，含覆盖对账
+    template: storymap.md
+    instruction: |
+      调用 `req-breakdown` 技能生成 storymap。
+
+      必须：
+      1. **覆盖对账（强制）**：拆分前列出 Epic 的 In Scope + Exit Criteria 清单；拆分后逐项对账，每个 Epic 承诺项（含 B 端）必须有 ≥1 个 Story 承接；有未覆盖项必须补拆或显式降级。
+      2. **粒度原则**：每个 Story 是一个【完整端到端功能】（如注册含表单→校验→API→落库→自动登录），不拆到行为/UI 细节级，避免破坏上下文。
+      3. **三要素**：每个 Story 必须有人物 (Role)、价值 (Value)、目标 (Goal)。
+      4. **依赖与优先级**：明确各 Story 依赖关系与 P0/P1/P2 优先级。
+      5. **治理映射对齐**：参考治理基线识别 Bounded Contexts / 流程节点 / 蓝图节点。
+
+      产出后需用户确认（HITL），确认每个 Story 可进入 story。
+    requires:
+      - idea
+
+  - id: prototype
+    generates: stories/<key>/prototypes/*.html
+    description: 交互式 UI/UX 原型，用于前端需求验证
+    template: prototype.html
+    instruction: |
+      调用 `req-prototype` 技能为涉及 UI 的 Story 生成交互式 HTML 原型。
+
+      必须严格遵循 `docs/FRONTEND.md`：
+        - 禁止圆角 / 阴影 / 装饰性 Emoji
+        - slate 色系，1px 实线边框
+        - 真实业务数据（严禁 foo/test 占位符），全中文
+        - Vue 3 (CDN) + Tailwind CSS (CDN)
+
+      产出后必须等待用户确认（HITL），确认后方可进入 story。涉及 UI 的 Story 无已确认原型不得交接。
+    requires:
+      - storymap
+
+  - id: story
+    generates: stories/<key>/story.md
+    description: 需求单元交付物（业务面）。= 一个 Story 的最终形态，作为开发侧 proposal 的输入
+    template: story.md
+    instruction: |
+      调用 `req-story` 技能生成需求单元交付物（业务面）。
+
+      **强制要求**：本交付物必须基于已确认的 `ideas/<idea-key>.md` 与 `storymaps/<key>/storymap.md`。若缺失，停止并回退。
+
+      **内容要求（纯业务面，不含行为规格）**：
+        - 用户场景（C 端 + B 端视角）+ 范围。
+        - 业务规则表。
+        - E2E 验收标准（Given/When/Then），映射到 `business_process.html` 的 L1/L2 与 `service_blueprint.html` 的 SB-STAGE-*/SB-CUSTOMER-*。
+        - 治理映射对齐（Bounded Context / L3 节点 / SB-<LANE>-*）。
+        - 若涉及 UI，必须链接【已确认】的 `stories/<key>/prototypes/<capability>.html`。
+
+      **⚠️ 行为规格（Story-specs）不由本阶段生成**：行为规格（按 capability 拆分的 specs，h3/h4 格式）由开发侧在 `openspec-handoff` 合成 proposal 之后产出。需求侧不生成 specs/。
+
+      **UI 门禁**：涉及 UI 的 Story，无已确认 prototype 链接时禁止勾选「待开发交接」。
+
+      **交接**：产出后通过 `openspec-handoff` 交给开发侧，这是需求侧唯一冻结交付物。
+    requires:
+      - storymap
+
+handoff:
+  requires: [story]
+  instruction: |
+    调用 `openspec-handoff` 技能，读取 `stories/<key>/story.md`（业务面）：
+    1. 在开发侧 `openspec new change "<name>"` 创建 change。
+    2. 从 Story 合成开发侧 `proposal.md`（Why ← 用户场景；What ← 范围；Capabilities ← 治理映射 taxonomy；Process/Blueprint Alignment ← L1/L2/L3 与 SB-STAGE-*/SB-<LANE>-*；Impact ← 架构影响）。
+    3. 开发侧 story 阶段跳过（业务评审已在需求侧完成，proposal 链接需求侧 story.md）。
+    4. 若属 Epic，登记 `openspec/epic-<key>.story-list.json`（status=in_progress, changeName）。
+    5. 回填需求侧交接状态。
+    开发侧随后按 capability 拆分生成行为规格 specs（Story-specs）→ design → tasks → apply → verify → sync → archive。
