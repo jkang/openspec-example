@@ -14,7 +14,7 @@ permission:
 
 **PM 是需求侧工作区的唯一主导者。** 需求漏斗顺序：`research（调研）→ explore（探索）→ prototype（原型·Epic整体）→ storymap（拆分+覆盖对账）→ story（业务面交付物）`。**仅大块 Epic 需求走本工作区**（Epic 来自 `docs/ROADMAP.md` 阶段条目）；Bug Fix / Tech Debt / 简单功能修改由 `lead` 直接路由到交付侧。
 
-- 加载 `research` skill：产出 `openspec-requirements/research/<epic-key>.md`（针对单个 Epic **收集**需求信息）。
+- 加载 `research` skill：产出 `openspec-requirements/epics/<epic-key>/research.md`（针对单个 Epic **收集**需求信息）。
 - 加载 `explore` skill：产出 `ideas/<idea-key>.md`（**转化**为产品设计思路：To-Be Process / To-Be Journey / 候选 Capabilities）。
 - 加载 `prototype` skill（若涉及 UI）：产出 `prototypes/<epic-key>/*.html`（**Epic 整体**原型，在拆分前完成）。
 - 加载 `storymap` skill：产出 `storymaps/<epic-key>/storymap.md`（拆成多个 Story + **覆盖对账**）。
@@ -29,13 +29,13 @@ permission:
 
 ### 2. 需求调研 (Research)
 
-- 加载 `research` skill，产出 `openspec-requirements/research/<epic-key>.md`：**针对单个 Epic 收集**需求信息（Epic 背景 / 调研对象 / 原始需求信息 / 业务约束线索 / 疑问待澄清项 / 调研结论）。
+- 加载 `research` skill，产出 `openspec-requirements/epics/<epic-key>/research.md`：**针对单个 Epic 收集**需求信息（Epic 背景 / 调研对象 / 原始需求信息 / 业务约束线索 / 疑问待澄清项 / 调研结论）。
 - **只收集不转化**（转化是 explore 的职责）。
 - 产出后征求用户确认（HITL），确认后才可进入 explore。
 
 ### 3. 需求探索 (Explore)
 
-- 加载 `explore` skill，产出 `openspec-requirements/ideas/<idea-key>.md`：
+- 加载 `explore` skill，产出 `openspec-requirements/epics/<epic-key>/idea.md`：
   1. 澄清业务意图（目的 / 范围 / 业务要求）
   2. **To-Be Process**（目标流程，可引用 L1/L2 节点）
   3. **To-Be Journey**（目标旅程：用户动作/系统反应/情绪/触点）
@@ -49,20 +49,20 @@ permission:
 
 ### 4. 原型设计 (Prototype · Epic 整体)
 
-- 加载 `prototype` skill（若涉及 UI），产出 `openspec-requirements/prototypes/<epic-key>/*.html`：**对 Epic 整体**做一次原型（在拆分前完成），拆分出的 Story 共享。
+- 加载 `prototype` skill（若涉及 UI），产出 `openspec-requirements/epics/<epic-key>/prototypes/*.html`：**对 Epic 整体**做一次原型（在拆分前完成），拆分出的 Story 共享。
 - 遵循 `docs/FRONTEND.md` 极简 UI 规范（无圆角/无阴影/slate 色系/真实数据/全中文）。
 - 产出后必须等待用户确认（HITL），确认后才可进入 storymap。
 
 ### 5. 需求拆分 (Storymap)
 
-- 加载 `storymap` skill，产出 `openspec-requirements/storymaps/<epic-key>/storymap.md`：把一个 idea 拆成多个可独立交付的 Story（Role-Value-Goal 三要素 + 依赖 + 优先级 P0/P1/P2）。
+- 加载 `storymap` skill，产出 `openspec-requirements/epics/<epic-key>/storymap.md`：把一个 idea 拆成多个可独立交付的 Story（Role-Value-Goal 三要素 + 依赖 + 优先级 P0/P1/P2）。
 - **覆盖对账（强制）**：Epic 的每个承诺项（In Scope / Exit Criteria / B 端承诺 / 候选 Capability）必须有 ≥1 个 Story 承接；未覆盖必须补拆或显式降级。
 - **粒度**：Story = 完整端到端功能，不拆到行为/UI 细节级，避免破坏上下文。
 - 产出后征求意见（HITL）。
 
 ### 6. 需求单元交付物 (Story)
 
-- 加载 `story` skill，产出 `openspec-requirements/stories/<story-key>/story.md`（**纯业务面**）：用户场景（B/C 双端）、业务规则表、E2E 验收（Given/When/Then，映射 `L1/L2` 与 `SB-STAGE-*` / `SB-CUSTOMER-*`）、治理映射（Bounded Context / L3 / SB-<LANE>-*）。
+- 加载 `story` skill，产出 `openspec-requirements/epics/<epic-key>/stories/<story-key>/story.md`（**纯业务面**）：用户场景（B/C 双端）、业务规则表、E2E 验收（Given/When/Then，映射 `L1/L2` 与 `SB-STAGE-*` / `SB-CUSTOMER-*`）、治理映射（Bounded Context / L3 / SB-<LANE>-*）。
 - **不含行为规格**：specs（Story-specs）由开发侧在 `/req:handoff` 合成 proposal 之后按 capability 拆分生成。
 - **UI 门禁**：涉及 UI 的 Story，无已确认的 Epic 整体原型时禁止勾选「待开发交接」。
 - Story 是需求侧**唯一冻结交付物**。确认后通过 `/req:handoff` 交给开发侧（合成开发侧 proposal）。

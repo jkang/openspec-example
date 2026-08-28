@@ -42,7 +42,7 @@
 | :--- | :--- | :--- |
 | **Planning Baseline** | `PRODUCT_SENSE.md`, `ROADMAP.md` | 提供方向、范围和优先级边界；**ROADMAP 按阶段组织，每阶段条目即 Epic（一句话描述），一阶段可含多 Epic** |
 | **Business Baseline** | `domain_model.html`, `business_process.html`, `service_blueprint.html` | 提供稳定的业务边界与流程参照 |
-| **Requirements 需求侧** | `research.md`, `idea.md`, `storymap.md`, `prototypes/*.html`, `story.md` | 需求调研 → 探索 → 拆分 → 原型 → Story（业务面冻结交付物），PM 主导，**仅大块 Epic** |
+| **Requirements 需求侧** | `epics/<epic-key>/research.md`、`idea.md`、`prototypes/`、`storymap.md`、`stories/<story-key>/story.md` | 需求调研 → 探索 → 原型 → 拆分 → Story（业务面冻结交付物），以 Epic 为工作单元，PM 主导，**仅大块 Epic** |
 | **Working Loop 交付侧** | `proposal.md`, `specs/`, `design.md`, `tasks.md`, `verify.md` | 确保实现遵循契约，并将认知沉淀回基线，Engineer 主导 |
 
 ### 2.2 Working Loop（端到端大循环）
@@ -226,15 +226,19 @@ flowchart TD
 │   ├── config.yaml
 │   ├── specs/               # 主规格说明书（基线沉淀区）
 │   └── changes/             # 变更管理流（proposal/specs/design/tasks/verify）
-├── openspec-requirements/   # [基础+业务] 需求侧工作区
+├── openspec-requirements/   # [基础+业务] 需求侧工作区（以 Epic 为工作单元）
 │   ├── config.yaml          # schema: req-sdd
 │   ├── schemas/req-sdd.yaml # 需求侧 schema（research→explore→prototype→storymap→story→handoff）
 │   ├── templates/           # research/idea/storymap/story/prototype 模板
-│   ├── research/            # research.md（按 Epic）
-│   ├── ideas/               # idea.md
-│   ├── prototypes/          # prototypes/*.html（Epic 整体）
-│   ├── storymaps/           # storymap.md（按 Epic）
-│   └── stories/             # story.md（按 Story）
+│   ├── epics/               # 活跃 Epic 工作区（对齐 openspec/changes/）
+│   │   └── <epic-key>/      # 一个 Epic 一个目录，产物内聚
+│   │       ├── research.md  # 调研（先执行，识别 Epic）
+│   │       ├── idea.md      # 探索（To-Be + 候选 Capabilities）
+│   │       ├── prototypes/  # Epic 整体原型
+│   │       ├── storymap.md  # 拆分（覆盖对账）
+│   │       └── stories/     # story.md（按 Story）
+│   └── archive/             # 已完成 Epic 归档（对齐 openspec/changes/archive/）
+│       └── YYYY-MM-DD-<epic-key>/
 ├── docs/                    # [业务] 项目治理与基线文档区
 │   ├── SOPS/SDD_WORKFLOW.md
 │   ├── PRODUCT_SENSE.md     # [业务] 产品定位与决策准则

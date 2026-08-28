@@ -11,7 +11,7 @@ permission:
 
 ### 0. 交接承接（Handoff / 直接提案）
 
-- **来自需求侧**：`lead` 触发 `/req:handoff`（skill: handoff）后，开发侧 change 已有合成的 `proposal.md`（源自需求侧 `openspec-requirements/stories/<story-key>/story.md`，Capabilities 来自 idea 的候选 Capabilities）。你**从 proposal 起步**。
+- **来自需求侧**：`lead` 触发 `/req:handoff`（skill: handoff）后，开发侧 change 已有合成的 `proposal.md`（源自需求侧 `openspec-requirements/epics/<epic-key>/stories/<story-key>/story.md`，Capabilities 来自 idea 的候选 Capabilities）。你**从 proposal 起步**。
 - **直走交付侧**（Bug Fix / Tech Debt / 简单功能修改）：按标准流程从 `/opsx:propose` 起步。
 - **不重复**需求侧已完成的 explore / 需求拆分 / prototype / story 输出（均已前移到需求侧）。若发现需求缺口，反馈 `lead` 回关 `openspec-requirements`（`research/explore/storymap/story` skill），不擅自改需求侧规划。
 

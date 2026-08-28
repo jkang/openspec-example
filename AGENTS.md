@@ -52,7 +52,7 @@
 - `docs/ROADMAP.md`: **[全局规划]** 定义滚动路线图、阶段边界及当前 Baseline（**唯一权威**，按阶段组织，每阶段条目即 Epic，需求侧只消费其 Epic 不扩范围）。
 - `docs/baseline/`: **[业务基线]** 包含 Blueprint, Process Flow 和 Event-Storming Domain Model。这是系统认知的核心沉淀。
 - `openspec/schemas/spec-driven.yaml`: **[Schema 优先]** 定义了开发侧所有制品的生成指令和格式约束，是开发侧工作流的最底层事实来源。
-- `openspec-requirements/`: **[需求侧工作区]** 需求漏斗（仅大块 Epic）：`research/<epic-key>.md` → `ideas/<idea-key>.md` → `prototypes/<epic-key>/` → `storymaps/<epic-key>/` → `stories/<story-key>/story.md`（业务面冻结交付物）。Schema 见 `openspec-requirements/schemas/req-sdd.yaml`，规则见 `openspec-requirements/config.yaml`。
+- `openspec-requirements/`: **[需求侧工作区]** 需求漏斗（仅大块 Epic），**以 Epic 为工作单元**：`epics/<epic-key>/research.md`（先调研→识别 Epic→创建目录）→ `idea.md` → `prototypes/` → `storymap.md` → `stories/<story-key>/story.md`（业务面冻结交付物）；Epic 完成后整个目录归档至 `archive/YYYY-MM-DD-<epic-key>/`。Schema 见 `openspec-requirements/schemas/req-sdd.yaml`，规则见 `openspec-requirements/config.yaml`。
 - **适用范围路由**：大块 Epic 走需求侧漏斗（`/req:research` → `/req:explore` → `/req:prototype`(UI, Epic整体) → `/req:storymap` → `/req:story` → `/req:handoff`）；Bug Fix / Tech Debt / 简单功能修改**直走交付侧**（`/opsx:propose` 起）。
 - **分层 Sync**：每个 change 只做 Spec Sync（`/opsx:sync`，change 级）；Baseline Sync（`/opsx:baseline/sync`）在 Epic 全部 Story 归档后统一执行。
 - `openspec/changes/`: 活跃的执行计划 (提案 Proposal、设计 Design、任务 Tasks、原型 Prototypes)。开发侧从 proposal 起步（直走交付侧 `/opsx:propose`，或需求侧 `/req:handoff` 合成）；不再有独立的开发侧探索/Story 阶段。

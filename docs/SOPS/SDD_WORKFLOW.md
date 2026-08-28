@@ -57,8 +57,15 @@ handoff                            ← 交接 → 合成开发侧 proposal → s
   - 行为规格（Story-specs）由开发侧在 proposal 之后按 capability 拆分生成，需求侧不生成 specs/。
   - 若开发中发现需求缺口，回关 `openspec-requirements` 的 `research/explore/storymap/story` skill，不擅自改需求侧规划。
   - 若属 Epic：登记 `openspec/epic-<key>.story-list.json`（status=in_progress, changeName），保持 Epic 队列单轨。
-  - 交接时在需求侧 `story.md` 回填交接状态（changeName），同步更新 `storymap.md`。
+  - 交接时在需求侧 `epics/<epic-key>/stories/<story-key>/story.md` 回填交接状态（changeName），同步更新 `epics/<epic-key>/storymap.md`。
   - **分层 Sync**：每个 change 只做 Spec Sync；Baseline Sync 在 Epic 全部 Story 归档后由 `/opsx:baseline/sync` 统一执行。
+
+### Epic 归档 (Epic Archive)
+
+- **时机**: 该 Epic 的**所有 Story 均完成交接且开发侧全部归档**后（`epic-<key>.story-list.json` 中该 Epic 全部 done）。
+- **动作**: 将 `openspec-requirements/epics/<epic-key>/` 整个目录移入 `openspec-requirements/archive/YYYY-MM-DD-<epic-key>/`（保留完整交付记录：research/idea/prototypes/storymap/stories），然后触发 **Baseline Sync**（`/opsx:baseline/sync`）+ **Roadmap 更新**（`/opsx:planning:product-planning`）。
+- **触发**: `/req:handoff` 在末 Story 交接时提示；`lead` 确认后执行归档。
+- **禁止**: 归档时不得删除任何需求侧产物（保留交付记录，对齐开发侧 `openspec/changes/archive/` 模式）。
 
 ### 需求侧 Schema
 

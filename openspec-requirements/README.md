@@ -5,43 +5,45 @@
 > 与 `openspec/` 平级目录，二者互相隔离，避免干扰。
 > **适用范围**：仅大块 Epic 需求走本工作区。Bug Fix / Tech Debt / 简单功能修改（如单个 UI 优化）**直走交付侧**，不走本流程。
 
-## 需求漏斗（v3）
+## 需求漏斗（v4 · 以 Epic 为工作单元）
 
 ```
 docs/ROADMAP.md（唯一权威，阶段条目即 Epic）
-  → ① research（调研，只收集）
+  → ① research（调研，只收集，据结果识别 Epic 并创建 epics/<epic-key>/）
   → ② explore（探索，转化：To-Be Process / To-Be Journey / 候选 Capabilities，产出 idea.md）
   → ③ prototype（Epic 整体原型，拆分前一次完成）
   → ④ storymap（拆分 + 覆盖对账）
   → ⑤ story（业务面冻结交付物）
   → /req:handoff → 开发侧 openspec/changes/<name>/（合成 proposal.md 后从 proposal 起步）
+  → Epic 全部 Story 完成 → 归档 archive/YYYY-MM-DD-<epic-key>/
 ```
 
 | 阶段 | 产物 | 目录 | 主导 | 命令 |
 | --- | --- | --- | --- | --- |
-| ① 需求调研 | `research/<epic-key>.md`（只收集：背景/对象/原始需求/约束线索/待澄清/结论） | `research/` | PM | `/req:research` |
-| ② 需求探索 | `ideas/<idea-key>.md`（业务意图 + To-Be Process/Journey + 候选 Capabilities + 任务类型路由） | `ideas/` | PM | `/req:explore` |
-| ③ 原型（Epic 整体） | `prototypes/<epic-key>/*.html`（拆分前一次完成，UI 门禁需 HITL 确认） | `prototypes/` | PM | `/req:prototype` |
-| ④ 需求拆分 | `storymaps/<epic-key>/storymap.md`（含覆盖对账：承诺项 + 候选 Capability 逐项承接） | `storymaps/` | PM | `/req:storymap` |
-| ⑤ 需求单元 | `stories/<story-key>/story.md`（业务面冻结交付物） | `stories/` | PM | `/req:story` |
+| ① 需求调研 | `epics/<epic-key>/research.md`（只收集，含访谈原始记录；**先调研→识别 Epic→创建目录**） | `epics/<epic-key>/` | PM | `/req:research` |
+| ② 需求探索 | `epics/<epic-key>/idea.md`（业务意图 + To-Be Process/Journey + 候选 Capabilities） | `epics/<epic-key>/` | PM | `/req:explore` |
+| ③ 原型（Epic 整体） | `epics/<epic-key>/prototypes/*.html`（拆分前一次完成，UI 门禁需 HITL 确认） | `epics/<epic-key>/prototypes/` | PM | `/req:prototype` |
+| ④ 需求拆分 | `epics/<epic-key>/storymap.md`（含覆盖对账：承诺项 + 候选 Capability 逐项承接） | `epics/<epic-key>/` | PM | `/req:storymap` |
+| ⑤ 需求单元 | `epics/<epic-key>/stories/<story-key>/story.md`（业务面冻结交付物） | `epics/<epic-key>/stories/` | PM | `/req:story` |
 | ⑥ 开发交接 | `openspec/changes/<name>/`（合成 proposal.md） | `openspec/` | Engineer（经 `/req:handoff`） | `/req:handoff` |
+| ⑦ Epic 归档 | `archive/YYYY-MM-DD-<epic-key>/`（整个 Epic 目录归档） | `archive/` | Lead | `/req:handoff` 末 Story 提示 |
 
-## 目录约定
+## 目录约定（以 Epic 为单元）
 
-- **`research/`**：需求调研层（漏斗第 1 步）。每个文件对应 **ROADMAP 的一个阶段条目（即 Epic）**，只负责**收集**（Epic 背景 / 调研对象 / 原始需求信息 / 业务约束线索 / 疑问待澄清项 / 调研结论），不做产品设计转化。
-- **`ideas/`**：Explore 产物（漏斗第 2 步）。基于已确认的 research，把调研信息**转化**为产品设计思路（澄清业务意图 / To-Be Process / To-Be Journey / 产品设计思路 / 任务类型 / 候选 Capabilities / 治理映射 / 拆分建议 / 架构影响）。
-- **`prototypes/`**：Epic 整体原型（漏斗第 3 步）。**在 storymap 拆分之前**针对 Epic 整体一次完成，路径 `prototypes/<epic-key>/`；严格遵循 `docs/FRONTEND.md`（无圆角、slate 色系、真实业务数据、全中文）；产出后必须用户 HITL 确认。
-- **`storymaps/`**：大需求拆分映射（漏斗第 4 步）。**必须覆盖对账**（Epic 每个承诺项 + 每个候选 Capability 都有 Story 承接）；粒度取完整端到端功能。
-- **`stories/`**：需求单元（漏斗第 5 步）。每个子目录是一个 Story，交付物为 `story.md`（业务面：场景/范围/规则/E2E/治理映射/交接状态）。**业务面纯净，不含行为规格**。
+- **`epics/<epic-key>/`**：一个 Epic 一个目录，该 Epic 的**全部需求产物内聚于此**（research.md / idea.md / prototypes/ / storymap.md / stories/）。Epic key 由 `research` 阶段据调研结果识别（对齐 ROADMAP 阶段条目）。
+- **`archive/YYYY-MM-DD-<epic-key>/`**：已完成的 Epic 归档区（对齐开发侧 `openspec/changes/archive/` 模式）。Epic 所有 Story 完成交接且开发侧全部归档后，整个 `epics/<epic-key>/` 目录移入此处，保留完整交付记录，禁止删除。
+- **`templates/`**：需求侧制品模板（research/idea/prototype/storymap/story）。
+- **`schemas/req-sdd.yaml`**：需求侧 schema（版本 v4：research→explore→prototype→storymap→story→handoff）。
 
 ## 交接契约（story → 开发侧）
 
 - **Story.md 是需求侧唯一冻结交付物（业务面）**。行为规格（Story-specs，按 capability 拆分的 specs）**不由需求侧生成**。
-- 开发侧通过 `/req:handoff`（skill: handoff）读取 `story.md`，在 `openspec/changes/<name>/` 创建 change 并**合成 `proposal.md`**（Why/What/Capabilities/Alignment/Impact），开发侧**从 proposal 起步**，随后按 capability 拆分生成 specs → design → tasks → apply → verify → sync → archive。
+- 开发侧通过 `/req:handoff`（skill: handoff）读取 `epics/<epic-key>/stories/<story-key>/story.md`，在 `openspec/changes/<name>/` 创建 change 并**合成 `proposal.md`**（Why/What/Capabilities/Alignment/Impact），开发侧**从 proposal 起步**，随后按 capability 拆分生成 specs → design → tasks → apply → verify → sync → archive。
 - 开发侧**不再有** explore / 需求拆分 / prototype / story 输出（均已前移到需求侧）。
-- 若开发中发现需求缺口，回关本工作区（`req-*` skill），不擅自改需求侧规划。
-- UI 门禁：涉及 UI 的 Story，无已确认的 Epic 整体原型（`prototypes/<epic-key>/*.html`）禁止交接。
+- 若开发中发现需求缺口，回关本工作区（`research/explore/storymap/story` skill），不擅自改需求侧规划。
+- UI 门禁：涉及 UI 的 Story，无已确认的 Epic 整体原型（`epics/<epic-key>/prototypes/*.html`）禁止交接。
 - 分层 Sync：每个 change 只做 Spec Sync（`/opsx:sync`，change 级）；Baseline Sync（`/opsx:baseline/sync`）在 Epic 全部 Story 归档后统一执行。
+- **Epic 归档**：末 Story 交接时 `/req:handoff` 提示，`lead` 确认后将 `epics/<epic-key>/` 归档至 `archive/YYYY-MM-DD-<epic-key>/`，随后 Baseline Sync + Roadmap 更新。
 
 ## 适用范围路由（关键）
 
@@ -62,4 +64,4 @@ docs/ROADMAP.md（唯一权威，阶段条目即 Epic）
 ## 跨工具一致性
 
 - **skills / commands**：对 `req-*` skills / 命令的任何修改必须同步 `.trae/`、`.cursor/`、`.agents/` 三目录（与既有 openspec-* 一致）。
-- **角色定义**：对团队角色（pm/engineer/lead）的修改必须同步 `.opencode/agents/`、`.cursor/agents/`、`.trae/skills/sdd-team/`、`.agents/skills/sdd-team/` 四目录（AGENTS.md 硬约束）。
+- **角色定义**：对团队角色（pm/engineer/lead）的修改必须同步 `.opencode/agents/`、`.cursor/agents/` 两处（AGENTS.md 硬约束）。
