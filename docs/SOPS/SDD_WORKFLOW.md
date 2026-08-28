@@ -96,15 +96,21 @@ handoff                            ← 交接 → 合成开发侧 proposal → s
 
 ```mermaid
 graph TD
-    A[产品感 /opsx:product-sense] --> B[路线图规划 /opsx:product-planning]
+    A[产品感 /opsx:planning:product-sense] --> B[路线图规划 /opsx:planning:product-planning]
     B --> C((上下文注入 config.yaml))
 
-    C --> D((探索阶段 /opsx:explore))
-    D --> E{确认任务类型}
+    C --> E{确认任务类型}
 
-    E -->|史诗| EP1[拆解为多个功能条目]
-    EP1 --> EP2[生成 openspec/epic-KEY.story-list.json]
-    EP2 --> EP3((等待启动具体功能条目))
+    E -->|史诗| R1[需求调研 /req:research]
+    R1 --> R2[探索 /req:explore<br/>To-Be 设计 + 候选 Capabilities]
+    R2 --> R3{涉及 UI 变更?}
+    R3 -->|是| R4[原型（Epic 整体）/req:prototype]
+    R4 --> R5{视觉/交互确认?}
+    R5 -->|否| R4
+    R5 -->|是| R6[需求拆分 /req:storymap<br/>覆盖对账]
+    R3 -->|否| R6
+    R6 --> R7[Story 交付物 /req:story<br/>业务面 + HITL]
+    R7 --> H[交接 /req:handoff<br/>合成开发侧 proposal]
 
     E -->|功能| F1[提案 /opsx:propose]
     F1 --> F2{涉及 UI 变更?}
@@ -129,20 +135,26 @@ graph TD
     T2 -->|否| T4[配置 skip_specs: true]
     T4 --> T5[设计与任务清单 /opsx:spec-design]
 
-    F6 --> U((实施阶段 /opsx:apply))
+    H --> U((实施阶段 /opsx:apply))
+    F6 --> U
     B5 --> U
     T3 --> U
     T5 --> U
 
-    U --> V((验证门禁))
+    U --> V((验证门禁 /opsx:verify))
     V --> W{需要更新规划?}
     W -->|是| X[更新规划 /opsx:update]
     X --> U
-    W -->|否| Y[同步规格 /opsx:sync]
+    W -->|否| Y[Spec Sync /opsx:sync<br/>change 级]
 
     Y --> Z[归档 /opsx:archive]
-    Z --> AA((完成))
+
+    Z -->|Epic 还有下一个 Story| R7
+    Z -->|Epic 全部完成| K2[Baseline Sync /opsx:baseline/sync<br/>Epic 级 +HITL]
+    K2 --> AA((完成))
 ```
+
+> **分层 Sync 说明**：每个 change 归档前只做 **Spec Sync**（`/opsx:sync`，change 级）；**Baseline Sync**（`/opsx:baseline/sync`）在 Epic 全部 Story 归档后统一执行（+ Roadmap 更新）。
 
 ### 1. 探索阶段 (Explore)
 - **指令**: `/opsx:explore`
