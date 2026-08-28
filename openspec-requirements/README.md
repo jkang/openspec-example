@@ -63,5 +63,5 @@ docs/ROADMAP.md（唯一权威，阶段条目即 Epic）
 
 ## 跨工具一致性
 
-- **skills / commands**：对 `req-*` skills / 命令的任何修改必须同步 `.trae/`、`.cursor/`、`.agents/` 三目录（与既有 openspec-* 一致）。
+- **skills / commands**：对 `/req:` 命名空间下的 skills / 命令的任何修改必须同步 `.trae/`、`.cursor/`、`.agents/` 三目录（与既有 `/opsx:` 一致）。
 - **角色定义**：对团队角色（pm/engineer/lead）的修改必须同步 `.opencode/agents/`、`.cursor/agents/` 两处（AGENTS.md 硬约束）。

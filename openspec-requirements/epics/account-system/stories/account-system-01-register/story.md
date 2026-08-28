@@ -95,4 +95,4 @@ UI 门禁：本 Story 涉及前端 UI（注册表单），原型未生成并经�
 -->
 
 - [ ] 待开发交接 (openspec-handoff)
-- [ ] 已交接 (changeName: <change-name> 记录于 epic/storymap/story-list.json)
+- [ ] 已交接 (changeName: <change-name> 记录于 openspec/epic-<key>.story-list.json)
