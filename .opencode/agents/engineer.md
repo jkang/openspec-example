@@ -11,21 +11,21 @@ permission:
 
 ### 0. 交接承接（Handoff / 直接提案）
 
-- **来自需求侧**：`lead` 触发 `openspec-handoff` 后，开发侧 change 已有合成的 `proposal.md`（源自需求侧 `openspec-requirements/stories/<key>/story.md`）。你**从 proposal 起步**。
+- **来自需求侧**：`lead` 触发 `/req:handoff`（skill: handoff）后，开发侧 change 已有合成的 `proposal.md`（源自需求侧 `openspec-requirements/stories/<story-key>/story.md`，Capabilities 来自 idea 的候选 Capabilities）。你**从 proposal 起步**。
 - **直走交付侧**（Bug Fix / Tech Debt / 简单功能修改）：按标准流程从 `/opsx:propose` 起步。
-- **不重复**需求侧已完成的 explore / 需求拆分 / prototype / story 输出（均已前移到需求侧）。若发现需求缺口，反馈 `lead` 回关 `openspec-requirements`（`req-*` skill），不擅自改需求侧规划。
+- **不重复**需求侧已完成的 explore / 需求拆分 / prototype / story 输出（均已前移到需求侧）。若发现需求缺口，反馈 `lead` 回关 `openspec-requirements`（`research/explore/storymap/story` skill），不擅自改需求侧规划。
 
 ### 1. 行为规格与设计（Spec-Design）
 
-- 加载 `openspec-spec-design` skill，基于已确认的 `proposal.md`：
+- 加载 `spec-design` skill，基于已确认的 `proposal.md`：
   - **按 capability 拆分生成行为规格 `specs/`（Story-specs）**：h3 `### Requirement` + h4 `#### Scenario` 格式（符合开发侧 schema）。
   - 产出 `design.md`（含 Service Blueprint / Domain Model Sync Assessment）与 `tasks.md`。
 - 参考需求侧 `story.md`（链接于 proposal）作为业务评审依据。
 
 ### 2. 交互原型（Prototype）—— 仅非需求侧流程
 
-- **需求侧已做原型的 Story 不重复制作原型**（那是 pm 的 `req-prototype`）。
-- 仅当**直走交付侧**且涉及 UI 变更（如 Bug Fix 带 UI）时，加载 `openspec-prototype` skill，按 `docs/FRONTEND.md` 极简 UI 规范产出可交互 HTML：
+- **需求侧已做原型的 Story 不重复制作原型**（那是 pm 的 `prototype` skill，Epic 整体原型）。
+- 仅当**直走交付侧**且涉及 UI 变更（如 Bug Fix 带 UI）时，加载 `opsx/prototype` skill，按 `docs/FRONTEND.md` 极简 UI 规范产出可交互 HTML：
   - 禁止圆角（rounded-none）、禁止阴影（shadow-none）、禁止装饰性 Emoji
   - slate 色系（slate-50 背景 / slate-200 边框 / slate-900 强调色），1px 实线边框
   - 真实业务数据（严禁 foo/test 占位符），全中文
@@ -34,7 +34,7 @@ permission:
 
 ### 3. 代码实施（Apply）
 
-- 加载 `openspec-apply-change` skill，按 `tasks.md` 逐项实施：
+- 加载 `apply-change` skill，按 `tasks.md` 逐项实施：
   - 严格遵循 BDD 标签（@unit / @api / @e2e）编写测试，测试金字塔：底层逻辑不推给 @e2e
   - 实现前运行 `openspec validate --change "<name>"` 并确保 `<changeRoot>/verify.md` 存在
   - 每完成一项：运行对应验证命令 → 更新 `verify.md` 证据 → 勾选 `tasks.md`（`- [ ]` → `- [x]`）

@@ -1,16 +1,20 @@
 # Storymap: 用户账户体系（注册 / 登录 / 会话 / B 端用户管理）
 
+> Epic Key: `account-system`（来自 `docs/ROADMAP.md` 下一阶段「用户资产与账户体系」）
+> 关联调研: `research/account-system.md`
+> 关联 Idea: `ideas/idea-account-system.md`
+> 关联原型: `prototypes/account-system/*.html`（Epic 整体，涉及 UI，待生成并经用户 HITL 确认）
+> 产出后需用户确认（HITL）
+
 <!--
 storymap 用于把大需求（Epic 级）拆分为多个可独立交付的 Story。
 每个 Story 对应 stories/<key>/story.md（业务面交付物）。
 要求：拆分必须【覆盖完整】（Epic 每个承诺项都要有 Story 承接），粒度取【完整端到端功能】。
 -->
 
-> 关联 Epic: `planning/epics/account-system/epic.md` | 来源 Idea: `ideas/idea-account-system.md`
-
 ## 需求背景 (Background)
 
-现有系统将订单、优惠券归属硬编码为 `user_dev` 占位用户，所有买家共享同一份身份，无法回答"这笔订单/这张券属于哪个真实买家"。本 storymap 把「用户账户体系」拆为 **4 个可独立交付、可独立验收的 Story**，让「我的订单」按登录用户查询、未登录不可下单，并让 B 端运营能对账户做生命周期管理（启停），为回款闭环奠基。存量 `user_dev` 数据本阶段**不做迁移**（保留并视为无归属），新订单/新发券使用真实 userId。
+现有系统将订单、优惠券归属硬编码为 `user_dev` 占位用户，所有买家共享同一份身份，无法回答"这笔订单/这张券属于哪个真实买家"（见 `research/account-system.md` 痛点 1/2/3）。本 storymap 把「用户账户体系」（来自 ROADMAP 下一阶段条目）拆为 **4 个可独立交付、可独立验收的 Story**，让「我的订单」按登录用户查询、未登录不可下单，并让 B 端运营能对账户做生命周期管理（启停），为回款闭环（阶段 D）奠基。存量 `user_dev` 数据本阶段**不做迁移**（保留并视为无归属），新订单/新发券使用真实 userId。
 
 ## 拆分粒度原则 (Granularity)
 
@@ -30,27 +34,34 @@ storymap 用于把大需求（Epic 级）拆分为多个可独立交付的 Story
 
 ## 覆盖对账 (Coverage Reconciliation)
 
-| Epic 承诺项（来自 epic.md） | 承接 Story | 覆盖状态 |
-| --- | --- | --- |
-| Exit Criteria ①：注册 E2E 通过（新买家注册成功获得 ACTIVE 账户，可进入登录） | account-system-01-register | ✅ 覆盖 |
-| Exit Criteria ②：登录 E2E 通过（买家登录后跳转个人区，可下单，订单 userId 归属当前登录用户） | account-system-02-login | ✅ 覆盖 |
-| Exit Criteria ③：会话保持 E2E 通过（刷新不掉登录态；退出登录后会话失效） | account-system-03-session | ✅ 覆盖 |
-| Exit Criteria ④：未登录拦截 E2E 通过（未登录点击下单/「我的订单」触发登录引导） | account-system-03-session | ✅ 覆盖 |
-| Exit Criteria ⑤：B 端用户管理可用（后台可查看用户列表并启停账户，禁用用户无法登录） | account-system-04-admin-users | ✅ 覆盖 |
-| In Scope: C 端认证（注册/登录/会话/退出登录） | account-system-01-register + account-system-02-login + account-system-03-session | ✅ 覆盖 |
-| In Scope: 订单/优惠券真实归属（新订单 userId 绑定当前登录用户；我的订单按 userId 查询；优惠券 userId 非空） | account-system-02-login | ✅ 覆盖（新订单归属本人；优惠券 userId 非空以真实用户存在为前提，随 login 建立身份主体） |
-| In Scope: 用户基础信息（昵称/联系方式） | account-system-01-register | ✅ 覆盖 |
-| In Scope: B 端用户管理（后台「用户管理」入口，查看列表，启用/禁用） | account-system-04-admin-users | ✅ 覆盖 |
-| B 端承诺项：账户生命周期 ACTIVE ↔ DISABLED 由运营掌控、禁用即禁止登录 | account-system-04-admin-users + account-system-02-login（R-LOGIN-003 联动） | ✅ 覆盖 |
+> ⚠️ 强制步骤：对账维度 = Epic 承诺项（In Scope / Exit Criteria / B 端与 C 端）+ **候选 Capability**。每个承诺项必须有 ≥1 个 Story 承接。
 
-> 对账结论：Epic 全部 5 条 Exit Criteria 与全部 In Scope / B 端承诺项均有 ≥1 个 Story 承接，覆盖完整，无缺口。
+| Epic 承诺项（来自 research/idea） | 候选 Capability | 承接 Story | 覆盖状态 |
+| --- | --- | --- | --- |
+| Exit Criteria ①：注册 E2E 通过（新买家注册成功获得 ACTIVE 账户，可进入登录） | `account-management`（新增） | account-system-01-register | ✅ 覆盖 |
+| Exit Criteria ②：登录 E2E 通过（买家登录后跳转个人区，可下单，订单 userId 归属当前登录用户） | `account-management`（新增）+ `order-management`（修改） | account-system-02-login | ✅ 覆盖 |
+| Exit Criteria ③：会话保持 E2E 通过（刷新不掉登录态；退出登录后会话失效） | `user-session`（新增） | account-system-03-session | ✅ 覆盖 |
+| Exit Criteria ④：未登录拦截 E2E 通过（未登录点击下单/「我的订单」触发登录引导） | `user-session`（新增） | account-system-03-session | ✅ 覆盖 |
+| Exit Criteria ⑤：B 端用户管理可用（后台可查看用户列表并启停账户，禁用用户无法登录） | `user-admin`（新增） | account-system-04-admin-users | ✅ 覆盖 |
+| In Scope: C 端认证（注册/登录/会话/退出登录） | `account-management` + `user-session` | account-system-01-register + account-system-02-login + account-system-03-session | ✅ 覆盖 |
+| In Scope: 订单/优惠券真实归属（新订单 userId 绑定当前登录用户；我的订单按 userId 查询；优惠券 userId 非空） | `order-management`（修改） | account-system-02-login | ✅ 覆盖（新订单归属本人；优惠券 userId 非空以真实用户存在为前提，随 login 建立身份主体） |
+| In Scope: 用户基础信息（昵称/联系方式） | `account-management`（新增） | account-system-01-register | ✅ 覆盖 |
+| In Scope: B 端用户管理（后台「用户管理」入口，查看列表，启用/禁用） | `user-admin`（新增） | account-system-04-admin-users | ✅ 覆盖 |
+| B 端承诺项：账户生命周期 ACTIVE ↔ DISABLED 由运营掌控、禁用即禁止登录 | `user-admin`（新增）+ `account-management`（新增） | account-system-04-admin-users + account-system-02-login（R-LOGIN-003 联动） | ✅ 覆盖 |
+| B 端承诺项：禁用后已颁发会话失效 | `user-admin`（新增）+ `user-session`（新增） | account-system-04-admin-users + account-system-03-session（R-SESS-007 联动） | ✅ 覆盖 |
+| 候选 Capability: `account-management`（新增，账户 CRUD 与生命周期） | — | account-system-01-register + account-system-02-login | ✅ 覆盖 |
+| 候选 Capability: `user-session`（新增，认证与会话） | — | account-system-03-session | ✅ 覆盖 |
+| 候选 Capability: `user-admin`（新增，B 端用户管理） | — | account-system-04-admin-users | ✅ 覆盖 |
+| 候选 Capability: `order-management`（修改，userId 归属 + 按 userId 查询） | — | account-system-02-login | ✅ 覆盖 |
+
+> 对账结论：Epic 全部 5 条 Exit Criteria 与全部 In Scope / B 端承诺项、4 个候选 Capability（3 新增 + 1 修改）均有 ≥1 个 Story 承接，覆盖完整，无缺口。
 
 ## 治理映射对齐
 
-- **Impacted Bounded Contexts**: `account`（**新增 BC**：注册/登录/会话/用户管理）、`cart`（Cart Context：Session 归属一致性）、`order`（Order Context：订单 `userId` 真实归属）、`coupon`（Coupon Context：发券 `userId` 非空）、`shared`（`frontend-ui` / `domain-model`）。
+- **Impacted Bounded Contexts**: `account`（**新增 BC**：注册/登录/会话/用户管理）、`order`（Order Context：订单 `userId` 真实归属 + 按 userId 查询）、`cart`（Cart Context：Session 归属一致性）、`coupon`（Coupon Context：发券 `userId` 非空）、`shared`（`frontend-ui` / `domain-model`）。
 - **新增 Capability Taxonomy**: `account-management`（register/login story）、`user-session`（session story）、`user-admin`（admin-users story）。
-- **Candidate Capabilities (复用)**: `frontend-ui`、`domain-model`、`order-management`、`cart-management`、`coupon-management`。
-- **Impacted Process Nodes**: `L1-03 加购与准备`（注册/登录前置身份、禁用账户登录准入）、`L1-04 下单结算`（未登录下单拦截）、`L1-06 履约与完成`（我的订单按用户）、`L2-02 加载结算上下文`（身份上下文）、`L2-06 发起支付`（归属校验）。
+- **候选 Capabilities (复用/修改)**: `order-management`（修改：userId 归属）、`frontend-ui`、`domain-model`、`cart-management`、`coupon-management`。
+- **Impacted Process Nodes**: `L1-03 加购与准备`（注册/登录前置身份、禁用账户登录准入）、`L1-04 下单结算`（未登录下单拦截、新订单归属校验）、`L1-06 履约与完成`（我的订单按用户）、`L2-02 加载结算上下文`（身份上下文）、`L2-06 发起支付`（归属校验）；注册/登录/会话/用户管理为新增 L3 环节（基线补充，设计中）。
 - **Impacted Service Blueprint Nodes**: `SB-STAGE-01`（登录/注册入口，CUSTOMER-01）、`SB-STAGE-02`（加购身份校验，CUSTOMER-02）、`SB-STAGE-04`（下单拦截，CUSTOMER-04）、`SB-STAGE-06`（我的订单按用户，CUSTOMER-06）、`SB-LANE-OPS` / `SB-OPS-06`（B 端用户管理，新增运营活动）、`SB-LANE-BACKSTAGE` / `SB-BACKSTAGE-02`（Session 一致性）、`SB-BACKSTAGE-04`（订单 `userId=` 查询）；账户体系为横切新增，贯穿 `SB-LANE-CUSTOMER` / `SB-LANE-OPS` / `SB-LANE-BACKSTAGE`。
 - **Sync Assessment**: **Yes**（新增 `account` BC 与 `account-management`/`user-session`/`user-admin` taxonomy，Phase 完成后回流三份基线）。
 

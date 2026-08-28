@@ -10,57 +10,59 @@ updated_at: 2026-08-28
 
 ## 需求侧工作区 (Requirements Workspace) - `openspec-requirements/`
 
-需求阶段独立于 `openspec/`（开发侧），形成 **`openspec-requirements/`** 需求侧工作区，供 PM 完成「产品规划 → 需求探索 → 需求拆分 → 原型 → Story」的需求漏斗，产出可交给开发的**冻结交付物（Story，业务面）**。
+需求阶段独立于 `openspec/`（开发侧），形成 **`openspec-requirements/`** 需求侧工作区，供 PM 完成「需求调研 → 探索 → 原型(Epic整体) → 需求拆分 → Story」的需求漏斗，产出可交给开发的**冻结交付物（Story，业务面）**。
 
-> 与 `openspec/` 平级目录，互相隔离。存量 17 个归档 change + 2 个 story-list 与 `openspec/specs/` 主规格**完全不动**。
+> 与 `openspec/` 平级目录，互相隔离。规划（roadmap·每阶段多 Epic）在 `docs/ROADMAP.md` 已有，需求侧直接消费。存量 17 个归档 change + 2 个 story-list 与 `openspec/specs/` 主规格**完全不动**。
 
 ### 适用范围路由（关键）
 
 | 需求类型 | 路径 |
 | --- | --- |
-| 大块 Epic（跨多能力、需拆分、需产品规划对齐） | ✅ 走需求侧漏斗 → `/opsx:handoff` |
+| 大块 Epic（跨多能力、需拆分、需产品规划对齐） | ✅ 走需求侧漏斗 → `/req:handoff` |
 | 简单功能修改（如单个 UI 优化） | ⛔ 直走交付侧（`/opsx:propose` 起） |
 | Bug Fix | ⛔ 直走交付侧（精简规格，UI 变更才原型） |
 | Tech Debt / 重构 | ⛔ 直走交付侧（可 `skip_specs`） |
 
-### 需求漏斗
+### 需求漏斗（命令空间 `/req:`）
 
 ```
-Product Planning (phase-plan.md)
+Research (research.md)              ← research/<epic-key>.md  (针对单个 Epic 收集需求，HITL)
    │  ▼
-Epics (epic.md)                     ← planning/epics/<key>/
+Explore (idea.md)                   ← ideas/<idea-key>.md  (调研→产品设计思路 + To-Be 设计 + 候选 Capabilities，HITL)
    │  ▼
-Explore → ideas (idea.md)           ← ideas/<idea-key>.md
+{涉及 UI?} ──是──▶ Prototype (Epic整体)  ← prototypes/<epic-key>/*.html  (HITL)
+   │ 否（跳过原型）／ 原型完成
+   ▼
+Storymap (storymap.md)              ← storymaps/<epic-key>/  (覆盖对账·端到端粒度，HITL)
    │  ▼
-Storymap (storymap.md)              ← storymaps/<key>/  (大需求拆分为多个 Story，含覆盖对账)
+Story (story.md)                    ← stories/<story-key>/  (业务面冻结交付物，HITL)
    │  ▼
-Story (story.md)                    ← stories/<key>/  (业务面冻结交付物；UI 故事先 req-prototype)
-   │  ▼
-openspec-handoff                    ← 交接 → 合成开发侧 proposal → specs/design/tasks/apply/verify/sync/archive
+handoff                            ← 交接 → 合成开发侧 proposal → specs/design/tasks/apply/verify
 ```
 
 ### 阶段产物与指令
 
-- **① 产品规划** `/opsx:req-planning`）：产出 `planning/phase-plan.md`（只引用 `docs/ROADMAP.md`，不扩范围）与一批 `planning/epics/<key>/epic.md`。产出后需 HITL 确认。
-- **② 需求探索** `/opsx:req-research`）：执行「结构化 6 步法」，产出 `ideas/<idea-key>.md`。必须 B/C 双端视角、治理映射对齐（`domain_model.html` / `business_process.html` / `service_blueprint.html`）；**任务类型路由**（Bug Fix / Tech Debt / 简单功能 → 直走交付侧）。产出后需 HITL 确认。
-- **③ 需求拆分** `/opsx:req-breakdown`）：产出 `storymaps/<key>/storymap.md`。**覆盖对账（强制）**：Epic 每个 In Scope / Exit Criteria / B 端承诺项必须有 ≥1 个 Story 承接；粒度取**完整端到端功能**（不拆到行为/UI 细节级）。产出后需 HITL 确认。
-- **④ 需求单元** `/opsx:req-story`）：产出 `stories/<key>/story.md` = 需求侧唯一冻结交付物（**业务面**）。含用户场景（B/C 双端）、业务规则表、E2E 验收（Given/When/Then，映射 L1/L2 与 SB-STAGE-*/SB-CUSTOMER-*）、治理映射（Bounded Context / L3 / SB-<LANE>-*）。**不含行为规格**（specs 由开发侧在 proposal 后按 capability 拆分生成）。产出后需 HITL 确认。
-- **原型** `/opsx:req-prototype`）：若涉及 UI，产出 `stories/<key>/prototypes/<capability>.html`，遵循 `docs/FRONTEND.md` 极简规范，产出后需 HITL 确认。**UI 门禁**：涉及 UI 的 Story，无已确认原型禁止交接。
+- **① 需求调研** `/req:research`）：产出 `research/<epic-key>.md`。针对 `docs/ROADMAP.md` 中的单个 Epic 收集需求信息（背景/对象/原始反馈/约束/疑问/结论）。**只收集不转化**。产出后需 HITL 确认。
+- **② 探索** `/req:explore`）：产出 `ideas/<idea-key>.md`。把调研信息**转化**为产品设计思路：澄清意图 / **To-Be Process** / **To-Be Journey** / 产品设计思路 / 任务类型路由 / **候选 Capabilities**（对齐 `domain_model.html`）/ 治理映射 / 拆分建议 / 架构影响。产出后需 HITL 确认。
+- **③ 原型（Epic 整体）** `/req:prototype`）：若涉及 UI，在拆分前对 **Epic 整体**产出 `prototypes/<epic-key>/*.html`，遵循 `docs/FRONTEND.md` 极简规范，产出后需 HITL 确认。**UI 门禁**：涉及 UI 的 Epic 无已确认原型不得拆分/交接。
+- **④ 需求拆分** `/req:storymap`）：产出 `storymaps/<epic-key>/storymap.md`。**覆盖对账（强制）**：Epic 每个承诺项（In Scope / Exit Criteria / B 端承诺 / 候选 Capability）必须有 ≥1 个 Story 承接；粒度取**完整端到端功能**（不拆到行为/UI 细节级）。产出后需 HITL 确认。
+- **⑤ 需求单元** `/req:story`）：产出 `stories/<story-key>/story.md` = 需求侧唯一冻结交付物（**业务面**）。含用户场景（B/C 双端）、业务规则表、E2E 验收（Given/When/Then，映射 L1/L2 与 SB-STAGE-*/SB-CUSTOMER-*）、治理映射（Bounded Context / L3 / SB-<LANE>-*）。**不含行为规格**（specs 由开发侧在 proposal 后按 capability 拆分生成）。产出后需 HITL 确认。
 
 ### 交接边界 (Handoff)
 
-- **指令**: `/opsx:handoff`（技能 `openspec-handoff`）
-- **目标**: 读取已确认的 `story.md`（业务面），在开发侧 `openspec/changes/<name>/` 创建 change 并**合成 `proposal.md`**（Why/What/Capabilities/Process & Blueprint Alignment/Impact），开发侧**从 proposal 起步**，随后按 capability 拆分生成行为规格 specs → design → tasks → apply → verify → sync → archive。
+- **指令**: `/req:handoff`（技能 `handoff`）
+- **目标**: 读取已确认的 `story.md`（业务面），在开发侧 `openspec/changes/<name>/` 创建 change 并**合成 `proposal.md`**（Why/What/**Capabilities ← idea 候选 Capabilities**/Process & Blueprint Alignment/Impact），开发侧**从 proposal 起步**，随后按 capability 拆分生成行为规格 specs → design → tasks → apply → verify → Spec Sync → archive。
 - **强制约束**:
   - 开发侧**不重复** explore / 需求拆分 / prototype / story 输出（均已前移到需求侧）。
   - 行为规格（Story-specs）由开发侧在 proposal 之后按 capability 拆分生成，需求侧不生成 specs/。
-  - 若开发中发现需求缺口，回关 `openspec-requirements` 的 `req-*` skill，不擅自改需求侧规划。
+  - 若开发中发现需求缺口，回关 `openspec-requirements` 的 `research/explore/storymap/story` skill，不擅自改需求侧规划。
   - 若属 Epic：登记 `openspec/epic-<key>.story-list.json`（status=in_progress, changeName），保持 Epic 队列单轨。
-  - 交接时在需求侧 `story.md` 回填交接状态（changeName），同步更新 `epic.md` / `storymap.md`。
+  - 交接时在需求侧 `story.md` 回填交接状态（changeName），同步更新 `storymap.md`。
+  - **分层 Sync**：每个 change 只做 Spec Sync；Baseline Sync 在 Epic 全部 Story 归档后由 `/opsx:baseline/sync` 统一执行。
 
 ### 需求侧 Schema
 
-- **`req-sdd`**：定义于 `openspec-requirements/schemas/req-sdd.yaml`（version 2），是需求侧制品格式与生成指令的唯一事实来源。`openspec-requirements/config.yaml`（`schema: req-sdd`）为规则来源。
+- **`req-sdd`**：定义于 `openspec-requirements/schemas/req-sdd.yaml`（version 3），是需求侧制品格式与生成指令的唯一事实来源。`openspec-requirements/config.yaml`（`schema: req-sdd`）为规则来源。
 - Schema 优先：若 SOP 描述与 `req-sdd` schema 冲突，以 Schema 为准。
 - **验证兜底**：需求侧不受 `openspec` CLI validate 覆盖，制品质量由 QA 对抗审查兜底；涉及治理锚点必须真实引用 `docs/baseline/*.html`。
 
@@ -207,37 +209,46 @@ graph TD
 - **目标**: 当实施过程中发现需要修改规划（如 specs 或 design）时使用。
 - **原则**: 先修改规格/设计，通过验证后，再继续 `/opsx:apply`。
 
-### 8. 同步阶段 (Sync)
+### 8. 同步阶段 (Sync) - 分层 Sync
+
+> **分层原则**：Spec Sync 与 Baseline Sync 解耦。Spec Sync 在**每个 change 归档前**执行（保证后续 Story 依赖最新 specs）；Baseline Sync 在 **Epic 所有 Story 归档后**统一执行（避免单个 Story 中间态污染 baseline，Roadmap 判定需 Epic Exit Criteria 全达成）。
+
+#### 8.1 Spec Sync（change 级）
 - **指令**: `/opsx:sync`
-- **目标**: 在归档前，将增量规格 (delta specs) 同步合并入主规格 (main specs)，并同步回流业务基线 (Baseline Sync)。
+- **目标**: 在归档前，将增量规格 (delta specs) 同步合并入主规格 (main specs)。**仅做 Spec Sync，不做 Baseline Sync。**
+- **核心动作**: 将 `openspec/changes/<name>/specs/` 下的变更同步至 `openspec/specs/`。
+
+#### 8.2 Baseline Sync（Epic 级）
+- **指令**: `/opsx:baseline/sync`（或手动执行 baseline 辅助技能）
+- **时机**: **Epic 全部 Story 归档完成后**统一执行；需求侧 Epic 收尾时触发。
+- **目标**: 将 Epic 沉淀的认知回流至 `docs/baseline/` 下的 HTML 基线文档。
 - **核心动作**:
-  1. **Spec Sync**: 将 `openspec/changes/<name>/specs/` 下的变更同步至 `openspec/specs/`。
-  2. **Baseline Sync**: 自动调用辅助技能，将 `story.md` (L1/L2)、`specs` 与 `design.md` (L3) 沉淀的认知回流至 `docs/baseline/` 下的 HTML 基线文档。
-     - **Service Blueprint Sync 判定**: `sync` 阶段必须先判断是否需要回写 `docs/baseline/service_blueprint.html`。当且仅当存在以下任一变化时，执行 Service Blueprint 回流：
-       - 受影响的旅程阶段 (`SB-STAGE-*`) 发生新增、移除或覆盖变化
-       - 受影响的泳道节点 (`SB-<LANE>-*`) 中 capability 分布发生新增、移除或重排
-       - capability 状态在“已落地 / 规划中 / 横切支撑”之间发生变化
-       - 新增或修改跨阶段支撑能力
-       - `story.md`、`specs` 或 `design.md` 引入新的 blueprint 引用节点
-       - `design.md` 中的 `Service Blueprint Sync Assessment` 明确写为 `Needs Sync: Yes`
-     - **显式 No-op**: 如果以上信号均不存在，必须在同步结果中明确记录“无需更新 Service Blueprint”及理由，而不是静默跳过。
-     - **Domain Model Sync 判定**: `sync` 阶段必须先判断是否需要回写 `docs/baseline/domain_model.html`。当且仅当存在以下任一变化时，执行 Domain Model 回流：
-       - `Bounded Context` 边界或 `BC -> Capability` 映射变化
-       - 新增、修改、移除 capability taxonomy
-       - 新增、修改、移除 Domain Event / Command / Policy
-       - Aggregate、状态机、对象关系、业务不变量发生变化
-     - **显式 No-op**: 如果以上信号均不存在，必须在同步结果中明确记录“无需更新 Domain Model”及理由，而不是静默跳过。
+  1. **Service Blueprint Sync 判定**: 必须判断是否需要回写 `docs/baseline/service_blueprint.html`。当且仅当存在以下任一变化时执行回流：
+     - 受影响的旅程阶段 (`SB-STAGE-*`) 发生新增、移除或覆盖变化
+     - 受影响的泳道节点 (`SB-<LANE>-*`) 中 capability 分布发生新增、移除或重排
+     - capability 状态在"已落地 / 规划中 / 横切支撑"之间发生变化
+     - 新增或修改跨阶段支撑能力
+     - `story.md`、`specs` 或 `design.md` 引入新的 blueprint 引用节点
+     - `design.md` 中的 `Service Blueprint Sync Assessment` 明确写为 `Needs Sync: Yes`
+     - **显式 No-op**: 如果以上信号均不存在，必须明确记录"无需更新 Service Blueprint"及理由，而不是静默跳过。
+  2. **Domain Model Sync 判定**: 必须判断是否需要回写 `docs/baseline/domain_model.html`。当且仅当存在以下任一变化时执行回流：
+     - `Bounded Context` 边界或 `BC -> Capability` 映射变化
+     - 新增、修改、移除 capability taxonomy
+     - 新增、修改、移除 Domain Event / Command / Policy
+     - Aggregate、状态机、对象关系、业务不变量发生变化
+     - **显式 No-op**: 如果以上信号均不存在，必须明确记录"无需更新 Domain Model"及理由，而不是静默跳过。
   3. **Auto Render**: 同步完成后自动刷新基线文档的可视化索引。
+- **HITL**: Baseline Sync 是粗粒度收尾动作，执行结果需用户确认。
 
 ### 9. 归档阶段 (Archive)
 - **指令**: `/opsx:archive`
 - **目标**: 将已完成的变更（包含测试）移至归档目录。
 - **流程**:
   - **全局 BDD 测试门禁**: 归档前必须运行 `init.sh e2e:run`，确保全局 Cucumber 测试通过。
-  - 归档前必须确保已经完成过 `sync`。
+  - 归档前必须确保已经完成过 Spec Sync（`/opsx:sync`）。
   - **技术债登记**: 登记本次变更遗留的技术债。
   - 移动路径: `openspec/changes/<name>/` -> `openspec/changes/archive/YYYY-MM-DD-<name>/`。
-  - **Epic 队列同步**: 归档完成后必须更新对应 `epic-*.story-list.json` 中该 Story 的状态为 `done`；若所有 Story 均已 `done`，将该 `story-list.json` 一并归档至 `openspec/changes/archive/`（文件名加 `YYYY-MM-DD-` 前缀），保留 Epic 交付记录，禁止直接删除。
+  - **Epic 队列同步**: 归档完成后必须更新对应 `epic-*.story-list.json` 中该 Story 的状态为 `done`；若所有 Story 均已 `done`，将该 `story-list.json` 一并归档至 `openspec/changes/archive/`（文件名加 `YYYY-MM-DD-` 前缀），保留 Epic 交付记录，禁止直接删除。**Epic 收尾后**提示执行 `Baseline Sync`（8.2）+ Roadmap 更新。
 
 ## Epic 队列管理 (Backlog Management)
 

@@ -23,7 +23,7 @@ model: inherit
 
 ### 2. 验证门禁（Verification Gates）
 
-- 加载 `openspec-verify` skill，执行并写入 `<changeRoot>/verify.md`：
+- 加载 `verify` skill，执行并写入 `<changeRoot>/verify.md`：
   - **Hard Gates**：`openspec validate`、`./init.sh node:test`、`./init.sh python:test`、`./init.sh vue:build`
   - **Soft Gates**：`./init.sh e2e:run`（失败记录摘要，不阻塞默认）
 - 任一 Hard Gate FAIL：标记 verify.md 对应项为 FAIL，停止并报告失败命令输出，不放行。

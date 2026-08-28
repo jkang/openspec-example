@@ -1,4 +1,10 @@
-# Storymap: <大需求名称>
+# Storymap: <Epic 名称> 需求拆分
+
+> Epic Key: `<epic-key>`
+> 关联调研: `research/<epic-key>.md`
+> 关联 Idea: `ideas/<idea-key>.md`
+> 关联原型: `prototypes/<epic-key>/*.html`（Epic 整体，若涉及 UI）
+> 产出后需用户确认（HITL）
 
 <!--
 storymap 用于把大需求（Epic 级）拆分为多个可独立交付的 Story。
@@ -7,7 +13,7 @@ storymap 用于把大需求（Epic 级）拆分为多个可独立交付的 Story
 -->
 
 ## 需求背景 (Background)
-<!-- 用 1-2 句话说明该大需求要解决的业务问题。 -->
+<!-- 用 1-2 句话说明该大需求要解决的业务问题（引用 research/idea 结论）。 -->
 
 ## 拆分粒度原则 (Granularity)
 <!--
@@ -26,14 +32,15 @@ storymap 用于把大需求（Epic 级）拆分为多个可独立交付的 Story
 
 ## 覆盖对账 (Coverage Reconciliation)
 <!--
-⚠️ 强制步骤：拆分前先列出 Epic 的 In Scope + Exit Criteria 清单；拆分后逐项对账。
-每个 Epic 承诺项（In Scope / Exit Criteria / B 端与 C 端）必须有 ≥1 个 Story 承接。
+⚠️ 强制步骤：拆分前先列出 Epic 的承诺项（来自 idea/research 的 In Scope + Exit Criteria + 候选 Capabilities）；拆分后逐项对账。
+每个 Epic 承诺项（In Scope / Exit Criteria / B 端与 C 端 / 候选 Capability）必须有 ≥1 个 Story 承接。
 对账结果写入下表；若有承诺项无 Story 承接，必须补拆 Story 或显式降级（说明理由）。
 -->
 
-| Epic 承诺项（来自 epic.md） | 承接 Story | 覆盖状态 |
+| Epic 承诺项（来自 idea/research） | 承接 Story | 覆盖状态 |
 | --- | --- | --- |
 | Exit Criteria ① ... | story-xxx-01 | ✅ 覆盖 / ❌ 未覆盖 |
+| Candidate Capability: ... | story-xxx-02 | ✅ 覆盖 / ❌ 未覆盖 |
 | In Scope: B 端 ... | story-xxx-03 | ✅ 覆盖 / ❌ 未覆盖 |
 
 ## 治理映射对齐

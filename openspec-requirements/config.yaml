@@ -5,14 +5,16 @@ schema: req-sdd
 context: |
   项目: ecommerce-mini - 一个展示 OpenSpec 规格驱动开发 (SDD) 的极简电商系统。
   需求侧工作区: openspec-requirements/ - 产品经理 (PM) 专属，仅用于大块 Epic 需求。
-  需求漏斗: product-plan → epic → idea → storymap → prototype(若UI) → story（业务面交付物）。
-  交接边界: 需求侧冻结交付物 story.md 通过 openspec-handoff 交给开发侧 openspec/changes/<name>/，
+  需求漏斗: research → explore → prototype(Epic整体) → storymap → story（业务面交付物）。
+  规划来源: docs/ROADMAP.md 是唯一权威（按阶段组织，每阶段条目即 Epic，一阶段可多 Epic）；需求侧不再产 roadmap。
+  交接边界: 需求侧冻结交付物 story.md 通过 /req:handoff（skill: handoff）交给开发侧 openspec/changes/<name>/，
     由 handoff 合成 proposal.md 后开发侧从 proposal 起步；行为规格 specs（Story-specs）由开发侧在 proposal 后按 capability 拆分生成。
+  分层 Sync: 每个 change 只做 Spec Sync（/opsx:sync，change 级）；Baseline Sync（/opsx:baseline/sync）在 Epic 全部 Story 归档后统一执行。
   适用范围: 仅大块 Epic 需求走本工作区。Bug Fix / Tech Debt / 简单功能修改（如单个 UI 优化）直接进入交付侧，不走本流程。
   治理文档 (唯一事实来源):
-    - 流程 SOP: docs/SOPS/SDD_WORKFLOW.md (需求漏斗 + 交接边界 + 适用范围路由)
+    - 流程 SOP: docs/SOPS/SDD_WORKFLOW.md (需求漏斗 + 交接边界 + 适用范围路由 + 分层 Sync)
     - 产品感: docs/PRODUCT_SENSE.md (Elevator Pitch 与业务导向)
-    - 产品路线图: docs/ROADMAP.md (唯一权威，需求侧 phase-plan 只引用不扩范围)
+    - 产品路线图: docs/ROADMAP.md (唯一权威，需求侧只消费其 Epic 条目)
     - 前端规范: docs/FRONTEND.md (极简 UI 约束与浏览器验证闭环)
     - 后端架构: docs/ARCHITECTURE.md (Node.js/Python 四层架构设计)
     - 测试策略: docs/TESTING_STRATEGY.md (BDD 标签与 Cucumber E2E 规范)
@@ -27,25 +29,31 @@ planning:
   domain_model: docs/baseline/domain_model.html
 
 rules:
-  product-plan:
-    - 必须对齐 docs/ROADMAP.md（唯一权威）当前阶段目标，只引用不扩范围
-    - 产品规划产出的是一批 Epics，作为需求漏斗的源
-    - 产出到 planning/phase-plan.md（非 ROADMAP.md，避免与全局 Roadmap 双写）
-  epic:
-    - 每个 Epic 必须声明目标、范围 (In/Out of Scope)、Exit Criteria
-    - 必须参考 docs/baseline/domain_model.html 识别 Impacted Bounded Contexts 与 Candidate Capabilities
-    - 必须参考 docs/baseline/business_process.html 识别受影响的 L1/L2/L3 流程节点
-    - 必须参考 docs/baseline/service_blueprint.html 识别受影响的 SB-STAGE-* 与 SB-<LANE>-* 节点
-    - 拆分状态必须单选（未启动/探索中/已探索/拆分中/已拆分/交付中/已完成）
-  idea:
-    - 必须执行"结构化 6 步法"澄清业务意图、Roadmap 对齐、业务设计思路、任务类型、治理映射、需求拆分建议
+  research:
+    - 针对单个 Epic（来自 docs/ROADMAP.md 阶段条目）做调研
+    - 只负责收集：Epic 背景 / 调研对象 / 原始需求信息 / 业务约束线索 / 疑问待澄清项 / 调研结论
+    - 不做产品设计转化（那是 explore 的职责）
+    - 产出到 research/<epic-key>.md
+  explore:
+    - 必须基于已确认的 research/<epic-key>.md
+    - 必须包含 To-Be Process（目标流程）与 To-Be Journey（目标旅程）业务设计
+    - 必须识别候选 Capabilities（对齐 docs/baseline/domain_model.html 的 BC→Capability 映射，新增 taxonomy 显式标注）
     - 必须包含 B/C 双端视角（B 端如何配置/生命周期/权限；C 端交互）
-    - 必须参考 docs/baseline/domain_model.html 识别 Impacted Bounded Contexts
     - 任务类型确认：Bug Fix / Tech Debt / 简单功能修改 → 直走交付侧，不继续需求漏斗
+    - 治理映射对齐：domain_model (Bounded Context) / business_process (L1/L2/L3) / service_blueprint (SB-STAGE-*/SB-<LANE>-*)
     - 拒绝空洞占位符，必须使用真实业务数据
+  prototype:
+    - 在需求拆分（storymap）之前完成，针对 Epic 整体做原型（一次完成）
+    - 必须严格遵循 docs/FRONTEND.md 的 UI 规范
+    - 现代扁平化：禁止圆角 (rounded-none)、禁止阴影 (shadow-none)、禁止装饰性 Emoji
+    - 颜色方案：使用 slate 色系 (slate-50 背景, slate-200 边框, slate-900 强调色)
+    - 数据要求：严禁使用空洞模板（foo/test），必须填充真实的业务数据示例
+    - 交互界面：必须完全使用中文
+    - 技术实现：使用 Vue 3 (CDN) + Tailwind CSS (CDN) 的可交互 HTML
+    - 产出后必须等待用户确认 (HITL)
   storymap:
     - 仅用于大需求/复杂 idea 拆分为多个 Story
-    - 覆盖对账（强制）：Epic 的每个 In Scope / Exit Criteria / B 端承诺项必须有 ≥1 个 Story 承接
+    - 覆盖对账（强制）：Epic 的每个 In Scope / Exit Criteria / B 端承诺项 / 候选 Capability 必须有 ≥1 个 Story 承接
     - 粒度原则：每个 Story 是一个完整端到端功能（不拆到行为/UI 细节级），避免破坏上下文
     - 每个拆分出的 Story 必须有人物 (role)、价值 (value)、目标 (goal) 三要素
     - 必须给出各 Story 的依赖关系与优先级 (P0/P1/P2)
@@ -55,13 +63,5 @@ rules:
     - ⚠️ 不含行为规格：specs（Story-specs）由开发侧在 proposal 后按 capability 拆分生成
     - 验收标准必须覆盖端到端 (E2E) 旅程，使用 Given/When/Then，映射到 L1/L2/L3 流程节点
     - 验收标准必须同时映射到 service_blueprint.html 中的 SB-STAGE-* 与 SB-<LANE>-* 节点
-    - 若涉及 UI，必须链接已确认的 prototype.html（HITL 确认后）；无已确认原型禁止勾选"待开发交接"
+    - 若涉及 UI，必须引用已确认的 Epic 整体原型 prototypes/<epic-key>/*.html；无已确认原型禁止勾选"待开发交接"
     - 拒绝空洞占位符，必须使用真实业务数据
-  prototype:
-    - 必须严格遵循 docs/FRONTEND.md 的 UI 规范
-    - 现代扁平化：禁止圆角 (rounded-none)、禁止阴影 (shadow-none)、禁止装饰性 Emoji
-    - 颜色方案：使用 slate 色系 (slate-50 背景, slate-200 边框, slate-900 强调色)
-    - 数据要求：严禁使用空洞模板（foo/test），必须填充真实的业务数据示例
-    - 交互界面：必须完全使用中文
-    - 技术实现：使用 Vue 3 (CDN) + Tailwind CSS (CDN) 的可交互 HTML
-    - 产出后必须等待用户确认 (HITL)

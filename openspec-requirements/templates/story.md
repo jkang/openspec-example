@@ -2,14 +2,15 @@
 
 <!--
 Story 是需求侧唯一冻结交付物（业务面）。
-开发侧通过 openspec-handoff 以本 Story 为输入，在 openspec/changes/<name>/ 合成 proposal.md，
+开发侧通过 /req:handoff（skill: handoff）以本 Story 为输入，在 openspec/changes/<name>/ 合成 proposal.md，
 随后在开发侧按 capability 拆分生成行为规格 specs（Story-specs）。
 需求侧不生成 specs/，行为规格一律由开发侧在 proposal 之后产出。
 -->
 
 > Story Key: `<story-key>` | 优先级: P0/P1/P2 | 依赖: `<依赖 story 或 无>`
-> 关联 Storymap: `storymaps/<key>/storymap.md`
+> 关联 Storymap: `storymaps/<epic-key>/storymap.md`
 > 关联 Idea: `ideas/<idea-key>.md`
+> 关联原型（Epic 整体）: `prototypes/<epic-key>/*.html`
 
 ## 用户场景 (User Scenario)
 <!--
@@ -31,7 +32,7 @@ Story 是需求侧唯一冻结交付物（业务面）。
 <!--
 如果涉及前端 UI，必须在此链接到【已确认】的原型文件。
 ⚠️ UI 门禁：涉及 UI 的 Story，若原型未生成并经用户 HITL 确认，禁止勾选下方「待开发交接」。
-- 原型链接：stories/<key>/prototypes/<capability>.html
+- 原型链接：prototypes/<epic-key>/<capability>.html
 - 关键交互点：
 -->
 

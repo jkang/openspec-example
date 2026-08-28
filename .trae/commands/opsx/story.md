@@ -18,4 +18,4 @@ This command generates a `story.md` file that captures the end-to-end user journ
 
 ## Skill
 
-This command is powered by the `openspec-story` skill.
+This command is powered by the `story` skill.

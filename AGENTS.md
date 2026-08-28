@@ -16,16 +16,16 @@
 
 本项目以 4 人团队形态模拟最新软件团队，角色定义**跨工具同步**，各工具按自身机制加载：
 
-| 角色 | 职责 | opencode | Cursor | Trae / 通用 |
-| :--- | :--- | :--- | :--- | :--- |
-| **lead** (Tech Lead/架构师, primary) | 编排交付（含需求侧漏斗路由与 openspec-handoff 交接）、架构设计、流程收尾，用户唯一入口 | `.opencode/agents/lead.md` | `.cursor/agents/lead.md` | `.trae/skills/sdd-team/lead/` (sdd-team-lead) |
-| **pm** (产品经理) | 产品感/路线图、需求侧工作区（需求漏斗，仅 Epic）、探索需求、业务评审 | `.opencode/agents/pm.md` | `.cursor/agents/pm.md` | `.trae/skills/sdd-team/pm/` (sdd-team-pm) |
-| **engineer** (全栈工程师) | 从 proposal 起步：行为规格 specs/技术设计/代码实施（需求侧原型由 pm 承担） | `.opencode/agents/engineer.md` | `.cursor/agents/engineer.md` | `.trae/skills/sdd-team/engineer/` (sdd-team-engineer) |
-| **qa** (质量工程师) | 验证门禁/对抗审查（含需求侧 req-sdd 制品质量兜底） | `.opencode/agents/qa.md` | `.cursor/agents/qa.md` | `.trae/skills/sdd-team/qa/` (sdd-team-qa) |
+| 角色 | 职责 | opencode（权威） | Cursor |
+| :--- | :--- | :--- | :--- |
+| **lead** (Tech Lead/架构师, primary) | 编排交付（含需求侧漏斗路由与 `/req:handoff` 交接）、架构设计、流程收尾，用户唯一入口 | `.opencode/agents/lead.md` | `.cursor/agents/lead.md` |
+| **pm** (产品经理) | 产品感/路线图、需求侧工作区（需求漏斗，仅 Epic）、需求调研/探索、业务评审 | `.opencode/agents/pm.md` | `.cursor/agents/pm.md` |
+| **engineer** (全栈工程师) | 从 proposal 起步：行为规格 specs/技术设计/代码实施（需求侧原型由 pm 承担） | `.opencode/agents/engineer.md` | `.cursor/agents/engineer.md` |
+| **qa** (质量工程师) | 验证门禁/对抗审查（含需求侧 req-sdd 制品质量兜底） | `.opencode/agents/qa.md` | `.cursor/agents/qa.md` |
 
-- **同步规则**：任何对团队角色定义（职责、约束、协作契约）的修改，必须同步更新上述 4 处（`.opencode/agents/`、`.cursor/agents/`、`.trae/skills/sdd-team/`、`.agents/skills/sdd-team/`，其中后两者内容必须一致）。
-- **编排契约**：`lead` 是用户与团队的唯一对话入口，通过任务委派调度 pm/engineer/qa；每个 HITL 检查点（原型确认、story 评审、归档放行）必须暂停征求用户确认。
-- **唯一事实来源**：角色职责的权威内容以 `.opencode/agents/*.md` 为基准（含权限与 mode 配置），其余位置为格式适配副本。
+- **同步规则**：任何对团队角色定义（职责、约束、协作契约）的修改，必须同步更新 2 处（`.opencode/agents/` 权威 + `.cursor/agents/` 格式适配副本）。
+- **编排契约**：`lead` 是用户与团队的唯一对话入口，通过任务委派调度 pm/engineer/qa；每个 HITL 检查点（需求调研/探索/原型/Story/验证/Baseline Sync 确认）必须暂停征求用户确认。
+- **唯一事实来源**：角色职责的权威内容以 `.opencode/agents/*.md` 为基准（含权限与 mode 配置），Cursor 副本为格式适配。
 
 ## 📚 治理与深链接 (Governance & Deep Links)
 
@@ -49,11 +49,12 @@
 所有的需求、设计和任务都与代码一起进行版本控制：
 
 - `docs/PRODUCT_SENSE.md`: **[全局规划]** 定义产品灵魂、痛点及竞争优势。
-- `docs/ROADMAP.md`: **[全局规划]** 定义滚动路线图、阶段边界及当前 Baseline（**唯一权威**，需求侧 phase-plan 只引用不扩范围）。
+- `docs/ROADMAP.md`: **[全局规划]** 定义滚动路线图、阶段边界及当前 Baseline（**唯一权威**，按阶段组织，每阶段条目即 Epic，需求侧只消费其 Epic 不扩范围）。
 - `docs/baseline/`: **[业务基线]** 包含 Blueprint, Process Flow 和 Event-Storming Domain Model。这是系统认知的核心沉淀。
 - `openspec/schemas/spec-driven.yaml`: **[Schema 优先]** 定义了开发侧所有制品的生成指令和格式约束，是开发侧工作流的最底层事实来源。
-- `openspec-requirements/`: **[需求侧工作区]** 需求漏斗（仅大块 Epic）：`planning/phase-plan.md` → `planning/epics/` → `ideas/` → `storymaps/` → `stories/<key>/story.md`（业务面冻结交付物）。Schema 见 `openspec-requirements/schemas/req-sdd.yaml`，规则见 `openspec-requirements/config.yaml`。
-- **适用范围路由**：大块 Epic 走需求侧漏斗（`/opsx:req-planning` → `req-research` → `req-breakdown` → `req-prototype`(UI) → `req-story` → `/opsx:handoff`）；Bug Fix / Tech Debt / 简单功能修改**直走交付侧**（`/opsx:propose` 起）。
+- `openspec-requirements/`: **[需求侧工作区]** 需求漏斗（仅大块 Epic）：`research/<epic-key>.md` → `ideas/<idea-key>.md` → `prototypes/<epic-key>/` → `storymaps/<epic-key>/` → `stories/<story-key>/story.md`（业务面冻结交付物）。Schema 见 `openspec-requirements/schemas/req-sdd.yaml`，规则见 `openspec-requirements/config.yaml`。
+- **适用范围路由**：大块 Epic 走需求侧漏斗（`/req:research` → `/req:explore` → `/req:prototype`(UI, Epic整体) → `/req:storymap` → `/req:story` → `/req:handoff`）；Bug Fix / Tech Debt / 简单功能修改**直走交付侧**（`/opsx:propose` 起）。
+- **分层 Sync**：每个 change 只做 Spec Sync（`/opsx:sync`，change 级）；Baseline Sync（`/opsx:baseline/sync`）在 Epic 全部 Story 归档后统一执行。
 - `openspec/changes/ideas/`: 通过 `/opsx:explore` 产生的原始想法（开发侧直走任务）。
 - `openspec/changes/`: 活跃的执行计划 (提案 Proposal、设计 Design、任务 Tasks、原型 Prototypes)。
 - `openspec/changes/archive/`: 已完成并归档的执行计划。
