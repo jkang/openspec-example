@@ -142,7 +142,7 @@ flowchart TD
 | 节点 | 环节 | 命令 | Skill | 产物 | 主导 | HITL |
 | --- | --- | --- | --- | --- | --- | --- |
 | A | 规划基线（起点即含 roadmap·每阶段多 Epic） | `/opsx:planning:product-sense` / `product-planning` | `product-sense` / `product-planning` | `PRODUCT_SENSE.md` / `ROADMAP.md` | PM | — |
-| B | 业务基线 | `/opsx:baseline/sync` | `*`×4 | baseline 三件套 html | PM/Lead | — |
+| B | 业务基线 | `/opsx:baseline/sync` | `blueprint` / `domain-model` / `process-flow` / `render` | baseline 三件套 html | PM/Lead | — |
 | R | 适用范围路由 | 决策点 | — | 分流：Epic→需求侧；其余→交付侧 | Lead | — |
 | P1 | 需求调研 | `/req:research` | `research` | `research.md`（单 Epic） | PM | ✅ |
 | P2 | 探索 | `/req:explore` | `explore` | `idea.md`（To-Be Process/Journey + 候选 Capabilities） | PM | ✅ |
@@ -157,7 +157,7 @@ flowchart TD
 | D4 | 实施与验证 | `/opsx:apply` → `/opsx:verify` | `apply-change` / `verify` | 代码 + `verify.md` | Engineer | ✅ |
 | K1 | Spec Sync（change 级） | `/opsx:sync` | `sync-specs` | delta→`openspec/specs` | Lead | — |
 | L | 归档 | `/opsx:archive` | `archive-change` | 归档 + epic 队列更新 | Lead | — |
-| K2 | Baseline Sync（Epic 级） | `/opsx:baseline/sync` | `*`×4 | 统一回流 `docs/baseline/*.html` | Lead | ✅ |
+| K2 | Baseline Sync（Epic 级） | `/opsx:baseline/sync` | `blueprint` / `domain-model` / `process-flow` / `render` | 统一回流 `docs/baseline/*.html` | Lead | ✅ |
 | M | 周期回顾 | `/opsx:planning:product-planning` | `product-planning` | 更新 `ROADMAP.md` | PM | — |
 
 ---
@@ -211,7 +211,7 @@ flowchart TD
 │   └── skills/              # [基础] Skill 按域子目录组织（三目录同步）
 │       ├── prod/            #   产品/需求侧 skill（research/explore/prototype/storymap/story/handoff + product-sense/product-planning/delivery-board）
 │       ├── opsx/            #   交付侧 skill（propose/spec-design/apply-change/verify/sync-specs/archive-change/update-change/explore/prototype/story）
-│       └── baseline/        #   业务基线 skill（*，保留前缀）
+│       └── baseline/        #   业务基线 skill（blueprint/domain-model/process-flow/render）
 ├── .cursor/                 # [基础] Cursor IDE 的 SDD 规则与门禁指令（skills/ 同 .agents 结构）
 ├── .trae/                   # [基础] Trae IDE 的 SDD 规则与门禁指令（skills/ 同 .agents 结构）
 │   └── commands/
