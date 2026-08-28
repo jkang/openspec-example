@@ -27,10 +27,10 @@ storymap 用于把大需求（Epic 级）拆分为多个可独立交付的 Story
 
 | Story ID | 标题 | 角色 (Role) | 价值 (Value) | 目标 (Goal) | 依赖 | 优先级 | 状态 |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| story-account-register | 用户注册 | C 端新买家（如林晓明） | 极简注册后即自动登录，无需二次登录即可下单 | 手机号+密码+昵称完成注册，手机号唯一校验，成功后创建账户并自动登录 | 无 | P0 | planned |
-| story-account-login | 用户登录 | C 端已注册买家 | 凭手机号+密码恢复身份，访问受保护的「我的订单」与下单能力 | 校验凭证正确后创建持久会话，错误与禁用状态有明确提示 | story-account-register（用户池） | P0 | planned |
-| story-account-session | 会话保持与退出 | C 端买家（登录后） | 刷新/换页不掉登录态，订单归属当前用户；主动退出即销毁会话 | 会话凭证持久化并全局校验；「我的订单」按登录用户归属查询；退出登录销毁会话 | story-account-login | P0 | planned |
-| story-account-admin-users | B 端用户管理 | B 端运营（陈运营） | 告别"订单里全是 user_dev"，按真实用户检索并查看订单聚合，支持禁用管控 | 用户列表/按手机号或昵称检索/详情（含订单聚合）/禁用启用；仅运营角色可见 | story-account-register（用户数据） | P1 | planned |
+| story-account-system-register | 用户注册 | C 端新买家（如林晓明） | 极简注册后即自动登录，无需二次登录即可下单 | 手机号+密码+昵称完成注册，手机号唯一校验，成功后创建账户并自动登录 | 无 | P0 | planned |
+| story-account-system-login | 用户登录 | C 端已注册买家 | 凭手机号+密码恢复身份，访问受保护的「我的订单」与下单能力 | 校验凭证正确后创建持久会话，错误与禁用状态有明确提示 | story-account-system-register（用户池） | P0 | planned |
+| story-account-system-session | 会话保持与退出 | C 端买家（登录后） | 刷新/换页不掉登录态，订单归属当前用户；主动退出即销毁会话 | 会话凭证持久化并全局校验；「我的订单」按登录用户归属查询；退出登录销毁会话 | story-account-system-login | P0 | planned |
+| story-account-system-admin-users | B 端用户管理 | B 端运营（陈运营） | 告别"订单里全是 user_dev"，按真实用户检索并查看订单聚合，支持禁用管控 | 用户列表/按手机号或昵称检索/详情（含订单聚合）/禁用启用；仅运营角色可见 | story-account-system-register（用户数据） | P1 | planned |
 
 ## 覆盖对账 (Coverage Reconciliation)
 
@@ -38,21 +38,21 @@ storymap 用于把大需求（Epic 级）拆分为多个可独立交付的 Story
 
 | Epic 承诺项（来自 idea/research） | 承接 Story | 覆盖状态 |
 | --- | --- | --- |
-| Exit Criteria ① 注册/登录 E2E 通过（登录后可下单，订单归属当前用户） | story-account-register + story-account-login + story-account-session | ✅ 覆盖（注册自动登录 → 登录会话 → 会话页归属订单） |
-| Exit Criteria ② 未登录不可下单/查看我的订单（引导登录） | story-account-session（未登录拦截 + 引导） | ✅ 覆盖 |
-| Exit Criteria ③ 会话保持（刷新不掉登录态） | story-account-session | ✅ 覆盖 |
-| In Scope：用户账户注册/登录/会话（基础认证，无第三方依赖） | story-account-register + story-account-login + story-account-session | ✅ 覆盖 |
-| In Scope：订单与优惠券按真实用户归属；「我的订单」按登录用户查询 | story-account-session（我的订单归属隔离）；order-management 改造约束写入 story-account-session 验收 | ✅ 覆盖 |
-| In Scope：用户基础信息（昵称/联系方式） | story-account-register（注册采集昵称+手机号） | ✅ 覆盖 |
-| B 端承诺：用户管理入口（列表/检索/详情/禁用，运营权限） | story-account-admin-users | ✅ 覆盖 |
-| Candidate Capability: `account-management`（新增 taxonomy） | story-account-register + story-account-login | ✅ 覆盖 |
-| Candidate Capability: `user-session`（新增 taxonomy） | story-account-login + story-account-session | ✅ 覆盖 |
-| Candidate Capability: `user-admin`（新增 taxonomy） | story-account-admin-users | ✅ 覆盖 |
-| Candidate Capability: `order-management`（修改，真实 userId 归属） | story-account-session（归属查询验收）；下单归属改造并入 register/login 链路验收 | ✅ 覆盖 |
-| Explore 护栏：B/C 双端原型 | story-account-register/login/session（C 端）+ story-account-admin-users（B 端） | ✅ 覆盖 |
-| 约束：零第三方认证依赖 / 文件会话持久化 | story-account-login + story-account-session（会话实现约束） | ✅ 覆盖 |
-| 约束：手机号唯一性 | story-account-register | ✅ 覆盖 |
-| 约束：禁用用户会话失效 | story-account-admin-users（禁用动作）+ story-account-session（会话校验拦截） | ✅ 覆盖 |
+| Exit Criteria ① 注册/登录 E2E 通过（登录后可下单，订单归属当前用户） | story-account-system-register + story-account-system-login + story-account-system-session | ✅ 覆盖（注册自动登录 → 登录会话 → 会话页归属订单） |
+| Exit Criteria ② 未登录不可下单/查看我的订单（引导登录） | story-account-system-session（未登录拦截 + 引导） | ✅ 覆盖 |
+| Exit Criteria ③ 会话保持（刷新不掉登录态） | story-account-system-session | ✅ 覆盖 |
+| In Scope：用户账户注册/登录/会话（基础认证，无第三方依赖） | story-account-system-register + story-account-system-login + story-account-system-session | ✅ 覆盖 |
+| In Scope：订单与优惠券按真实用户归属；「我的订单」按登录用户查询 | story-account-system-session（我的订单归属隔离）；order-management 改造约束写入 story-account-system-session 验收 | ✅ 覆盖 |
+| In Scope：用户基础信息（昵称/联系方式） | story-account-system-register（注册采集昵称+手机号） | ✅ 覆盖 |
+| B 端承诺：用户管理入口（列表/检索/详情/禁用，运营权限） | story-account-system-admin-users | ✅ 覆盖 |
+| Candidate Capability: `account-management`（新增 taxonomy） | story-account-system-register + story-account-system-login | ✅ 覆盖 |
+| Candidate Capability: `user-session`（新增 taxonomy） | story-account-system-login + story-account-system-session | ✅ 覆盖 |
+| Candidate Capability: `user-admin`（新增 taxonomy） | story-account-system-admin-users | ✅ 覆盖 |
+| Candidate Capability: `order-management`（修改，真实 userId 归属） | story-account-system-session（归属查询验收）；下单归属改造并入 register/login 链路验收 | ✅ 覆盖 |
+| Explore 护栏：B/C 双端原型 | story-account-system-register/login/session（C 端）+ story-account-system-admin-users（B 端） | ✅ 覆盖 |
+| 约束：零第三方认证依赖 / 文件会话持久化 | story-account-system-login + story-account-system-session（会话实现约束） | ✅ 覆盖 |
+| 约束：手机号唯一性 | story-account-system-register | ✅ 覆盖 |
+| 约束：禁用用户会话失效 | story-account-system-admin-users（禁用动作）+ story-account-system-session（会话校验拦截） | ✅ 覆盖 |
 
 **对账结论**：14 项承诺项全部 ✅ 覆盖，无未覆盖项需补拆或降级。
 
@@ -65,7 +65,7 @@ storymap 用于把大需求（Epic 级）拆分为多个可独立交付的 Story
 
 ## 关联 Stories
 
-- `epics/account-system/stories/story-account-register/story.md`
-- `epics/account-system/stories/story-account-login/story.md`
-- `epics/account-system/stories/story-account-session/story.md`
-- `epics/account-system/stories/story-account-admin-users/story.md`
+- `epics/account-system/stories/story-account-system-register/story.md`
+- `epics/account-system/stories/story-account-system-login/story.md`
+- `epics/account-system/stories/story-account-system-session/story.md`
+- `epics/account-system/stories/story-account-system-admin-users/story.md`

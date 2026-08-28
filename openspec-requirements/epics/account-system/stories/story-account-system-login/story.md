@@ -7,7 +7,7 @@ Story 是需求侧唯一冻结交付物（业务面）。
 需求侧不生成 specs/，行为规格一律由开发侧在 proposal 之后产出。
 -->
 
-> Story Key: `story-account-login` | 优先级: P0 | 依赖: story-account-register（用户池）
+> Story Key: `story-account-system-login` | 优先级: P0 | 依赖: story-account-system-register（用户池）
 > 关联 Storymap: `epics/account-system/storymap.md`
 > 关联 Idea: `epics/account-system/idea.md`
 > 关联原型（Epic 整体）: `epics/account-system/prototypes/account-login.html`
@@ -17,7 +17,7 @@ Story 是需求侧唯一冻结交付物（业务面）。
 - **目标用户（C 端）**：已注册买家（如林晓明），更换设备或清理浏览器后再次访问商城。
 - **使用动机**：购物车跟随账户、查看「我的订单」、继续下单都需要恢复身份。
 - **关键目标**：用手机号 + 密码快速恢复登录态；错误场景（密码错误/禁用）给出明确反馈。
-- **B 端视角**：登录是会话生命周期的一部分，无后台配置；被 B 端禁用的用户（见 story-account-admin-users）登录时被拦截。登录凭证校验失败次数策略（Q-1 默认不限次，待确认）。
+- **B 端视角**：登录是会话生命周期的一部分，无后台配置；被 B 端禁用的用户（见 story-account-system-admin-users）登录时被拦截。登录凭证校验失败次数策略（Q-1 默认不限次，待确认）。
 
 ## 范围 (Scope)
 
@@ -46,8 +46,8 @@ Story 是需求侧唯一冻结交付物（业务面）。
 | --- | --- | --- | --- | --- |
 | R-LOG-001 | 手机号格式校验 11 位 | 提交登录 | 非法格式提示，不提交 | 与注册校验一致 |
 | R-LOG-002 | 凭证不区分账号不存在/密码错误 | 校验失败 | 统一提示「手机号或密码不正确，请重试」 | 安全惯例，防账号枚举 |
-| R-LOG-003 | 已禁用用户禁止登录 | 用户 status=已禁用 时提交 | 提示「该账户已被禁用，如有疑问请联系平台客服」，不创建会话 | 与 story-account-admin-users 的禁用动作联动 |
-| R-LOG-004 | 登录成功创建持久会话 | 凭证校验通过 | 生成会话凭证，前端持久化存储；刷新不掉 | 会话能力详见 story-account-session |
+| R-LOG-003 | 已禁用用户禁止登录 | 用户 status=已禁用 时提交 | 提示「该账户已被禁用，如有疑问请联系平台客服」，不创建会话 | 与 story-account-system-admin-users 的禁用动作联动 |
+| R-LOG-004 | 登录成功创建持久会话 | 凭证校验通过 | 生成会话凭证，前端持久化存储；刷新不掉 | 会话能力详见 story-account-system-session |
 | R-LOG-005 | 会话凭证零第三方依赖 | 会话创建 | 使用文件/内存会话存储 | 对齐 ROADMAP Explore 护栏 |
 | R-LOG-006 | 登录后回跳原页面 | 从受保护页（我的订单/结算）跳转登录 | 登录成功后回到原目标页面 | Q-4 默认整页跳转 + 回跳 |
 

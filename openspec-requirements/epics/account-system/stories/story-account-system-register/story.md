@@ -7,7 +7,7 @@ Story 是需求侧唯一冻结交付物（业务面）。
 需求侧不生成 specs/，行为规格一律由开发侧在 proposal 之后产出。
 -->
 
-> Story Key: `story-account-register` | 优先级: P0 | 依赖: 无
+> Story Key: `story-account-system-register` | 优先级: P0 | 依赖: 无
 > 关联 Storymap: `epics/account-system/storymap.md`
 > 关联 Idea: `epics/account-system/idea.md`
 > 关联原型（Epic 整体）: `epics/account-system/prototypes/account-register.html`
@@ -17,7 +17,7 @@ Story 是需求侧唯一冻结交付物（业务面）。
 - **目标用户（C 端）**：新买家（如林晓明），首次在商城下单，当前无任何账户。
 - **使用动机**：购物车已有商品，点击「去结算」时被引导登录——没有账户，只能先注册。
 - **关键目标**：用最少的步骤完成注册并直接进入可用状态（自动登录），不要重复填表、不要二次登录。
-- **B 端视角**：注册由 C 端自助发起，后台无配置项；注册产生的用户数据（昵称/手机号）成为 B 端用户管理（story-account-admin-users）与订单归属的基础。生命周期起点：`注册成功 → 状态正常`。
+- **B 端视角**：注册由 C 端自助发起，后台无配置项；注册产生的用户数据（昵称/手机号）成为 B 端用户管理（story-account-system-admin-users）与订单归属的基础。生命周期起点：`注册成功 → 状态正常`。
 
 ## 范围 (Scope)
 
@@ -25,7 +25,7 @@ Story 是需求侧唯一冻结交付物（业务面）。
 - 注册表单：手机号（11 位）、昵称（默认"手机尾号用户"可改）、密码（≥6 位，单次输入 + 明文切换）。
 - 手机号唯一性校验：已注册手机号提示「该手机号已注册，请直接登录」，不创建重复用户。
 - 创建用户记录（`users.json` 持久化，对齐现有 JSON 存储风格）。
-- 注册成功即自动登录（创建会话，见 story-account-login 的会话能力复用）。
+- 注册成功即自动登录（创建会话，见 story-account-system-login 的会话能力复用）。
 - 密码安全：不落明文（存储哈希）。
 
 ### Out of Scope
@@ -49,7 +49,7 @@ Story 是需求侧唯一冻结交付物（业务面）。
 | R-REG-003 | 昵称必填，长度 ≤20 字，默认"手机尾号用户" | 提交注册 | 昵称为空提示「请输入昵称」；未填时采用默认昵称 | |
 | R-REG-004 | 密码最少 6 位，最长 32 位 | 提交注册 | 长度不足提示「密码至少 6 位」，不提交 | 单次输入 + 明文可见切换 |
 | R-REG-005 | 密码不得明文落库 | 创建用户 | 存储密码哈希，不存明文 | 安全约束 |
-| R-REG-006 | 注册成功即自动登录 | 用户创建成功 | 创建会话凭证并跳转登录态；无需二次登录 | 与 story-account-login 会话能力复用 |
+| R-REG-006 | 注册成功即自动登录 | 用户创建成功 | 创建会话凭证并跳转登录态；无需二次登录 | 与 story-account-system-login 会话能力复用 |
 | R-REG-007 | 新用户默认状态为「正常」 | 用户创建 | status = 正常，可立即下单 | B 端用户管理数据来源 |
 
 ## 验收标准 (E2E 用户旅程)
@@ -81,7 +81,7 @@ Story 是需求侧唯一冻结交付物（业务面）。
 
 - Source of Truth: `docs/baseline/domain_model.html`
 - Bounded Context: **User Context（新增 taxonomy，domain_model 现无用户认证 BC）**；Shared / Cross（复用 error-handling）
-- Capability Taxonomy: **`account-management`（新增 taxonomy）**——承载注册（本 Story）；`user-session`（新增，自动登录复用，详见 story-account-login）
+- Capability Taxonomy: **`account-management`（新增 taxonomy）**——承载注册（本 Story）；`user-session`（新增，自动登录复用，详见 story-account-system-login）
 - Related Process Nodes: `L1-03 加购与准备`（身份前置）、`L1-04 下单结算`（注册后继续下单，订单绑定真实 userId）
 - Related Service Blueprint Nodes: `SB-STAGE-01`（顶部登录/注册入口）、`SB-STAGE-03`（结算引导注册）、`SB-CUSTOMER-01`（注册触点）、`SB-CUSTOMER-03`（结算前登录引导）
 - Sync Assessment: **Yes** — 新增 `User Context` BC 与 `account-management` taxonomy，属基线级新增，需 Epic 归档后 Baseline Sync（本阶段预判不执行）

@@ -7,7 +7,7 @@ Story 是需求侧唯一冻结交付物（业务面）。
 需求侧不生成 specs/，行为规格一律由开发侧在 proposal 之后产出。
 -->
 
-> Story Key: `story-account-session` | 优先级: P0 | 依赖: story-account-login
+> Story Key: `story-account-system-session` | 优先级: P0 | 依赖: story-account-system-login
 > 关联 Storymap: `epics/account-system/storymap.md`
 > 关联 Idea: `epics/account-system/idea.md`
 > 关联原型（Epic 整体）: `epics/account-system/prototypes/account-session.html`
@@ -30,7 +30,7 @@ Story 是需求侧唯一冻结交付物（业务面）。
 - 「我的订单」归属查询：按当前会话 userId 返回订单列表（替代 `user_dev` 占位）。
 - 未登录访问「我的订单」/下单：拦截并引导登录（整页跳转 + 回跳）。
 - 退出登录：销毁会话凭证，前端清除登录态，回到未登录状态。
-- 禁用用户会话失效：会话校验时检测用户状态，禁用即拒绝（联动 story-account-admin-users）。
+- 禁用用户会话失效：会话校验时检测用户状态，禁用即拒绝（联动 story-account-system-admin-users）。
 
 ### Out of Scope
 - 会话过期时间的自动刷新/续期策略（本阶段会话长期有效，待确认）。
@@ -52,7 +52,7 @@ Story 是需求侧唯一冻结交付物（业务面）。
 | R-SES-003 | 「我的订单」按会话 userId 归属查询 | 已登录访问我的订单 | 仅返回当前用户订单，倒序展示 | 替代 user_dev；对应 SB-BACKSTAGE-04 `GET /api/orders?userId=` |
 | R-SES-004 | 未登录访问受保护页面 → 整页跳转登录并回跳 | 未登录访问我的订单/结算 | 跳转登录页，登录成功后回跳原页面 | Q-4 默认方案 |
 | R-SES-005 | 退出登录销毁会话 | 点击「退出登录」 | 后端销毁会话凭证，前端清除登录态，回到未登录 | |
-| R-SES-006 | 禁用用户会话立即失效 | 用户被禁用后访问需登录接口 | 会话校验拒绝，返回未登录引导 | 联动 story-account-admin-users |
+| R-SES-006 | 禁用用户会话立即失效 | 用户被禁用后访问需登录接口 | 会话校验拒绝，返回未登录引导 | 联动 story-account-system-admin-users |
 | R-SES-007 | 下单绑定当前会话 userId | 已登录用户提交订单 | Order.userId = 当前登录用户（替代 user_dev） | order-management 修改落点，对齐 L1-04 |
 
 ## 验收标准 (E2E 用户旅程)

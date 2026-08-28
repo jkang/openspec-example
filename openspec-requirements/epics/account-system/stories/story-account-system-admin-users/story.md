@@ -7,7 +7,7 @@ Story 是需求侧唯一冻结交付物（业务面）。
 需求侧不生成 specs/，行为规格一律由开发侧在 proposal 之后产出。
 -->
 
-> Story Key: `story-account-admin-users` | 优先级: P1 | 依赖: story-account-register（用户数据）
+> Story Key: `story-account-system-admin-users` | 优先级: P1 | 依赖: story-account-system-register（用户数据）
 > 关联 Storymap: `epics/account-system/storymap.md`
 > 关联 Idea: `epics/account-system/idea.md`
 > 关联原型（Epic 整体）: `epics/account-system/prototypes/admin-users.html`
@@ -19,7 +19,7 @@ Story 是需求侧唯一冻结交付物（业务面）。
 - **关键目标**：按手机号/昵称检索用户、查看用户基础信息与其订单聚合、禁用恶意/异常用户；敏感信息受权限约束。
 - **B 端视角**：
   - **后台怎么配置**：用户管理为查看型后台功能，无需运营配置项（用户数据由 C 端注册产生）。
-  - **生命周期**：查看正常/禁用用户；禁用后用户会话立即失效（联动 story-account-session R-SES-006）；可重新启用。
+  - **生命周期**：查看正常/禁用用户；禁用后用户会话立即失效（联动 story-account-system-session R-SES-006）；可重新启用。
   - **谁有权限**：仅「运营」角色可见本入口；客服账号无权限访问全量用户资料（敏感信息保护，research 访谈记录 2 信号）。
 
 ## 范围 (Scope)
@@ -51,7 +51,7 @@ Story 是需求侧唯一冻结交付物（业务面）。
 | R-ADM-002 | 列表展示用户基础信息与订单数 | 进入用户管理 | 展示 ID/昵称/手机号/订单数/注册日期/状态 | 订单数聚合自订单归属 |
 | R-ADM-003 | 按手机号或昵称关键词检索 | 输入关键词搜索 | 返回匹配用户列表；空关键词返回全量 | |
 | R-ADM-004 | 用户详情展示该用户全部订单 | 点击用户查看详情 | 展示基础信息 + 订单聚合（订单号/商品/金额/状态） | 一人多单聚合，对齐运营诉求 |
-| R-ADM-005 | 禁用用户 | 点击「禁用」 | 状态变为「已禁用」；该用户现有会话立即失效 | 联动 story-account-session R-SES-006 |
+| R-ADM-005 | 禁用用户 | 点击「禁用」 | 状态变为「已禁用」；该用户现有会话立即失效 | 联动 story-account-system-session R-SES-006 |
 | R-ADM-006 | 启用用户 | 点击「启用」 | 状态恢复「正常」；可重新登录 | |
 | R-ADM-007 | 手机号属敏感信息，访问受限 | 非运营角色尝试读取用户手机号 | 拒绝返回手机号字段 | 敏感信息保护 |
 
