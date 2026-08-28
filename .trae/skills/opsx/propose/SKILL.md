@@ -15,7 +15,7 @@ Propose a new change - create the change and generate the initial `proposal.md`.
 **Planning boundary**: This workflow creates the initial planning artifact (`proposal.md`) only. Do not edit project code. After the proposal is complete, stop and let the user decide the next step based on the task type (Epic, Feature, Bug Fix, or Tech Debt).
 
 I'll create a change with the initial artifacts:
-- ideas/idea.md (structured exploration conclusions - MANDATORY first step)
+
 - proposal.md (what & why - defines the scope, capabilities, and process alignment)
 
 `<capability-path>` is the spec directory relative to `specs/` (for example, `user-auth` or `identity/user-auth`). Preserve an existing capability's full path and follow the project's established organization for new capabilities.
@@ -84,14 +84,12 @@ After generating the proposal, summarize the task type and recommend the next co
 
 5. **Generate the Proposal**
 
-   **MANDATORY CHECK**: Before creating `proposal.md`, you MUST ensure `ideas/idea.md` exists and contains the results of a structured 6-step exploration. If it's missing or generic, you MUST transition to the `openspec-explore` skill logic to clarify the business intent with the user first.
-
    a. **Get instructions for `proposal`**:
       ```bash
       openspec instructions proposal --change "<name>" --json
       ```
    b. **Create `proposal.md`**:
-      - Read `ideas/idea.md` for context.
+      - 直接基于用户描述/当前需求创建提案（不依赖 `idea.md`）。
       - Re-read `docs/baseline/domain_model.html`, `docs/baseline/business_process.html`, `docs/baseline/service_blueprint.html`, and `.trae/skills/baseline/blueprint/SKILL.md` as the governance source of truth.
       - Follow the `template` and `instruction` from the JSON.
       - Ensure the proposal explicitly lists `Impacted Bounded Contexts`, aligns `Capabilities` to the `domain_model.html` mapping, and records `Process Alignment` node IDs.

@@ -31,7 +31,7 @@ I'll create the following artifacts:
    
    Ensure `proposal.md` exists. 
    If the task type requires a prototype (Story/UI Bug Fix), ensure `prototype.html` exists and was approved.
-   If the task type is not Tech Debt, ensure `story.md` exists and was approved.
+   若为 handoff 场景，参考 proposal 中链接的需求侧 `story.md` 的 E2E 验收标准（开发侧不单独生成 story.md）。
    Re-read `docs/baseline/domain_model.html`, `docs/baseline/business_process.html`, `docs/baseline/service_blueprint.html`, and `.trae/skills/baseline/blueprint/SKILL.md` before drafting artifacts.
 
 2. **Generate Specs, Design, and Tasks**
@@ -43,7 +43,7 @@ I'll create the following artifacts:
         ```bash
         openspec instructions <artifact-id> --change "<name>" --json
         ```
-      - Read dependencies (e.g., `proposal.md`, `prototype.html`, `story.md` if any, and preceding artifacts) for context.
+      - Read dependencies (e.g., `proposal.md`, `prototype.html`, and preceding artifacts) for context.
       - Ensure every `specs/<capability-path>/spec.md` includes `Governance Mapping`, references the owning `Bounded Context`, and cites the related **L3 Process Nodes**.
       - Ensure every `specs/<capability-path>/spec.md` cites the related `SB-STAGE-*` and `SB-<LANE>-*` nodes.
       - Ensure `design.md` includes `Service Blueprint Sync Assessment`, with an explicit `Needs Sync: Yes/No` decision for `docs/baseline/service_blueprint.html`.
@@ -68,5 +68,5 @@ Prompt: "Planning is complete. When you are ready, run `/opsx:apply` to start im
 
 **Guardrails**
 - This workflow ONLY creates `specs`, `design`, and `tasks`. Do NOT proceed to implementation.
-- Always read the approved `prototype.html` (if any) and `story.md` (if any) before creating specs.
+- Always read the approved `prototype.html` (if any) and the linked requirements-side `story.md` (if handoff) before creating specs.
 - Ensure `tasks.md` contains E2E validation steps.

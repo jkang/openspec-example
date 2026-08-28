@@ -28,7 +28,7 @@ I'll create the prototype artifact:
 1. **Verify pre-requisites**
    
    Ensure `proposal.md` exists and contains the defined capabilities.
-   Check `ideas/idea.md` to confirm the task type requires a prototype (Feature or UI-related Bug Fix).
+   若为 handoff 场景，原型已在需求侧完成（`/req:prototype`），不重复制作；若为直走交付侧且涉及 UI，继续本流程。
 
 2. **Generate the Prototype**
    
@@ -37,7 +37,7 @@ I'll create the prototype artifact:
       openspec instructions prototype --change "<name>" --json
       ```
    b. **Create `prototype.html`**:
-      - Read `proposal.md` and `ideas/idea.md` for context.
+      - Read `proposal.md` for context.
       - Invoke the `prototype` skill (if applicable) or follow the schema instructions to generate the HTML.
       - Write the file to `resolvedOutputPath` (e.g., `prototypes/<capability-path>.html`).
       - Show progress: "Generated UI prototype at <path>"

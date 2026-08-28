@@ -24,7 +24,8 @@ This workflow creates an interactive HTML prototype for the change to validate U
 
 1. **Verify pre-requisites**
    - Ensure `proposal.md` exists.
-   - Read `ideas/idea.md` to confirm task type.
+   - 若为 handoff 场景（需求侧 Epic Story），原型已在需求侧完成（`/req:prototype`，Epic 整体），**不重复制作**。
+   - 若为直走交付侧任务且涉及 UI：继续本流程。
 
 2. **Generate the Prototype**
    - Get instructions: `openspec instructions prototype --change "<name>" --json`

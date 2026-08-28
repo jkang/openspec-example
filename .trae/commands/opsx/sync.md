@@ -123,15 +123,15 @@ This is an **agent-driven** operation - you will read delta specs and directly e
 
    在完成 Spec 同步后，你必须执行业务基线回流，将变更中的业务认知沉淀到全局规划层：
    - **调用辅助技能**: 依次调用 `baseline/` 子目录下的辅助技能：
-     - `blueprint`: 根据 `proposal.md`、`story.md`、`specs/**/*.md`、`design.md` 与 `verify.md` 判断并更新 `service_blueprint.html` 中的阶段覆盖、泳道能力分布与 capability 状态。
-     - `process-flow`: 根据 `story.md` (L1/L2) 和 `specs/design.md` (L3) 更新 `business_process.html`。
+     - `blueprint`: 根据 `proposal.md`、`specs/**/*.md`、`design.md` 与 `verify.md` 判断并更新 `service_blueprint.html` 中的阶段覆盖、泳道能力分布与 capability 状态。
+     - `process-flow`: 根据 `proposal.md`、`specs/**/*.md` 与 `design.md` 更新 `business_process.html`。
      - `domain-model`: 先基于 `proposal.md`、全部 delta `specs/**/*.md`、主 specs 合并结果与 `design.md` 判断是否需要更新 `docs/baseline/domain_model.html`；若需要，则回写图与清单，若不需要，则输出显式 no-op 理由。
    - **Service Blueprint Sync Trigger**: 当且仅当存在以下任一变化时，执行 Service Blueprint 回流：
      - `SB-STAGE-*` 阶段覆盖发生新增、移除或调整
      - `SB-<LANE>-*` 节点中的 capability 分布发生新增、移除或重排
      - capability 状态在“已落地 / 规划中 / 横切支撑”之间变化
      - 新增或修改跨阶段支撑能力
-     - `story.md`、`specs/**/*.md` 或 `proposal.md` 引入新的 blueprint 引用节点
+     - `specs/**/*.md` 或 `proposal.md` 引入新的 blueprint 引用节点
      - `design.md` 中的 `Service Blueprint Sync Assessment` 明确写为 `Needs Sync: Yes`
    - **Explicit No-op**: 若上述条件均不满足，必须在同步摘要中明确记录“无需更新 Service Blueprint”及理由，不能静默跳过。
    - **Domain Model Sync Trigger**: 当且仅当存在以下任一变化时，执行 Domain Model 回流：

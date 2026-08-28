@@ -1,42 +1,25 @@
 name: spec-driven
-version: 1
-description: 包含交互式原型验证的 OpenSpec 工作流 - 探索 (explore) → 提案 (proposal) → 原型 (prototype) → 业务评审 (story) → 规范 (specs) → 设计 (design) → 任务 (tasks) → 验证 (verify)
+version: 2
+description: OpenSpec 交付侧工作流 - 提案 (proposal) → 原型 (prototype，可选) → 规范 (specs) → 设计 (design) → 任务 (tasks) → 验证 (verify)。需求侧（req-sdd）已完成探索/业务评审，开发侧从 proposal 起步。
 artifacts:
-  - id: explore
-    generates: ideas/idea.md
-    description: 结构化探索文档，记录业务意图、设计思路及架构分析结论
-    template: idea.md
-    instruction: |
-      你必须执行 `/opsx:explore` 流程，通过“结构化 6 步法”与用户达成共识。
-      严禁跳过探索阶段直接进入提案。
-      
-      在变更目录下的 `ideas/idea.md` 中记录以下结论：
-      1. **澄清业务意图**：目的、范围、具体业务要求。
-      2. **业务设计思路**：逻辑流转、用户价值。
-      3. **任务类型与后续策略**：必须与用户确认这是 Epic, Story, Bug Fix 还是 Tech Debt，并制定对应的流程策略。
-      4. **治理映射对齐**：必须参考 `docs/baseline/domain_model.html` 识别 **Impacted Bounded Contexts**，参考 `docs/baseline/business_process.html` 识别受影响的 **L1/L2/L3 流程节点**，并参考 `docs/baseline/service_blueprint.html` 与 `.trae/skills/baseline/blueprint/SKILL.md` 识别受影响的 **SB-STAGE-* / SB-<LANE>-*** 节点。
-        5. **需求拆分建议**：是否需要分阶段实施。
-      6. **架构影响分析**：现有架构改动点、技术挑战。
-      7. **确认结论**：用户已确认的最终意图。
-
-      该文档是后续所有产物的源头，未完成此文档前不得开始 `proposal`。
-    requires: []
-
   - id: proposal
     generates: proposal.md
     description: 概述变更内容的初始提案文档
     template: proposal.md
     instruction: |
       创建提案文档，明确说明为什么需要进行此项变更。
-      
-      **强制要求**：本提案必须基于已确认的 `ideas/idea.md` 中的结论。如果你发现 `idea.md` 缺失或内容不完整，请立即停止并引导用户执行 `/opsx:explore`。
-      **流程分支控制**：检查 `idea.md` 中的“任务类型”。如果是 Epic，则提案应聚焦于拆解后的子功能；如果是 Bug Fix 或 Tech Debt，请在提案中明确说明后续可能跳过原型 (Prototype) 并在 `.openspec.yaml` 中标记 `skip_specs: true`（若适用）。
+
+      **来源**：
+      - **handoff 场景**（需求侧 Epic Story）：由 `/req:handoff` 基于需求侧 `story.md` 合成（Why ← 用户场景；What ← 范围；Capabilities ← idea 候选 Capabilities；Alignment ← 治理映射；Impact ← 架构影响），链接需求侧 story.md 作为业务评审依据。开发侧不重复探索/评审。
+      - **直走交付侧场景**（Bug Fix / Tech Debt / 简单功能修改）：直接基于用户输入/当前需求创建提案，不经过独立探索阶段。
+
+      **流程分支控制**：如果是 Bug Fix 或 Tech Debt，请在提案中明确说明后续可能跳过原型 (Prototype) 并在 `.openspec.yaml` 中标记 `skip_specs: true`（若适用）。
 
       章节结构：
       - **Why (背景原因)**: 用 1-2 句话说明要解决的问题或抓住的机遇。这解决了什么问题？为什么现在要做？
       - **What Changes (变更内容)**: 使用项目符号列出具体的变更点。明确说明新增功能、修改点或移除的内容。对于破坏性变更，请标记为 **BREAKING**。
       - **Capabilities (系统能力)**: 明确指出将要创建或修改哪些规范 (specs)：
-        - **映射对齐约束**：此处列出的 Capabilities 必须与 `docs/baseline/domain_model.html` 中的映射表对齐。如果 proposal 写了一个未映射的 capability，你必须显式说明这是“新增 taxonomy”及其理由。
+        - **映射对齐约束**：此处列出的 Capabilities 必须与 `docs/baseline/domain_model.html` 中的映射表对齐。如果 proposal 写了一个未映射的 capability，你必须显式说明这是"新增 taxonomy"及其理由。
         - **边界引用约束**：必须显式列出受影响的 `Bounded Contexts`，说明每个 capability 归属到哪个治理边界。
         - **流程对齐约束 (Process Alignment)**: 必须明确列出本次变更受影响的流程节点 ID (来自 `business_process.html`)。
         - **蓝图对齐约束 (Service Blueprint Alignment)**: 必须明确列出本次变更受影响的服务蓝图节点 ID (来自 `service_blueprint.html`)，至少包含 `SB-STAGE-*` 与 `SB-<LANE>-*` 引用，并说明本次是新增、修改还是复用既有蓝图结构。
@@ -50,42 +33,24 @@ artifacts:
       每次变更必须至少声明一个能力（新增或修改），或者明确选择跳过规范生成：除非变更的 `.openspec.yaml` 设置了 `skip_specs: true`，否则 `openspec validate` 将拒绝零增量的变更。只有当规范级别的行为没有变化（如纯重构、工具链更改、文档更新）时，才使用 `skip_specs: true` - 规范描述的是系统行为，如果行为没变，规范也不应该改变。
       切勿为了通过验证而捏造需求。
 
-      保持简明扼要（1-2 页）。重点关注“为什么要做 (why)”，而不是“怎么做 (how)” - 具体的实现细节应放在 design.md 中。
+      保持简明扼要（1-2 页）。重点关注"为什么要做 (why)"，而不是"怎么做 (how)" - 具体的实现细节应放在 design.md 中。
 
       这是整个流程的基础 - 后续的 specs、design 和 tasks 都将以此为基础。
-    requires:
-      - explore
+    requires: []
 
   - id: prototype
     generates: "prototypes/**/*.html"
     description: 用于前端验证的交互式 UI/UX 原型
     template: prototype.html
     instruction: |
-      调用 `openspec-prototype` 技能为提案中定义的系统能力创建一个交互式的 HTML 原型。
-      
+      调用 `prototype` 技能（交付侧 `opsx/prototype`）为提案中定义的系统能力创建一个交互式的 HTML 原型。
+
       在进入技术设计阶段之前，该原型将作为 UI/UX 设计的唯一事实来源 (Single Source of Truth)。
-      
+
       **流程分支控制**：
-      - 如果 `idea.md` 中的任务类型是 Tech Debt，或是不涉及前端 UI 变更的 Bug Fix，请直接跳过此阶段。
+      - 如果变更不涉及前端 UI（如 Tech Debt、纯后端 Bug Fix），请直接跳过此阶段。
+      - **handoff 场景**：需求侧 Epic Story 的原型已在需求侧完成（`/req:prototype`，Epic 整体），开发侧不重复制作。
       - 为每个涉及前端变更的能力创建一个 HTML 文件：输出路径使用 `prototypes/<capability-path>.html`。
-    requires:
-      - proposal
-
-  - id: story
-    generates: story.md
-    description: 业务评审文档，包含 E2E 验收标准与用户场景
-    template: story.md
-    instruction: |
-      调用 `openspec-story` 技能生成业务评审 Story 文档。
-      
-      **流程分支控制**：
-      - 如果任务类型是 Tech Debt，通常跳过此阶段。
-      - 如果涉及前端 UI 变更，必须在 `prototype.html` 已生成并确认后执行。
-
-      **内容要求**：
-        - 该文档用于业务评审，必须包含端到端的验收标准 (Given/When/Then)。
-        - 验收标准必须映射到流程基线中的 `L1` (价值流) 和 `L2` (协同流) 节点。
-        - 每条 E2E 旅程必须同时映射到 `service_blueprint.html` 中的 `SB-STAGE-*` 与 `SB-CUSTOMER-*` 节点。
     requires:
       - proposal
 
@@ -105,7 +70,7 @@ artifacts:
       - **重要**：每个能力规范必须包含 `Governance Mapping`，显式引用 `docs/baseline/domain_model.html` 中的 `Bounded Context` 与 capability taxonomy。
       **重要**：每个能力规范必须注明其对应的流程节点 ID（尤其是 `L3` 规则流节点）。
       **重要**：每个能力规范必须注明其关联的服务蓝图节点 ID（至少包含 `SB-STAGE-*` 与 `SB-<LANE>-*`）。
-      **重要**：如果任务类型不是 Tech Debt，必须参考已确认的 `story.md`，确保模块规范与 E2E 验收标准保持一致。
+      **重要**：若为 handoff 场景（需求侧 Epic Story），须参考 proposal 中链接的需求侧 `story.md` 的 E2E 验收标准，确保模块规范与之保持一致。
 
       优秀的规范内容应包含：
       - 用户或下游系统所依赖的可观察行为

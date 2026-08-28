@@ -10,6 +10,8 @@ Propose a new change - create the change and generate the initial `proposal.md`.
 
 **Planning boundary**: This workflow creates the initial planning artifact (`proposal.md`) only. Do not edit project code. After the proposal is complete, stop and let the user decide the next step based on the task type.
 
+**适用范围**：本命令服务**直走交付侧任务**（Bug Fix / Tech Debt / 简单功能修改）。大块 Epic 需求走需求侧漏斗（`/req:research` 起），由 `/req:handoff` 合成 proposal 后从本提案起步。
+
 **Epic/Story Queue Awareness**:
 Before proposing a new change:
 1. Check if any `openspec/epic-*.story-list.json` exists.
@@ -17,16 +19,15 @@ Before proposing a new change:
 3. If a planned story is found, suggest starting that specific story.
 4. Once a story change is started, update its status to `in_progress` and record the `changeName` in the corresponding `.story-list.json`.
 
-I'll create a change with the initial artifacts:
-- ideas/idea.md (structured exploration conclusions - MANDATORY first step)
+I'll create a change with the initial artifact:
 - proposal.md (what & why - defines the scope and capabilities)
 
 `<capability-path>` is the spec directory relative to `specs/` (for example, `user-auth` or `identity/user-auth`). Preserve an existing capability's full path and follow the project's established organization for new capabilities.
 
 After generating the proposal, recommend the next command:
-- **Story/Bug Fix (with UI)**: `/opsx:prototype`
-- **Tech Debt/Bug Fix (no UI)**: `/opsx:spec-design`
-- **Epic**: Wait for the user to select a sub-story.
+- **Bug Fix / Feature (with UI)**: `/opsx:prototype`
+- **Tech Debt / Bug Fix (no UI)**: `/opsx:spec-design`
+- **Epic**: 应走需求侧漏斗（`/req:research` 起），不直走本命令。
 
 ---
 
@@ -80,14 +81,12 @@ After generating the proposal, recommend the next command:
 
 5. **Generate the Proposal**
 
-   **MANDATORY CHECK**: Before creating `proposal.md`, you MUST ensure `ideas/idea.md` exists and contains the results of a structured 6-step exploration. If it's missing or generic, you MUST transition to the `/opsx:explore` workflow logic to clarify the business intent with the user first.
-
    a. **Get instructions for `proposal`**:
       ```bash
       openspec instructions proposal --change "<name>" --json
       ```
    b. **Create `proposal.md`**:
-      - Read `ideas/idea.md` for context.
+      - 直接基于用户描述/当前需求创建提案（不依赖 `idea.md`）。
       - Re-read `docs/baseline/domain_model.html`, `docs/baseline/business_process.html`, `docs/baseline/service_blueprint.html`, and `.trae/skills/baseline/blueprint/SKILL.md` as the governance source of truth.
       - Follow the `template` and `instruction` from the JSON.
       - Ensure the proposal explicitly lists `Impacted Bounded Contexts`, aligns `Capabilities` to the `domain_model.html` mapping, and records `Process Alignment` node IDs.
@@ -100,19 +99,19 @@ After generating the proposal, recommend the next command:
    ```bash
    openspec status --change "<name>"
    ```
-   Summarize the created proposal and prompt the user for the next action based on the task type confirmed in `idea.md`.
+   Summarize the created proposal and prompt the user for the next action based on the task type.
 
 **Output**
 
 After completing the proposal, summarize:
 - Change name and location
-- Artifacts created: `idea.md` (if newly created) and `proposal.md`.
+- Artifacts created: `proposal.md`.
 - Governance summary: impacted bounded contexts, capabilities, and whether a future Domain Model sync is likely required.
 - Next step recommendation: "The initial proposal is ready. Based on the task type, you should now run `/opsx:prototype` (for UI features) or `/opsx:spec-design` (for technical tasks)."
 
 **Guardrails**
 - This workflow ONLY creates `proposal.md`. Do NOT proceed to generate prototypes, specs, designs, or tasks.
-- Always read `idea.md` before creating the proposal.
+- 不创建 `ideas/idea.md`（探索已前移到需求侧 `openspec-requirements/`）。
 - Ask about ambiguities that would materially change scope.
 - If a change with that name already exists, ask if user wants to continue it or create a new one.
 - Verify the proposal file exists after writing.
