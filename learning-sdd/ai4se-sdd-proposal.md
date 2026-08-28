@@ -1,7 +1,10 @@
-# SDD 端到端提案：需求工程与开发闭环的一体化流程
+# SDD 完整版提案：复杂业务端到端流程与脚手架
 
-> **提案目的**：给内部 AI4SE Council 一套可落地的完整方案，把产品规划、需求调研、交互原型、需求分析与规格驱动开发（SDD）接成**端到端可追溯闭环**，支持研发流程逐步达到 L3（Human in the Loop）到 L4（Human on the Loop）的成熟度。
-> **演进**：由 `ai4se-lightweight-sdd-proposal.md`（轻量版）演进而来——引入**需求侧/交付侧两级解耦**，补齐需求工程链路。
+> **提案目的**：给内部 AI4SE Council 一套**面向复杂业务的完整端到端流程与脚手架**——覆盖 产品规划 → 需求调研 → 探索 → 原型 → 需求拆分 → Story 业务面冻结 → 交接 → 开发实施 → 分层同步 → 归档，全链路可追溯，支持研发流程达到 L3（Human in the Loop）到 L4（Human on the Loop）的成熟度。
+> **版本定位**（与轻量版区分）：
+> - **轻量版** `ai4se-lightweight-sdd-proposal.md`：**起步最小集**——单条知识闭环（explore → propose → prototype → story → specs），适合小团队快速启动。
+> - **完整版（本文档）**：**复杂业务全流程**——引入需求侧/交付侧两级解耦（`openspec-requirements/` + `openspec/`），补齐需求工程链路（调研/探索/拆分/原型/Story），加入分层 Sync（change 级 Spec + Epic 级 Baseline），支撑多 Story 多 Epic 的规模化协作。
+> **演进路径**：团队可从轻量版起步，业务复杂度提升后按本文档迁移到完整版（增量启用需求侧工作区与分层 Sync）。
 > **开源参考**：[openspec-example](https://github.com/jkang/openspec-example.git)
 
 ---
@@ -19,19 +22,15 @@
 
 ## 1. 核心挑战：断链的需求工程与孤立的 SDD
 
-现在很多团队说 SDD，实际落地主要集中在 **Coding 阶段**：
-- AI 根据 spec、design、tasks 生成代码。
-- Verify 保障实现质量。
-- L4 的讨论也往往集中在"代码实现能否自治"。
-
-> **痛点直击**：Coding 阶段之前的信息准备，往往还是割裂的。
+当业务复杂度提升（多 Epic、多 Story、跨角色协同）时，仅靠 Coding 阶段的 SDD 闭环会暴露严重的上游断链：
 
 - **输入不稳定**：产品规划和路线图在上游单独管理，研发拿到的往往是压缩后的结果。
 - **分析无落点**：需求分析散落在会议、IM 对话和 Jira 卡片里，缺少稳定、可追溯的链路。
 - **知识严重割裂**：业务文档说 A，代码实现逻辑是 B。这种"知识漂移"导致系统最终沦为黑盒。
 - **高昂返工成本**：很多返工源于原型未确认、边界不清晰，导致 Spec 从一开始就偏离了真实意图。
+- **规模化失控**：多个 Epic/Story 并行时，缺乏统一的需求漏斗、覆盖对账与基线同步机制，易出现"承诺但不交付"、基线中间态污染。
 
-**本提案核心：把 SDD 往前接到 Planning、Research、Prototype 和 Analysis，让端到端流程不断链。**
+**本提案核心：面向复杂业务，把 SDD 往前接到 Planning、Research、Prototype 和 Analysis，用需求侧/交付侧两级解耦 + 分层 Sync 让端到端流程不断链。**
 
 ---
 
@@ -197,8 +196,8 @@ flowchart TD
 - **baseline skill 去 `openspec-baseline-` 前缀**：`blueprint` / `domain-model` / `process-flow` / `render`（独立域，不与 prod/opsx 混用）。
 - 命令用**命名空间子目录**：需求侧 `/req:`（`.trae/commands/req/`），交付侧 `/opsx:`（`.trae/commands/opsx/`，含 `planning/`、`governance/`、`baseline/` 子目录）。
 
-### 3.7 Lightweight 原则（保留）
-降低落地门槛、提升 AI 执行效能、在"混乱"与"过度治理"间寻找平衡。
+### 3.7 完整但不臃肿（Complexity-Balanced）
+面向复杂业务，治理力度随复杂度自适应：需求侧覆盖需求工程全链路（调研/探索/原型/拆分/Story），交付侧聚焦契约落地，分层 Sync 只在 Epic 收尾统一执行——**完整覆盖复杂场景，但不陷入"文档量膨胀"与"过度治理"**。轻量版（起步最小集）见 `ai4se-lightweight-sdd-proposal.md`。
 
 ---
 
@@ -254,6 +253,10 @@ flowchart TD
 
 ## 5. 落地指引：如何在其他业务项目中启用
 
+> **两条启用路径**：
+> - **新项目直接上完整版**：按下方 5.1-5.4 全量启用（推荐业务已较复杂、或预期快速进入多 Epic 并行）。
+> - **从轻量版演进**：先按 `ai4se-lightweight-sdd-proposal.md` 启动单条闭环；当出现"需求分析无落点、多 Story 并行、基线频繁漂移"时，增量启用：① 引入 `openspec-requirements/` 需求侧工作区（research/explore/storymap/story）② 引入 `/req:*` 命令与 handoff 交接 ③ 将 sync 切换为分层（change 级 Spec + Epic 级 Baseline）。
+
 ### 5.1 第一步：引入基础引擎与初始化结构
 1. **执行迁移脚本**：将 `.trae/`, `.cursor/`, `.agents/`, `openspec/`, `openspec-requirements/` 基础配置以及 `docs/` 模板拷贝至目标项目。
 2. **重构 Config**：修改 `openspec/config.yaml` 与 `openspec-requirements/config.yaml` 中的项目背景。
@@ -296,13 +299,15 @@ flowchart TD
 
 ---
 
-> **核心总结**：先建立一条 AI 和团队都能稳定执行的 **最小知识闭环**——需求侧从调研到 Story 业务面冻结，交付侧从 proposal 到归档，中间用 handoff 与分层 Sync 咬合，让需求资产随开发自然沉淀。
+> **核心总结**：面向复杂业务，建立一条 AI 和团队都能稳定执行的 **完整知识闭环**——需求侧从调研到 Story 业务面冻结（research → explore → prototype → storymap → story），交付侧从 proposal 到归档（specs → design → apply → verify → Spec Sync → archive），中间用 handoff 与分层 Sync（Epic 级 Baseline）咬合，让需求资产随开发自然沉淀、基线稳定演进。轻量起步见 `ai4se-lightweight-sdd-proposal.md`。
 
 ---
 
 ## 7. 开源资源与参考
 
 - **OpenSpec 示例项目**: [https://github.com/jkang/openspec-example.git](https://github.com/jkang/openspec-example.git)
+- **轻量版提案（起步最小集）**: `learning-sdd/ai4se-lightweight-sdd-proposal.md`
+- **完整版流程讨论稿**: `learning-sdd/ai4se-lightweight-sdd-flow-v2-draft.md`
+- **实施计划**: `learning-sdd/ai4se-sdd-implementation-plan.md`
 - **SDD 工作流 SOP**: 参考本代码库 `docs/SOPS/SDD_WORKFLOW.md`
 - **需求侧工作区**: 参考本代码库 `openspec-requirements/`
-- **流程讨论稿**: `learning-sdd/ai4se-lightweight-sdd-flow-v2-draft.md`
