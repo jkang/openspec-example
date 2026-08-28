@@ -91,7 +91,7 @@ handoff                            ← 交接 → 合成开发侧 proposal → s
   - `.trae/skills/baseline/blueprint/SKILL.md` - 定义 `service_blueprint.html` 的稳定锚点、Planning 阶段引用方式、capability 口径与 Sync 触发/No-op 规则。
 - **Skill 组织（按域子目录）**:
   - `prod/`：产品/需求侧（research/explore/prototype/storymap/story/handoff + product-sense/product-planning/delivery-board）
-  - `opsx/`：交付侧（propose/spec-design/apply-change/verify/sync-specs/archive-change/update-change/explore/prototype/story）
+  - `opsx/`：交付侧（propose/spec-design/apply-change/verify/sync-specs/archive-change/update-change/prototype）
   - `baseline/`：业务基线（blueprint / domain-model / process-flow / render，去 `openspec-baseline-` 前缀）
   - 三目录同步：`.agents/`、`.trae/`、`.cursor/` 下 skills/ 结构一致。
 - **强制约束**:

@@ -1,7 +1,7 @@
 # Idea: 用户账户体系（注册 / 登录 / 会话 + B 端用户管理）
 
 > 关联 Epic: `account-system`（来自 `docs/ROADMAP.md` 下一阶段「用户资产与账户体系」）
-> 关联调研: `research/account-system.md`
+> 关联调研: `epics/account-system/research.md`
 > 产出后需用户确认（HITL）
 
 <!--
@@ -90,7 +90,7 @@
 
 确认的类型：**Epic/Feature（大块复杂功能，走需求侧漏斗）**——本需求来自 `docs/ROADMAP.md` 下一阶段条目（阶段条目即 Epic），跨注册/登录/会话/B 端管理多个能力面，需拆分。
 
-后续策略说明：全流程执行——先产出 Epic 整体原型 `prototypes/account-system/*.html`（UI 门禁，需用户 HITL 确认），再 storymap 拆为 **4 个独立可交付的 Story**（注册/登录/会话/B 端用户管理），逐个产出冻结交付物 `story.md`（业务面，不含行为规格），最终通过 `/req:handoff` 交接给开发侧，由开发侧在 proposal 后按 capability 生成 specs。
+后续策略说明：全流程执行——先产出 Epic 整体原型 `epics/account-system/prototypes/*.html`（UI 门禁，需用户 HITL 确认），再 storymap 拆为 **4 个独立可交付的 Story**（注册/登录/会话/B 端用户管理），逐个产出冻结交付物 `story.md`（业务面，不含行为规格），最终通过 `/req:handoff` 交接给开发侧，由开发侧在 proposal 后按 capability 生成 specs。
 
 ## 6. 候选 Capabilities (Candidate Capabilities)
 
@@ -144,4 +144,4 @@
 
 **结论**：本次以 **Epic/Feature（大块复杂功能，走需求侧漏斗）** 任务类型进入需求漏斗。已确认业务意图（注册需邮箱+密码≥6位含字母数字+昵称+手机号）、B/C 双端逻辑（C 端注册/登录/会话；B 端后台用户管理与 ACTIVE/DISABLED 生命周期）、订单/优惠券真实归属（新数据用真实 userId，**存量 user_dev 不做迁移、视为无归属**）。
 
-**下一步**：产出 Epic 整体原型 `prototypes/account-system/*.html`（注册/登录/会话/B 端用户管理四页，UI 门禁需用户 HITL 确认），随后进入 storymap 拆分为 **4 个独立 Story**（`account-system-01-register` / `-02-login` / `-03-session` / `-04-admin-users`），逐个产出冻结交付物 `story.md`（业务面），最终通过 `/req:handoff` 交接给开发侧。等待用户对本品 idea 的 **HITL 确认**后方可进入原型。
+**下一步**：产出 Epic 整体原型 `epics/account-system/prototypes/*.html`（注册/登录/会话/B 端用户管理四页，UI 门禁需用户 HITL 确认），随后进入 storymap 拆分为 **4 个独立 Story**（`account-system-01-register` / `-02-login` / `-03-session` / `-04-admin-users`），逐个产出冻结交付物 `story.md`（业务面），最终通过 `/req:handoff` 交接给开发侧。等待用户对本品 idea 的 **HITL 确认**后方可进入原型。

@@ -12,7 +12,7 @@ tags: ["req-sdd", "prototype", "ui"]
 
 **步骤**
 1. 加载 `prototype` skill。
-2. 读 `ideas/<idea-key>.md`，确认涉及 UI。
+2. 读 `epics/<epic-key>/idea.md`，确认涉及 UI。
 3. 严格遵循 `docs/FRONTEND.md`：无圆角 / 无阴影 / slate 色系 / 真实业务数据 / 全中文 / Vue 3 (CDN) + Tailwind CSS (CDN)。
 4. **产出后必须暂停征求用户确认（HITL）**。
 5. 确认后进入 `/req:storymap`（拆分出的 Story 共享此 Epic 整体原型）。

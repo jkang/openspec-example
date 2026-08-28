@@ -8,9 +8,9 @@ Story 是需求侧唯一冻结交付物（业务面）。
 -->
 
 > Story Key: `account-system-01-register` | 优先级: P0 | 依赖: 无
-> 关联 Storymap: `storymaps/account-system/storymap.md`
-> 关联 Idea: `ideas/idea-account-system.md`
-> 关联原型（Epic 整体）: `prototypes/account-system/account-register.html`（待生成并经用户 HITL 确认）
+> 关联 Storymap: `epics/account-system/storymap.md`
+> 关联 Idea: `epics/account-system/idea.md`
+> 关联原型（Epic 整体）: `epics/account-system/prototypes/account-register.html`（待生成并经用户 HITL 确认）
 
 ## 用户场景 (User Scenario)
 
@@ -42,7 +42,7 @@ Story 是需求侧唯一冻结交付物（业务面）。
 
 > ⚠️ UI 门禁：本 Story 涉及前端注册表单 UI，Epic 整体原型尚未生成（`/req:prototype` 未产出），故「交接状态」不勾选待开发交接。原型经用户 HITL 确认后补充链接。
 
-- 原型链接：`prototypes/account-system/account-register.html`（Epic 整体原型，待 `/req:prototype` 生成并经用户 HITL 确认后链接）
+- 原型链接：`epics/account-system/prototypes/account-register.html`（Epic 整体原型，待 `/req:prototype` 生成并经用户 HITL 确认后链接）
 - 关键交互点：注册表单（邮箱/密码/确认密码/昵称/手机号）、前端即时校验、错误态提示、注册成功自动登录并返回原流程。
 - UI 约束（`docs/FRONTEND.md`）：无圆角、无阴影、slate 色系、真实数据、全中文。
 

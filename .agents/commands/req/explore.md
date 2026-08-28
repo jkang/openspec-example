@@ -14,7 +14,7 @@ tags: ["req-sdd", "explore", "idea"]
 
 **步骤**
 1. 加载 `explore` skill。
-2. 读已确认的 `research/<epic-key>.md`、`docs/ROADMAP.md`、`docs/baseline/*.html`、`openspec-requirements/config.yaml`。
+2. 读已确认的 `epics/<epic-key>/research.md`、`docs/ROADMAP.md`、`docs/baseline/*.html`、`openspec-requirements/config.yaml`。
 3. 转化产出 idea.md：澄清业务意图 / **To-Be Process** / **To-Be Journey** / 产品设计思路 / 任务类型路由 / **候选 Capabilities**（对齐 domain_model）/ 治理映射 / 拆分建议 / 架构影响。
 4. **B/C 双端视角（强约束）**。
 5. 按 `openspec-requirements/templates/idea.md` 产出。

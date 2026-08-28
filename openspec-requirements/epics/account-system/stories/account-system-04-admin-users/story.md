@@ -8,9 +8,9 @@ Story 是需求侧唯一冻结交付物（业务面）。
 -->
 
 > Story Key: `account-system-04-admin-users` | 优先级: P0 | 依赖: `account-system-02-login`
-> 关联 Storymap: `storymaps/account-system/storymap.md`
-> 关联 Idea: `ideas/idea-account-system.md`
-> 关联原型（Epic 整体）: `prototypes/account-system/admin-users.html`（待生成并经用户 HITL 确认）
+> 关联 Storymap: `epics/account-system/storymap.md`
+> 关联 Idea: `epics/account-system/idea.md`
+> 关联原型（Epic 整体）: `epics/account-system/prototypes/admin-users.html`（待生成并经用户 HITL 确认）
 
 ## 用户场景 (User Scenario)
 
@@ -47,7 +47,7 @@ Story 是需求侧唯一冻结交付物（业务面）。
 
 > ⚠️ UI 门禁：本 Story 涉及后台用户管理 UI，Epic 整体原型尚未生成（`/req:prototype` 未产出），故「交接状态」不勾选待开发交接。原型经用户 HITL 确认后补充链接。
 
-- 原型链接：`prototypes/account-system/admin-users.html`（Epic 整体原型，待 `/req:prototype` 生成并经用户 HITL 确认后链接）
+- 原型链接：`epics/account-system/prototypes/admin-users.html`（Epic 整体原型，待 `/req:prototype` 生成并经用户 HITL 确认后链接）
 - 关键交互点：后台「用户管理」列表（邮箱/昵称/手机号/状态/注册时间）、邮箱搜索框、单行启用/禁用操作按钮、状态切换后的即时反馈。
 - UI 约束（`docs/FRONTEND.md`）：无圆角、无阴影、slate 色系、真实数据、全中文。
 

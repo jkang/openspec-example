@@ -19,14 +19,14 @@ Story 是需求侧**唯一冻结交付物（业务面）**。开发侧经 `/req:
 
 ## 步骤
 
-1. **读上下文**：读已确认的 `epics/<epic-key>/idea.md`、`storymaps/<epic-key>/storymap.md`、以及 `epics/<epic-key>/prototypes/*.html`（若 UI 且已确认）。
+1. **读上下文**：读已确认的 `epics/<epic-key>/idea.md`、`epics/<epic-key>/storymap.md`、以及 `epics/<epic-key>/prototypes/*.html`（若 UI 且已确认）。
 2. **应用规则**：读 `openspec-requirements/config.yaml` 的 `rules.story`。
 3. **生成 story.md**：按 `openspec-requirements/templates/story.md` 产出（纯业务面）：
    - 用户场景（C 端 + B 端视角）/ 范围
    - 业务规则表
    - E2E 验收标准（Given/When/Then，映射 L1/L2 与 SB-STAGE-*/SB-CUSTOMER-*）
    - 治理映射对齐（Bounded Context / L3 / SB-<LANE>-*，新增 taxonomy 显式标注）
-   - 若涉及 UI：引用【已确认】的 Epic 整体原型 `prototypes/<epic-key>/<capability>.html`
+   - 若涉及 UI：引用【已确认】的 Epic 整体原型 `epics/<epic-key>/prototypes/<capability>.html`
 4. **UI 门禁**：涉及 UI 的 Story，若无已确认的 Epic 整体原型 → **禁止**勾选「待开发交接」，提示先跑 `prototype`（Epic 整体）。
 5. **HITL**：产出后暂停确认。
 6. **交接**：确认后提示执行 `/req:handoff`（合成开发侧 proposal）。

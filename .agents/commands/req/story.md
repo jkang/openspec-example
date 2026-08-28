@@ -14,7 +14,7 @@ tags: ["req-sdd", "story", "deliverable"]
 
 **步骤**
 1. 加载 `story` skill。
-2. 读已确认的 `ideas/<idea-key>.md`、`storymaps/<epic-key>/storymap.md`、`prototypes/<epic-key>/*.html`（若 UI 且已确认）。
+2. 读已确认的 `epics/<epic-key>/idea.md`、`epics/<epic-key>/storymap.md`、`epics/<epic-key>/prototypes/*.html`（若 UI 且已确认）。
 3. 按 `openspec-requirements/templates/story.md` 产出（纯业务面）：用户场景（B/C 双端）/ 范围 / 业务规则表 / E2E 验收（映射 L1/L2 与 SB-STAGE-*/SB-CUSTOMER-*）/ 治理映射 / 交接状态。
 4. **UI 门禁**：涉及 UI 的 Story，无已确认的 Epic 整体原型 → 禁止勾选「待开发交接」，先跑 `/req:prototype`。
 5. **HITL**：产出后暂停确认。

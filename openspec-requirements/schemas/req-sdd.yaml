@@ -1,5 +1,5 @@
 name: req-sdd
-version: 3
+version: 4
 description: 需求侧工作流（仅用于大块 Epic 需求） - 需求调研 (research) → 探索 (explore) → 原型 (prototype，Epic 整体) → 需求拆分 (storymap) → 需求单元交付物 (story)。规划（roadmap·每阶段多 Epic）在起点 docs/ROADMAP.md 已有，需求侧直接消费。需求侧只产出业务面 story.md；行为规格（Story-specs，按 capability 拆分的 specs）由开发侧在 handoff 合成 proposal 之后生成。Bug Fix / Tech Debt / 简单功能修改不走本流程，直接进入交付侧。
 artifacts:
   - id: research

@@ -64,5 +64,5 @@ rules:
     - ⚠️ 不含行为规格：specs（Story-specs）由开发侧在 proposal 后按 capability 拆分生成
     - 验收标准必须覆盖端到端 (E2E) 旅程，使用 Given/When/Then，映射到 L1/L2/L3 流程节点
     - 验收标准必须同时映射到 service_blueprint.html 中的 SB-STAGE-* 与 SB-<LANE>-* 节点
-    - 若涉及 UI，必须引用已确认的 Epic 整体原型 prototypes/<epic-key>/*.html；无已确认原型禁止勾选"待开发交接"
+    - 若涉及 UI，必须引用已确认的 Epic 整体原型 epics/<epic-key>/prototypes/*.html；无已确认原型禁止勾选"待开发交接"
     - 拒绝空洞占位符，必须使用真实业务数据

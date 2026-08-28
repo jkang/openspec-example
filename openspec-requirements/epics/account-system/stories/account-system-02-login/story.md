@@ -8,9 +8,9 @@ Story 是需求侧唯一冻结交付物（业务面）。
 -->
 
 > Story Key: `account-system-02-login` | 优先级: P0 | 依赖: `account-system-01-register`
-> 关联 Storymap: `storymaps/account-system/storymap.md`
-> 关联 Idea: `ideas/idea-account-system.md`
-> 关联原型（Epic 整体）: `prototypes/account-system/account-login.html`（待生成并经用户 HITL 确认）
+> 关联 Storymap: `epics/account-system/storymap.md`
+> 关联 Idea: `epics/account-system/idea.md`
+> 关联原型（Epic 整体）: `epics/account-system/prototypes/account-login.html`（待生成并经用户 HITL 确认）
 
 ## 用户场景 (User Scenario)
 
@@ -41,7 +41,7 @@ Story 是需求侧唯一冻结交付物（业务面）。
 
 > ⚠️ UI 门禁：本 Story 涉及前端登录表单 UI，Epic 整体原型尚未生成（`/req:prototype` 未产出），故「交接状态」不勾选待开发交接。原型经用户 HITL 确认后补充链接。
 
-- 原型链接：`prototypes/account-system/account-login.html`（Epic 整体原型，待 `/req:prototype` 生成并经用户 HITL 确认后链接）
+- 原型链接：`epics/account-system/prototypes/account-login.html`（Epic 整体原型，待 `/req:prototype` 生成并经用户 HITL 确认后链接）
 - 关键交互点：登录表单（邮箱/密码）、错误态（账号密码错误 / 账户禁用）、登录成功跳转个人区、顶部用户区显示昵称。
 - UI 约束（`docs/FRONTEND.md`）：无圆角、无阴影、slate 色系、真实数据、全中文。
 

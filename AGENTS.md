@@ -31,11 +31,11 @@
 
 在编写任何代码或提出方案之前，你**必须**查阅相关的治理文档：
 
-- **[SDD 工作流 SOP](docs/SOPS/SDD_WORKFLOW.md)**: `/opsx:` 指令的使用规则（含 `/opsx:product-sense`, `/opsx:product-planning`, `/opsx:Story` 业务评审指令）、6步探索法、HITL（人机协同）检查点以及**四大任务类型 (Epic/Story/Bug Fix/Tech Debt) 的分支策略**与**业务基线同步 (Baseline Sync)** 机制。**开始任务前必读**。
+- **[SDD 工作流 SOP](docs/SOPS/SDD_WORKFLOW.md)**: `/opsx:` 与 `/req:` 指令的使用规则（含规划层 `/opsx:planning:product-sense`、`/opsx:planning:product-planning`；需求侧 `/req:research → explore → prototype → storymap → story → handoff`）、HITL（人机协同）检查点以及**任务类型 (Epic/Bug Fix/Tech Debt/简单功能) 的分支策略**与**分层同步 (Spec Sync change 级 / Baseline Sync Epic 级)** 机制。**开始任务前必读**。
 - **[Service Blueprint 标准](.trae/skills/baseline/blueprint/SKILL.md)**: `service_blueprint.html` 的稳定锚点、引用方式、capability 口径与 sync 触发规则。凡是 planning artifacts 或 sync 涉及服务蓝图，必须先参考此文档。
 - **[业务基线治理]**: 包含 `service_blueprint.html` (Story 矩阵/服务蓝图)、`business_process.html` (流程图) 和 `domain_model.html` (Event-Storming 模型)。**位于 `docs/baseline/`**。
 - **[治理映射约束]**: **核心准则**：`Bounded Contexts` (Baseline) 治理 `Capabilities` (Spec Layer)。在 Explore/Propose 阶段必须参考 `domain_model.html` 中的映射表来识别 Impact Capabilities。
-- **[交付看板]**: `docs/governance/delivery_board.html` - 使用 `/opsx:delivery-board` 生成，展示系统当前的交付状态与健康度。
+- **[交付看板]**: `docs/governance/delivery_board.html` - 使用 `/opsx:governance:delivery-board` 生成，展示系统当前的交付状态与健康度。
 - **[产品路线图](docs/ROADMAP.md)**: 高阶业务规划，明确当前项目所处阶段，指导 Explore 探索的边界。
 - **[产品感与业务导向](docs/PRODUCT_SENSE.md)**: AI 决策准则、目标用户画像，确保构建“可视即价值”的极简电商。
 - **[前端开发规范与验证闭环](docs/FRONTEND.md)**: 包含极简 UI 约束（无圆角、slate 色系、真实数据），以及通过浏览器验证视觉约束的闭环 SOP。

@@ -15,10 +15,10 @@ permission:
 **PM 是需求侧工作区的唯一主导者。** 需求漏斗顺序：`research（调研）→ explore（探索）→ prototype（原型·Epic整体）→ storymap（拆分+覆盖对账）→ story（业务面交付物）`。**仅大块 Epic 需求走本工作区**（Epic 来自 `docs/ROADMAP.md` 阶段条目）；Bug Fix / Tech Debt / 简单功能修改由 `lead` 直接路由到交付侧。
 
 - 加载 `research` skill：产出 `openspec-requirements/epics/<epic-key>/research.md`（针对单个 Epic **收集**需求信息）。
-- 加载 `explore` skill：产出 `ideas/<idea-key>.md`（**转化**为产品设计思路：To-Be Process / To-Be Journey / 候选 Capabilities）。
-- 加载 `prototype` skill（若涉及 UI）：产出 `prototypes/<epic-key>/*.html`（**Epic 整体**原型，在拆分前完成）。
-- 加载 `storymap` skill：产出 `storymaps/<epic-key>/storymap.md`（拆成多个 Story + **覆盖对账**）。
-- 加载 `story` skill：产出 `stories/<story-key>/story.md` —— **需求侧唯一冻结交付物（业务面）**，交给开发侧（`/req:handoff` 合成 proposal）。
+- 加载 `explore` skill：产出 `epics/<epic-key>/idea.md`（**转化**为产品设计思路：To-Be Process / To-Be Journey / 候选 Capabilities）。
+- 加载 `prototype` skill（若涉及 UI）：产出 `epics/<epic-key>/prototypes/*.html`（**Epic 整体**原型，在拆分前完成）。
+- 加载 `storymap` skill：产出 `epics/<epic-key>/storymap.md`（拆成多个 Story + **覆盖对账**）。
+- 加载 `story` skill：产出 `epics/<epic-key>/stories/<story-key>/story.md` —— **需求侧唯一冻结交付物（业务面）**，交给开发侧（`/req:handoff` 合成 proposal）。
 - 每个阶段产物后必须暂停征求用户确认（HITL），确认后才可进入下一阶段。
 
 ### 1. 产品感与路线图

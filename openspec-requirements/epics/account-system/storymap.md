@@ -1,9 +1,9 @@
 # Storymap: 用户账户体系（注册 / 登录 / 会话 / B 端用户管理）
 
 > Epic Key: `account-system`（来自 `docs/ROADMAP.md` 下一阶段「用户资产与账户体系」）
-> 关联调研: `research/account-system.md`
-> 关联 Idea: `ideas/idea-account-system.md`
-> 关联原型: `prototypes/account-system/*.html`（Epic 整体，涉及 UI，待生成并经用户 HITL 确认）
+> 关联调研: `epics/account-system/research.md`
+> 关联 Idea: `epics/account-system/idea.md`
+> 关联原型: `epics/account-system/prototypes/*.html`（Epic 整体，涉及 UI，待生成并经用户 HITL 确认）
 > 产出后需用户确认（HITL）
 
 <!--
@@ -14,7 +14,7 @@ storymap 用于把大需求（Epic 级）拆分为多个可独立交付的 Story
 
 ## 需求背景 (Background)
 
-现有系统将订单、优惠券归属硬编码为 `user_dev` 占位用户，所有买家共享同一份身份，无法回答"这笔订单/这张券属于哪个真实买家"（见 `research/account-system.md` 痛点 1/2/3）。本 storymap 把「用户账户体系」（来自 ROADMAP 下一阶段条目）拆为 **4 个可独立交付、可独立验收的 Story**，让「我的订单」按登录用户查询、未登录不可下单，并让 B 端运营能对账户做生命周期管理（启停），为回款闭环（阶段 D）奠基。存量 `user_dev` 数据本阶段**不做迁移**（保留并视为无归属），新订单/新发券使用真实 userId。
+现有系统将订单、优惠券归属硬编码为 `user_dev` 占位用户，所有买家共享同一份身份，无法回答"这笔订单/这张券属于哪个真实买家"（见 `epics/account-system/research.md` 痛点 1/2/3）。本 storymap 把「用户账户体系」（来自 ROADMAP 下一阶段条目）拆为 **4 个可独立交付、可独立验收的 Story**，让「我的订单」按登录用户查询、未登录不可下单，并让 B 端运营能对账户做生命周期管理（启停），为回款闭环（阶段 D）奠基。存量 `user_dev` 数据本阶段**不做迁移**（保留并视为无归属），新订单/新发券使用真实 userId。
 
 ## 拆分粒度原则 (Granularity)
 
@@ -67,7 +67,7 @@ storymap 用于把大需求（Epic 级）拆分为多个可独立交付的 Story
 
 ## 关联 Stories
 
-- stories/account-system-01-register/story.md（用户注册，P0，无依赖）
-- stories/account-system-02-login/story.md（用户登录，P0，依赖 register）
-- stories/account-system-03-session/story.md（会话保持，P1，依赖 login）
-- stories/account-system-04-admin-users/story.md（B 端用户管理，P0，依赖 login）
+- epics/account-system/stories/account-system-01-register/story.md（用户注册，P0，无依赖）
+- epics/account-system/stories/account-system-02-login/story.md（用户登录，P0，依赖 register）
+- epics/account-system/stories/account-system-03-session/story.md（会话保持，P1，依赖 login）
+- epics/account-system/stories/account-system-04-admin-users/story.md（B 端用户管理，P0，依赖 login）
