@@ -34,9 +34,9 @@ storymap 用于把大需求（Epic 级）拆分为多个可独立交付的 Story
 
 ## 覆盖对账 (Coverage Reconciliation)
 
-> ⚠️ 强制步骤：对账维度 = Epic 承诺项（In Scope / Exit Criteria / B 端与 C 端）+ **候选 Capability**。每个承诺项必须有 ≥1 个 Story 承接。
+> ⚠️ 强制步骤：对账维度 = Epic 承诺项（**ROADMAP Exit Criteria ①-③** + **In Scope/护栏承诺项（含 ④⑤）** + B 端承诺）+ **候选 Capability**。每个承诺项必须有 ≥1 个 Story 承接。
 
-| Epic 承诺项（来自 research/idea） | 候选 Capability | 承接 Story | 覆盖状态 |
+| Epic 承诺项（来源：ROADMAP Exit Criteria / In Scope / B 端承诺） | 候选 Capability | 承接 Story | 覆盖状态 |
 | --- | --- | --- | --- |
 | Exit Criteria ①：注册 E2E 通过（新买家注册成功获得 ACTIVE 账户，可进入登录） | `account-management`（新增） | account-system-01-register | ✅ 覆盖 |
 | Exit Criteria ②：登录 E2E 通过（买家登录后跳转个人区，可下单，订单 userId 归属当前登录用户） | `account-management`（新增）+ `order-management`（修改） | account-system-02-login | ✅ 覆盖 |
@@ -54,7 +54,7 @@ storymap 用于把大需求（Epic 级）拆分为多个可独立交付的 Story
 | 候选 Capability: `user-admin`（新增，B 端用户管理） | — | account-system-04-admin-users | ✅ 覆盖 |
 | 候选 Capability: `order-management`（修改，userId 归属 + 按 userId 查询） | — | account-system-02-login | ✅ 覆盖 |
 
-> 对账结论：Epic 全部 5 条 Exit Criteria 与全部 In Scope / B 端承诺项、4 个候选 Capability（3 新增 + 1 修改）均有 ≥1 个 Story 承接，覆盖完整，无缺口。
+> 对账结论：Epic 的 **3 条 ROADMAP Exit Criteria + 全部 In Scope/护栏承诺项（含未登录拦截、B 端用户管理）+ B 端承诺**、4 个候选 Capability（3 新增 + 1 修改）均有 ≥1 个 Story 承接，覆盖完整，无缺口。
 
 ## 治理映射对齐
 
