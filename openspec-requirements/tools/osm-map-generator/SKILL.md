@@ -23,12 +23,12 @@ author: KK
 > 1. **结构化 YAML**: 用于下一步的自动化处理和数据存档。
 > 2. **交互式 HTML**: 用于最终用户的直观审查与演示。
 > 
-> **输出路径与命名规范 (Output Path & Naming Convention)**:
-> - **目录**: 所有输出文件必须放在当前工作目录下的一个新子目录中，目录名为 `[公司/业务名]` (例如：`张雪机车海外销售/`)。
-> - **文件名**: HTML 文件名必须反映内容，格式为 `[公司/业务名]-[业务类型].html` (例如：`张雪机车海外销售-OSM战略地图.html`)。
+> **输出路径与命名规范 (本仓库适配)**:
+> - **目录**: 产物必须输出到需求侧工作区 `epics/<epic-key>/analysis/osm/`（`<epic-key>` 为需求侧 Epic key）。
+> - **文件名**: 数据文件 `osm.yaml`，可视化文件 `osm.html`。
 > 
 > **视觉设计规范 (Visual Design Standard)**:
-> - **样式风格**: 默认按照 `ai4pm-skills/design.md` 进行样式输出。
+> - **样式风格**: 默认按照 `openspec-requirements/tools/design.md` 进行样式输出。
 > - **底色模式**: 默认使用 **浅色底 (Light Mode)**。
 > - **页面布局**: HTML 内容占据页面 **85%** 宽度，保持简洁的 Header 设计（参考简洁 Header 规范）。
 
@@ -42,7 +42,7 @@ author: KK
 ### Step 2 · 生成 YAML
 - 读取 `references/osm_prompts.md` 获取全部设定（角色+字段规范+示例）
 - 使用完整 prompt 指导 LLM 生成结构化 YAML（字段说明见 `references/schema.yml`）
-- 将生成内容保存至 `examples/<标识>.yaml`
+- 将生成内容保存至 `epics/<epic-key>/analysis/osm/osm.yaml`
 
 ### Step 3 · 校验 YAML（选做）
 - 确认文件以 `title:` 开始，无 Markdown 代码块外壳
@@ -51,7 +51,9 @@ author: KK
 
 ### Step 4 · 编译 HTML
 ```bash
-python3 scripts/build_osm.py examples/<输入>.yaml examples/<输出>.html
+python3 openspec-requirements/tools/osm-map-generator/scripts/build_osm.py \
+  epics/<epic-key>/analysis/osm/osm.yaml \
+  epics/<epic-key>/analysis/osm/osm.html
 ```
 
 ### Step 5 · 交付
@@ -71,7 +73,7 @@ osm-map-generator/
 │   └── osm_layout.html             # Jinja2 HTML/CSS 模板（与算法完全解耦）
 ├── scripts/
 │   └── build_osm.py                # 核心编译引擎（v2）
-└── examples/                       # 存放每次生成的 YAML & HTML
+└── examples/                       # 示例 YAML（数据契约参考，非产物目录；产物在 epics/<key>/analysis/osm/）
 ```
 
 ---

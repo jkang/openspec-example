@@ -25,10 +25,10 @@ author: KK
 > 当你使用此 Skill 时，必须**同时**输出两个部分：
 > 1. **结构化 YAML**: 用于下一步的自动化处理和数据存档。
 > 2. **交互式 HTML**: 用于最终用户的直观审查与演示。HTML 内部已集成“复制 YAML”功能，确保数据可溯源.
-> 3. **输出路径与命名规范**: 
->    - **输出目录**: 所有生成的 HTML 文件 must be stored in a subdirectory named after the `[Company Name]` (e.g., `张雪机车海外销售/`).
->    - **文件名格式**: `[Company Name]-[Business Type].html` (e.g., `张雪机车-业务流程分析报告.html`).
-> 4. **视觉规范**: HTML 样式默认按照目录下的 `design.md` 进行样式输出，且默认都是浅色底色（Light Mode），页面内容占据 85% 宽度并居中。
+> 3. **输出路径与命名规范 (本仓库适配)**: 
+>    - **输出目录**: 产物必须输出到需求侧工作区 `epics/<epic-key>/analysis/process/`（`<epic-key>` 为需求侧 Epic key）。
+>    - **文件名**: 数据文件 `process.yaml`，可视化文件 `process.html`。
+> 4. **视觉规范**: HTML 样式默认按照 `openspec-requirements/tools/design.md` 进行样式输出，且默认都是浅色底色（Light Mode），页面内容占据 85% 宽度并居中。
 
 ## 核心架构
 
@@ -80,11 +80,13 @@ author: KK
 ### Step 2 · 生成 YAML
 - 读取 `references/process_prompts.md`（角色设定 + 字段规范 + 输出铁律）
 - 按照四层分析框架，将分析结果保存为结构化 YAML
-- 将 YAML 保存至 `examples/<标识>.yaml`
+- 将 YAML 保存至 `epics/<epic-key>/analysis/process/process.yaml`
 
 ### Step 3 · 编译 HTML
 ```bash
-python3 scripts/build_process.py examples/<输入>.yaml examples/<输出>.html
+python3 openspec-requirements/tools/business-process-deep-analyzer/scripts/build_process.py \
+  epics/<epic-key>/analysis/process/process.yaml \
+  epics/<epic-key>/analysis/process/process.html
 ```
 
 ### Step 4 · 交付

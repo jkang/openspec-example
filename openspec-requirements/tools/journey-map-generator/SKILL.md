@@ -21,12 +21,12 @@ author: KK
 > 1. **结构化 YAML**: 用于下一步的自动化处理和数据存档。
 > 2. **交互式 HTML**: 用于最终用户的直观审查与演示。
 > 
-> **输出路径与命名规范 (Output Path & Naming Convention)**:
-> - **目录**: 所有输出文件必须放在当前工作目录下的一个新子目录中，目录名为 `[公司/业务名]` (例如：`张雪机车海外销售/`)。
-> - **文件名**: HTML 文件名必须反映内容，格式为 `[公司/业务名]-[业务类型].html` (例如：`张雪机车海外销售-体验旅程图.html`)。
+> **输出路径与命名规范 (本仓库适配)**:
+> - **目录**: 产物必须输出到需求侧工作区 `epics/<epic-key>/analysis/journey/`（`<epic-key>` 为需求侧 Epic key）。
+> - **文件名**: 数据文件 `journey.yaml`，可视化文件 `journey.html`。
 > 
 > **视觉设计规范 (Visual Design Standard)**:
-> - **样式风格**: 默认按照 `ai4pm-skills/design.md` 进行样式输出。
+> - **样式风格**: 默认按照 `openspec-requirements/tools/design.md` 进行样式输出。
 > - **底色模式**: 默认使用 **浅色底 (Light Mode)**。
 > - **页面布局**: HTML 内容占据页面 **85%** 宽度，保持简洁的 Header 设计（参考简洁 Header 规范）。
 
@@ -55,12 +55,14 @@ author: KK
 
 ### Step 2 · 推演 YAML
 - 请严格遵循 `references/journey_prompts.md` 的要求（结构及数据契约规范）。
-- 将推演的结果保存至 `examples/<标识>.yaml`。
+- 将推演的结果保存至 `epics/<epic-key>/analysis/journey/journey.yaml`。
 
 ### Step 3 · 编译输出 HTML
 - 使用 Python 编译组件根据 YAML 数据生成最终的纯静态 HTML：
 ```bash
-python3 scripts/build_journey.py examples/<标识>.yaml examples/<标识>.html
+python3 openspec-requirements/tools/journey-map-generator/scripts/build_journey.py \
+  epics/<epic-key>/analysis/journey/journey.yaml \
+  epics/<epic-key>/analysis/journey/journey.html
 ```
 
 ### Step 4 · 最终交付
@@ -80,5 +82,5 @@ journey-map-generator/
 │   └── journey_layout.html         # Jinja2 HTML/CSS 与排版引擎
 ├── scripts/
 │   └── build_journey.py            # 核心编译分析及坐标轴计算器
-└── examples/                       # 存放生成产物 (.yaml & .html)
+└── examples/                       # 示例 YAML（数据契约参考，非产物目录；产物在 epics/<key>/analysis/journey/）
 ```
