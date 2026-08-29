@@ -24,7 +24,12 @@ class CustomWorld {
 
 setWorldConstructor(CustomWorld);
 
-Before(async function () {
+Before(async function (scenario) {
+  // 持久化旅程（@persist）：steps 自行 spawn/重启后端进程并管理临时数据目录，
+  // 不重置后端、不依赖浏览器，此处直接跳过，与既有 24 场景互不干扰
+  const tags = ((scenario && scenario.pickle && scenario.pickle.tags) || []).map(t => t.name)
+  if (tags.includes('@persist')) return
+
   await resetBackend('http://localhost:3000/api/__test/reset', true);
   await resetBackend('http://localhost:8000/api/__test/reset', false);
   this.browser = await chromium.launch({ headless: true });

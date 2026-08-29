@@ -85,6 +85,14 @@ export class UserFileRepo extends FileRepoAdapter {
     return max
   }
 
+  /**
+   * 同步序列续号：种子/既有数据注入后调用，避免新注册用户覆盖已存在的 user_<n>
+   * （构造时 FileStore 尚未含种子，故 findMaxSeq 须在种子写入后再同步一次）
+   */
+  syncSequence() {
+    this.sequence = this.findMaxSeq()
+  }
+
   nextId() {
     this.sequence += 1
     return `user_${this.sequence}`

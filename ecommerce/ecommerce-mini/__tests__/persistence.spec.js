@@ -117,7 +117,8 @@ describe('持久化集成测试（@api）：写操作落盘 + 进程重启恢复
       await request(s1.base, 'POST', '/api/cart/items', { productId: '1', quantity: 2 }, authHeaders)
       const cartsBeforeOrder = readJson(tmp, 'carts.json')
       const cartRec = cartsBeforeOrder.find(c => c.userId === user.id)
-      assert.ok(cartRec && cartRec.items.length === 2, 'carts.json 应按 userId 键控且含加购条目')
+      assert.ok(cartRec && cartRec.items.length === 1 && cartRec.items[0].quantity === 2,
+        'carts.json 应按 userId 键控且含加购条目')
 
       // 3. 下单
       const order = await request(s1.base, 'POST', '/api/orders', {}, authHeaders)

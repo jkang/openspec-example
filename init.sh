@@ -52,7 +52,8 @@ function show_help() {
     echo ""
     echo "  --- BDD & E2E Tests ---"
     echo "  e2e:install     - 安装全局 BDD 与 Playwright 环境"
-    echo "  e2e:run         - 运行全局 Cucumber E2E 测试"
+    echo "  e2e:run         - 运行全局 Cucumber E2E 测试（24 场景，NODE_ENV=test 内存语义）"
+    echo "  e2e:persist     - 运行持久化 E2E（STORAGE=file + 进程级重启，独立临时 data 目录）"
     echo ""
     echo "  --- 全局 (Global) ---"
     echo "  test:all        - 运行所有后端的测试"
@@ -165,7 +166,20 @@ case "$1" in
         wait_for_url "http://localhost:$NODE_PORT/api/products"
         wait_for_url "http://localhost:$VUE_PORT"
 
-        cd e2e-tests && npm run test:e2e
+        cd e2e-tests && npm run test:e2e -- --profile e2e
+        ;;
+    e2e:persist)
+        echo "-> 运行持久化 E2E（STORAGE=file + 进程级重启，独立临时 data 目录）..."
+        if [ ! -x e2e-tests/node_modules/.bin/cucumber-js ]; then
+            echo "-> 缺少 cucumber-js 请先运行 ./init.sh e2e:install"
+            exit 1
+        fi
+
+        # 持久化 steps 自行 spawn 后端（端口 3011 / 临时 DATA_DIR）；先释放端口避免冲突
+        free_port 3011
+        trap 'free_port 3011' EXIT
+
+        cd e2e-tests && npm run test:e2e -- --profile persist
         ;;
     test:all)
         echo "-> 运行所有测试..."

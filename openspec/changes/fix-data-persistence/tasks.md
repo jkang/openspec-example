@@ -5,21 +5,21 @@
 
 ## 1. 共享仓储适配层 (Shared File Repo Layer)
 
-- [ ] 1.1 [Node.js] 新增 `src/repo/fileRepo.js`：将 `server.prod.js` 中的 `FileRepoAdapter` / `UserFileRepo` / `SessionFileRepo` 迁移并泛化（支持 8 类数据：products/categories/coupons/issuances/orders/carts(keyField=userId)/users/sessions）
-- [ ] 1.2 [Node.js] 增强 `src/persist/fileStore.js`：首次启动自动创建缺失数据文件（含 `users.json`/`sessions.json`/`issuances.json`）；`data/` 目录不存在时自动创建；JSON 解析失败时安全降级（空数据集启动，不崩溃）
-- [ ] 1.3 [Node.js] 编写 `fileStore`/`fileRepo` 单元测试（`__tests__/persistence.spec.js` 或独立 spec）：文件初始化、写后一致性、损坏文件降级
+- [x] 1.1 [Node.js] 新增 `src/repo/fileRepo.js`：将 `server.prod.js` 中的 `FileRepoAdapter` / `UserFileRepo` / `SessionFileRepo` 迁移并泛化（支持 8 类数据：products/categories/coupons/issuances/orders/carts(keyField=userId)/users/sessions）
+- [x] 1.2 [Node.js] 增强 `src/persist/fileStore.js`：首次启动自动创建缺失数据文件（含 `users.json`/`sessions.json`/`issuances.json`）；`data/` 目录不存在时自动创建；JSON 解析失败时安全降级（空数据集启动，不崩溃）
+- [x] 1.3 [Node.js] 编写 `fileStore`/`fileRepo` 单元测试（`__tests__/persistence.spec.js` 或独立 spec）：文件初始化、写后一致性、损坏文件降级
 
 ## 2. 服务统一入口与存储选择 (Server Unified Entry)
 
-- [ ] 2.1 [Node.js] 改造 `server.js`：`createServer({ storage })` 支持存储后端选择；缺省解析规则 = `NODE_ENV=test` → memory，否则 file；显式 `STORAGE=memory|file` 环境变量优先；路由逻辑保持单一来源不动
-- [ ] 2.2 [Node.js] file 模式下注入共享 fileRepo（含种子数据对齐：products/categories/coupons 沿用既有种子、users 注入演示用户 `user_1001`、carts/orders/issuances/sessions 空文件初始化）
-- [ ] 2.3 [Node.js] memory 模式（`NODE_ENV=test`）保留既有行为：`/api/__test/reset`、`/api/__test/user-status`、`/api/__test/user-role` 测试后门仅 test 生效
-- [ ] 2.4 [Node.js] 收敛 `server.prod.js` 为薄壳：复用 `server.js` 的 `createServer({ storage: 'file' })`，保留端口 3002 与 `node:prod` 入口；删除其内部重复路由/仓储定义（消除漂移）
+- [x] 2.1 [Node.js] 改造 `server.js`：`createServer({ storage })` 支持存储后端选择；缺省解析规则 = `NODE_ENV=test` → memory，否则 file；显式 `STORAGE=memory|file` 环境变量优先；路由逻辑保持单一来源不动
+- [x] 2.2 [Node.js] file 模式下注入共享 fileRepo（含种子数据对齐：products/categories/coupons 沿用既有种子、users 注入演示用户 `user_1001`、carts/orders/issuances/sessions 空文件初始化）
+- [x] 2.3 [Node.js] memory 模式（`NODE_ENV=test`）保留既有行为：`/api/__test/reset`、`/api/__test/user-status`、`/api/__test/user-role` 测试后门仅 test 生效
+- [x] 2.4 [Node.js] 收敛 `server.prod.js` 为薄壳：复用 `server.js` 的 `createServer({ storage: 'file' })`，保留端口 3002 与 `node:prod` 入口；删除其内部重复路由/仓储定义（消除漂移）
 
 ## 3. 持久化集成测试 (Persistence Integration Tests)
 
-- [ ] 3.1 [Node.js] `__tests__/persistence.spec.js`（@api）：临时 `data/` 目录 + 两次 `createServer({storage:'file'})` 模拟进程重启 → 断言注册用户/会话/订单/购物车重启后可恢复、登录可成功
-- [ ] 3.2 [Node.js] 断言运行链路写操作落盘：注册/下单/支付后 `users.json`/`sessions.json`/`orders.json` 含对应记录；`NODE_ENV=test` 时 `data/` 零写入
+- [x] 3.1 [Node.js] `__tests__/persistence.spec.js`（@api）：临时 `data/` 目录 + 两次 `createServer({storage:'file'})` 模拟进程重启 → 断言注册用户/会话/订单/购物车重启后可恢复、登录可成功
+- [x] 3.2 [Node.js] 断言运行链路写操作落盘：注册/下单/支付后 `users.json`/`sessions.json`/`orders.json` 含对应记录；`NODE_ENV=test` 时 `data/` 零写入
 
 ## 4. 持久化 E2E 旅程 (Persistence E2E Journey)
 

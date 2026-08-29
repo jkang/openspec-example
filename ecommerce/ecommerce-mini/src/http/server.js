@@ -169,7 +169,11 @@ function seedFileRepos({ productRepo, categoryRepo, couponRepo, userRepo }) {
   if (productRepo.findAll().length === 0) initialProducts.forEach(p => productRepo.save({ ...p }))
   if (categoryRepo.findAll().length === 0) initialCategories.forEach(c => categoryRepo.save({ ...c }))
   if (couponRepo.findAll().length === 0) initialCoupons.forEach(c => couponRepo.save({ ...c }))
-  if (userRepo.findAll().length === 0) initialUsers.forEach(u => userRepo.save({ ...u }))
+  if (userRepo.findAll().length === 0) {
+    initialUsers.forEach(u => userRepo.save({ ...u }))
+    // 种子注入后同步序列：避免新注册用户从 1001 起覆盖演示用户 user_1001
+    userRepo.syncSequence()
+  }
 }
 
 export function createServer({ storage, dataDir } = {}) {
