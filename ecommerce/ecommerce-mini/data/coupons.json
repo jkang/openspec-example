@@ -15,7 +15,7 @@
     "type": "PERCENTAGE",
     "value": 9,
     "minSpendCents": 10000,
-    "status": "UNUSED",
+    "status": "USED",
     "expiryDate": "2026-12-31",
     "userId": null
   }

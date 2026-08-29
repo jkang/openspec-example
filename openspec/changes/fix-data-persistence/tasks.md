@@ -26,6 +26,7 @@
 - [x] 4.1 [E2E] 新增 `e2e-tests/features/persistence.feature`：以 `STORAGE=file` 拉起后端 → 注册/登录/下单支付 → **进程级重启** → 验证登录态保持（原会话凭证有效）、历史订单可见、状态与重启前一致
 - [x] 4.2 [E2E] 实现对应 cucumber steps（spawn/restart/清理），并新增 `init.sh e2e:persist`（或等价脚本入口）负责文件存储后端的拉起/重启编排
 - [x] 4.3 [E2E] 既有 `init.sh e2e:run`（`NODE_ENV=test` 内存语义）回归全绿，与新持久化 E2E 互不干扰
+- [ ] 4.4 [E2E] **补齐 smoke 完整主链路**（smoke 覆盖缺陷修复）：`smoke.feature` 由「仅 storefront load」扩展为覆盖**交易主链路一体化场景**——注册新账户自动登录 → 选购加购两件商品 → 自动推荐最优优惠券并结算 → 模拟支付 → 我的订单显示已支付订单。复用/补齐既有 steps（注册/加购/结算/支付/我的订单），在 `NODE_ENV=test` + reset 隔离下运行，`./init.sh e2e:run` 回归全绿
 
 ## 5. 文档同步 (Docs Sync)
 
