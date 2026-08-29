@@ -148,6 +148,11 @@ Archive a completed change in the experimental workflow.
 
 6. **Sync Epic Backlog (progress update)**
 
+   **⚠️ 状态更新原子化（本项目）**：归档后必须**一次更新多个状态源**，防漂移：
+   - `openspec/epic-<key>.story-list.json`：匹配 changeName 的 Story → `done`（见下方步骤）。
+   - 需求侧 `openspec-requirements/epics/<epic-key>/STATUS.md`：该 Story → `done` + 开发侧归档 ✅；若该 Epic 全部 Story done → Epic 生命周期置 `all-done`，并提示需求侧 Epic 归档（`epics/<key>/` → `archive/YYYY-MM-DD-<key>/`）。
+   - 需求侧 `epics/<key>/stories/<story-key>/story.md`：交接状态勾选"已交接"（若未勾选）。
+
    If the archived change belongs to an Epic, sync the `openspec/epic-*.story-list.json` backlog. All story-list paths below are relative to the same resolved planning root (`planningHome.root`) used in step 2 — stay store-aware:
    - Search all `openspec/epic-*.story-list.json` for a story whose `changeName` matches the archived change name.
    - Update the matching story's `status` to `done` — this is the required progress update after every story archive.

@@ -42,9 +42,24 @@ updated_at: 2026-08-23
 **严禁将底层业务逻辑判断推卸给 `@e2e` 层。**
 
 ### Apply 阶段的落实 (Implementation)
-在 `/opsx:apply` 阶段，AI 必须根据标签分配测试任务：
-- 遇到 `@unit` / `@api`，在后端项目的 `__tests__/` 或 `tests/` 目录下编写测试。
-- 只有遇到 `@e2e` 时，才前往全局 `e2e-tests/features/` 和 `e2e-tests/steps/` 目录下编写 Playwright 自动化脚本。
+ 在 `/opsx:apply` 阶段，AI 必须根据标签分配测试任务：
+ - 遇到 `@unit` / `@api`，在后端项目的 `__tests__/` 或 `tests/` 目录下编写测试。
+ - 只有遇到 `@e2e` 时，才前往全局 `e2e-tests/features/` 和 `e2e-tests/steps/` 目录下编写 Playwright 自动化脚本。
+
+### E2E 步骤命名空间化规范（防跨 Story 冲突）
+
+> 背景：多个 Story 的 E2E 步骤集中在同一 `e2e-tests/steps/` 目录，若步骤文本（Given/When/Then）高度相似，Cucumber 会报 **ambiguous（步骤定义歧义）**，导致回归失败（见 flow-issues-log ISSUE-015）。
+
+**强制规范**：
+
+1. **步骤文件按 Story 分文件**：`e2e-tests/steps/<story-key>.js`（如 `account_register.js`、`account_login.js`、`account_session.js`、`account_admin_users.js`）。
+2. **步骤文本带领域前缀**：步骤的 Gherkin 文本必须体现业务领域/角色，避免泛化措辞。例如：
+   - ❌ `Given('已注册用户')`（多个 Story 可能复用/冲突）
+   - ✅ `Given('买家已注册账号 {string}')`（含角色"买家"与领域动作）
+   - ✅ `When('运营在用户管理界面将 {string} 禁用')`（含角色"运营"与页面定位）
+3. **测试后门步骤独立命名**：`/api/__test/*` 后门步骤统一前缀 `测试后门`（如 `Given('测试后门将用户 {string} 置为禁用')`），与 UI 操作步骤（`When('运营在用户管理中将 {string} 禁用')`）严格区分。
+4. **新增步骤前 grep 查重**：编写步骤定义前，先 `grep` 确认该步骤文本不存在于其他步骤文件；若语义相同应**复用共享步骤**（抽到 `ui_steps.js` 或 `shared.js`），而非复制。
+5. **Ambiguous 即失败**：`./init.sh e2e:run` 若报 ambiguous，视为门禁不通过，必须按上述规范收敛步骤文本。
 
 ### Archive 阶段的门禁 (Gating)
 
@@ -56,3 +71,15 @@ updated_at: 2026-08-23
 4. **verify.md 记录**: `verify.md` 的 E2E 门禁行必须填写**实际场景数**（如 `10 scenarios / 46 steps`），严禁标注"E2E 未纳入"作为通过理由。
 
 > 背景: E2E 是测试金字塔的顶层（约占 10%），覆盖用户核心交易链路与跨端交互；它不应是"可选验证"。归档前旧场景全绿但新 `@e2e` 场景零覆盖，属于验收缺口。
+
+### E2E 测试数据策略（动态建号 vs 预置种子）
+
+> 背景：E2E 跨 Story 运行时共享同一后端存储，若多个 feature 依赖预置种子账号，会互相污染（见 ISSUE-012/013）。
+
+**强制规范**：
+
+1. **Given 动态建号优先**：涉及用户/账户的 E2E 场景，一律在 `Given` 步骤中**动态创建**该场景所需数据（如 `Given('买家已注册账号 13888217536')` 内部调用注册 API），不依赖共享种子数据。
+2. **测试后门仅用于状态翻转**：`/api/__test/*` 后门（如 user-status/user-role）只用于翻转**当前场景已建账号**的状态，不用于创建共享数据。
+3. **种子数据只读复用**：全局种子（如 `user_1001`）仅供只读断言；任何变更性操作（禁用/改状态）必须针对动态建的账号。
+4. **场景间数据隔离**：每个 feature 场景的账号用**独立手机号**（或 UUID 后缀），避免并发/顺序执行相互影响。
+5. **清理语义**：若场景创建了会造成后续冲突的数据，在 `After` hook 中清理（或使用可覆盖的唯一标识）。

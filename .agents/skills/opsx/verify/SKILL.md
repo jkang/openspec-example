@@ -15,6 +15,10 @@ metadata:
 
 **Input**: 可选变更名（如 `/opsx:verify coupon-engine-upgrade`）。省略时从对话上下文推断，或运行 `openspec list --json` 让用户选择。
 
+**工具降级路径（浏览器 UI 验证不可用时）**：
+- 首选：Chrome DevTools / webapp-testing 验证前端视觉与交互（FRONTEND.md §6 自检）。
+- 降级：若 MCP 浏览器实例不可用/被占用，先 `--isolated` 重试；仍不可用时按 `docs/FRONTEND.md` 静态自检清单（无圆角 `border-radius:0`、无阴影 `box-shadow:none`、slate 色系、真实中文数据、无占位符）审查，并在 verify.md 中记录"静态自检"而非"浏览器验证"。
+
 ## 门禁定义
 
 - **Hard Gates（硬门禁，任一 FAIL 即拦截）**:
