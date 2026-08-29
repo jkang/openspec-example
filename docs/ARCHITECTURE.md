@@ -35,8 +35,9 @@ updated_at: 2026-08-20
 - **依赖限制**: **Zero npm dependencies**（零第三方依赖），仅使用 Node 原生模块（`http`, `fs`, `node:test`）。
 - **类型定义**: 强制使用 JSDoc 进行实体和类型定义，替代 TypeScript。
 - **持久化**:
-  - 开发环境: In-memory Map-based repositories (`server.js`)
-  - 生产环境: 基于文件的 JSON 持久化 (`FileStore`) + 模拟 JWT (`server.prod.js`)
+  - 运行链路默认 FileStore 文件持久化（`npm start` / `init.sh node:start` 即落盘 `data/*.json` 全部 8 类数据：products / categories / coupons / issuances / orders / carts / users / sessions）
+  - `NODE_ENV=test` 使用内存仓储（`memoryRepo.js`）保证测试隔离（`/api/__test/*` 测试后门仅 test 生效）；显式 `STORAGE=memory|file` 环境变量优先级最高
+  - `server.prod.js` 为 file 存储兼容入口（端口 3002，`npm run start:prod`），复用 `server.js` 单一路由实现（路由单一来源，仅存储后端不同）
 
 ## 4. Python 实现规范 (`ecommerce-mini-python`)
 

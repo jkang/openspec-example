@@ -222,3 +222,12 @@ __marimo__/
 !.opencode/skills/
 !.opencode/commands/
 opencode.jsonc
+
+# ECommerce 运行态数据（FileStore 落盘产物，非种子基线）
+# 种子基线（products/categories/coupons.json）保留版本控制；
+# 运行态产物（carts/orders/users/sessions/issuances.json）为服务运行自动生成，忽略跟踪
+ecommerce/ecommerce-mini/data/carts.json
+ecommerce/ecommerce-mini/data/orders.json
+ecommerce/ecommerce-mini/data/users.json
+ecommerce/ecommerce-mini/data/sessions.json
+ecommerce/ecommerce-mini/data/issuances.json

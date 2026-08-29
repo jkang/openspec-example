@@ -19,12 +19,14 @@ Given('买家打开店铺首页', async function () {
 });
 
 Given(/^系统已存在用户手机号 (\d+)（昵称 (.+)）$/, async function (phone, nickname) {
+  // 前置状态准备：确保该手机号已存在（新建成功 201 或已存在 409 均可；
+  // 409 出现于后端 seed 用户 user_1001 已含该手机号时，语义同样满足「已存在」）
   const res = await fetch(`${API_URL}/api/auth/register`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ phone: String(phone), nickname, password: '123456' })
   });
-  expect(res.status).to.equal(201);
+  expect([201, 409]).to.include(res.status);
 });
 
 // ---------- 进入注册页 ----------

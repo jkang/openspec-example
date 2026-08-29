@@ -58,7 +58,7 @@ const initialUsers = [
   { 
     id: 'user_1001', phone: '13912345678', nickname: '陈晓芸', 
     passwordHash: 'scrypt:708139f4b3a834319eacf7c532b1e4c9:d850177ba1e6bf16d801ec85a8720a98be2b7cb42c1bbca37f30831827b4d09f5dcf8b641c8657c8f41ce154d35d4896e4312923c0e58da3baa8bd9594fb8f92', 
-    status: '正常', role: '客户', createdAt: '2026-08-29 08:00'
+    status: '正常', role: '运营', createdAt: '2026-08-29 08:00'
   }
 ]
 
