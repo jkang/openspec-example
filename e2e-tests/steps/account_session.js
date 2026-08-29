@@ -173,7 +173,8 @@ Then('再次访问{string}被引导登录', async function (target) {
 
 // ---------- 禁用用户会话失效（R-SES-006） ----------
 
-When('运营在用户管理中将王强禁用', async function () {
+When('测试后门：运营已将王强禁用', async function () {
+  // 命名空间化（ISSUE-015）：后门步骤显式加「测试后门」前缀，与 UI 操作步骤（account_admin_users.js）区分
   const res = await fetch(`${API_URL}/api/__test/user-status`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

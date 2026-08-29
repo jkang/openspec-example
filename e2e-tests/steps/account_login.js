@@ -15,7 +15,7 @@ Given('已注册用户林晓明（手机号 {int}，密码 {int}）', async func
   expect(res.status).to.equal(201);
 });
 
-Given('用户王强（手机号 {int}）已被运营禁用', async function (phone) {
+Given('测试后门：用户王强（手机号 {int}）已被运营禁用', async function (phone) {
   // 先注册（复用 register API，保证哈希格式与生产一致），再通过测试后门置为禁用
   const res = await fetch(`${API_URL}/api/auth/register`, {
     method: 'POST',
