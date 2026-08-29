@@ -36,9 +36,19 @@ export class FileStore {
     return this.data.get(id)
   }
 
+  has(id) {
+    return this.data.has(id)
+  }
+
   set(id, item) {
     this.data.set(id, item)
     this.saveAll(this.data.values())
+  }
+
+  delete(id) {
+    const existed = this.data.delete(id)
+    if (existed) this.saveAll(this.data.values())
+    return existed
   }
   
   values() {

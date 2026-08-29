@@ -18,8 +18,11 @@
       <div v-else-if="viewMode === 'orders'" class="flex-1 mx-8 text-sm text-slate-500">
         当前路径: <span class="text-slate-900 font-medium">我的订单</span>
       </div>
+      <div v-else-if="viewMode === 'register' || viewMode === 'login'" class="flex-1 mx-8 text-sm text-slate-500">
+        当前路径: <span class="text-slate-900 font-medium">{{ viewMode === 'register' ? '账户 / 注册' : '账户 / 登录' }}</span>
+      </div>
       <div v-else class="flex-1 mx-8 text-sm text-slate-500">
-        当前路径: <span class="text-slate-900 font-medium">{{ { order: '交易管理 / 订单列表', product: '交易管理 / 商品管理', category: '交易管理 / 分类管理', coupon: '营销中心 / 优惠券管理' }[adminTab] }}</span>
+        当前路径: <span class="text-slate-900 font-medium">{{ { order: '交易管理 / 订单列表', product: '交易管理 / 商品管理', category: '交易管理 / 分类管理', coupon: '营销中心 / 优惠券管理', user: '账户中心 / 用户管理' }[adminTab] }}</span>
       </div>
 
       <div class="flex items-center gap-6 text-sm font-medium">
@@ -34,9 +37,18 @@
             :class="['px-3 py-1 border-l border-slate-200 transition-colors', viewMode === 'admin' ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 hover:bg-slate-50']"
           >运营后台</button>
         </div>
-        <button v-if="viewMode === 'store' || viewMode === 'orders'" @click="switchViewMode('orders')"
+        <button v-if="viewMode === 'store' || viewMode === 'orders' || (viewMode === 'login' && sessionToken && loginSuccess)" @click="goToOrders"
                 :class="['py-1 px-2 border transition-colors', viewMode === 'orders' ? 'border-slate-900 text-slate-900' : 'border-slate-200 hover:bg-slate-50']">
           我的订单
+        </button>
+        <button v-if="viewMode === 'store' && !sessionToken" @click="switchToRegister" class="py-1 px-2 border border-slate-200 hover:bg-slate-50">
+          注册 / 登录
+        </button>
+        <span v-if="sessionToken && currentUser && viewMode !== 'admin'" class="text-sm text-slate-600">
+          {{ currentUser.nickname }}
+        </span>
+        <button v-if="sessionToken && currentUser && viewMode !== 'admin'" @click="logoutSession" class="py-1 px-2 border border-slate-900 bg-slate-900 text-white hover:bg-slate-700">
+          退出登录
         </button>
         <button v-if="viewMode === 'store'" @click="isCartOpen = !isCartOpen" class="relative py-1 px-2 border border-slate-200 hover:bg-slate-50">
           购物车
@@ -44,7 +56,7 @@
             {{ cartTotalItems }}
           </span>
         </button>
-        <span v-if="viewMode === 'admin'" class="text-sm text-slate-500 font-normal">运营专员: 王琳</span>
+        <span v-if="viewMode === 'admin'" class="text-sm text-slate-500 font-normal">运营专员: {{ (isOperator && currentUser?.nickname) || '王琳' }}</span>
       </div>
     </header>
 
@@ -186,9 +198,165 @@
       </aside>
     </main>
 
+    <!-- 主内容区 (C 端注册) -->
+    <main v-else-if="viewMode === 'register'" class="flex-1 overflow-y-auto p-8 bg-slate-50 scrollbar-hide">
+      <div class="max-w-2xl mx-auto space-y-6">
+        <header class="border border-slate-200 bg-white p-6 flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-bold mb-2">注册新账户</h2>
+            <p class="text-sm text-slate-600">手机号 + 密码即可完成注册，注册成功将自动登录</p>
+          </div>
+          <div class="text-sm text-slate-600">
+            已有账户？<span class="text-slate-900 underline underline-offset-4 cursor-pointer" @click="switchToLogin()">直接登录</span>
+          </div>
+        </header>
+
+        <section class="border border-slate-200 bg-white p-6">
+          <div class="max-w-xl mx-auto">
+            <div v-if="registerSuccess" class="border border-slate-200 bg-slate-50 p-4 mb-6 text-sm">
+              <p class="font-semibold mb-1">注册成功，已自动登录</p>
+              <p class="text-slate-600">欢迎回来，{{ currentUser?.nickname }}。你可以继续结算购物车，或前往「我的订单」。</p>
+              <div class="mt-4 flex gap-3">
+                <button @click="switchViewMode('orders')" class="border border-slate-900 bg-slate-900 text-white px-4 py-2 text-sm">查看我的订单</button>
+                <button @click="switchViewMode('store')" class="border border-slate-200 px-4 py-2 text-sm text-slate-600">返回店铺</button>
+              </div>
+            </div>
+
+            <form v-else @submit.prevent="submitRegister" class="space-y-5">
+              <div>
+                <label class="block text-sm font-medium mb-2">手机号</label>
+                <input v-model.trim="registerForm.phone" type="tel" maxlength="11" placeholder="请输入 11 位手机号，例如 13888217536"
+                  class="w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-slate-900" />
+                <p v-if="registerErrors.phone" class="text-sm text-red-600 mt-1">{{ registerErrors.phone }}</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium mb-2">昵称</label>
+                <input v-model.trim="registerForm.nickname" type="text" maxlength="20" placeholder="例如：林晓明（不填则使用默认昵称）"
+                  class="w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-slate-900" />
+                <p v-if="registerErrors.nickname" class="text-sm text-red-600 mt-1">{{ registerErrors.nickname }}</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium mb-2">密码</label>
+                <input v-model="registerForm.password" :type="showPassword ? 'text' : 'password'" maxlength="32" placeholder="设置密码，至少 6 位"
+                  class="w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-slate-900" />
+                <div class="mt-1 flex items-center justify-between">
+                  <p v-if="registerErrors.password" class="text-sm text-red-600">{{ registerErrors.password }}</p>
+                  <label class="text-sm text-slate-600 cursor-pointer">
+                    <input type="checkbox" v-model="showPassword" class="mr-1" /> 显示密码
+                  </label>
+                </div>
+              </div>
+
+              <div v-if="registerServerError" class="border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                {{ registerServerError }}
+                <span v-if="registerServerError.includes('已注册')" class="underline underline-offset-4 cursor-pointer ml-1" @click="switchToLogin()">去登录</span>
+              </div>
+
+              <button type="submit"
+                class="w-full border border-slate-900 bg-slate-900 text-white py-2 text-sm hover:bg-slate-700">
+                注册并登录
+              </button>
+
+              <p class="text-xs text-slate-500">注册即表示同意平台服务条款与隐私政策。手机号将作为登录凭证，请妥善保管。</p>
+            </form>
+          </div>
+        </section>
+
+        <footer class="border border-slate-200 bg-white p-6">
+          <h3 class="text-sm font-semibold mb-3">已注册用户示例</h3>
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-slate-200 text-left text-slate-600">
+                <th class="py-2 pr-4 font-medium">手机号</th>
+                <th class="py-2 pr-4 font-medium">昵称</th>
+                <th class="py-2 pr-4 font-medium">状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr class="border-b border-slate-200">
+                <td class="py-2 pr-4">13912345678</td>
+                <td class="py-2 pr-4">陈晓芸</td>
+                <td class="py-2"><span class="text-slate-600">正常</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </footer>
+      </div>
+    </main>
+
+    <!-- 主内容区 (C 端登录) -->
+    <main v-else-if="viewMode === 'login'" class="flex-1 overflow-y-auto p-8 bg-slate-50 scrollbar-hide">
+      <div class="max-w-2xl mx-auto space-y-6">
+        <header class="border border-slate-200 bg-white p-6 flex items-center justify-between">
+          <div>
+            <h2 class="text-xl font-bold mb-2">登录</h2>
+            <p class="text-sm text-slate-600">登录后可下单、查看「我的订单」，购物车将跟随你的账户</p>
+          </div>
+          <div class="text-sm text-slate-600">
+            还没有账户？<span class="text-slate-900 underline underline-offset-4 cursor-pointer" @click="switchToRegister()">立即注册</span>
+          </div>
+        </header>
+
+        <section class="border border-slate-200 bg-white p-6">
+          <div class="max-w-xl mx-auto">
+            <div v-if="loginSuccess" class="border border-slate-200 bg-slate-50 p-4 mb-6 text-sm">
+              <p class="font-semibold mb-1">登录成功，{{ currentUser?.nickname }}</p>
+              <p class="text-slate-600">会话已创建并保持，刷新页面不会退出登录。购物车将跟随你的账户。</p>
+              <div class="mt-4 flex gap-3">
+                <button @click="goToOrders" class="border border-slate-900 bg-slate-900 text-white px-4 py-2 text-sm">查看我的订单</button>
+                <button @click="switchViewMode('store')" class="border border-slate-200 px-4 py-2 text-sm text-slate-600">返回店铺</button>
+              </div>
+            </div>
+
+            <form v-else @submit.prevent="submitLogin" class="space-y-5">
+              <div>
+                <label class="block text-sm font-medium mb-2">手机号</label>
+                <input v-model.trim="loginForm.phone" type="tel" maxlength="11" placeholder="请输入注册手机号，例如 13888217536"
+                  class="w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-slate-900" />
+                <p v-if="loginErrors.phone" class="text-sm text-red-600 mt-1">{{ loginErrors.phone }}</p>
+              </div>
+
+              <div>
+                <label class="block text-sm font-medium mb-2">密码</label>
+                <input v-model="loginForm.password" :type="loginShowPassword ? 'text' : 'password'" maxlength="32" placeholder="请输入密码"
+                  class="w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-slate-900" />
+                <div class="mt-1 flex items-center justify-between">
+                  <p class="text-sm text-slate-500">忘记密码请联系平台客服（本阶段暂不提供自助找回）</p>
+                  <label class="text-sm text-slate-600 cursor-pointer">
+                    <input type="checkbox" v-model="loginShowPassword" class="mr-1" /> 显示密码
+                  </label>
+                </div>
+              </div>
+
+              <div v-if="loginServerError" class="border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+                {{ loginServerError }}
+              </div>
+
+              <button type="submit"
+                class="w-full border border-slate-900 bg-slate-900 text-white py-2 text-sm hover:bg-slate-700">
+                登录
+              </button>
+
+              <p class="text-xs text-slate-500">登录即创建持久会话，你可以在任意设备查看自己的订单。</p>
+            </form>
+          </div>
+        </section>
+
+        <footer class="border border-slate-200 bg-white p-6">
+          <h3 class="text-sm font-semibold mb-3">为什么需要登录？</h3>
+          <ul class="text-sm text-slate-600 space-y-1 list-disc list-inside">
+            <li>订单将归属于你的账户，「我的订单」只展示你自己的订单。</li>
+            <li>购物车跟随账户，换设备不丢失。</li>
+            <li>未登录时无法下单与查看订单，系统会引导你先登录。</li>
+          </ul>
+        </footer>
+      </div>
+    </main>
+
     <!-- 主内容区 (C 端我的订单) -->
-    <main v-else-if="viewMode === 'orders'" class="flex-1 overflow-y-auto p-8 bg-slate-50 scrollbar-hide">
-      <div class="max-w-3xl mx-auto space-y-6">
+    <main v-else-if="viewMode === 'orders'" class="flex-1 overflow-y-auto p-8 bg-slate-50 scrollbar-hide">      <div class="max-w-3xl mx-auto space-y-6">
         <h2 class="text-xl font-bold tracking-tight border-b-2 border-slate-900 pb-4">我的订单</h2>
 
         <section v-for="o in myOrders" :key="o.id" class="bg-white border border-slate-200">
@@ -247,6 +415,9 @@
           <div class="mt-8 px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">营销中心</div>
           <a @click="adminTab = 'coupon'"
              :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'coupon' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']">优惠券管理</a>
+          <div class="mt-8 px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">账户中心</div>
+          <a v-if="isOperator" @click="adminTab = 'user'"
+             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'user' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']">用户管理</a>
         </nav>
       </aside>
 
@@ -605,6 +776,125 @@
 
           </div><!-- /分类管理 tab -->
 
+          <!-- ===== 用户管理 tab（仅运营角色，R-ADM-001） ===== -->
+          <div v-else-if="adminTab === 'user'">
+
+            <!-- 无权限兜底：非运营越权进入（R-ADM-007 不返回敏感信息） -->
+            <section v-if="!isOperator" class="bg-white border border-slate-200 p-8">
+              <h2 class="text-lg font-bold mb-4 border-b border-slate-200 pb-4">用户管理</h2>
+              <p class="text-sm text-slate-700">无权限访问用户管理：本入口仅「运营」角色可见。手机号等用户资料属敏感信息，客服与普通账号无法查看。</p>
+            </section>
+
+            <template v-else>
+              <!-- 章节一: 检索区（R-ADM-003） -->
+              <section class="bg-white border border-slate-200 p-8">
+                <div class="flex items-end justify-between mb-6 border-b border-slate-200 pb-4">
+                  <div>
+                    <h2 class="text-lg font-bold">用户管理</h2>
+                    <p class="text-sm text-slate-500 mt-1">查看用户基础信息与订单归属，支持按手机号 / 昵称检索。手机号属敏感信息，仅运营角色可见。</p>
+                  </div>
+                  <span class="border border-slate-200 px-3 py-1 text-xs text-slate-600">当前角色：运营 · {{ currentUser?.nickname || '—' }}</span>
+                </div>
+                <div class="flex gap-3 items-end">
+                  <div class="flex-1">
+                    <label class="block text-sm font-medium text-slate-700 mb-2">关键词</label>
+                    <input v-model.trim="adminUserKeyword" type="text" placeholder="按手机号或昵称搜索，例如 138 或 林晓明" @keyup.enter="searchAdminUsers"
+                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                  </div>
+                  <button @click="searchAdminUsers" class="border border-slate-900 bg-slate-900 text-white px-6 py-2 text-sm hover:bg-slate-700">搜索</button>
+                  <button @click="resetAdminUsers" class="border border-slate-200 px-6 py-2 text-sm text-slate-600">重置</button>
+                </div>
+                <p class="text-xs text-slate-500 mt-3">共 {{ adminUsers.length }} 位用户</p>
+                <div v-if="adminUserError" class="border border-slate-900 bg-slate-50 px-4 py-3 text-sm text-slate-900 mt-3">{{ adminUserError }}</div>
+              </section>
+
+              <!-- 章节二: 用户列表（R-ADM-002） -->
+              <section class="bg-white border border-slate-200 p-8">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="text-left text-slate-500 border-b border-slate-200">
+                      <th class="pb-3 pr-4 font-medium">用户 ID</th>
+                      <th class="pb-3 pr-4 font-medium">昵称</th>
+                      <th class="pb-3 pr-4 font-medium">手机号</th>
+                      <th class="pb-3 pr-4 font-medium">订单数</th>
+                      <th class="pb-3 pr-4 font-medium">注册日期</th>
+                      <th class="pb-3 pr-4 font-medium">状态</th>
+                      <th class="pb-3 font-medium">操作</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="u in adminUsers" :key="u.id" class="border-b border-slate-200">
+                      <td class="py-3 pr-4 font-mono text-xs">{{ u.id }}</td>
+                      <td class="py-3 pr-4">{{ u.nickname }}</td>
+                      <td class="py-3 pr-4 font-mono text-xs">{{ u.phone }}</td>
+                      <td class="py-3 pr-4">{{ u.orderCount }}</td>
+                      <td class="py-3 pr-4">{{ u.createdAt }}</td>
+                      <td class="py-3 pr-4">
+                        <span class="border px-2 py-0.5 text-xs" :class="u.status === '正常' ? 'border-slate-200 text-slate-700' : 'border-slate-900 text-slate-900'">{{ u.status }}</span>
+                      </td>
+                      <td class="py-3">
+                        <button @click="toggleAdminUserStatus(u)" class="text-sm underline underline-offset-4 text-slate-900">{{ u.status === '正常' ? '禁用' : '启用' }}</button>
+                        <button @click="openAdminUserDetail(u)" class="text-sm underline underline-offset-4 text-slate-600 ml-4">详情</button>
+                      </td>
+                    </tr>
+                    <tr v-if="adminUsers.length === 0">
+                      <td colspan="7" class="py-8 text-center text-slate-400">暂无匹配用户</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+
+              <!-- 章节三: 用户详情（R-ADM-004 订单聚合） -->
+              <section v-if="selectedAdminUser" class="bg-white border border-slate-200 p-8">
+                <div class="flex items-center justify-between mb-6 border-b border-slate-200 pb-4">
+                  <h2 class="text-lg font-bold">用户详情：{{ selectedAdminUser.nickname }}</h2>
+                  <button @click="selectedAdminUser = null" class="text-sm text-slate-600 underline underline-offset-4">关闭</button>
+                </div>
+                <div class="grid grid-cols-4 gap-4 text-sm mb-6">
+                  <div class="border border-slate-200 p-3">
+                    <p class="text-slate-500 mb-1">用户 ID</p>
+                    <p class="font-mono text-xs">{{ selectedAdminUser.id }}</p>
+                  </div>
+                  <div class="border border-slate-200 p-3">
+                    <p class="text-slate-500 mb-1">手机号</p>
+                    <p class="font-mono text-xs">{{ selectedAdminUser.phone }}</p>
+                  </div>
+                  <div class="border border-slate-200 p-3">
+                    <p class="text-slate-500 mb-1">注册日期</p>
+                    <p>{{ selectedAdminUser.createdAt }}</p>
+                  </div>
+                  <div class="border border-slate-200 p-3">
+                    <p class="text-slate-500 mb-1">累计订单</p>
+                    <p>{{ selectedAdminUser.orders.length }} 笔</p>
+                  </div>
+                </div>
+                <h3 class="text-sm font-semibold mb-3">该用户的订单</h3>
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="text-left text-slate-500 border-b border-slate-200">
+                      <th class="pb-3 pr-4 font-medium">订单号</th>
+                      <th class="pb-3 pr-4 font-medium">商品</th>
+                      <th class="pb-3 pr-4 font-medium">实付金额</th>
+                      <th class="pb-3 font-medium">状态</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="o in selectedAdminUser.orders" :key="o.id" class="border-b border-slate-200">
+                      <td class="py-3 pr-4 font-mono text-xs">{{ o.id }}</td>
+                      <td class="py-3 pr-4">{{ (o.items || []).map(i => i.name).join('、') || '—' }}</td>
+                      <td class="py-3 pr-4 font-mono">¥{{ (o.actualPaidCents / 100).toFixed(2) }}</td>
+                      <td class="py-3">{{ orderStatusLabel(o.status) }}</td>
+                    </tr>
+                    <tr v-if="selectedAdminUser.orders.length === 0">
+                      <td colspan="4" class="py-8 text-center text-slate-400">该用户暂无订单</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+            </template>
+
+          </div><!-- /用户管理 tab -->
+
           <!-- ===== 订单列表 tab ===== -->
           <div v-else>
 
@@ -781,10 +1071,160 @@ const lastOrderPaidCents = ref(0)
 const payingOrder = ref(false)
 const payOrderError = ref('')
 
-// 视图模式: store (C 端店铺) / admin (B 端运营后台)
+// 视图模式: store (C 端店铺) / admin (B 端运营后台) / register (C 端注册) / login (C 端登录)
 const viewMode = ref('store')
 // 当前用户 (支持通过 ?user=user_1003 切换身份，用于多用户链路验证)
 const currentUserId = ref(new URLSearchParams(window.location.search).get('user') || 'user_dev')
+
+// ==================== 登录态与会话（注册自动登录 / 登录恢复身份 / 会话生命周期）====================
+const sessionToken = ref(localStorage.getItem('ecommerce_session') || '')
+const currentUser = ref(JSON.parse(localStorage.getItem('ecommerce_user') || 'null'))
+const persistSession = (token, user) => {
+  sessionToken.value = token
+  currentUser.value = user
+  currentUserId.value = user.id
+  localStorage.setItem('ecommerce_session', token)
+  localStorage.setItem('ecommerce_user', JSON.stringify(user))
+}
+
+// 清除本地登录态（退出登录 / 会话失效 401 时调用，R-SES-005）
+const clearSession = () => {
+  sessionToken.value = ''
+  currentUser.value = null
+  localStorage.removeItem('ecommerce_session')
+  localStorage.removeItem('ecommerce_user')
+}
+
+// 认证请求头：需登录接口携带会话凭证（R-SES-002）
+const authHeaders = () => (sessionToken.value
+  ? { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionToken.value}` }
+  : { 'Content-Type': 'application/json' })
+
+// 未登录拦截回跳目标（R-SES-004）：记录访问受保护页前的目标，登录成功后回跳
+const loginRedirect = ref('')
+
+// 登录表单状态（R-LOG-001~006：手机号+密码，统一失败提示，禁用拦截，成功创建持久会话）
+const loginForm = ref({ phone: '', password: '' })
+const loginErrors = ref({})
+const loginServerError = ref('')
+const loginShowPassword = ref(false)
+const loginSuccess = ref(false)
+
+const switchToLogin = () => {
+  viewMode.value = 'login'
+  loginSuccess.value = false
+  loginServerError.value = ''
+  loginErrors.value = {}
+  loginForm.value = { phone: '', password: '' }
+}
+
+const submitLogin = async () => {
+  // 字段级前端校验（与后端规则一致，R-LOG-001）
+  const errors = {}
+  if (!/^1\d{10}$/.test(loginForm.value.phone)) errors.phone = '请输入 11 位有效手机号'
+  loginErrors.value = errors
+  if (Object.keys(errors).length > 0) return
+
+  loginServerError.value = ''
+  try {
+    const response = await fetch(`${API_BASE}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...loginForm.value })
+    })
+    const body = await response.json()
+    if (response.ok) {
+      // 登录成功：持久化会话（localStorage），刷新不掉登录态（R-LOG-004）
+      persistSession(body.sessionToken, body.user)
+      loginSuccess.value = true
+      loginErrors.value = {}
+      fetchCart()
+      // 未登录拦截回跳（R-SES-004）：登录成功后回到原目标页
+      if (loginRedirect.value) {
+        const target = loginRedirect.value
+        loginRedirect.value = ''
+        switchViewMode(target)
+      }
+    } else {
+      // 统一失败提示 / 禁用拦截提示均由后端返回（R-LOG-002/003）
+      loginServerError.value = body.message || '登录失败，请稍后重试'
+    }
+  } catch (e) {
+    loginServerError.value = '网络异常，请稍后重试'
+  }
+}
+
+// 我的订单入口：登录态下进入订单页；未登录拦截并跳登录（R-SES-004，携带回跳目标）
+const goToOrders = () => {
+  if (!sessionToken.value) {
+    loginRedirect.value = 'orders'
+    switchToLogin()
+    return
+  }
+  switchViewMode('orders')
+}
+
+// 退出登录：服务端销毁会话凭证 + 前端清除登录态（R-SES-005）
+const logoutSession = async () => {
+  try {
+    await fetch(`${API_BASE}/api/auth/logout`, {
+      method: 'POST',
+      headers: authHeaders()
+    })
+  } catch (e) {
+    // 网络异常不阻断本地退出
+  }
+  clearSession()
+  loginRedirect.value = ''
+  switchViewMode('store')
+  fetchCart()
+}
+
+// 注册表单状态
+const registerForm = ref({ phone: '', nickname: '', password: '' })
+const registerErrors = ref({})
+const registerServerError = ref('')
+const showPassword = ref(false)
+const registerSuccess = ref(false)
+
+const switchToRegister = () => {
+  viewMode.value = 'register'
+  registerSuccess.value = false
+  registerServerError.value = ''
+}
+
+const submitRegister = async () => {
+  // 字段级前端校验（与后端规则一致，R-REG-001~004）
+  const errors = {}
+  if (!/^1\d{10}$/.test(registerForm.value.phone)) errors.phone = '请输入 11 位有效手机号'
+  if (registerForm.value.password.length > 0 && registerForm.value.password.length < 6) errors.password = '密码至少 6 位'
+  if (registerForm.value.password.length > 32) errors.password = '密码最多 32 位'
+  if (registerForm.value.nickname.length > 20) errors.nickname = '昵称最多 20 字'
+  registerErrors.value = errors
+  if (Object.keys(errors).length > 0) return
+
+  registerServerError.value = ''
+  try {
+    const response = await fetch(`${API_BASE}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...registerForm.value, nickname: registerForm.value.nickname || undefined })
+    })
+    const body = await response.json()
+    if (response.ok) {
+      // 注册成功即自动登录：持久化会话 + 展示成功横幅（停留注册页），可继续结算/查看订单
+      persistSession(body.sessionToken, body.user)
+      currentUserId.value = body.user.id
+      registerSuccess.value = true
+      registerErrors.value = {}
+      fetchCart()
+    } else {
+      registerServerError.value = body.message || '注册失败，请稍后重试'
+    }
+  } catch (e) {
+    registerServerError.value = '网络异常，请稍后重试'
+  }
+}
 
 // 同步购物车状态（服务端驱动）
 const syncCart = (serverCart) => {
@@ -847,14 +1287,14 @@ const fetchCoupons = async () => {
   }
 }
 
-// 获取购物车状态
+// 获取购物车状态（有会话按会话 userId 归属，游客按 user_dev）
 const fetchCart = async () => {
   try {
     // 这里借用 checkout 接口预览或新增一个 GET /api/cart 接口
     // 目前 Node 后端没有显式的 GET /api/cart，但我们可以通过加购数量为 0 来获取
     const response = await fetch(`${API_BASE}/api/cart/items`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders(),
       body: JSON.stringify({ userId: currentUserId.value, productId: '1', quantity: 0 })
     })
     if (response.ok) {
@@ -970,7 +1410,7 @@ const addToCart = async (product, quantity = 1) => {
   try {
     const response = await fetch(`${API_BASE}/api/cart/items`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders(),
       body: JSON.stringify({
         userId: currentUserId.value,
         productId: String(product.id || product.productId),
@@ -996,7 +1436,7 @@ const removeFromCart = async (productId) => {
   try {
     const response = await fetch(`${API_BASE}/api/cart/remove`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders(),
       body: JSON.stringify({
         userId: currentUserId.value,
         productId: String(productId)
@@ -1026,6 +1466,12 @@ const decreaseQuantity = async (item) => {
 
 const checkout = async () => {
   if (cart.value.length === 0) return
+  // 未登录不可下单（R-SES-002/004）：拦截并引导登录（带回跳）
+  if (!sessionToken.value) {
+    loginRedirect.value = 'store'
+    switchToLogin()
+    return
+  }
   isProcessing.value = true
   try {
     // 结算前最后一次同步，确保优惠券计算基于最新状态
@@ -1033,9 +1479,8 @@ const checkout = async () => {
     
     const response = await fetch(`${API_BASE}/api/checkout`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: authHeaders(),
       body: JSON.stringify({
-        userId: currentUserId.value,
         couponId: selectedCouponId.value
       })
     })
@@ -1049,6 +1494,14 @@ const checkout = async () => {
       cart.value = []
     } else {
       const error = await response.json()
+      // 会话失效（401/403）：清除本地登录态并引导重新登录（R-SES-002/006）
+      if (response.status === 401 || response.status === 403) {
+        clearSession()
+        loginRedirect.value = 'store'
+        switchToLogin()
+        loginServerError.value = error.message || '请先登录'
+        return
+      }
       alert(`结算失败: ${error.detail || error.message || '未知错误'}`)
     }
   } catch (e) {
@@ -1130,6 +1583,7 @@ const switchViewMode = (mode) => {
     fetchAdminProducts()
     fetchCategories()
     fetchAdminOrders()
+    fetchAdminUsers()
   }
 }
 
@@ -1138,10 +1592,26 @@ const myOrders = ref([])
 const expandedMyOrderId = ref(null)
 
 const fetchMyOrders = async () => {
+  // 未登录不发起请求（R-SES-004 已在 goToOrders 拦截）
+  if (!sessionToken.value) {
+    myOrders.value = []
+    return
+  }
   try {
-    const response = await fetch(`${API_BASE}/api/orders?userId=${encodeURIComponent(currentUserId.value)}`)
+    const response = await fetch(`${API_BASE}/api/orders`, {
+      headers: { Authorization: `Bearer ${sessionToken.value}` }
+    })
     if (response.ok) {
       myOrders.value = await response.json()
+    } else {
+      const error = await response.json()
+      // 会话失效（401）/ 禁用（403）：清除本地登录态并引导重新登录（R-SES-002/006）
+      if (response.status === 401 || response.status === 403) {
+        clearSession()
+        loginRedirect.value = 'orders'
+        switchToLogin()
+        loginServerError.value = error.message || '请先登录'
+      }
     }
   } catch (e) {
     console.error('获取我的订单失败:', e)
@@ -1350,7 +1820,6 @@ const orderFilter = ref('ALL')
 const orderKeyword = ref('')
 const expandedOrderId = ref(null)
 const pendingCancelOrder = ref(null)
-
 const orderFilters = [
   { label: '全部', value: 'ALL' },
   { label: '待支付', value: 'PENDING_PAYMENT' },
@@ -1421,6 +1890,95 @@ const doCancelOrder = async () => {
     await fetchAdminOrders()
   } catch (e) {
     alert(`网络错误: ${e.message}`)
+  }
+}
+
+// ==================== B 端用户管理（user-admin capability，仅运营角色 R-ADM-001） ====================
+const adminUsers = ref([])
+const adminUserKeyword = ref('')
+const selectedAdminUser = ref(null)
+const adminUserError = ref('')
+
+// 运营角色判定：入口可见性（R-ADM-001）+ 无权限兜底
+const isOperator = computed(() => currentUser.value?.role === '运营')
+
+const fetchAdminUsers = async (keyword = '') => {
+  adminUserError.value = ''
+  try {
+    const query = keyword.trim() ? `?keyword=${encodeURIComponent(keyword.trim())}` : ''
+    const response = await fetch(`${API_BASE}/api/admin/users${query}`, { headers: authHeaders() })
+    if (response.status === 403) {
+      adminUserError.value = '无权限，仅运营角色可访问用户管理'
+      adminUsers.value = []
+      return
+    }
+    if (response.ok) {
+      adminUsers.value = await response.json()
+    } else {
+      const err = await response.json()
+      adminUserError.value = err.message || '获取用户列表失败'
+    }
+  } catch (e) {
+    console.error('获取用户列表失败:', e)
+    adminUserError.value = '网络异常，请稍后重试'
+  }
+}
+
+const searchAdminUsers = () => fetchAdminUsers(adminUserKeyword.value)
+
+const resetAdminUsers = () => {
+  adminUserKeyword.value = ''
+  fetchAdminUsers()
+}
+
+const openAdminUserDetail = async (u) => {
+  adminUserError.value = ''
+  try {
+    const response = await fetch(`${API_BASE}/api/admin/users/${u.id}`, { headers: authHeaders() })
+    if (response.status === 403) {
+      adminUserError.value = '无权限，仅运营角色可访问用户管理'
+      return
+    }
+    if (response.ok) {
+      selectedAdminUser.value = await response.json()
+    } else {
+      const err = await response.json()
+      adminUserError.value = err.message || '获取用户详情失败'
+    }
+  } catch (e) {
+    console.error('获取用户详情失败:', e)
+    adminUserError.value = '网络异常，请稍后重试'
+  }
+}
+
+// 禁用/启用切换（R-ADM-005/006）：状态变更后刷新列表与详情（若打开）
+const toggleAdminUserStatus = async (u) => {
+  adminUserError.value = ''
+  const target = u.status === '正常' ? '禁用' : '正常'
+  try {
+    const response = await fetch(`${API_BASE}/api/admin/users/${u.id}/status`, {
+      method: 'PATCH',
+      headers: authHeaders(),
+      body: JSON.stringify({ status: target })
+    })
+    if (response.status === 403) {
+      adminUserError.value = '无权限，仅运营角色可访问用户管理'
+      return
+    }
+    if (response.ok) {
+      u.status = target
+      if (selectedAdminUser.value && selectedAdminUser.value.id === u.id) {
+        selectedAdminUser.value.status = target
+      }
+      // 禁用后该用户会话立即失效（R-ADM-005 联动 R-SES-006），操作提示
+      await fetchAdminUsers(adminUserKeyword.value)
+    } else {
+      const err = await response.json()
+      adminUserError.value = err.message || '状态变更失败'
+    }
+  } catch (e) {
+    console.error('状态变更失败:', e)
+    adminUserError.value = '网络异常，请稍后重试'
   }
 }
 

@@ -173,8 +173,37 @@ Then('模态框应显示{string}', async function (expected) {
 
 // ---------- C 端下单/支付前置 ----------
 
+// 注册并登录辅助：下单需会话凭证（R-SES-002/007），将会话写入 localStorage
+async function ensureLoggedIn(page, phone, nickname, password) {
+  const API_URL = 'http://localhost:3000';
+  const reg = await fetch(`${API_URL}/api/auth/register`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ phone: String(phone), nickname, password: String(password) })
+  });
+  let body;
+  if (reg.status === 201) {
+    body = await reg.json();
+  } else {
+    const login = await fetch(`${API_URL}/api/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: String(phone), password: String(password) })
+    });
+    expect(login.status).to.equal(201);
+    body = await login.json();
+  }
+  await page.evaluate(({ token, user }) => {
+    localStorage.setItem('ecommerce_session', token);
+    localStorage.setItem('ecommerce_user', JSON.stringify(user));
+  }, { token: body.sessionToken, user: body.user });
+}
+
 Given('用户通过 C 端完成一笔已支付订单', async function () {
   await this.page.goto(STORE_URL);
+  await this.page.waitForSelector('button:has-text("加入购物车")');
+  await ensureLoggedIn(this.page, '13888217536', '林晓明', '123456');
+  await this.page.reload();
   await this.page.waitForSelector('button:has-text("加入购物车")');
   await this.page.locator('button:has-text("加入购物车")').first().click();
   await this.page.waitForSelector('header button:has-text("购物车") span');
@@ -188,6 +217,9 @@ Given('用户通过 C 端完成一笔已支付订单', async function () {
 
 Given('用户通过 C 端创建一笔待支付订单', async function () {
   await this.page.goto(STORE_URL);
+  await this.page.waitForSelector('button:has-text("加入购物车")');
+  await ensureLoggedIn(this.page, '13888217536', '林晓明', '123456');
+  await this.page.reload();
   await this.page.waitForSelector('button:has-text("加入购物车")');
   await this.page.locator('button:has-text("加入购物车")').first().click();
   await this.page.waitForSelector('header button:has-text("购物车") span');

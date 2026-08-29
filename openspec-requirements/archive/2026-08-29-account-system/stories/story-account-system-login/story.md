@@ -89,4 +89,4 @@ Story 是需求侧唯一冻结交付物（业务面）。
 ## 交接状态 (Handoff Status)
 
 - [x] 待开发交接 (openspec-handoff) — 满足交接条件（UI 门禁已通过：原型已确认）
-- [ ] 已交接 (changeName: <change-name> 记录于 openspec/epic-account-system.story-list.json)
+- [x] 已交接 (changeName: story-account-system-login 记录于 openspec/epic-account-system.story-list.json)

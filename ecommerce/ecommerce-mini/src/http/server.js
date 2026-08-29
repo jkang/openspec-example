@@ -1,7 +1,7 @@
 import http from 'http'
 import fs from 'fs'
 import path from 'path'
-import { ProductRepo, CartRepo, OrderRepo, CouponRepo, IssuanceRepo, CategoryRepo } from '../repo/memoryRepo.js'
+import { ProductRepo, CartRepo, OrderRepo, CouponRepo, IssuanceRepo, CategoryRepo, UserRepo, SessionRepo } from '../repo/memoryRepo.js'
 import { CatalogService } from '../services/catalog.js'
 import { CartService } from '../services/cart.js'
 import { OrderService } from '../services/order.js'
@@ -9,6 +9,8 @@ import { CouponService } from '../services/coupon.js'
 import { AdminCouponService } from '../services/adminCoupon.js'
 import { CategoryService } from '../services/category.js'
 import { PaymentService } from '../services/payment.js'
+import { AuthService } from '../services/auth.js'
+import { AdminUserService } from '../services/userAdmin.js'
 
 // 注入初始商品数据
 const initialProducts = [
@@ -86,6 +88,59 @@ const sendError = (res, code, message, status = 500) => {
   res.end(JSON.stringify({ code, message }))
 }
 
+/**
+ * 会话全局校验（R-SES-002）：解析 `Authorization: Bearer <token>` 并校验归属用户
+ * 无有效会话抛 UNAUTHORIZED；归属用户被禁用抛 USER_DISABLED（R-SES-006）
+ * @param {import('http').IncomingMessage} req
+ * @returns {Omit<import('../domain/types.js').User, 'passwordHash'>} 脱敏用户 DTO
+ */
+function requireSession(req, authService) {
+  const authHeader = req.headers['authorization'] || ''
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null
+  return authService.getSessionUser(token)
+}
+
+/**
+ * 可选会话解析（购物车归属 D3）：有会话按会话 userId，无会话返回 null（游客）
+ * @param {import('http').IncomingMessage} req
+ * @returns {Omit<import('../domain/types.js').User, 'passwordHash'> | null}
+ */
+function optionalSession(req, authService) {
+  const authHeader = req.headers['authorization'] || ''
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null
+  if (!token) return null
+  try {
+    return authService.getSessionUser(token)
+  } catch (e) {
+    // 会话无效时按游客处理（购物车归属宽松策略），不阻断加购
+    return null
+  }
+}
+
+/**
+ * B 端运营角色门禁（R-ADM-001）：解析 Bearer 会话 → 归属用户须 role=运营
+ * 复用 getSessionUser（含禁用门禁：运营被禁用保留 USER_DISABLED 专属提示）
+ * 缺失/无效会话统一按 FORBIDDEN 403 处理：admin 端点不区分未登录与越权（防探测，对齐 R-ADM-001 拒绝访问语义）
+ * @param {import('http').IncomingMessage} req
+ * @param {AuthService} authService
+ * @returns {Omit<import('../domain/types.js').User, 'passwordHash'>} 运营用户 DTO
+ */
+function requireAdminRole(req, authService) {
+  const authHeader = req.headers['authorization'] || ''
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null
+  let user
+  try {
+    user = authService.getSessionUser(token)
+  } catch (e) {
+    if (e.message === 'UNAUTHORIZED') throw new Error('FORBIDDEN')
+    throw e // USER_DISABLED：运营被禁用，保留专属提示
+  }
+  if (!user || user.role !== '运营') {
+    throw new Error('FORBIDDEN')
+  }
+  return user
+}
+
 export function createServer() {
   // 每个 server 实例独立的仓储与服务（保证测试套件间状态隔离）
   const productRepo = new ProductRepo()
@@ -94,6 +149,8 @@ export function createServer() {
   const couponRepo = new CouponRepo()
   const issuanceRepo = new IssuanceRepo()
   const categoryRepo = new CategoryRepo()
+  const userRepo = new UserRepo()
+  const sessionRepo = new SessionRepo()
 
   // 克隆种子对象，避免跨 server 实例共享引用导致状态污染
   initialProducts.forEach(p => productRepo.save({ ...p }))
@@ -107,6 +164,8 @@ export function createServer() {
   const orderService = new OrderService(cartRepo, orderRepo, productRepo, couponService)
   const categoryService = new CategoryService(categoryRepo, productRepo)
   const paymentService = new PaymentService(orderRepo, productRepo, couponService)
+  const authService = new AuthService(userRepo, sessionRepo)
+  const adminUserService = new AdminUserService(userRepo, orderRepo)
 
   const server = http.createServer(async (req, res) => {
     // Handle CORS preflight
@@ -134,10 +193,38 @@ export function createServer() {
         couponRepo.coupons.clear()
         issuanceRepo.issuances.clear()
         categoryRepo.categories.clear()
+        userRepo.users.clear()
+        userRepo.sequence = 1000
+        sessionRepo.sessions.clear()
         initialProducts.forEach(p => productRepo.save({ ...p }))
         initialCoupons.forEach(c => couponRepo.save({ ...c }))
         initialCategories.forEach(c => categoryRepo.save({ ...c }))
         return sendJson(res, 200, { ok: true })
+      }
+
+      // 测试后门：设置用户状态（禁用/正常），仅 NODE_ENV=test 启用，供登录 E2E 禁用拦截场景使用
+      if (pathname === '/api/__test/user-status' && req.method === 'POST') {
+        if (process.env.NODE_ENV !== 'test')
+          return sendError(res, 'NOT_FOUND', 'Endpoint not found', 404)
+        const body = await readJson(req)
+        const user = userRepo.findByPhone(String(body.phone ?? '').trim())
+        if (!user) return sendError(res, 'USER_NOT_FOUND', '用户不存在', 404)
+        user.status = body.status === '禁用' ? '禁用' : '正常'
+        return sendJson(res, 200, { ok: true, status: user.status })
+      }
+
+      // 测试后门：设置用户角色（运营/客服/客户），仅 NODE_ENV=test 启用，供 B 端用户管理 E2E 创建运营/客服账号
+      if (pathname === '/api/__test/user-role' && req.method === 'POST') {
+        if (process.env.NODE_ENV !== 'test')
+          return sendError(res, 'NOT_FOUND', 'Endpoint not found', 404)
+        const body = await readJson(req)
+        const user = userRepo.findByPhone(String(body.phone ?? '').trim())
+        if (!user) return sendError(res, 'USER_NOT_FOUND', '用户不存在', 404)
+        const role = body.role
+        if (role !== '运营' && role !== '客服' && role !== '客户')
+          return sendError(res, 'INVALID_ROLE', '角色不合法', 400)
+        user.role = role
+        return sendJson(res, 200, { ok: true, role: user.role })
       }
 
       if (pathname === '/api/products' && req.method === 'GET') {
@@ -198,29 +285,33 @@ export function createServer() {
 
       if (pathname === '/api/cart/items' && req.method === 'POST') {
         const body = await readJson(req)
-        const userId = body.userId || 'user_dev'
+        // 购物车归属（D3）：有会话按会话 userId，无会话按游客（user_dev）
+        const sessionUser = optionalSession(req, authService)
+        const userId = sessionUser ? sessionUser.id : (body.userId || 'user_dev')
         const cart = cartService.addToCart(userId, body.productId, body.quantity)
         return sendJson(res, 200, cart)
       }
 
       if (pathname === '/api/cart/remove' && req.method === 'POST') {
         const body = await readJson(req)
-        const userId = body.userId || 'user_dev'
+        const sessionUser = optionalSession(req, authService)
+        const userId = sessionUser ? sessionUser.id : (body.userId || 'user_dev')
         const cart = cartService.removeFromCart(userId, body.productId)
         return sendJson(res, 200, cart)
       }
 
       if (pathname === '/api/orders' && req.method === 'POST') {
         const body = await readJson(req)
-        const userId = body.userId || 'user_dev'
-        const order = orderService.createOrder(userId, body.couponId)
+        // 下单绑定当前会话 userId（R-SES-007，替代 body.userId / user_dev 占位）
+        const sessionUser = requireSession(req, authService)
+        const order = orderService.createOrder(sessionUser.id, body.couponId)
         return sendJson(res, 201, order)
       }
 
       if (pathname === '/api/checkout' && req.method === 'POST') {
         const body = await readJson(req)
-        const userId = body.userId || 'user_dev'
-        const order = orderService.checkout(userId, body.couponId)
+        const sessionUser = requireSession(req, authService)
+        const order = orderService.checkout(sessionUser.id, body.couponId)
         return sendJson(res, 200, order)
       }
 
@@ -246,6 +337,28 @@ export function createServer() {
         const id = pathname.split('/')[4]
         const order = orderService.cancelOrder(id)
         return sendJson(res, 200, order)
+      }
+
+      // ===== B 端用户管理（user-admin capability，运营角色门禁 R-ADM-001） =====
+      if (pathname === '/api/admin/users' && req.method === 'GET') {
+        requireAdminRole(req, authService)
+        const keyword = url.searchParams.get('keyword')
+        return sendJson(res, 200, adminUserService.list({ keyword }))
+      }
+
+      if (pathname.startsWith('/api/admin/users/') && pathname.endsWith('/status') && req.method === 'PATCH') {
+        requireAdminRole(req, authService)
+        const id = pathname.split('/')[4]
+        const body = await readJson(req)
+        const result = adminUserService.setStatus(id, body.status)
+        return sendJson(res, 200, result)
+      }
+
+      if (pathname.startsWith('/api/admin/users/') && req.method === 'GET') {
+        requireAdminRole(req, authService)
+        const id = pathname.split('/').pop()
+        const detail = adminUserService.getDetail(id)
+        return sendJson(res, 200, detail)
       }
 
       if (pathname === '/api/coupons' && req.method === 'GET') {
@@ -288,10 +401,36 @@ export function createServer() {
       }
 
       if (pathname === '/api/orders' && req.method === 'GET') {
-        // 按用户查询我的订单（带 userId 参数）；否则回落 404
-        const userId = url.searchParams.get('userId')
-        if (!userId) return sendError(res, 'BAD_REQUEST', 'userId is required', 400)
-        return sendJson(res, 200, orderService.listByUser(userId))
+        // 我的订单：归属从会话解析（R-SES-003，替代客户端 ?userId= 参数信任）
+        const sessionUser = requireSession(req, authService)
+        return sendJson(res, 200, orderService.listByUser(sessionUser.id))
+      }
+
+      if (pathname === '/api/auth/register' && req.method === 'POST') {
+        const body = await readJson(req)
+        const { user, sessionToken } = authService.register({
+          phone: body.phone,
+          nickname: body.nickname,
+          password: body.password
+        })
+        return sendJson(res, 201, { user, sessionToken })
+      }
+
+      if (pathname === '/api/auth/login' && req.method === 'POST') {
+        const body = await readJson(req)
+        const { user, sessionToken } = authService.login({
+          phone: body.phone,
+          password: body.password
+        })
+        return sendJson(res, 201, { user, sessionToken })
+      }
+
+      if (pathname === '/api/auth/logout' && req.method === 'POST') {
+        // 退出登录：销毁服务端会话凭证（R-SES-005，幂等）
+        const authHeader = req.headers['authorization'] || ''
+        const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null
+        authService.logout(token)
+        return sendJson(res, 200, { ok: true })
       }
 
       sendError(res, 'NOT_FOUND', 'Endpoint not found', 404)
@@ -337,6 +476,30 @@ export function createServer() {
         return sendError(res, 'COUPON_ALREADY_ISSUED', '该用户已持有此券，请勿重复发放', 409)
       if (e.message === 'COUPON_NOT_ACTIVE')
         return sendError(res, 'COUPON_NOT_ACTIVE', '该券当前不可发放（非 ACTIVE 状态）', 400)
+      if (e.message === 'INVALID_PHONE')
+        return sendError(res, 'INVALID_PHONE', '请输入 11 位有效手机号', 400)
+      if (e.message === 'PHONE_ALREADY_REGISTERED')
+        return sendError(res, 'PHONE_ALREADY_REGISTERED', '该手机号已注册，请直接登录', 409)
+      if (e.message === 'PASSWORD_TOO_SHORT')
+        return sendError(res, 'PASSWORD_TOO_SHORT', '密码至少 6 位', 400)
+      if (e.message === 'PASSWORD_TOO_LONG')
+        return sendError(res, 'PASSWORD_TOO_LONG', '密码最多 32 位', 400)
+      if (e.message === 'NICKNAME_REQUIRED')
+        return sendError(res, 'NICKNAME_REQUIRED', '请输入昵称', 400)
+      if (e.message === 'NICKNAME_TOO_LONG')
+        return sendError(res, 'NICKNAME_TOO_LONG', '昵称最多 20 字', 400)
+      if (e.message === 'INVALID_CREDENTIALS')
+        return sendError(res, 'INVALID_CREDENTIALS', '手机号或密码不正确，请重试', 401)
+      if (e.message === 'UNAUTHORIZED')
+        return sendError(res, 'UNAUTHORIZED', '请先登录', 401)
+      if (e.message === 'USER_DISABLED')
+        return sendError(res, 'USER_DISABLED', '该账户已被禁用，如有疑问请联系平台客服', 403)
+      if (e.message === 'FORBIDDEN')
+        return sendError(res, 'FORBIDDEN', '无权限，仅运营角色可访问用户管理', 403)
+      if (e.message === 'USER_NOT_FOUND')
+        return sendError(res, 'USER_NOT_FOUND', '用户不存在', 404)
+      if (e.message === 'INVALID_STATUS')
+        return sendError(res, 'INVALID_STATUS', '用户状态不合法，仅支持正常/禁用', 400)
 
       console.error(e)
       sendError(res, 'INTERNAL_ERROR', e.message, 500)

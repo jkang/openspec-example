@@ -472,7 +472,7 @@
                     所有能力命名优先对齐 `domain_model.html` 中的 Capability taxonomy。
                 </p>
             </div>
-            <div class="meta">Baseline / Last Updated: 2026-08-23</div>
+            <div class="meta">Baseline / Last Updated: 2026-08-29</div>
         </div>
 
         <div class="intro-grid">
@@ -509,15 +509,15 @@
             <div class="summary-list">
                 <div class="summary-item">
                     <div class="summary-key">客户主线</div>
-                    <div class="summary-value">商品发现 → 加购 → 结算确认 → 提交订单 → 模拟支付 → 成功回流。</div>
+                    <div class="summary-value">商品发现 → 加购 → 结算确认 → 提交订单 → 模拟支付 → 成功回流（注册/登录/会话贯穿，订单归属真实用户）。</div>
                 </div>
                 <div class="summary-item">
                     <div class="summary-key">运营主线</div>
-                    <div class="summary-value">商品发布与库存维护、优惠券配置与门槛控制、订单与支付结果追踪。</div>
+                    <div class="summary-value">商品发布与库存维护、优惠券配置与门槛控制、订单与支付结果追踪、用户管理（列表/检索/详情/禁用启用，仅运营角色）。</div>
                 </div>
                 <div class="summary-item">
                     <div class="summary-key">能力边界</div>
-                    <div class="summary-value">Catalog / Cart / Coupon / Order 四个 Bounded Context 负责治理对应 capability；Shared / Cross 承担 UI、治理模型与异常规范。</div>
+                    <div class="summary-value">Catalog / Cart / Coupon / Order / User 五个 Bounded Context 负责治理对应 capability；Shared / Cross 承担 UI、治理模型与异常规范。</div>
                 </div>
             </div>
         </div>
@@ -529,22 +529,22 @@
                     <div class="stage-cell" id="SB-STAGE-01" data-blueprint-stage="SB-STAGE-01">
                         <span class="stage-index">Stage 01</span>
                         <h2 class="stage-name">触达与发现</h2>
-                        <p class="stage-note">首页进入、商品浏览、搜索与排序、单品详情查看。</p>
+                        <p class="stage-note">首页进入、商品浏览、搜索与排序、单品详情查看；顶部登录/注册入口（账户体系）。</p>
                     </div>
                     <div class="stage-cell" id="SB-STAGE-02" data-blueprint-stage="SB-STAGE-02">
                         <span class="stage-index">Stage 02</span>
                         <h2 class="stage-name">选购与加购</h2>
-                        <p class="stage-note">挑选商品、录入数量、加入购物车并同步状态。</p>
+                        <p class="stage-note">挑选商品、录入数量、加入购物车并同步状态（登录用户购物车跟随账户）。</p>
                     </div>
                     <div class="stage-cell" id="SB-STAGE-03" data-blueprint-stage="SB-STAGE-03">
                         <span class="stage-index">Stage 03</span>
                         <h2 class="stage-name">结算确认</h2>
-                        <p class="stage-note">进入结算页、自动推荐最优券、确认优惠后金额。</p>
+                        <p class="stage-note">进入结算页、自动推荐最优券、确认优惠后金额；未登录引导注册/登录（身份前置）。</p>
                     </div>
                     <div class="stage-cell" id="SB-STAGE-04" data-blueprint-stage="SB-STAGE-04">
                         <span class="stage-index">Stage 04</span>
                         <h2 class="stage-name">提交订单</h2>
-                        <p class="stage-note">把购物车转成订单，完成库存与金额校验。</p>
+                        <p class="stage-note">把购物车转成订单，完成库存与金额校验；订单归属当前登录会话用户。</p>
                     </div>
                     <div class="stage-cell" id="SB-STAGE-05" data-blueprint-stage="SB-STAGE-05">
                         <span class="stage-index">Stage 05</span>
@@ -554,7 +554,7 @@
                     <div class="stage-cell" id="SB-STAGE-06" data-blueprint-stage="SB-STAGE-06">
                         <span class="stage-index">Stage 06</span>
                         <h2 class="stage-name">成功回流</h2>
-                        <p class="stage-note">展示成功页与订单详情，并把用户带回下一轮浏览。</p>
+                        <p class="stage-note">展示成功页与订单详情，并把用户带回下一轮浏览；「我的订单」按登录用户归属查询，B 端可按用户聚合回查。</p>
                     </div>
                 </div>
 
@@ -570,6 +570,7 @@
                                 <li>进入商城首页</li>
                                 <li>搜索商品名称 / 按价格排序</li>
                                 <li>打开商品详情确认图片与库存</li>
+                                <li>注册账户（手机号+昵称+密码）或登录（恢复身份，R-REG/R-LOG）</li>
                             </ul>
                         </div>
                         <div class="cell-block">
@@ -583,9 +584,17 @@
                                     <span class="capability-name">product-query</span>
                                     <span class="capability-desc">按 ID 查询单品详情</span>
                                 </div>
+                                <div class="capability" data-capability="account-management">
+                                    <span class="capability-name">account-management</span>
+                                    <span class="capability-desc">注册/登录：手机号唯一、密码哈希、禁用拦截</span>
+                                </div>
+                                <div class="capability" data-capability="user-session">
+                                    <span class="capability-name">user-session</span>
+                                    <span class="capability-desc">登录/注册成功创建持久会话凭证</span>
+                                </div>
                                 <div class="capability support" data-capability="frontend-ui">
                                     <span class="capability-name">frontend-ui</span>
-                                    <span class="capability-desc">商品栅格与搜索交互</span>
+                                    <span class="capability-desc">商品栅格与搜索交互、登录/注册视图</span>
                                 </div>
                             </div>
                         </div>
@@ -596,7 +605,7 @@
                             <ul class="activity-list">
                                 <li>选择规格与数量</li>
                                 <li>加入购物车</li>
-                                <li>看到购物车状态实时更新</li>
+                                <li>看到购物车状态实时更新（登录态购物车跟随账户）</li>
                             </ul>
                         </div>
                         <div class="cell-block">
@@ -604,7 +613,7 @@
                             <div class="capability-list">
                                 <div class="capability" data-capability="cart-management">
                                     <span class="capability-name">cart-management</span>
-                                    <span class="capability-desc">加购、数量累加、移除与清空</span>
+                                    <span class="capability-desc">加购、数量累加、移除与清空（有会话按会话 userId 归属）</span>
                                 </div>
                                 <div class="capability support" data-capability="frontend-ui">
                                     <span class="capability-name">frontend-ui</span>
@@ -618,6 +627,7 @@
                             <p class="cell-block-title">客户动作</p>
                             <ul class="activity-list">
                                 <li>进入结算页</li>
+                                <li>未登录被引导注册/登录（回跳原页面）</li>
                                 <li>查看推荐优惠券与折扣结果</li>
                                 <li>确认应付金额与优惠说明</li>
                             </ul>
@@ -637,6 +647,10 @@
                                     <span class="capability-name">order-management</span>
                                     <span class="capability-desc">持久化 total / discount / actualPaid</span>
                                 </div>
+                                <div class="capability" data-capability="account-management">
+                                    <span class="capability-name">account-management</span>
+                                    <span class="capability-desc">结算前身份确认（未登录引导注册/登录）</span>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -644,7 +658,7 @@
                         <div class="cell-block">
                             <p class="cell-block-title">客户动作</p>
                             <ul class="activity-list">
-                                <li>点击提交订单</li>
+                                <li>点击提交订单（携带会话凭证）</li>
                                 <li>等待校验与创建结果</li>
                                 <li>感知到订单编号生成</li>
                             </ul>
@@ -654,11 +668,15 @@
                             <div class="capability-list">
                                 <div class="capability" data-capability="order-management">
                                     <span class="capability-name">order-management</span>
-                                    <span class="capability-desc">订单创建与幂等保证</span>
+                                    <span class="capability-desc">订单创建与幂等保证；归属当前会话用户（R-SES-007）</span>
                                 </div>
                                 <div class="capability" data-capability="checkout-management">
                                     <span class="capability-name">checkout-management</span>
                                     <span class="capability-desc">结算触发与成功反馈</span>
+                                </div>
+                                <div class="capability" data-capability="user-session">
+                                    <span class="capability-name">user-session</span>
+                                    <span class="capability-desc">会话全局校验：未登录/禁用即拦截（401/403）</span>
                                 </div>
                             </div>
                         </div>
@@ -704,7 +722,11 @@
                                 </div>
                                 <div class="capability" data-capability="order-management">
                                     <span class="capability-name">order-management</span>
-                                    <span class="capability-desc">订单详情读取与展示</span>
+                                    <span class="capability-desc">订单详情读取与展示；我的订单按会话 userId 归属查询（R-SES-003）</span>
+                                </div>
+                                <div class="capability" data-capability="user-session">
+                                    <span class="capability-name">user-session</span>
+                                    <span class="capability-desc">未登录访问我的订单被引导登录（回跳）；禁用即引导重新登录</span>
                                 </div>
                             </div>
                         </div>
@@ -835,6 +857,7 @@
                                 <li>查看订单列表/详情（订单号/金额/商品快照）</li>
                                 <li>发货（PAID→SHIPPED）与取消（仅待支付→CANCELLED）</li>
                                 <li>以订单数据复盘营销效果</li>
+                                <li>用户管理（运营角色）：按手机号/昵称检索用户、查看详情与订单聚合、禁用/启用（R-ADM-001~007）</li>
                             </ul>
                         </div>
                         <div class="cell-block">
@@ -843,6 +866,10 @@
                                 <div class="capability" data-capability="order-management">
                                     <span class="capability-name">order-management</span>
                                     <span class="capability-desc">订单查询/发货/取消（B 端管理）</span>
+                                </div>
+                                <div class="capability" data-capability="user-admin">
+                                    <span class="capability-name">user-admin</span>
+                                    <span class="capability-desc">B 端用户管理：列表/检索/详情（订单聚合）/禁用启用；仅运营角色</span>
                                 </div>
                                 <div class="capability support" data-capability="frontend-ui">
                                     <span class="capability-name">frontend-ui</span>
@@ -942,7 +969,8 @@
                                 <li>持久化 `discountCents / actualPaidCents` 并绑定优惠券</li>
                                 <li>成功后清空购物车并保证幂等</li>
                                 <li>`/api/admin/orders` 列表（状态过滤/搜索）与 ship/cancel 接口</li>
-                                <li>`GET /api/orders?userId=` 按用户查询我的订单（归属隔离，倒序）</li>
+                                <li>`GET /api/orders` 按会话解析 userId 返回我的订单（归属隔离，倒序，R-SES-003）</li>
+                                <li>B 端用户管理：`GET /api/admin/users`（列表/检索）、`GET /api/admin/users/:id`（详情+订单聚合）、`PATCH /api/admin/users/:id/status`（禁用/启用）——仅运营角色（R-ADM-001）</li>
                             </ul>
                         </div>
                         <div class="cell-block">
@@ -959,6 +987,14 @@
                                 <div class="capability" data-capability="cart-management">
                                     <span class="capability-name">cart-management</span>
                                     <span class="capability-desc">结算成功后自动清空购物车</span>
+                                </div>
+                                <div class="capability" data-capability="user-admin">
+                                    <span class="capability-name">user-admin</span>
+                                    <span class="capability-desc">用户列表/检索/详情（订单聚合）/启停 + 运营角色门禁</span>
+                                </div>
+                                <div class="capability" data-capability="user-session">
+                                    <span class="capability-name">user-session</span>
+                                    <span class="capability-desc">会话校验门禁（禁用即失效）供 B 端接口复用</span>
                                 </div>
                             </div>
                         </div>
@@ -1133,6 +1169,24 @@
                         <td>Shared / Cross</td>
                         <td>规划中</td>
                         <td>历史提案中已有统一错误码诉求，但当前主规格目录尚未形成，因此用虚线提示。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>account-management</strong></td>
+                        <td>User Context</td>
+                        <td>已落地</td>
+                        <td>承载 C 端注册/登录（手机号唯一、密码哈希、禁用拦截、自动登录）与 B 端启停产生的生命周期状态门禁。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>user-session</strong></td>
+                        <td>User Context</td>
+                        <td>已落地</td>
+                        <td>承载会话生命周期：创建/全局校验/持久化保持/退出销毁/禁用即失效，支撑订单归属与 B 端接口复用。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>user-admin</strong></td>
+                        <td>User Context</td>
+                        <td>已落地</td>
+                        <td>承载 B 端用户管理：列表/检索/详情（订单聚合）/禁用启用；仅运营角色（敏感信息保护）。</td>
                     </tr>
                 </tbody>
             </table>

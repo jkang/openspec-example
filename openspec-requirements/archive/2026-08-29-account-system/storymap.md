@@ -30,7 +30,7 @@ storymap 用于把大需求（Epic 级）拆分为多个可独立交付的 Story
 | story-account-system-register | 用户注册 | C 端新买家（如林晓明） | 极简注册后即自动登录，无需二次登录即可下单 | 手机号+密码+昵称完成注册，手机号唯一校验，成功后创建账户并自动登录 | 无 | P0 | planned |
 | story-account-system-login | 用户登录 | C 端已注册买家 | 凭手机号+密码恢复身份，访问受保护的「我的订单」与下单能力 | 校验凭证正确后创建持久会话，错误与禁用状态有明确提示 | story-account-system-register（用户池） | P0 | planned |
 | story-account-system-session | 会话保持与退出 | C 端买家（登录后） | 刷新/换页不掉登录态，订单归属当前用户；主动退出即销毁会话 | 会话凭证持久化并全局校验；「我的订单」按登录用户归属查询；退出登录销毁会话 | story-account-system-login | P0 | planned |
-| story-account-system-admin-users | B 端用户管理 | B 端运营（陈运营） | 告别"订单里全是 user_dev"，按真实用户检索并查看订单聚合，支持禁用管控 | 用户列表/按手机号或昵称检索/详情（含订单聚合）/禁用启用；仅运营角色可见 | story-account-system-register（用户数据） | P1 | planned |
+| story-account-system-admin-users | B 端用户管理 | B 端运营（陈运营） | 告别"订单里全是 user_dev"，按真实用户检索并查看订单聚合，支持禁用管控 | 用户列表/按手机号或昵称检索/详情（含订单聚合）/禁用启用；仅运营角色可见 | story-account-system-register（用户数据） | P1 | handoff（changeName: story-account-system-admin-users） |
 
 ## 覆盖对账 (Coverage Reconciliation)
 

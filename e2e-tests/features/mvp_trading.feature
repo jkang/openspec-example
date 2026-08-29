@@ -17,14 +17,16 @@ Feature: MVP 核心交易链路
 
   @e2e
   Scenario: 成功发起结算（checkout-management）
-    Given 用户已将商品加入购物车
+    Given 买家已注册并登录（手机号 13888217536，密码 123456）
+    And 用户已将商品加入购物车
     When 用户点击"确认结算"
     Then 系统应展示包含订单号的成功模态框
     And 模态框中应有"继续购物"按钮
 
   @e2e
   Scenario: 使用优惠券结算（coupon-management）
-    Given 用户打开店铺首页
+    Given 买家已注册并登录（手机号 13888217536，密码 123456）
+    And 用户打开店铺首页
     When 用户将第一个商品加入购物车
     Then 结算侧边栏应自动推荐"9 折数码券"为最优方案
     And 优惠减免金额应为 "-¥29.90"

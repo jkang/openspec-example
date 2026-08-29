@@ -49,6 +49,22 @@ describe('领域与服务单元测试', () => {
     assert.strictEqual(c.items[0].quantity, 2)
   })
 
+  it('购物车读取型调用：quantity=0 不向空购物车写入零数量条目（防订单污染）', () => {
+    // fetchCart 用 qty=0 探测购物车；不得把 qty=0 条目写入购物车，
+    // 否则下单时该条目会进入订单快照（items[0] 被空条目占据）
+    const p = catalog.addProduct({ name: 'Hat', priceCents: 100, stock: 10 })
+    const c0 = cart.addToCart('u1', p.id, 0)
+    assert.strictEqual(c0.items.length, 0)
+    // 已存在条目时 qty=0 不改变数量
+    cart.addToCart('u1', p.id, 2)
+    const c1 = cart.addToCart('u1', p.id, 0)
+    assert.strictEqual(c1.items[0].quantity, 2)
+    // 真实加购后下单，订单快照仅含真实商品
+    const order = orders.createOrder('u1')
+    assert.strictEqual(order.items.length, 1)
+    assert.strictEqual(order.items[0].name, 'Hat')
+  })
+
   it('下单不扣库存，支付成功后扣减', () => {
     const p = catalog.addProduct({ name: 'Hat', priceCents: 100, stock: 10 })
     cart.addToCart('u1', p.id, 2)

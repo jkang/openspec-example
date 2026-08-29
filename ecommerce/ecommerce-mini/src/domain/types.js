@@ -72,3 +72,21 @@
  * @property {string} userId 目标用户
  * @property {string} operator 操作人
  */
+
+/**
+ * @typedef {Object} User
+ * @property {string} id 用户 ID（格式 user_<seq>，如 user_1001）
+ * @property {string} phone 手机号（11 位中国大陆手机号，全局唯一）
+ * @property {string} passwordHash 密码哈希（scrypt:<salt>:<hash>），不存明文
+ * @property {string} nickname 昵称（≤20 字；未填时默认 "<尾号>用户"）
+ * @property {"正常" | "禁用"} status 用户状态（注册默认"正常"；B 端启停动作迁移）
+ * @property {"客户" | "运营" | "客服"} [role] 用户角色（注册默认"客户"；运营角色可访问 B 端用户管理，R-ADM-001）
+ * @property {string} createdAt 创建时间 (YYYY-MM-DD HH:mm)
+ */
+
+/**
+ * @typedef {Object} Session
+ * @property {string} token 会话凭证（随机 UUID）
+ * @property {string} userId 归属用户
+ * @property {string} createdAt 创建时间 (YYYY-MM-DD HH:mm)
+ */

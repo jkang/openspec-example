@@ -391,7 +391,7 @@
                     <div>
                         <h3 class="section-title">1. Bounded Context Map</h3>
                         <div class="section-desc">
-                            用上下文边界而不是技术模块来定义系统职责。重点描述 Catalog、Cart、Coupon、Order
+                            用上下文边界而不是技术模块来定义系统职责。重点描述 Catalog、Cart、Coupon、Order、User
                             之间交换的业务事实，以及哪些规则在边界内被维护。
                         </div>
                     </div>
@@ -500,7 +500,7 @@
                 </div>
             </section>
 
-            <div class="footer-note">Last Updated: 2026-08-23</div>
+            <div class="footer-note">Last Updated: 2026-08-29</div>
         </div>
     </div>
 
@@ -539,6 +539,14 @@
                     meta: ['Order', 'OrderItem', 'actualPaidCents'],
                     x: 990,
                     y: 70
+                },
+                {
+                    id: 'user',
+                    title: 'User Context',
+                    subtitle: '用户账户 / 认证 / 会话 / B 端用户管理',
+                    meta: ['User', 'role', 'Session', 'status'],
+                    x: 60,
+                    y: 300
                 }
             ],
             edges: [
@@ -571,6 +579,18 @@
                     to: 'catalog',
                     label: '支付后扣减库存',
                     rule: '仅当 PaymentConfirmed 后，Catalog 才执行异步库存扣减。'
+                },
+                {
+                    from: 'user',
+                    to: 'order',
+                    label: '提供归属主体',
+                    rule: 'Order.userId 指向真实注册用户（替代 user_dev 占位）；下单/我的订单从会话解析归属。'
+                },
+                {
+                    from: 'user',
+                    to: 'cart',
+                    label: '会话归属',
+                    rule: '有会话时购物车按会话 userId 归属，无会话按游客 user_dev；登录用户购物车跟随账户。'
                 }
             ]
         };
@@ -685,6 +705,30 @@
                         rule: '进入结算后以当前购物车快照作为 Coupon 计算与 Order 生成的唯一输入。'
                     }
                 ]
+            },
+            {
+                id: 'user',
+                name: 'User',
+                desc: '用户生命周期状态机：注册起点「正常」，B 端用户管理（user-admin）禁用/启用动作迁移；禁用即会话失效且禁止登录，启用恢复登录能力。',
+                canvas: { width: 1040, height: 520, nodeWidth: 190, nodeHeight: 74 },
+                states: [
+                    { id: 'normal', label: '正常', desc: '可登录、可下单、会话有效', x: 260, y: 110 },
+                    { id: 'disabled', label: '禁用', desc: '禁止登录；既有会话访问需登录接口被拒（403）', x: 600, y: 110 }
+                ],
+                transitions: [
+                    {
+                        from: 'normal',
+                        to: 'disabled',
+                        event: 'UserDisabled',
+                        rule: '运营在 B 端用户管理执行禁用（PATCH /api/admin/users/:id/status）；禁用后该用户登录被拒（USER_DISABLED）、既有会话访问受保护接口立即失效（R-SES-006）。'
+                    },
+                    {
+                        from: 'disabled',
+                        to: 'normal',
+                        event: 'UserEnabled',
+                        rule: '运营执行启用动作；状态恢复「正常」后可重新登录并恢复会话能力。'
+                    }
+                ]
             }
         ];
 
@@ -696,8 +740,10 @@
                 { id: 'cart', title: 'Cart', subtitle: '购物车根实体，持有会话归属', meta: ['userId', 'sessionId', 'items'], x: 370, y: 70 },
                 { id: 'cartItem', title: 'CartItem', subtitle: '购物车项，记录价格快照', meta: ['productId', 'quantity', 'unitPriceCents'], x: 670, y: 70 },
                 { id: 'coupon', title: 'Coupon', subtitle: '优惠券根实体，控制核销规则', meta: ['type', 'value', 'minSpendCents', 'status', 'userId', 'templateId'], x: 70, y: 320 },
-                { id: 'order', title: 'Order', subtitle: '订单根实体，承载支付与审计', meta: ['status', 'totalCents', 'actualPaidCents', 'couponId'], x: 370, y: 320 },
-                { id: 'orderItem', title: 'OrderItem', subtitle: '订单项，锁定历史价格事实', meta: ['productId', 'quantity', 'priceCents'], x: 670, y: 320 }
+                { id: 'order', title: 'Order', subtitle: '订单根实体，承载支付与审计', meta: ['status', 'totalCents', 'actualPaidCents', 'couponId', 'userId'], x: 370, y: 320 },
+                { id: 'orderItem', title: 'OrderItem', subtitle: '订单项，锁定历史价格事实', meta: ['productId', 'quantity', 'priceCents'], x: 670, y: 320 },
+                { id: 'user', title: 'User', subtitle: '用户根实体，承载账户/角色/生命周期状态', meta: ['id', 'phone', 'nickname', 'status', 'role'], x: 370, y: 450 },
+                { id: 'session', title: 'Session', subtitle: '会话凭证，token→userId 映射', meta: ['token', 'userId', 'createdAt'], x: 670, y: 450 }
             ],
             edges: [
                 {
@@ -741,6 +787,24 @@
                     to: 'coupon',
                     label: '关联 0..1',
                     rule: 'Order 最多绑定一张 Coupon；couponId 为空表示未使用优惠券。'
+                },
+                {
+                    from: 'user',
+                    to: 'order',
+                    label: '归属 0..*',
+                    rule: 'Order.userId 指向真实注册用户（替代 user_dev 占位）；B 端用户管理按 userId 聚合订单。'
+                },
+                {
+                    from: 'user',
+                    to: 'session',
+                    label: '拥有 1..*',
+                    rule: 'Session 记录 token→userId；登录/注册创建，退出销毁，禁用即失效（惰性门禁）。'
+                },
+                {
+                    from: 'cart',
+                    to: 'user',
+                    label: '归属 0..1',
+                    rule: '有会话时 Cart.userId 指向登录用户；无会话按游客 user_dev 归属。'
                 }
             ]
         };
@@ -757,7 +821,12 @@
                 ['Order', 'PlaceOrder', '基于购物车快照生成订单（下单不扣库存）。'],
                 ['Order', 'PayOrder', '模拟支付：扣减库存、核销券、订单 → PAID。'],
                 ['Order', 'ConfirmPayment', '确认支付并触发后续履约动作。'],
-                ['Order', 'CancelOrder', '取消待支付订单 → CANCELLED。']
+                ['Order', 'CancelOrder', '取消待支付订单 → CANCELLED。'],
+                ['User', 'RegisterUser', '买家以手机号+密码+昵称注册并自动登录。'],
+                ['User', 'LoginUser', '凭手机号+密码恢复身份并创建持久会话。'],
+                ['User', 'LogoutUser', '销毁服务端会话凭证回到未登录态。'],
+                ['User', 'DisableUser', '运营禁用用户：状态正常→禁用（user-admin）。'],
+                ['User', 'EnableUser', '运营启用用户：状态禁用→正常（user-admin）。']
             ],
             events: [
                 ['Catalog', 'ProductSearched', '用户完成商品搜索。'],
@@ -771,7 +840,12 @@
                 ['Order', 'OrderCompleted', '订单已完成。'],
                 ['Order', 'OrderCancelled', '订单已取消（仅待支付可取消）。'],
                 ['Order', 'OrderPaymentConfirmed', '支付确认完成。'],
-                ['Order', 'OrderStockDeducted', '库存扣减成功。']
+                ['Order', 'OrderStockDeducted', '库存扣减成功。'],
+                ['User', 'UserRegistered', '新用户创建成功（status=正常，role=客户）。'],
+                ['User', 'UserLoggedIn', '登录成功并创建持久会话。'],
+                ['User', 'SessionDestroyed', '退出登录销毁会话凭证。'],
+                ['User', 'UserDisabled', '用户被禁用，登录/会话门禁立即生效。'],
+                ['User', 'UserEnabled', '用户被启用，恢复登录能力。']
             ],
             policies: [
                 ['Coupon', '单券策略', '一次结算仅允许一张券参与实际核销。'],
@@ -780,14 +854,20 @@
                 ['Order', '精度补偿', '百分比折扣结果执行 +0.00001 后向下取整。'],
                 ['Cart', '一致性校验', 'Session 用户与购物车归属必须一致。'],
                 ['Catalog', '库存扣减时机', '下单仅校验库存；PaymentConfirmed 后二次校验并扣减库存；取消（未支付）不涉及库存。'],
-                ['Order', '支付幂等', '已 PAID 订单重复支付返回幂等提示，不重复扣库存/核销券。']
+                ['Order', '支付幂等', '已 PAID 订单重复支付返回幂等提示，不重复扣库存/核销券。'],
+                ['User', '禁用即失效', '用户被禁用后，其既有会话访问需登录接口立即被拒（USER_DISABLED 403），且禁止登录。'],
+                ['User', '防枚举登录', '账号不存在与密码错误统一提示「手机号或密码不正确」，不泄露账号存在性。'],
+                ['User', 'B 端权限门禁', '用户管理接口仅 role=运营 会话可访问；客服/未登录 403，不返回手机号等敏感信息。']
             ],
             readModels: [
                 ['Catalog', '商品搜索结果', '供买家浏览与筛选。'],
                 ['Cart', '购物车快照', '供结算页与最优券算法消费。'],
                 ['Coupon', '可用券集合', '包含门槛、类型、有效期与归属。'],
                 ['Order', '订单成功页', '展示已锁定的订单与支付信息。'],
-                ['Operator', '库存看板', '运营查看销量与补货状态。']
+                ['Operator', '库存看板', '运营查看销量与补货状态。'],
+                ['Operator', '用户列表', 'B 端用户管理：ID/昵称/手机号/订单数/注册日期/状态。'],
+                ['Operator', '用户详情', '基础信息 + 该用户订单聚合（一人多单）。'],
+                ['Customer', '我的订单', '按会话 userId 归属查询当前登录用户的订单。']
             ]
         };
 
@@ -826,17 +906,25 @@
                 entities: '当前以根实体为主，规则集中在状态与门槛约束。',
                 values: 'Discount policy semantics',
                 invariant: '只有 UNUSED 且满足 minSpendCents 的券才可参与最优券计算；userId 为空表示全场通用，非空实例仅对归属用户可见。'
+            },
+            {
+                title: 'User Aggregate',
+                root: 'User (id, phone, passwordHash, nickname, status, role, createdAt)',
+                entities: 'Session (token, userId, createdAt) 作为跨聚合凭证对象由 User Context 管理。',
+                values: 'PhoneNumber, PasswordHash, UserRole, AccountStatus',
+                invariant: '手机号全局唯一；密码仅存 scrypt 哈希不落明文；status ∈ {正常, 禁用}（注册默认正常）；role ∈ {客户, 运营, 客服}（注册默认客户）；禁用后登录与既有会话访问均被拒绝，启用后恢复。'
             }
         ];
 
         const mappingGraph = {
-            canvas: { width: 1180, height: 1040, nodeWidth: 240, nodeHeight: 120 },
+            canvas: { width: 1180, height: 1320, nodeWidth: 240, nodeHeight: 120 },
             nodes: [
                 { id: 'bc-catalog', title: 'Catalog Context', subtitle: 'Bounded Context', meta: ['Governance'], x: 100, y: 40 },
                 { id: 'bc-cart', title: 'Cart Context', subtitle: 'Bounded Context', meta: ['Governance'], x: 100, y: 180 },
                 { id: 'bc-coupon', title: 'Coupon Context', subtitle: 'Bounded Context', meta: ['Governance'], x: 100, y: 320 },
                 { id: 'bc-order', title: 'Order Context', subtitle: 'Bounded Context', meta: ['Governance'], x: 100, y: 460 },
                 { id: 'bc-shared', title: 'Shared / Cross', subtitle: 'Shared Boundary', meta: ['Governance'], x: 100, y: 600 },
+                { id: 'bc-user', title: 'User Context', subtitle: 'Bounded Context', meta: ['Governance'], x: 100, y: 740 },
 
                 { id: 'cap-catalog', title: 'catalog-management', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 20 },
                 { id: 'cap-prodquery', title: 'product-query', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 120 },
@@ -847,7 +935,10 @@
                 { id: 'cap-payment', title: 'payment', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 620 },
                 { id: 'cap-domain', title: 'domain-model', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 720 },
                 { id: 'cap-error', title: 'error-handling', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 820 },
-                { id: 'cap-ui', title: 'frontend-ui', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 920 }
+                { id: 'cap-ui', title: 'frontend-ui', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 920 },
+                { id: 'cap-account', title: 'account-management', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1020 },
+                { id: 'cap-session', title: 'user-session', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1120 },
+                { id: 'cap-admin', title: 'user-admin', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1220 }
             ],
             edges: [
                 { from: 'bc-catalog', to: 'cap-catalog', label: 'Governs', rule: 'Catalog 边界负责商品元数据与库存管理' },
@@ -859,7 +950,10 @@
                 { from: 'bc-order', to: 'cap-payment', label: 'Governs', rule: 'Order 边界负责支付对接与状态确认' },
                 { from: 'bc-shared', to: 'cap-domain', label: 'Cross-Context', rule: '共享领域对象结构定义' },
                 { from: 'bc-shared', to: 'cap-error', label: 'Cross-Context', rule: '全局错误码与异常处理规范' },
-                { from: 'bc-shared', to: 'cap-ui', label: 'Cross-Context', rule: '全局极简 UI 组件库与视觉规范' }
+                { from: 'bc-shared', to: 'cap-ui', label: 'Cross-Context', rule: '全局极简 UI 组件库与视觉规范' },
+                { from: 'bc-user', to: 'cap-account', label: 'Governs', rule: 'User 边界负责账户注册/登录认证与生命周期状态' },
+                { from: 'bc-user', to: 'cap-session', label: 'Governs', rule: 'User 边界负责会话创建/校验/销毁' },
+                { from: 'bc-user', to: 'cap-admin', label: 'Governs', rule: 'User 边界负责 B 端用户管理（列表/检索/详情/启停 + 权限门禁）' }
             ]
         };
 

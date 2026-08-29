@@ -1,3 +1,5 @@
+import crypto from 'crypto'
+
 export class ProductRepo {
   constructor() {
     this.products = new Map()
@@ -99,5 +101,71 @@ export class IssuanceRepo {
 
   findAll() {
     return Array.from(this.issuances.values())
+  }
+}
+
+export class UserRepo {
+  constructor() {
+    this.users = new Map()
+    this.sequence = 1000
+  }
+
+  /**
+   * 生成下一个用户 ID（user_<seq>，对齐既有 user_\d+ 校验约定）
+   * @returns {string} 如 user_1001
+   */
+  nextId() {
+    this.sequence += 1
+    return `user_${this.sequence}`
+  }
+
+  save(user) {
+    this.users.set(user.id, user)
+  }
+
+  findAll() {
+    return Array.from(this.users.values())
+  }
+
+  findById(id) {
+    return this.users.get(id)
+  }
+
+  findByPhone(phone) {
+    return Array.from(this.users.values()).find(u => u.phone === phone)
+  }
+}
+
+export class SessionRepo {
+  constructor() {
+    this.sessions = new Map()
+  }
+
+  /**
+   * 创建会话
+   * @param {string} userId 归属用户
+   * @returns {import('../domain/types.js').Session}
+   */
+  create(userId) {
+    const session = {
+      token: crypto.randomUUID(),
+      userId,
+      createdAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
+    }
+    this.sessions.set(session.token, session)
+    return session
+  }
+
+  findByToken(token) {
+    return this.sessions.get(token)
+  }
+
+  /**
+   * 删除会话（退出登录销毁凭证）
+   * @param {string} token 会话凭证
+   * @returns {boolean} 是否存在并删除
+   */
+  delete(token) {
+    return this.sessions.delete(token)
   }
 }

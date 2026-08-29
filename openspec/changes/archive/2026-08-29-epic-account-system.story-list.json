@@ -1,0 +1,40 @@
+{
+  "epicKey": "account-system",
+  "title": "用户账户体系",
+  "description": "让订单、优惠券、购物车拥有真实归属主体（注册/登录/会话/B端用户管理），替换 user_dev 占位用户，为回款与应收账款闭环（Phase D）奠定账户基础。",
+  "stories": [
+    {
+      "id": "story-account-system-register",
+      "title": "用户注册",
+      "description": "手机号+昵称+密码极简注册，手机号唯一校验，注册成功即自动登录",
+      "status": "done",
+      "changeName": "story-account-system-register",
+      "priority": "P0"
+    },
+    {
+      "id": "story-account-system-login",
+      "title": "用户登录",
+      "description": "凭手机号+密码恢复身份，校验通过创建持久会话，错误与禁用状态有明确提示",
+      "status": "done",
+      "changeName": "story-account-system-login",
+      "priority": "P0"
+    },
+    {
+      "id": "story-account-system-session",
+      "title": "会话保持与退出",
+      "description": "会话凭证持久化并全局校验；我的订单按登录用户归属查询；退出登录销毁会话",
+      "status": "done",
+      "changeName": "story-account-system-session",
+      "priority": "P0"
+    },
+    {
+      "id": "story-account-system-admin-users",
+      "title": "B端用户管理",
+      "description": "用户列表/按手机号或昵称检索/详情（含订单聚合）/禁用启用；仅运营角色可见",
+      "status": "done",
+      "changeName": "story-account-system-admin-users",
+      "priority": "P1"
+    }
+  ],
+  "updatedAt": "2026-08-29T03:00:00Z"
+}

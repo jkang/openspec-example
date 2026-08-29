@@ -2,6 +2,8 @@ import { describe, it, before, after } from 'node:test'
 import assert from 'node:assert'
 import { createServer } from '../src/http/server.js'
 
+process.env.NODE_ENV = 'test'
+
 describe('性能基线测试', () => {
   let base = ''
   let stop = () => {}
@@ -17,27 +19,38 @@ describe('性能基线测试', () => {
   after(() => stop())
 
   it('下单接口 P99 < 100ms', async () => {
-    // Setup data
+    // Setup data: 上架商品 + 注册并登录（下单需会话凭证，R-SES-007）
     const res = await fetch(`${base}/api/products`, {
         method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: 'Perf Item', priceCents: 100, stock: 1000 })
     })
     const product = await res.json()
+
+    const regRes = await fetch(`${base}/api/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone: '13888880000', nickname: '性能用户', password: '123456' })
+    })
+    const { sessionToken } = await regRes.json()
+    const authHeaders = { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionToken}` }
 
     const latencies = []
     const REQUESTS = 50
 
     for (let i = 0; i < REQUESTS; i++) {
-        // Add to cart first
+        // Add to cart first (会话归属，下单后购物车清空，需重新加购)
         await fetch(`${base}/api/cart/items`, {
             method: 'POST',
+            headers: authHeaders,
             body: JSON.stringify({ productId: product.id, quantity: 1 })
         })
 
         const start = performance.now()
         await fetch(`${base}/api/orders`, {
             method: 'POST',
-            body: JSON.stringify({ userId: `user_${i}` })
+            headers: authHeaders,
+            body: JSON.stringify({})
         })
         latencies.push(performance.now() - start)
     }
