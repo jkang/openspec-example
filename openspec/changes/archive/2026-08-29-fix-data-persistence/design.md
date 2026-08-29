@@ -59,7 +59,7 @@
   - 不引入第三方数据库/ORM（保持零依赖，JSON 文件存储）。
   - 不改变任何 API 契约与前端行为（C 端/B 端可观察行为不变）。
   - 不做 Python 端（`ecommerce-mini-python`）持久化（功能不完整且非 E2E 依赖，登记后续技术债）。
-  - 不修改 SDD 工作流 skills/commands（`.trae`/`.cursor`/`.agents` 三目录无需同步）。
+  - 存储实现本身不要求修改 SDD 工作流 skills/commands；但本次随行发布了 SDD 流程补强（spec-design「E2E 覆盖审查」强制步骤 + verify「覆盖完整性软门禁」），已同步 `.trae`/`.cursor`/`.agents` 三目录并核验一致（记录见 verify.md P2-3 修订）。
 
 ## Architecture (架构方案)
 

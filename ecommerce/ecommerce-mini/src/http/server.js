@@ -62,6 +62,9 @@ const initialUsers = [
   }
 ]
 
+/**
+ * @param {import('http').IncomingMessage} req
+ */
 const readJson = async (req) => {
   return new Promise((resolve, reject) => {
     let body = ''
@@ -76,6 +79,11 @@ const readJson = async (req) => {
   })
 }
 
+/**
+ * @param {import('http').ServerResponse} res
+ * @param {number} status
+ * @param {any} data
+ */
 const sendJson = (res, status, data) => {
   res.writeHead(status, { 
     'Content-Type': 'application/json',
@@ -86,6 +94,12 @@ const sendJson = (res, status, data) => {
   res.end(JSON.stringify(data))
 }
 
+/**
+ * @param {import('http').ServerResponse} res
+ * @param {string} code
+ * @param {string} message
+ * @param {number} [status]
+ */
 const sendError = (res, code, message, status = 500) => {
   res.writeHead(status, { 
     'Content-Type': 'application/json',
@@ -100,6 +114,7 @@ const sendError = (res, code, message, status = 500) => {
  * 会话全局校验（R-SES-002）：解析 `Authorization: Bearer <token>` 并校验归属用户
  * 无有效会话抛 UNAUTHORIZED；归属用户被禁用抛 USER_DISABLED（R-SES-006）
  * @param {import('http').IncomingMessage} req
+ * @param {import('../services/auth.js').AuthService} authService
  * @returns {Omit<import('../domain/types.js').User, 'passwordHash'>} 脱敏用户 DTO
  */
 function requireSession(req, authService) {
@@ -111,6 +126,7 @@ function requireSession(req, authService) {
 /**
  * 可选会话解析（购物车归属 D3）：有会话按会话 userId，无会话返回 null（游客）
  * @param {import('http').IncomingMessage} req
+ * @param {import('../services/auth.js').AuthService} authService
  * @returns {Omit<import('../domain/types.js').User, 'passwordHash'> | null}
  */
 function optionalSession(req, authService) {
@@ -130,7 +146,7 @@ function optionalSession(req, authService) {
  * 复用 getSessionUser（含禁用门禁：运营被禁用保留 USER_DISABLED 专属提示）
  * 缺失/无效会话统一按 FORBIDDEN 403 处理：admin 端点不区分未登录与越权（防探测，对齐 R-ADM-001 拒绝访问语义）
  * @param {import('http').IncomingMessage} req
- * @param {AuthService} authService
+ * @param {import('../services/auth.js').AuthService} authService
  * @returns {Omit<import('../domain/types.js').User, 'passwordHash'>} 运营用户 DTO
  */
 function requireAdminRole(req, authService) {
@@ -157,7 +173,7 @@ function requireAdminRole(req, authService) {
  * @param {string} [storage]
  * @returns {'memory' | 'file'}
  */
-function resolveStorage(storage) {
+export function resolveStorage(storage) {
   if (storage === 'memory' || storage === 'file') return storage
   const env = process.env.STORAGE
   if (env === 'memory' || env === 'file') return env
@@ -176,12 +192,31 @@ function seedFileRepos({ productRepo, categoryRepo, couponRepo, userRepo }) {
   }
 }
 
-export function createServer({ storage, dataDir } = {}) {
+/**
+ * @param {{ storage?: 'memory' | 'file', dataDir?: string }} [options]
+ */
+export function createServer({ storage, dataDir } = { storage: undefined, dataDir: undefined }) {
   // 每个 server 实例独立的仓储与服务（保证测试套件间状态隔离）
   const useFile = resolveStorage(storage) === 'file'
   const fileDataDir = resolveDataDir(dataDir)
 
-  let productRepo, cartRepo, orderRepo, couponRepo, issuanceRepo, categoryRepo, userRepo, sessionRepo
+  /** @type {any} */
+  let productRepo
+  /** @type {any} */
+  let cartRepo
+  /** @type {any} */
+  let orderRepo
+  /** @type {any} */
+  let couponRepo
+  /** @type {any} */
+  let issuanceRepo
+  /** @type {any} */
+  let categoryRepo
+  /** @type {any} */
+  let userRepo
+  /** @type {any} */
+  let sessionRepo
+  
   let testMode = false
 
   if (useFile) {
@@ -247,15 +282,14 @@ export function createServer({ storage, dataDir } = {}) {
       if (pathname === '/api/__test/reset' && req.method === 'POST') {
         if (!testMode)
           return sendError(res, 'NOT_FOUND', 'Endpoint not found', 404)
-        productRepo.products.clear()
-        cartRepo.carts.clear()
-        orderRepo.orders.clear()
-        couponRepo.coupons.clear()
-        issuanceRepo.issuances.clear()
-        categoryRepo.categories.clear()
-        userRepo.users.clear()
-        userRepo.sequence = 1000
-        sessionRepo.sessions.clear()
+        productRepo.clear()
+        cartRepo.clear()
+        orderRepo.clear()
+        couponRepo.clear()
+        issuanceRepo.clear()
+        categoryRepo.clear()
+        userRepo.clear()
+        sessionRepo.clear()
         initialProducts.forEach(p => productRepo.save({ ...p }))
         initialCoupons.forEach(c => couponRepo.save({ ...c }))
         initialCategories.forEach(c => categoryRepo.save({ ...c }))

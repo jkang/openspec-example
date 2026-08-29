@@ -223,11 +223,18 @@ __marimo__/
 !.opencode/commands/
 opencode.jsonc
 
-# ECommerce 运行态数据（FileStore 落盘产物，非种子基线）
-# 种子基线（products/categories/coupons.json）保留版本控制；
-# 运行态产物（carts/orders/users/sessions/issuances.json）为服务运行自动生成，忽略跟踪
+# ECommerce 运行态数据（FileStore 落盘产物，种子与运行态彻底分离）
+# 8 类 data/*.json 全部为 FileStore 运行态落盘产物，一律忽略跟踪；
+# 纯净种子基线以代码为准（server.js initialProducts/initialCategories/initialCoupons/initialUsers），
+# data/ 为空时首次启动即按纯净种子重建，运行态写入永不回写 git 跟踪文件。
+ecommerce/ecommerce-mini/data/products.json
+ecommerce/ecommerce-mini/data/categories.json
+ecommerce/ecommerce-mini/data/coupons.json
 ecommerce/ecommerce-mini/data/carts.json
 ecommerce/ecommerce-mini/data/orders.json
 ecommerce/ecommerce-mini/data/users.json
 ecommerce/ecommerce-mini/data/sessions.json
 ecommerce/ecommerce-mini/data/issuances.json
+e2e-tests/cucumber-report.html
+ecommerce/ecommerce-mini/data/*.tmp
+ecommerce/ecommerce-mini/data/*.corrupt-*

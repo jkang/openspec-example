@@ -1,10 +1,9 @@
 # data-persistence Specification
 
 ## Purpose
-
 承载系统**数据持久化**横切能力：运行链路（`npm start` / `init.sh node:start`）默认以 JSON 文件存储（FileStore）落盘全部业务数据，服务重启后数据可恢复；`NODE_ENV=test` 下使用内存仓储保证测试隔离。本能力是对既有 specs（catalog/coupon/order/user-session）中零散持久化承诺的统一支撑契约，修复「规范已承诺文件持久化、运行链路却纯内存未落盘」的缺陷。
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: 运行链路默认文件持久化
 
@@ -21,7 +20,7 @@
 - **AND** 会话凭证已写入 `sessions.json`
 
 #### Scenario: 测试环境强制内存隔离
-- @unit
+- @api
 - **GIVEN** `NODE_ENV=test` 启动后端
 - **WHEN** 执行任意写操作
 - **THEN** 数据仅驻留进程内存 Map
@@ -81,22 +80,14 @@
 - **Rationale**: 当前 `data/` 目录缺 `users.json`/`sessions.json`/`issuances.json`，首次运行需自动创建；写一致性是文件存储的基本正确性保证。
 
 #### Scenario: 首次启动自动初始化缺失数据文件
-- @unit
+- @api
 - **GIVEN** `data/` 目录不存在或缺少 `sessions.json`
 - **WHEN** 以文件存储模式启动后端
 - **THEN** 启动成功，缺失数据文件被自动创建（空数据集）
 - **AND** 不抛出异常
 
 #### Scenario: 写操作后文件与内存状态一致
-- @unit
+- @api
 - **GIVEN** 文件存储模式下商品列表含 3 条记录
 - **WHEN** 新增第 4 个商品
 - **THEN** 再次启动读取 `products.json` 含 4 条记录
-
-## Governance Mapping
-
-- **Bounded Context**: 横切支撑（`domain_model.html` BC → Capability 映射：Catalog / Cart / Coupon / Order / User 全部受益；本能力不归属单一 BC，作为跨 BC 的基础设施契约）
-- **Capability Taxonomy**: `data-persistence`（**新增 taxonomy**，横切支撑；理由：既有 specs 将持久化语义零散分布于 catalog/coupon/order/user-session，无统一契约声明「运行链路默认文件持久化 + 重启可恢复」，独立声明避免各域重复并修复实现未兑现）
-- **Process Alignment**: 横切支撑：覆盖 L1-01~L1-06 与 L2-01~06 / L3-01~06 全部数据读写环节（`business_process.html`）
-- **Service Blueprint**: 横切支撑：`SB-BACKSTAGE-01/03/04/06`（商品/分类/券规则/订单接口持久化语义，REUSE 既有蓝图结构，本次修复其支撑未生效）；`SB-STAGE-01~06` 与 `SB-CUSTOMER-*` / `SB-OPS-*` 可观察行为不变
-- **实现版本**: Node.js（`ecommerce/ecommerce-mini`）

@@ -46,3 +46,10 @@
 ## 7. 收尾 (Closure)
 
 - [x] 7.1 [全部] 将结果写入 `verify.md`（硬门禁证据 + E2E 摘要 + 技术债登记：Python 端持久化、双文件历史遗留清理）
+
+## 8. qa 对抗审查修复（engineer，2026-08-29）
+
+- [x] 8.1 [配置+Git] 修复 P1-1（阻塞）：种子/运行态彻底分离 —— `.gitignore` 追加忽略 products/categories/coupons（8 类全忽略）、`git rm --cached` 移除跟踪、清理磁盘运行态残留；验证 `rm -rf data/*` 后 file 模式首启 8 类纯净重建（stock=99 / UNUSED / user_1001 / 空集合），`git status` 下 data/ 无变更
+- [x] 8.2 [Node.js] 修复 P1-2（阻塞）：`fileStore.js` 损坏文件改为 `.corrupt-<timestamp>` 备份保留现场（不再 `saveAll([])` 原地覆盖销毁）+ `saveAll()` 原子写（tmp + rename）；新增损坏备份/原子重建/无 .tmp 残留测试，既有「损坏降级」断言同步更新
+- [x] 8.3 [Node.js] 修复 P2-2：`server.js` 导出 `resolveStorage`；新增参数化单测（无环境变量→file / NODE_ENV=test→memory / STORAGE 显式优先 / storage 参数优先）+ `createServer()` 缺省模式（DATA_DIR 临时目录）落盘与纯净种子断言
+- [x] 8.4 [E2E] 修复 P3-5：`e2e-tests/steps/persistence.js` After 钩子删除临时 `DATA_DIR`，杜绝 `/tmp/e2e-persist-*` 残留（运行后残留 0 个）

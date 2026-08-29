@@ -7,7 +7,10 @@ import path from 'path'
  * 增强（fix-data-persistence）：
  * - 首次启动：data/ 目录不存在时自动创建（mkdir -p）
  * - 首次启动：数据文件缺失时自动创建为空数据集（[]），不抛异常
- * - 加载失败（损坏/格式不符/空文件）：安全降级为空数据集启动，不崩溃
+ * - 加载失败（损坏/格式不符）：不覆盖原文件，重命名备份为 `<file>.corrupt-<timestamp>`
+ *   保留现场，并以空数据集启动，不崩溃
+ * - 写操作原子落盘：先写 `<file>.tmp`，成功后 `rename` 原子替换目标文件，
+ *   避免崩溃窗口留下截断文件
  *
  * 每次写操作将完整数据集同步写回文件，保证文件与内存状态一致。
  */
@@ -34,7 +37,7 @@ export class FileStore {
   }
 
   /**
-   * 加载数据集；文件缺失 → 自动创建空数据集；解析失败 → 安全降级为空数据集（不崩溃）
+   * 加载数据集；文件缺失 → 自动创建空数据集；解析失败 → 备份损坏文件后以空数据集启动（不崩溃）
    */
   load() {
     if (!fs.existsSync(this.filePath)) {
@@ -58,17 +61,26 @@ export class FileStore {
         })
       }
     } catch (e) {
-      // 损坏/格式不符：以空数据集启动并重建文件，保证后续写操作一致（不崩溃）
-      console.error(`[FileStore] 数据文件 ${this.filePath} 解析失败，安全降级为空数据集启动: ${e.message}`)
+      // 损坏/格式不符：重命名备份保留现场，不覆盖原文件；以空数据集启动（不崩溃）。
+      // 后续首次写操作会通过原子写重建有效文件。
+      const backupPath = `${this.filePath}.corrupt-${Date.now()}`
+      try {
+        fs.renameSync(this.filePath, backupPath)
+        console.error(`[FileStore] 数据文件 ${this.filePath} 解析失败，已备份为 ${backupPath} 并以空数据集启动: ${e.message}`)
+      } catch (backupErr) {
+        // 备份失败（极端场景）也绝不原地覆盖销毁原数据：仅降级为空数据集
+        console.error(`[FileStore] 数据文件 ${this.filePath} 解析失败且备份失败（${backupErr.message}），仅以空数据集启动，保留原文件: ${e.message}`)
+      }
       this.data = new Map()
-      this.saveAll([])
     }
   }
 
-  /** 将当前数据集全量写回文件（写后一致性） */
+  /** 将当前数据集全量写回文件（原子写：tmp + rename，避免崩溃窗口留下截断文件） */
   saveAll(items) {
     const json = Array.from(items)
-    fs.writeFileSync(this.filePath, JSON.stringify(json, null, 2))
+    const tmpPath = `${this.filePath}.tmp`
+    fs.writeFileSync(tmpPath, JSON.stringify(json, null, 2))
+    fs.renameSync(tmpPath, this.filePath)
   }
 
   get(id) {
@@ -92,5 +104,10 @@ export class FileStore {
 
   values() {
     return this.data.values()
+  }
+
+  clear() {
+    this.data.clear()
+    this.saveAll([])
   }
 }

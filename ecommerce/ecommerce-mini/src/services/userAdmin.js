@@ -6,8 +6,8 @@ import { assertUserStatusValue } from '../domain/logic.js'
  */
 export class AdminUserService {
   /**
-   * @param {import('../repo/memoryRepo.js').UserRepo} userRepo
-   * @param {import('../repo/memoryRepo.js').OrderRepo} orderRepo
+   * @param {any} userRepo
+   * @param {any} orderRepo
    */
   constructor(userRepo, orderRepo) {
     this.userRepo = userRepo
@@ -20,6 +20,7 @@ export class AdminUserService {
    * @returns {number} 该用户订单总数
    */
   orderCount(userId) {
+    /** @param {import('../domain/types.js').Order} o */
     return this.orderRepo.findAll().filter(o => o.userId === userId).length
   }
 

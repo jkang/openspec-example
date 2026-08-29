@@ -16,6 +16,10 @@ export class ProductRepo {
   findById(id) {
     return this.products.get(id)
   }
+
+  clear() {
+    this.products.clear()
+  }
 }
 
 export class CategoryRepo {
@@ -34,6 +38,10 @@ export class CategoryRepo {
   findById(id) {
     return this.categories.get(id)
   }
+
+  clear() {
+    this.categories.clear()
+  }
 }
 
 export class CartRepo {
@@ -47,6 +55,10 @@ export class CartRepo {
 
   save(cart) {
     this.carts.set(cart.userId, cart)
+  }
+
+  clear() {
+    this.carts.clear()
   }
 }
 
@@ -65,6 +77,10 @@ export class OrderRepo {
 
   findAll() {
     return Array.from(this.orders.values())
+  }
+
+  clear() {
+    this.orders.clear()
   }
 }
 
@@ -88,6 +104,10 @@ export class CouponRepo {
   countByTemplateId(templateId) {
     return this.findAll().filter(c => c.templateId === templateId).length
   }
+
+  clear() {
+    this.coupons.clear()
+  }
 }
 
 export class IssuanceRepo {
@@ -101,6 +121,10 @@ export class IssuanceRepo {
 
   findAll() {
     return Array.from(this.issuances.values())
+  }
+
+  clear() {
+    this.issuances.clear()
   }
 }
 
@@ -133,6 +157,11 @@ export class UserRepo {
 
   findByPhone(phone) {
     return Array.from(this.users.values()).find(u => u.phone === phone)
+  }
+
+  clear() {
+    this.users.clear()
+    this.sequence = 1000
   }
 }
 
@@ -167,5 +196,9 @@ export class SessionRepo {
    */
   delete(token) {
     return this.sessions.delete(token)
+  }
+
+  clear() {
+    this.sessions.clear()
   }
 }

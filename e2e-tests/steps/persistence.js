@@ -63,6 +63,10 @@ Before({ tags: '@persist' }, async function () {
 
 After({ tags: '@persist' }, async function () {
   stopBackend();
+  // 清理临时数据目录，避免每次运行残留 /tmp/e2e-persist-*
+  if (DATA_DIR) {
+    fs.rmSync(DATA_DIR, { recursive: true, force: true });
+  }
 });
 
 // ---------- 生命周期与写操作 ----------

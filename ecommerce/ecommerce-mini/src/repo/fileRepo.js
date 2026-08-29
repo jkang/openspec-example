@@ -36,8 +36,8 @@ export class FileRepoAdapter {
   /**
    * @param {{ filename: string, keyField?: string, dataDir?: string }} options
    */
-  constructor({ filename, keyField = 'id', dataDir } = {}) {
-    this.store = new FileStore(resolveDataFile(filename, dataDir), keyField)
+  constructor({ filename, keyField = 'id', dataDir } = { filename: '' }) {
+    this.store = new FileStore(resolveDataFile(filename || 'default.json', dataDir), keyField)
     this.keyField = keyField
   }
 
@@ -64,6 +64,10 @@ export class FileRepoAdapter {
   countByTemplateId(templateId) {
     return this.findAll().filter(c => c.templateId === templateId).length
   }
+
+  clear() {
+    this.store.clear()
+  }
 }
 
 /**
@@ -71,7 +75,10 @@ export class FileRepoAdapter {
  * 序列续号：从现有数据最大 user_<n> 继续，避免覆盖种子演示用户
  */
 export class UserFileRepo extends FileRepoAdapter {
-  constructor({ dataDir } = {}) {
+  /**
+   * @param {{ dataDir?: string }} [options]
+   */
+  constructor({ dataDir } = { dataDir: undefined }) {
     super({ filename: 'users.json', keyField: 'id', dataDir })
     this.sequence = this.findMaxSeq()
   }
@@ -101,13 +108,21 @@ export class UserFileRepo extends FileRepoAdapter {
   findByPhone(phone) {
     return this.findAll().find(u => u.phone === String(phone))
   }
+
+  clear() {
+    this.store.clear()
+    this.sequence = 1000
+  }
 }
 
 /**
  * 会话仓储（sessions.json 持久化）：token 键控 + SessionRepo 接口
  */
 export class SessionFileRepo {
-  constructor({ dataDir } = {}) {
+  /**
+   * @param {{ dataDir?: string }} [options]
+   */
+  constructor({ dataDir } = { dataDir: undefined }) {
     // sessions.json 以 token 为键（显式 keyField='token'，覆盖缺省 id/userId 推断）
     this.store = new FileStore(resolveDataFile('sessions.json', dataDir), 'token')
   }
@@ -133,5 +148,9 @@ export class SessionFileRepo {
       return true
     }
     return false
+  }
+
+  clear() {
+    this.store.clear()
   }
 }

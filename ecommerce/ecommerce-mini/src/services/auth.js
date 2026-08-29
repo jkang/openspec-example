@@ -13,8 +13,8 @@ import {
  */
 export class AuthService {
   /**
-   * @param {import('../repo/memoryRepo.js').UserRepo} userRepo
-   * @param {import('../repo/memoryRepo.js').SessionRepo} sessionRepo
+   * @param {any} userRepo
+   * @param {any} sessionRepo
    */
   constructor(userRepo, sessionRepo) {
     this.userRepo = userRepo
@@ -24,7 +24,7 @@ export class AuthService {
   /**
    * 注册并自动登录
    * @param {{ phone: string, nickname?: string, password: string }} input
-   * @returns {{ user: import('../domain/types.js').User, sessionToken: string }}
+   * @returns {{ user: Omit<import('../domain/types.js').User, 'passwordHash'>, sessionToken: string }}
    * @throws {Error} INVALID_PHONE 手机号格式非法
    * @throws {Error} PHONE_ALREADY_REGISTERED 手机号已注册
    * @throws {Error} PASSWORD_TOO_SHORT / PASSWORD_TOO_LONG 密码长度不合法
@@ -48,6 +48,7 @@ export class AuthService {
     }
 
     // 3. 创建用户（昵称缺省时默认"手机尾号用户"，status=正常，role=客户）
+    /** @type {import('../domain/types.js').User} */
     const user = {
       id: this.userRepo.nextId(),
       phone: normalizedPhone,
