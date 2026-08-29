@@ -1,0 +1,17 @@
+// =========================================================
+// Mock Business Systems —— 外部业务系统 Mock 模块
+// 说明：模拟与 ERP / SRM / HR 等业务系统的交互（返回真实感数据）。
+//       后续可替换为真实业务系统 SDK/HTTP 客户端。
+// =========================================================
+
+const latency = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export const businessMock = {
+{% for mock in businessMocks %}
+  // ---- {{ mock.name }}（system: {{ mock.system }}）----
+  async {{ mock.name }}(body = {}) {
+    await latency({{ mock.latency }});
+    return {{ mock.response|tojson }};
+  },
+{% endfor %}
+};

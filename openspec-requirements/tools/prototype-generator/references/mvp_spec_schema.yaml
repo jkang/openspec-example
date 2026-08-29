@@ -1,0 +1,115 @@
+# =============================================================
+# MVP 设计规格 (mvp_spec) 数据契约 · 标准示例
+# 由 LLM 从「AI Canvas YAML + To-be Journey YAML」推导产出
+# Python 脚手架 scaffold_mvp.py 依据本契约编译出可运行的 mvp-prototype/ 项目
+# =============================================================
+meta:
+  projectName: "intelligent-procurement"      # 包名/目录名（小写连字符）
+  productName: "智能采购助手"                  # 产品中文名
+  businessDomain: "供应链采购"                 # 业务域（用于自动主题推导）
+  frontend: "react"                           # react | vue（用户输入，必填）
+  designSystem: "antd"                        # antd(react) | arco(vue)
+  theme:
+    source: "auto"                            # auto=按业务域推导 | user=用户提供
+    primary: "#2563eb"                        # 主色
+    accent: "#f97316"                         # 强调色
+    layout: "side"                            # side=侧边栏 | top=顶栏
+  ports:
+    dev: 5173                                 # Vite 开发端口
+    api: 8080                                 # Express API 端口（生产单端口同此）
+
+# ---- 角色（承接 To-be Journey personas，前端角色切换器用） ----
+personas:
+  - id: "buyer_zhang"
+    name: "张敏"
+    role: "采购专员"
+    department: "采购部"
+    goals:
+      - "快速完成需求识别与供应商寻源"
+      - "避免物料漏采或交期延误"
+
+# ---- 典型场景（承接 To-be Journey scenarios，场景导航用） ----
+scenarios:
+  - id: "s1"
+    name: "紧急缺料采购"
+    personaId: "buyer_zhang"
+    trigger: "产线报缺料，需求方要求当天确认供应商并下单"
+    goal: "10 分钟内完成需求识别 + 供应商初选 + 订单草稿生成"
+
+# ---- 核心数据模型 + 真实 Mock 数据（承接 userInputs / visibleData） ----
+dataModels:
+  - name: "PurchaseOrder"
+    description: "采购订单"
+    fields:
+      - { key: "code", title: "订单号", type: "string" }
+      - { key: "supplier", title: "供应商", type: "string" }
+      - { key: "amount", title: "金额", type: "number" }
+      - { key: "dueDate", title: "交期", type: "string" }
+      - { key: "status", title: "状态", type: "string" }
+    mockData:
+      - { code: "PO-2024-0812-001", supplier: "泰科机电", amount: 9250, dueDate: "2024-08-17", status: "待供应商确认" }
+      - { code: "PO-2024-0812-002", supplier: "华宇传动", amount: 3580, dueDate: "2024-08-21", status: "在途" }
+      - { code: "PO-2024-0812-003", supplier: "密封圈科技", amount: 3330, dueDate: "2024-08-24", status: "待审批" }
+
+# ---- 页面设计（承接 touchpoints / handoff.pages，元素见 mvp_prompts.md） ----
+pages:
+  - id: "upload"
+    title: "上传采购申请单"
+    route: "/upload"
+    icon: "UploadOutlined"
+    description: "上传缺料申请单，AI 自动识别并校验完整性"
+    actions:
+      - { name: "parseRequest", button: "识别并校验申请单" }
+    sections:
+      - type: "steps"
+        current: 0
+        items: ["上传申请单", "AI 识别校验", "供应商推荐", "订单审批", "下单同步"]
+      - type: "uploadCard"
+        title: "采购申请单"
+        accept: ".xlsx,.csv"
+        hint: "支持 Excel/CSV，自动识别物料编码、数量、期望交期（示例：PR-2024-0812.xlsx）"
+        action: "parseRequest"
+      - type: "aiResultCard"
+        title: "AI 识别结果"
+        bind: "parseRequest"
+        render: "table"
+        columns:
+          - { key: "code", title: "物料编码" }
+          - { key: "name", title: "物料名称" }
+          - { key: "qty", title: "需求数量" }
+          - { key: "dueDate", title: "期望交期" }
+          - { key: "status", title: "校验状态", tag: { "通过": "success", "缺失": "warning", "异常": "error" } }
+      - type: "buttonRow"
+        buttons:
+          - { text: "确认并进入供应商推荐", type: "primary", action: "navigate:/recommend" }
+
+# ---- Mock AI 服务接口（server/services/aiService.js 生成依据） ----
+aiMocks:
+  - name: "parseRequest"                      # aiService 方法名
+    latency: 700                              # 模拟 AI 处理延迟 ms
+    response:
+      summary: "已识别 3 条物料，2 项通过，1 项缺失（期望交期未填）"
+      items:
+        - { code: "MTR-001", name: "电机", qty: 180, dueDate: "2024-08-15", status: "通过" }
+        - { code: "BRG-002", name: "轴承", qty: 200, dueDate: "2024-08-15", status: "通过" }
+        - { code: "SEL-003", name: "密封圈", qty: 1000, dueDate: "", status: "缺失" }
+
+# ---- Mock 业务系统接口（server/services/businessMock.js 生成依据） ----
+businessMocks:
+  - name: "getInventory"                      # businessMock 方法名
+    system: "erp"
+    latency: 200
+    response:
+      items:
+        - { code: "MTR-001", name: "电机", stock: 320, safeStock: 500, status: "低于安全库存" }
+
+# ---- API 网关路由（server/routes/api.js 与前端 client.js 生成依据） ----
+apiRoutes:
+  - { name: "parseRequest", method: "POST", path: "/api/purchase/parse", target: "ai:parseRequest" }
+  - { name: "getOrders", method: "GET", path: "/api/orders", target: "business:getOrders" }
+  - {
+      name: "loadDashboard", method: "GET", path: "/api/dashboard",
+      target: "compose",
+      compose:
+        - { key: "inventory", service: "business", method: "getInventory" }
+    }

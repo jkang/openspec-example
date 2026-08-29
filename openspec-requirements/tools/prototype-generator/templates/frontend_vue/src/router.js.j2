@@ -1,0 +1,20 @@
+import { createRouter, createWebHistory } from 'vue-router';
+import WorkbenchLayout from './layouts/WorkbenchLayout.vue';
+{% for page in pages %}
+import {{ page.component }} from './pages/{{ page.component }}.vue';
+{% endfor %}
+
+const routes = [
+  {
+    path: '/',
+    component: WorkbenchLayout,
+    redirect: '{{ first_route }}',
+    children: [
+{% for page in pages %}
+      { path: '{{ page.route }}', component: {{ page.component }} },
+{% endfor %}
+    ],
+  },
+];
+
+export default createRouter({ history: createWebHistory(), routes });

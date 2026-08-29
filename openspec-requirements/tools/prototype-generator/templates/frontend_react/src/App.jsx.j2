@@ -1,0 +1,21 @@
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import WorkbenchLayout from './layouts/WorkbenchLayout.jsx';
+{% for page in pages %}
+import {{ page.component }} from './pages/{{ page.component }}.jsx';
+{% endfor %}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<WorkbenchLayout />}>
+          <Route index element={<Navigate to="{{ first_route }}" replace />} />
+{% for page in pages %}
+          <Route path="{{ page.route }}" element={<{{ page.component }} />} />
+{% endfor %}
+          <Route path="*" element={<Navigate to="{{ first_route }}" replace />} />
+        </Route>
+      </Routes>
+    </BrowserRouter>
+  );
+}

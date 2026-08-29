@@ -1,0 +1,18 @@
+// =========================================================
+// {{ productName }} · API 客户端（由 mvp_spec.apiRoutes 生成）
+// =========================================================
+import axios from 'axios';
+
+const http = axios.create({ baseURL: '/api', timeout: 30000 });
+
+export const api = {
+{% for route in apiRoutes %}
+  {{ route.name }}: (data) => http.request({
+    url: {{ route.client_path|tojson }},
+    method: '{{ route.method }}',
+    {% if route.method == 'GET' %}params: data || {},
+    {% else %}data: data || {},
+    {% endif %}
+  }).then((r) => r.data),
+{% endfor %}
+};

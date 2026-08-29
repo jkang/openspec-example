@@ -1,0 +1,79 @@
+```yaml
+title: "SaaS产品增长战役·全年GMR突破"
+config:
+  height:
+    objectiveScore: 70
+objectives:
+  - name: 全年 ARR 增长 40%
+    value: "目标: $12M ARR"
+    trend: up
+    subObjectives:
+      - name: 新客获取提速
+        value: "月新签客户 ≥ 80 家"
+        trend: up
+        strategies:
+          - 强化 SEO/内容营销漏斗，降低获客成本
+          - 建立合作伙伴渠道，每季引入 10 家系统集成商
+          - 精准 ABM 策略，聚焦 500-2000 人规模企业
+        metrics:
+          - name: 月新签 MRR
+            calculation: "当月新签合同 MRR 求和"
+            value: "当前: $120K 目标: $180K"
+            trend: up
+          - name: 获客成本 CAC
+            calculation: "销售+市场成本 / 当月新签客户数"
+            value: "当前: $3.2K 目标: ≤$2.5K"
+            trend: down
+        relatedScenarios:
+          scenarios:
+            - name: 官网 Demo 申请→Sales 跟进旅程
+              description: 潜客通过官网"免费 Demo"按钮提交表单后，CRM 自动分派给对应区域 SDR，SDR 需在 4 小时内发出个性化邮件并预约 30 分钟演示，完成后推进至 AE 进行深度 Discovery Call。
+            - name: 合作伙伴线索联合转化
+              description: ISV/SI 合作伙伴通过专属 Partner Portal 提交线索，系统自动触发 Channel Manager 跟进提醒，双方在 48 小时内联合拜访客户，并共享赢单佣金。
+            - name: ABM 定向广告召回冷线索
+              description: 识别目标公司访问官网但未注册的匿名流量，在 LinkedIn 投放定制化行业痛点广告，配合 SDR 主动触达完成从"冷" 到"热"的孵化切换。
+      - name: 现有客户扩销增收
+        value: "NRR > 115%"
+        trend: up
+        strategies:
+          - 基于使用量数据驱动 CSM 主动扩座位建议
+          - 针对高健康评分账户推进模块 Upsell
+          - 推出企业级附加模块（AI 分析包、SSO 集成）
+        metrics:
+          - name: 净收入留存率 NRR
+            calculation: "(月末ARR - 流失 + 扩销) / 月初ARR"
+            value: "当前: 108% 目标: 115%"
+            trend: up
+          - name: 扩销触达率
+            calculation: "CSM 主动联系扩销机会 / 健康账户总数"
+            value: "当前: 30% 目标: 60%"
+            trend: up
+        relatedScenarios:
+          scenarios:
+            - name: CSM 健康评分预警 → 主动扩销
+              description: 系统每周自动计算账户健康评分，对连续 3 周活跃度上升且用量利用率 > 80% 的账户，触发 CSM 任务提醒，CSM 准备个性化扩座位 proposal 并预约 QBR 会议。
+            - name: AI 分析包 Upsell 漏斗
+              description: 在产品内嵌入 Upsell 入口，当用户尝试访问高级 AI 报告时提示功能升级，联动 CSM 系统创建 Upsell 机会，并在 7 天内跟进报价。
+      - name: 流失控制与续约保障
+        value: "年流失率 < 8%"
+        trend: down
+        strategies:
+          - 建立流失预警模型，提前 90 天识别风险账户
+          - 为高风险客户配置专属 Executive Sponsor
+          - 推出 2 年期锁定合同并给予折扣激励
+        metrics:
+          - name: 季度 Logo 流失率
+            calculation: "流失客户数 / 期初客户总数"
+            value: "当前: 3.5%/季 目标: ≤2%/季"
+            trend: down
+          - name: 高风险账户挽救率
+            calculation: "挽救成功账户数 / 预警账户总数"
+            value: "当前: 40% 目标: 70%"
+            trend: up
+        relatedScenarios:
+          scenarios:
+            - name: 流失预警模型自动分级
+              description: 每天凌晨运行 ML 模型，对全量账户按流失概率分为"红/橙/绿"三级，红色账户自动同步至 CSM 工作台，要求 24 小时内完成第一轮电话访谈。
+            - name: Executive Sponsor 挽留计划
+              description: 当 CSM 判断客户流失概率极高时，升级至公司 VP/C-Level 进行一对一 Executive Briefing，展示产品路线图并提供专属 SLA 承诺，谈判 3 个月延期或转换方案。
+```

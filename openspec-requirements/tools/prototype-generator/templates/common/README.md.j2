@@ -1,0 +1,63 @@
+# {{ productName }} · MVP 原型
+
+> 由 `prototype-generator` Skill 基于 AI Canvas + To-be Journey 自动生成。
+> 前后端一体（Node.js + Express + {{ designSystem }}），AI 与业务系统均为 Mock 服务。
+
+## 快速开始
+
+```bash
+npm install        # 安装全部依赖（一次）
+npm run dev        # 开发模式：API(:{{ apiPort }}) + Vite 前端(:{{ devPort }})
+```
+
+浏览器打开 **http://localhost:{{ devPort }}**
+
+### 生产模式（单端口一体化）
+
+```bash
+npm run build      # 构建前端到 dist/
+npm start          # 单端口 :{{ apiPort }} 同时提供 API 与前端页面
+```
+
+## 系统架构
+
+```
+浏览器 ──► Vite(前端 :{{ devPort }}) ──/api 代理──► Express(API :{{ apiPort }})
+                                                      │
+                                                      ├── services/aiService.js      （Mock AI：识别/推荐/审批/对话）
+                                                      └── services/businessMock.js   （Mock 业务系统：ERP/SRM）
+```
+
+## 目录结构
+
+```
+{{ projectName }}/
+├── server/
+│   ├── index.js            # Express 入口（API + 生产托管前端）
+│   ├── config.js           # 端口与全局配置
+│   ├── routes/api.js       # 编排路由（{{ apiRoutes|length }} 条）
+│   └── services/
+│       ├── aiService.js    # Mock AI 服务模块（{{ aiMocks|length }} 个接口，模拟延迟）
+│       └── businessMock.js # Mock 业务系统模块（{{ businessMocks|length }} 个接口）
+├── src/                    # 前端源码（{{ frontend }}+{{ designSystem }}）
+│   ├── pages/              # {{ pages|length }} 个页面
+│   ├── layouts/            # 工作台布局（侧边栏+顶栏）
+│   ├── api/client.js       # API 客户端
+│   └── theme.js            # 主题配色
+├── vite.config.js
+└── package.json
+```
+
+## 页面清单
+
+{% for page in pages %}
+- **{{ page.route }}** · {{ page.title }} — {{ page.description }}
+{% endfor %}
+
+## 后端接口（Mock）
+
+{% for route in apiRoutes %}
+| {{ route.method }} | {{ route.path }} | {{ route.target }} |
+{% endfor %}
+
+_生成时间：{{ generated_at }}_

@@ -1,0 +1,292 @@
+# =============================================================
+# 演示规格：dreame 采购订单自动生成 MVP
+# 输入来源：dreame_canvas_1_procurement.yaml + dreame_to_be_1_procurement.yaml
+# =============================================================
+meta:
+  projectName: "intelligent-procurement"
+  productName: "智能采购助手"
+  businessDomain: "供应链采购"
+  frontend: "react"
+  designSystem: "antd"
+  theme:
+    source: "auto"
+    primary: "#2563eb"
+    accent: "#f97316"
+    layout: "side"
+  ports:
+    dev: 5173
+    api: 8080
+
+personas:
+  - id: "buyer_zhang"
+    name: "张敏"
+    role: "采购专员"
+    department: "采购部"
+    goals:
+      - "快速完成需求识别与供应商寻源"
+      - "避免物料漏采或交期延误"
+  - id: "manager_li"
+    name: "李强"
+    role: "采购经理"
+    department: "采购部"
+    goals:
+      - "快速完成订单审批，不阻塞采购时效"
+      - "及时发现异常价格与交期风险"
+
+scenarios:
+  - id: "s1"
+    name: "紧急缺料采购"
+    personaId: "buyer_zhang"
+    trigger: "产线报缺料，需求方要求当天确认供应商并下单"
+    goal: "10 分钟内完成需求识别 + 供应商初选 + 订单草稿生成"
+
+dataModels:
+  - name: "PurchaseOrder"
+    description: "采购订单"
+    fields:
+      - { key: "code", title: "订单号", type: "string" }
+      - { key: "supplier", title: "供应商", type: "string" }
+      - { key: "amount", title: "金额", type: "number" }
+      - { key: "dueDate", title: "交期", type: "string" }
+      - { key: "status", title: "状态", type: "string" }
+    mockData:
+      - { code: "PO-2024-0812-001", supplier: "泰科机电", amount: 9250, dueDate: "2024-08-17", status: "待供应商确认" }
+      - { code: "PO-2024-0812-002", supplier: "华宇传动", amount: 3580, dueDate: "2024-08-21", status: "在途" }
+      - { code: "PO-2024-0812-003", supplier: "密封圈科技", amount: 3330, dueDate: "2024-08-24", status: "待审批" }
+  - name: "Material"
+    description: "物料"
+    fields:
+      - { key: "code", title: "物料编码", type: "string" }
+      - { key: "name", title: "物料名称", type: "string" }
+      - { key: "stock", title: "当前库存", type: "number" }
+      - { key: "safeStock", title: "安全库存", type: "number" }
+    mockData:
+      - { code: "MTR-001", name: "电机", stock: 320, safeStock: 500 }
+      - { code: "BRG-002", name: "轴承", stock: 210, safeStock: 200 }
+      - { code: "SEL-003", name: "密封圈", stock: 980, safeStock: 1200 }
+
+pages:
+  - id: "dashboard"
+    title: "工作台总览"
+    route: "/dashboard"
+    icon: "DashboardOutlined"
+    description: "采购待办、库存水位与今日 AI 处理概况"
+    actions: []
+    sections:
+      - type: "statRow"
+        stats:
+          - { label: "待处理申请", value: 12, suffix: "张" }
+          - { label: "今日 AI 识别", value: 8, suffix: "张" }
+          - { label: "紧急缺料预警", value: 3, suffix: "项" }
+          - { label: "审批时效", value: "2h", suffix: "" }
+      - type: "alert"
+        level: "warning"
+        message: "P0 紧急缺料：电机库存 320 件，低于安全库存 500 件"
+        description: "建议立即发起采购申请，AI 将自动识别并推荐供应商"
+      - type: "table"
+        title: "今日采购订单"
+        data: "mock:PurchaseOrder"
+        columns:
+          - { key: "code", title: "订单号" }
+          - { key: "supplier", title: "供应商" }
+          - { key: "amount", title: "金额(元)" }
+          - { key: "dueDate", title: "交期" }
+          - { key: "status", title: "状态", tag: { "待审批": "warning", "待供应商确认": "processing", "在途": "success", "已入库": "default" } }
+
+  - id: "upload"
+    title: "上传采购申请单"
+    route: "/upload"
+    icon: "UploadOutlined"
+    description: "上传缺料申请单，AI 自动识别并校验完整性"
+    actions:
+      - { name: "parseRequest", button: "识别并校验申请单" }
+    sections:
+      - type: "steps"
+        current: 0
+        items: ["上传申请单", "AI 识别校验", "供应商推荐", "订单审批", "下单同步"]
+      - type: "uploadCard"
+        title: "采购申请单"
+        accept: ".xlsx,.csv"
+        hint: "支持 Excel/CSV，自动识别物料编码、需求数量、期望交期（示例：PR-2024-0812.xlsx）"
+        action: "parseRequest"
+      - type: "aiResultCard"
+        title: "AI 识别结果"
+        bind: "parseRequest"
+        render: "table"
+        columns:
+          - { key: "code", title: "物料编码" }
+          - { key: "name", title: "物料名称" }
+          - { key: "qty", title: "需求数量" }
+          - { key: "dueDate", title: "期望交期" }
+          - { key: "status", title: "校验状态", tag: { "通过": "success", "缺失": "warning", "异常": "error" } }
+      - type: "buttonRow"
+        buttons:
+          - { text: "确认并进入供应商推荐", type: "primary", action: "navigate:/recommend" }
+
+  - id: "recommend"
+    title: "AI 供应商推荐"
+    route: "/recommend"
+    icon: "FileSearchOutlined"
+    description: "AI 基于价格、交期与历史履约率推荐最优供应商"
+    actions:
+      - { name: "recommendSuppliers", button: "开始 AI 选商" }
+    sections:
+      - type: "steps"
+        current: 1
+        items: ["上传申请单", "AI 识别校验", "供应商推荐", "订单审批", "下单同步"]
+      - type: "buttonRow"
+        buttons:
+          - { text: "开始 AI 选商（推荐最优供应商）", type: "primary", action: "recommendSuppliers" }
+      - type: "aiResultCard"
+        title: "AI 推荐结果（打分对比）"
+        bind: "recommendSuppliers"
+        render: "table"
+        columns:
+          - { key: "supplier", title: "供应商" }
+          - { key: "score", title: "综合评分" }
+          - { key: "price", title: "报价(元/件)" }
+          - { key: "leadTime", title: "交期(天)" }
+          - { key: "fulfillment", title: "履约率" }
+          - { key: "level", title: "推荐级别", tag: { "最优": "success", "备选": "processing" } }
+      - type: "alert"
+        level: "info"
+        message: "推荐依据：价格权重 40% / 交期 30% / 历史履约率 30%"
+        description: "价格偏离历史均价 ±8% 的供应商已标记异常，请人工复核"
+      - type: "buttonRow"
+        buttons:
+          - { text: "生成订单草稿并进入审批", type: "primary", action: "navigate:/approval" }
+
+  - id: "approval"
+    title: "订单审批"
+    route: "/approval"
+    icon: "CheckCircleOutlined"
+    description: "AI 生成订单草稿并识别异常项，审批人一键决策"
+    actions:
+      - { name: "auditOrder", button: "AI 审批检查" }
+    sections:
+      - type: "steps"
+        current: 2
+        items: ["上传申请单", "AI 识别校验", "供应商推荐", "订单审批", "下单同步"]
+      - type: "table"
+        title: "待审批订单"
+        data: "mock:PurchaseOrder"
+        columns:
+          - { key: "code", title: "订单号" }
+          - { key: "supplier", title: "供应商" }
+          - { key: "amount", title: "金额(元)" }
+          - { key: "dueDate", title: "交期" }
+          - { key: "status", title: "状态", tag: { "待审批": "warning", "待供应商确认": "processing", "在途": "success" } }
+      - type: "aiResultCard"
+        title: "AI 审批检查"
+        bind: "auditOrder"
+        render: "kv"
+      - type: "buttonRow"
+        buttons:
+          - { text: "一键审批通过（无异常）", type: "primary", action: "navigate:/dispatch" }
+          - { text: "标记异常并打回", type: "danger", action: "auditOrder" }
+
+  - id: "dispatch"
+    title: "下单与状态同步"
+    route: "/dispatch"
+    icon: "SendOutlined"
+    description: "审批通过后自动下发订单至供应商并同步 ERP 状态"
+    actions:
+      - { name: "generateOrder", button: "确认下发订单" }
+    sections:
+      - type: "steps"
+        current: 3
+        items: ["上传申请单", "AI 识别校验", "供应商推荐", "订单审批", "下单同步"]
+      - type: "timeline"
+        items:
+          - { title: "订单草稿生成：PO-2024-0812-003（电机 180 件 × ¥18.5 = ¥3,330）", color: "blue" }
+          - { title: "审批通过（采购经理：李强）", color: "blue" }
+          - { title: "电子签章并下发至供应商（泰科机电）", color: "green" }
+          - { title: "ERP 状态同步：待供应商确认", color: "gray" }
+      - type: "aiResultCard"
+        title: "AI 下单确认"
+        bind: "generateOrder"
+        render: "kv"
+      - type: "alert"
+        level: "warning"
+        message: "交期风险：密封圈 9 天 > 期望 7 天"
+        description: "AI 已自动发送交期催办提醒至供应商，请关注确认进度"
+      - type: "buttonRow"
+        buttons:
+          - { text: "查看供应商确认进度", type: "primary", action: "generateOrder" }
+
+aiMocks:
+  - name: "parseRequest"
+    latency: 700
+    response:
+      summary: "已识别 3 条物料，2 项通过，1 项缺失（期望交期未填）"
+      items:
+        - { key: "1", code: "MTR-001", name: "电机", qty: 180, dueDate: "2024-08-15", status: "通过" }
+        - { key: "2", code: "BRG-002", name: "轴承", qty: 200, dueDate: "2024-08-15", status: "通过" }
+        - { key: "3", code: "SEL-003", name: "密封圈", qty: 1000, dueDate: "", status: "缺失" }
+  - name: "recommendSuppliers"
+    latency: 900
+    response:
+      summary: "已按价格/交期/履约率加权打分，推荐最优供应商：泰科机电（92 分）"
+      items:
+        - { key: "1", supplier: "泰科机电", score: 92, price: "18.5", leadTime: 5, fulfillment: "98%", level: "最优" }
+        - { key: "2", supplier: "华宇传动", score: 86, price: "17.9", leadTime: 9, fulfillment: "95%", level: "备选" }
+        - { key: "3", supplier: "宏远精工", score: 71, price: "21.0", leadTime: 6, fulfillment: "88%", level: "备选" }
+  - name: "auditOrder"
+    latency: 500
+    response:
+      审批结论: "建议通过（含 1 项价格异常复核）"
+      异常项: "密封圈报价高于历史均价 12%，已标红提示"
+      审批建议: "通过后自动下发电子签章订单并同步 ERP"
+      预估时效: "本次审批节省人工核对约 30 分钟"
+  - name: "generateOrder"
+    latency: 600
+    response:
+      订单号: "PO-2024-0812-003"
+      供应商: "泰科机电"
+      金额: "¥3,330"
+      交期: "5 天"
+      状态: "已下发 · ERP 待供应商确认"
+      提醒: "密封圈交期存在 2 天冲突，已自动触发催办"
+  - name: "chat"
+    latency: 400
+    response:
+      reply: "我可以帮你：识别申请单、对比供应商报价、检查订单异常、跟踪交期风险。"
+      suggestions:
+        - "识别并校验物料信息"
+        - "对比 Top 3 供应商报价"
+        - "检查待审批订单异常"
+
+businessMocks:
+  - name: "getInventory"
+    system: "erp"
+    latency: 200
+    response:
+      items:
+        - { code: "MTR-001", name: "电机", stock: 320, safeStock: 500, status: "低于安全库存" }
+        - { code: "BRG-002", name: "轴承", stock: 210, safeStock: 200, status: "正常" }
+        - { code: "SEL-003", name: "密封圈", stock: 980, safeStock: 1200, status: "低于安全库存" }
+  - name: "getSuppliers"
+    system: "srm"
+    latency: 200
+    response:
+      items:
+        - { name: "泰科机电", rating: 4.8, onTime: "98%", quotes: 12 }
+        - { name: "华宇传动", rating: 4.6, onTime: "95%", quotes: 9 }
+        - { name: "宏远精工", rating: 4.2, onTime: "88%", quotes: 6 }
+  - name: "getOrders"
+    system: "erp"
+    latency: 150
+    response:
+      items:
+        - { code: "PO-2024-0812-001", status: "待供应商确认" }
+        - { code: "PO-2024-0812-002", status: "在途" }
+        - { code: "PO-2024-0812-003", status: "待审批" }
+
+apiRoutes:
+  - { name: "parseRequest", method: "POST", path: "/api/purchase/parse", target: "ai:parseRequest" }
+  - { name: "recommendSuppliers", method: "POST", path: "/api/purchase/recommend", target: "ai:recommendSuppliers" }
+  - { name: "auditOrder", method: "POST", path: "/api/purchase/audit", target: "ai:auditOrder" }
+  - { name: "generateOrder", method: "POST", path: "/api/purchase/dispatch", target: "ai:generateOrder" }
+  - { name: "chat", method: "POST", path: "/api/purchase/chat", target: "ai:chat" }
+  - { name: "getInventory", method: "GET", path: "/api/erp/inventory", target: "business:getInventory" }
+  - { name: "getOrders", method: "GET", path: "/api/orders", target: "business:getOrders" }

@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title }} - Service Blueprint | Inspire</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      /* Inspire Design System Tokens (Standard Light Mode) */
+      --color-primary: #10213E;      /* Starry Blues */
+      --color-accent: #5DB2E2;       /* Creative Blue */
+      --color-secondary: #625D9C;    /* Amethyst */
+      --color-success: #00524C;      /* Myrtle Deep Green */
+      --color-info: #6FB1C8;         /* Cerulean Frost */
+      --color-warning: #F59E0B;      /* Warning */
+      --color-destructive: #EF4444;  /* Danger */
+      --color-background: #FFFFFF;   /* Pure White */
+      --color-bg-alt: #F5F5F6;       /* Tech Gray */
+      --color-foreground: #10213E;   /* Primary Text */
+      --color-text-muted: #64748B;   /* Text Secondary */
+      --color-border: #E2E8F0;       /* Border/Line */
+      
+      --shadow-sm: 0 2px 8px rgba(16, 33, 62, 0.08);
+      --shadow-md: 0 10px 15px -3px rgba(16, 33, 62, 0.1);
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --font-family: 'MiSans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --transition: 0.15s ease-out;
+    }
+
+    /* Reset & Base */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: var(--font-family);
+      background-color: var(--color-bg-alt);
+      color: var(--color-foreground);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== Page Container ===== */
+    .page-wrap {
+      background: var(--color-background);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 40px;
+      width: 95%;
+      max-width: 1600px;
+      margin: 48px auto;
+      border: 1px solid var(--color-border);
+      min-height: calc(100vh - 96px);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Standardized Header */
+    .page-header {
+      margin-bottom: 40px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .page-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--color-primary);
+      line-height: 1.2;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .page-header h1::before {
+      content: "";
+      display: block;
+      width: 4px;
+      height: 24px;
+      background: var(--color-accent);
+      border-radius: 2px;
+      flex-shrink: 0;
+    }
+
+    .page-subtitle {
+      font-size: 16px;
+      color: var(--color-text-muted);
+      font-weight: 500;
+      padding-left: 16px;
+    }
+
+    .header-right {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .meta-info {
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      justify-content: flex-end;
+    }
+
+    .btn-primary {
+      background: var(--color-primary);
+      color: white;
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    .btn-secondary {
+      background: white;
+      color: var(--color-primary);
+      border: 1px solid var(--color-border);
+      padding: 8px 16px;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn-secondary:hover { background: var(--color-bg-alt); }
+
+    /* ── Blueprint canvas ── */
+    .bp-outer-container {
+      overflow-x: auto;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: white;
+    }
+
+    .bp-canvas {
+      min-width: var(--bp-canvas-width, 960px);
+      overflow: hidden;
+      background: #fff;
+    }
+
+    /* ── Phase header row ── */
+    .phase-header-row {
+      display: flex;
+      background: var(--color-bg-alt);
+      border-bottom: 2px solid var(--color-border);
+    }
+    .corner-cell {
+      width: 128px;
+      min-width: 128px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-right: 2px solid var(--color-border);
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--color-text-muted);
+      letter-spacing: .05em;
+      padding: 8px 4px;
+      text-transform: uppercase;
+    }
+    .phase-headers { display: flex; }
+    .phase-header-cell {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px;
+      height: 48px;
+      background: var(--color-secondary);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 600;
+      position: relative;
+      transition: var(--transition);
+    }
+    .phase-header-cell:hover { opacity: 0.9; }
+
+    /* arrow chevron shape */
+    .phase-header-cell.first-phase {
+      clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%);
+    }
+    .phase-header-cell.mid-phase {
+      clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%, 14px 50%);
+    }
+
+    .lane-cells { display: flex; flex: 1; }
+
+    /* ── Swimlane & Lane Label ── */
+    .swimlane-row {
+      display: flex;
+      border-bottom: 1px solid var(--color-border);
+    }
+    .lane-label {
+      width: 128px;
+      min-width: 128px;
+      padding: 12px 16px;
+      background: var(--color-bg-alt);
+      border-right: 2px solid var(--color-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--color-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      text-align: center;
+      position: sticky;
+      left: 0;
+      z-index: 20;
+      box-shadow: 2px 0 4px rgba(0,0,0,0.02);
+    }
+    .corner-cell {
+      position: sticky;
+      left: 0;
+      z-index: 30;
+      background: var(--color-bg-alt);
+      box-shadow: 2px 0 4px rgba(0,0,0,0.02);
+    }
+
+    /* ── Phase cell ── */
+    .phase-cell {
+      flex-shrink: 0;
+      border-right: 1px solid #e2e8f0;
+      padding: 8px 10px;
+    }
+    .phase-cell:last-child { border-right: none; }
+
+    /* ── Layer divider (dashed) ── */
+    .layer-divider {
+      border-top: 1.5px dashed #cbd5e1;
+      margin: 2px 0;
+    }
+
+    /* ── Action / Activity card ── */
+    .cards-row { display: flex; flex-wrap: nowrap; gap: 6px; }
+    
+    .card-container {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .card {
+      width: 100px;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 0.68rem;
+      color: #334155;
+      line-height: 1.4;
+      text-align: center;
+    }
+    .card.front-card { background: #f0f9ff; }
+    .card.back-card  { background: #f0f9ff; } /* bg-sky-50 used universally in react cards */
+    .card-w { width: var(--card-width, 100px); }
+
+    .card-name { font-weight: 500; color: #334155; }
+    
+    .card-role {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.6rem;
+      color: #64748b;
+    }
+    .role-avatar {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .role-avatar svg { width: 12px; height: 12px; color: #475569; }
+
+    /* Touchpoint and System Chip container */
+    .chip-container {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Touchpoint badge */
+    .touchpoint-badge {
+      display: inline-block;
+      font-size: 0.6rem;
+      background: #f1f5f9;
+      color: #475569;
+      border-radius: 4px;
+      padding: 2px 6px;
+      text-align: center;
+    }
+
+    /* System touchpoint chip */
+    .sys-chip {
+      display: inline-block;
+      font-size: 0.6rem;
+      background: #f1f5f9;
+      color: #475569;
+      border-radius: 4px;
+      padding: 2px 6px;
+      text-align: center;
+    }
+
+    /* Cognitive load badge */
+    .load-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.6rem;
+      border-radius: 999px;
+      padding: 2px 6px;
+      border-width: 1px;
+      border-style: solid;
+      margin-top: 2px;
+    }
+    .load-low      { background: #dcfce7; border-color: #86efac; color: #166534; }
+    .load-medium   { background: #fef9c3; border-color: #fde047; color: #713f12; }
+    .load-high     { background: #ffedd5; border-color: #fdba74; color: #9a3412; }
+    .load-critical { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+
+    /* Pain point & expectation tags */
+    .pain-item {
+      display: flex; align-items: flex-start; gap: 4px;
+      font-size: 0.62rem; color: #2563eb; line-height: 1.45;
+    }
+    .pain-bullet { flex-shrink: 0; color: #60a5fa; }
+    .expect-item {
+      display: flex; align-items: flex-start; gap: 4px;
+      font-size: 0.62rem; color: #16a34a; line-height: 1.45;
+    }
+    .expect-bullet { flex-shrink: 0; }
+
+    /* Footer */
+    .bp-footer {
+      font-size: 0.62rem;
+      color: #94a3b8;
+      margin-top: 14px;
+      text-align: right;
+    }
+
+    /* ===== Custom Scrollbar ===== */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--color-bg-alt); }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+  </style>
+
+</head>
+<body>
+  {% macro render_load_badge(load) %}
+  {% if load %}
+  <span class="load-badge load-{{ load }}">
+    {% if load == 'critical' %}
+    <svg style="width:12px; height:12px; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3Z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    {% elif load == 'high' %}
+    <svg style="width:12px; height:12px; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    {% elif load == 'medium' %}
+    <svg style="width:12px; height:12px; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    {% elif load == 'low' %}
+    <svg style="width:12px; height:12px; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    {% endif %}
+    {{ load }}
+  </span>
+  {% endif %}
+  {% endmacro %}
+
+  <div class="page-wrap">
+    <header class="page-header">
+      <div class="header-left">
+        <h1>{{ title }}</h1>
+      </div>
+      <div class="header-right">
+        <div class="btn-group">
+          <button class="btn-secondary" onclick="window.print()">导出 PDF / 打印</button>
+          <button class="btn-primary" onclick="copyYAML()">复制原始 YAML</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="bp-outer-container">
+    <div class="bp-canvas" style="--bp-canvas-width: {{ total_canvas_width }}px; --card-width: {{ card_width }}px;">
+
+      {# ── Phase header row ── #}
+      <div class="phase-header-row">
+        <div class="corner-cell">阶段<br>Phase</div>
+        <div class="phase-headers">
+          {% for ph in phases %}
+          <div class="phase-header-cell {{ 'first-phase' if loop.first else 'mid-phase' }}" style="--ph-width: {{ ph.width }}px; width: var(--ph-width);">
+            {{ ph.name }}
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {# ══════════════════════════════════════════
+         LAYER 1: 客户层
+         ══════════════════════════════════════════ #}
+      {# Row 1-a: 客户行为 #}
+      <div class="swimlane-row layer-customer">
+        <div class="lane-label">客户行为</div>
+        <div class="lane-cells">
+          {% for ph in phases %}
+          <div class="phase-cell" style="--ph-width: {{ ph.width }}px; width: var(--ph-width); min-height: 50px;">
+            <div class="cards-row">
+              {% for act in ph.customer_actions %}
+              <div class="card-container card-w">
+                <div class="card front-card">
+                  <div class="card-name">{{ act.name }}</div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {# Row 1-b: 触点 #}
+      <div class="swimlane-row layer-customer">
+        <div class="lane-label">触点</div>
+        <div class="lane-cells">
+          {% for ph in phases %}
+          <div class="phase-cell" style="--ph-width: {{ ph.width }}px; width: var(--ph-width); min-height: 40px;">
+            <div class="cards-row">
+              {% for act in ph.customer_actions %}
+              <div class="chip-container card-w">
+                {% if act.touchpoints %}
+                <span class="touchpoint-badge">{{ act.touchpoints }}</span>
+                {% endif %}
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {# Row 1-c: 痛点 / 期待 #}
+      <div class="swimlane-row layer-customer">
+        <div class="lane-label">痛点<br>期待</div>
+        <div class="lane-cells">
+          {% for ph in phases %}
+          <div class="phase-cell" style="--ph-width: {{ ph.width }}px; width: var(--ph-width); min-height: 50px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+            {% for act in ph.customer_actions %}
+              {% for pp in act.pain_points %}
+              <div class="pain-item"><span class="pain-bullet">•</span><span>{{ pp }}</span></div>
+              {% endfor %}
+              {% for ex in act.expectations %}
+              <div class="expect-item"><span class="expect-bullet">○</span><span>{{ ex }}</span></div>
+              {% endfor %}
+            {% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {# Visibility line #}
+      <div class="layer-divider" style="margin: 0;"></div>
+
+      {# ══════════════════════════════════════════
+         LAYER 2: 业务前台层
+         ══════════════════════════════════════════ #}
+      {# Row 2-a: 前台活动 #}
+      <div class="swimlane-row layer-front">
+        <div class="lane-label">前台活动</div>
+        <div class="lane-cells">
+          {% for ph in phases %}
+          <div class="phase-cell" style="--ph-width: {{ ph.width }}px; width: var(--ph-width); min-height: 70px;">
+            <div class="cards-row">
+              {% for act in ph.front_activities %}
+              <div class="card-container card-w">
+                {% if act.role %}
+                <div class="card-role">
+                  <div class="role-avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </div>
+                  {{ act.role }}
+                </div>
+                {% endif %}
+                <div class="card front-card">
+                  <div class="card-name">{{ act.name }}</div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {# Row 2-b: 系统触点 #}
+      <div class="swimlane-row layer-front">
+        <div class="lane-label">系统触点</div>
+        <div class="lane-cells">
+          {% for ph in phases %}
+          <div class="phase-cell" style="--ph-width: {{ ph.width }}px; width: var(--ph-width); min-height: 40px;">
+            <div class="cards-row">
+              {% for act in ph.front_activities %}
+              <div class="chip-container card-w">
+                {% if act.system_touchpoints %}
+                <span class="sys-chip">{{ act.system_touchpoints }}</span>
+                {% endif %}
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {# Row 2-c: 认知负荷 / 业务痛点 #}
+      <div class="swimlane-row layer-front">
+        <div class="lane-label">痛点<br>负荷</div>
+        <div class="lane-cells">
+          {% for ph in phases %}
+          <div class="phase-cell" style="--ph-width: {{ ph.width }}px; width: var(--ph-width); min-height: 40px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+            {% for act in ph.front_activities %}
+              {% for pp in act.pain_points %}
+              <div class="pain-item"><span class="pain-bullet">•</span><span>{{ pp }}</span></div>
+              {% endfor %}
+              {% if act.cognitive_load %}
+              <div>{{ render_load_badge(act.cognitive_load) }}</div>
+              {% endif %}
+            {% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {# Internal interaction line #}
+      <div class="layer-divider" style="margin: 0;"></div>
+
+      {# ══════════════════════════════════════════
+         LAYER 3: 业务后台层
+         ══════════════════════════════════════════ #}
+      {# Row 3-a: 后台活动 #}
+      <div class="swimlane-row layer-back">
+        <div class="lane-label">支撑流程</div>
+        <div class="lane-cells">
+          {% for ph in phases %}
+          <div class="phase-cell" style="--ph-width: {{ ph.width }}px; width: var(--ph-width); min-height: 60px;">
+            <div class="cards-row">
+              {% for act in ph.back_activities %}
+              <div class="card-container card-w">
+                {% if act.role %}
+                <div class="card-role">
+                  <div class="role-avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </div>
+                  {{ act.role }}
+                </div>
+                {% endif %}
+                <div class="card back-card">
+                  <div class="card-name">{{ act.name }}</div>
+                </div>
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {# Row 3-b: 后台系统 #}
+      <div class="swimlane-row layer-back">
+        <div class="lane-label">后台系统</div>
+        <div class="lane-cells">
+          {% for ph in phases %}
+          <div class="phase-cell" style="--ph-width: {{ ph.width }}px; width: var(--ph-width); min-height: 40px;">
+            <div class="cards-row">
+              {% for act in ph.back_activities %}
+              <div class="chip-container card-w">
+                {% if act.system_touchpoints %}
+                <span class="sys-chip">{{ act.system_touchpoints }}</span>
+                {% endif %}
+              </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+      {# Row 3-c: 后台负荷 / 痛点 #}
+      <div class="swimlane-row layer-back">
+        <div class="lane-label">痛点<br>负荷</div>
+        <div class="lane-cells">
+          {% for ph in phases %}
+          <div class="phase-cell" style="--ph-width: {{ ph.width }}px; width: var(--ph-width); min-height: 40px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+            {% for act in ph.back_activities %}
+              {% for pp in act.pain_points %}
+              <div class="pain-item"><span class="pain-bullet">•</span><span>{{ pp }}</span></div>
+              {% endfor %}
+              {% if act.cognitive_load %}
+              <div>{{ render_load_badge(act.cognitive_load) }}</div>
+              {% endif %}
+            {% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+
+    </div>{# /bp-canvas #}
+    </div>{# /bp-outer-container #}
+
+    <footer style="margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--color-border); text-align: center; font-size: 12px; color: var(--color-text-muted);">
+      Generated by blueprint-map-generator · {{ generated_at }} · &copy; 2026 Inspire AI4PM
+    </footer>
+  </div>
+    <div class="toast" id="toast">已成功复制 YAML 数据</div>
+    
+    <script type="application/yaml" id="raw-yaml">
+{{ raw_yaml }}
+    </script>
+
+    <script>
+      function copyYAML() {
+        const yaml = document.getElementById('raw-yaml').textContent.trim();
+        navigator.clipboard.writeText(yaml).then(() => {
+          const toast = document.getElementById('toast');
+          toast.style.display = 'block';
+          setTimeout(() => { toast.style.display = 'none'; }, 2500);
+        });
+      }
+    </script>
+</body>
+</html>

@@ -1,0 +1,383 @@
+title: "电商企业供应链业务流程深度分析"
+company: "示例电商集团"
+domain: "供应链"
+description: "对电商企业供应链领域的业务类型、价值流、流程及痛点进行系统化分析"
+
+business_types:
+  - name: "自营电商"
+    model: "B2C自营"
+    product_type: "实体产品"
+    market_type: "大众市场"
+    description: "企业直接采购、仓储并销售商品给消费者，掌握全链路控制权"
+  - name: "平台电商"
+    model: "B2B2C平台"
+    product_type: "平台服务"
+    market_type: "双边市场"
+    description: "为商家和消费者提供交易平台，负责流量分发和交易撮合"
+  - name: "跨境贸易"
+    model: "B2C跨境"
+    product_type: "实体产品"
+    market_type: "利基市场"
+    description: "面向海外消费者的直邮或保税模式跨境零售业务"
+
+l1_value_streams:
+  - name: "自营供应链价值流"
+    description: "从需求预测到消费者签收的全链路价值创造过程"
+    business_type: "自营电商"
+    stages:
+      - name: "需求预测"
+        description: "基于历史数据和市场趋势预测未来需求"
+        order: 1
+        type: "process"
+        l2_processes:
+          - name: "数据采集"
+            role: "数据分析师"
+            system: "BI系统"
+            inputs:
+              - "历史销售数据"
+              - "市场趋势报告"
+            outputs:
+              - "清洗后的数据集"
+            description: "收集并清洗多源数据，为预测模型做准备"
+            order: 1
+            pain_points:
+              - severity: "high"
+                description: "数据散落在多个系统，整合耗时且易出错"
+                impact: "预测准备周期长达3-5天，影响补货时效"
+                root_cause: "缺乏统一数据中台，各业务系统独立建设"
+          - name: "需求预测"
+            role: "计划经理"
+            system: "ERP/计划系统"
+            inputs:
+              - "清洗后的数据集"
+            outputs:
+              - "需求预测报告"
+            description: "运用统计模型和算法预测未来销售需求"
+            order: 2
+            pain_points:
+              - severity: "critical"
+                description: "预测准确率仅65%，导致大量库存积压或缺货"
+                impact: "库存周转天数高达90天，资金占用严重；缺货率8%"
+                root_cause: "预测模型未考虑促销、季节性等动态因素"
+
+      - name: "采购执行"
+        description: "根据预测结果下达采购订单并跟踪交付"
+        order: 2
+        type: "process"
+        l2_processes:
+          - name: "供应商选择"
+            role: "采购经理"
+            system: "SRM系统"
+            inputs:
+              - "需求预测报告"
+              - "供应商档案"
+            outputs:
+              - "采购候选名单"
+            description: "评估并选择合适的供应商"
+            order: 1
+            pain_points:
+              - severity: "medium"
+                description: "供应商评估依赖人工经验，缺乏量化指标"
+                impact: "供应商质量波动大，退货率达5%"
+                root_cause: "SRM系统数据不完善，评估维度单一"
+          - name: "订单下达"
+            role: "采购专员"
+            system: "ERP系统"
+            inputs:
+              - "采购候选名单"
+            outputs:
+              - "采购订单"
+            description: "向选定供应商下达采购订单"
+            order: 2
+            pain_points: []
+          - name: "交付跟踪"
+            role: "采购专员"
+            system: "ERP/TMS"
+            inputs:
+              - "采购订单"
+            outputs:
+              - "到货通知"
+            description: "跟踪供应商生产和物流进度"
+            order: 3
+            pain_points:
+              - severity: "high"
+                description: "交付状态不透明，异常发现滞后"
+                impact: "紧急缺货频繁，临时加急采购成本增加30%"
+                root_cause: "缺乏供应商协同平台，信息传递依赖邮件/电话"
+
+      - name: "仓储管理"
+        description: "商品入库、存储、拣货、包装和发货"
+        order: 3
+        type: "process"
+        l2_processes:
+          - name: "入库验收"
+            role: "仓库管理员"
+            system: "WMS系统"
+            inputs:
+              - "到货通知"
+              - "采购订单"
+            outputs:
+              - "入库单"
+              - "质检报告"
+            description: "验收到货商品，完成系统入库"
+            order: 1
+            pain_points:
+              - severity: "medium"
+                description: "质检标准不统一，人工判定主观性强"
+                impact: "不合格品流入仓库，客户投诉增加"
+                root_cause: "缺乏标准化质检SOP和自动化检测设备"
+          - name: "库存管理"
+            role: "仓库管理员"
+            system: "WMS系统"
+            inputs:
+              - "入库单"
+            outputs:
+              - "库存台账"
+            description: "维护库存准确性，执行盘点"
+            order: 2
+            pain_points:
+              - severity: "critical"
+                description: "库存账实不符率高达12%"
+                impact: "超卖/缺卖频发，客户体验差；财务对账困难"
+                root_cause: "出入库操作未及时扫码，系统数据滞后"
+          - name: "订单拣货"
+            role: "拣货员"
+            system: "WMS系统"
+            inputs:
+              - "销售订单"
+              - "库存台账"
+            outputs:
+              - "拣货单"
+            description: "根据订单从库位拣选商品"
+            order: 3
+            pain_points:
+              - severity: "high"
+                description: "拣货路径规划不合理，走动距离过长"
+                impact: "人均拣货效率仅80单/天，高峰期间积压严重"
+                root_cause: "WMS缺乏智能路径优化算法，库位规划静态"
+          - name: "包装发货"
+            role: "打包员"
+            system: "WMS/OMS"
+            inputs:
+              - "拣货单"
+            outputs:
+              - "包裹"
+              - "物流面单"
+            description: "打包商品并交接给物流公司"
+            order: 4
+            pain_points:
+              - severity: "low"
+                description: "包装材料选择依赖经验，成本波动大"
+                impact: "包装成本占物流成本15%，高于行业平均"
+                root_cause: "缺乏包装标准化和智能推荐"
+
+      - name: "配送交付"
+        description: "商品从仓库到消费者的末端配送"
+        order: 4
+        type: "process"
+        l2_processes:
+          - name: "物流揽收"
+            role: "物流专员"
+            system: "TMS系统"
+            inputs:
+              - "包裹"
+            outputs:
+              - "物流跟踪号"
+            description: "交接包裹给物流承运商"
+            order: 1
+            pain_points: []
+          - name: "在途跟踪"
+            role: "客服"
+            system: "TMS/OMS"
+            inputs:
+              - "物流跟踪号"
+            outputs:
+              - "物流状态"
+            description: "跟踪包裹配送进度"
+            order: 2
+            pain_points:
+              - severity: "medium"
+                description: "物流状态更新延迟，客户反复询问"
+                impact: "客服咨询量30%为物流查询，人力成本高"
+                root_cause: "物流商系统对接不完善，状态推送不及时"
+          - name: "末端配送"
+            role: "快递员"
+            system: "TMS"
+            inputs:
+              - "包裹"
+            outputs:
+              - "签收确认"
+            description: "最后一公里配送到消费者手中"
+            order: 3
+            pain_points:
+              - severity: "high"
+                description: "配送时效不稳定，异常处理慢"
+                impact: "客户满意度评分仅3.8/5，退货率上升"
+                root_cause: "缺乏智能路由和异常预警机制"
+
+      - name: "逆向回流"
+        description: "退货、换货、维修等逆向流程"
+        order: 5
+        type: "process"
+        l2_processes:
+          - name: "退货申请"
+            role: "客服"
+            system: "OMS/CRM"
+            inputs:
+              - "客户退货请求"
+            outputs:
+              - "退货授权码"
+            description: "审核退货申请并生成授权"
+            order: 1
+            pain_points:
+              - severity: "medium"
+                description: "退货规则复杂，客服判定标准不一"
+                impact: "退货处理时长48小时，客户投诉多"
+                root_cause: "退货政策未系统化，依赖人工判断"
+          - name: "退货入库"
+            role: "仓库管理员"
+            system: "WMS系统"
+            inputs:
+              - "退货包裹"
+              - "退货授权码"
+            outputs:
+              - "退货入库单"
+            description: "验收退货商品并重新入库"
+            order: 2
+            pain_points:
+              - severity: "high"
+                description: "退货商品质检慢，二次上架周期长"
+                impact: "退货商品平均15天才能二次销售，资金占用"
+                root_cause: "缺乏退货快速质检通道和自动分级机制"
+
+  - name: "平台供应链价值流"
+    description: "平台模式下商家入驻到消费者交易的供应链协同过程"
+    business_type: "平台电商"
+    stages:
+      - name: "商家入驻"
+        description: "商家资质审核和平台入驻"
+        order: 1
+        type: "process"
+        l2_processes:
+          - name: "资质审核"
+            role: "运营审核员"
+            system: "商家后台"
+            inputs:
+              - "商家入驻申请"
+            outputs:
+              - "审核结果"
+            description: "审核商家营业执照、品牌授权等资质"
+            order: 1
+            pain_points:
+              - severity: "high"
+                description: "人工审核效率低，商家等待时间长"
+                impact: "审核周期7-10天，商家流失率15%"
+                root_cause: "缺乏AI辅助审核和自动化验真"
+          - name: "店铺开通"
+            role: "运营专员"
+            system: "商家后台"
+            inputs:
+              - "审核结果"
+            outputs:
+              - "店铺账号"
+            description: "为通过审核的商家开通店铺"
+            order: 2
+            pain_points: []
+
+      - name: "商品上架"
+        description: "商家商品信息录入和平台审核"
+        order: 2
+        type: "process"
+        l2_processes:
+          - name: "商品发布"
+            role: "商家运营"
+            system: "商家后台"
+            inputs:
+              - "商品信息"
+            outputs:
+              - "待审核商品"
+            description: "商家填写商品信息并提交审核"
+            order: 1
+            pain_points:
+              - severity: "medium"
+                description: "商品信息填写繁琐，重复录入多"
+                impact: "商家上架一个SKU平均耗时2小时"
+                root_cause: "缺乏商品信息模板化和智能填充"
+          - name: "商品审核"
+            role: "平台审核员"
+            system: "运营后台"
+            inputs:
+              - "待审核商品"
+            outputs:
+              - "上架/驳回结果"
+            description: "审核商品合规性和信息准确性"
+            order: 2
+            pain_points:
+              - severity: "critical"
+                description: "海量商品人工审核，漏审错审频发"
+                impact: "违规商品上架导致投诉和监管风险"
+                root_cause: "日均审核量10万+，纯人工审核无法覆盖"
+
+      - name: "交易履约"
+        description: "订单生成到商家发货的全流程"
+        order: 3
+        type: "process"
+        l2_processes:
+          - name: "订单分发"
+            role: "系统"
+            system: "OMS"
+            inputs:
+              - "消费者订单"
+            outputs:
+              - "商家订单"
+            description: "将订单路由给对应商家"
+            order: 1
+            pain_points: []
+          - name: "商家发货"
+            role: "商家"
+            system: "商家后台/ERP"
+            inputs:
+              - "商家订单"
+            outputs:
+              - "发货通知"
+            description: "商家拣货打包并通知物流揽收"
+            order: 2
+            pain_points:
+              - severity: "high"
+                description: "商家发货时效参差不齐，虚假发货频发"
+                impact: "平台整体履约评分低，消费者体验差"
+                root_cause: "缺乏对商家的履约监控和预警机制"
+
+      - name: "售后服务"
+        description: "平台介入的售后纠纷处理"
+        order: 4
+        type: "process"
+        l2_processes:
+          - name: "纠纷仲裁"
+            role: "客服仲裁员"
+            system: "客服系统"
+            inputs:
+              - "纠纷申请"
+            outputs:
+              - "仲裁结果"
+            description: "处理商家与消费者的售后纠纷"
+            order: 1
+            pain_points:
+              - severity: "high"
+                description: "纠纷判定依赖人工经验，标准不统一"
+                impact: "买卖双方满意度双低，平台公信力受损"
+                root_cause: "缺乏纠纷案例库和智能辅助决策"
+          - name: "赔付执行"
+            role: "财务"
+            system: "财务系统"
+            inputs:
+              - "仲裁结果"
+            outputs:
+              - "赔付完成"
+            description: "执行退款或赔付"
+            order: 2
+            pain_points:
+              - severity: "medium"
+                description: "赔付流程长，资金到账慢"
+                impact: "消费者投诉升级，监管关注"
+                root_cause: "财务系统与客服系统未打通"

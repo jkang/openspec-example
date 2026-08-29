@@ -1,0 +1,47 @@
+title: "租车服务用户故事地图"
+stages:
+  - name: "租车前准备"
+    activities:
+      - name: "搜索租车服务"
+        touchpoints: "微信小程序/搜索页面\n服务号/公众号主页"
+        stories:
+          - description: "作为潜在客户，我想通过微信搜索找到租车小程序，以便比较不同服务商的价格和评价。"
+            priority: "must"
+          - description: "作为潜在客户，我想在微信小程序中查看租车服务的介绍，以便了解服务内容。"
+            priority: "should"
+          - description: "作为潜在客户，我想看到租车服务的评价和评分，以便选择信誉良好的服务商。"
+            priority: "must"
+      - name: "浏览租车选项"
+        touchpoints: "微信小程序/车辆列表页\n微信小程序/车辆详情页"
+        stories:
+          - description: "作为潜在客户，我想浏览不同车型和价格，以便选择符合我需求的车辆。"
+            priority: "must"
+          - description: "作为潜在客户，我想查看车辆的详细信息如配置图片里程数，以便全面了解车辆状况。"
+            priority: "must"
+          - description: "作为潜在客户，我想筛选和排序车辆，以便快速找到目标车辆。"
+            priority: "must"
+  - name: "预订流程"
+    activities:
+      - name: "选择租车时间和地点"
+        touchpoints: "微信小程序/选择页面"
+        stories:
+          - description: "作为客户，我想选择取车和还车的时间和地点，以便规划我的行程。"
+            priority: "must"
+          - description: "作为客户，我想查看不同时段和门店的车辆可用性，以便确保能租到车。"
+            priority: "must"
+          - description: "作为客户，我想修改已选的取还车时间地点，以便灵活调整我的计划。"
+            priority: "should"
+      - name: "填写预订信息"
+        touchpoints: "微信小程序/订单填写页"
+        stories:
+          - description: "作为客户，我想填写我的个人信息和驾驶证信息，以便完成实名认证和预订。"
+            priority: "must"
+          - description: "作为客户，我想绑定我的支付方式，以便便捷支付租金。"
+            priority: "must"
+          - description: "作为客户，我想阅读并同意租车合同，以便明确双方权利义务。"
+            priority: "must"
+        supportingRequirements:
+          - description: "支持身份证/驾驶证 OCR 识别"
+            priority: "should"
+          - description: "集成芝麻信用免押金功能"
+            priority: "must"

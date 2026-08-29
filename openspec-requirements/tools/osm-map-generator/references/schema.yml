@@ -1,0 +1,39 @@
+title: "示例：电商平台增长破局"
+config:
+  height:
+    objectiveScore: 150
+objectives:
+  - name: "年度 GMV 突破千万级"
+    value: "1000万/季度"
+    trend: "up"
+    subObjectives:
+      - name: "提高公域转私域转化率"
+        value: "当前: 2% 目标: 5%"
+        trend: "up"
+        strategies:
+          - "优化落地页首屏购买引导按钮颜色"
+          - "推出新人专享首单首件5折优惠券"
+        metrics:
+          - name: "首屏按钮点击率"
+            calculation: "按钮点击UV / 页面UV"
+            value: "目标: 15%"
+            trend: "up"
+        relatedScenarios:
+          scenarios:
+            - name: "新人首次访问着陆页"
+              description: "用户通过公域广告点击进入着陆页时，系统判断为新客，不仅展示标准商品详情，同时强制弹出倒计时 5 折优惠券，增加紧迫感促使其完成账户注册并首单转化。"
+      - name: "提升老客复购复访频率"
+        value: "每月复访 3 次以上"
+        trend: "up"
+        strategies:
+          - "开启周期性会员专属促销日"
+          - "利用 AI 测算每个用户的下一次购买意图发送短信"
+        metrics:
+          - name: "会员促活召回率"
+            calculation: "当月活跃的老会员 / 上一个月总会员"
+            value: "目标: 30%"
+            trend: "up"
+        relatedScenarios:
+          scenarios:
+            - name: "会员生日关怀自动化旅程"
+              description: "每月初系统筛选当月生日用户，利用 AI 自动组合其偏好商品，发送专属生日礼遇短信，引导在小程序端点击查看并直接购买。"

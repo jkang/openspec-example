@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ data.title }} - User Story Map | Inspire</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Inspire Design System Tokens */
+            --color-primary: #10213E;
+            --color-accent: #5DB2E2;
+            --color-secondary: #625D9C;
+            --color-success: #00524C;
+            --color-info: #6FB1C8;
+            --color-warning: #F59E0B;
+            --color-destructive: #EF4444;
+            --color-background: #FFFFFF;
+            --color-bg-alt: #F5F5F6;
+            --color-foreground: #10213E;
+            --color-text-muted: #64748B;
+            --color-border: #E2E8F0;
+            
+            --shadow-sm: 0 2px 8px rgba(16, 33, 62, 0.08);
+            --shadow-md: 0 10px 15px -3px rgba(16, 33, 62, 0.1);
+            --radius-md: 8px;
+            --radius-lg: 12px;
+            
+            --priority-must: #ef4444;
+            --priority-should: #f59e0b;
+            --priority-could: #5db2e2;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'MiSans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--color-bg-alt);
+            color: var(--color-foreground);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Header / Toolbar */
+        .page-header {
+            background: var(--color-background);
+            padding: 32px 40px;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content h1 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--color-primary);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-content p {
+            font-size: 14px;
+            color: var(--color-text-muted);
+            margin-top: 4px;
+        }
+
+        .btn-copy-yaml {
+            background: var(--color-primary);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-copy-yaml:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--color-primary);
+            border: 1px solid var(--color-border);
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-secondary:hover {
+            background: var(--color-bg-alt);
+        }
+
+        /* Map Layout */
+        .map-viewport {
+            padding: 40px;
+            overflow-x: auto;
+            min-height: calc(100vh - 120px);
+        }
+
+        .map-canvas {
+            display: flex;
+            min-width: max-content;
+            background: var(--color-background);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-sm);
+            overflow: hidden;
+            border: 1px solid var(--color-border);
+        }
+
+        /* Left Labels Column */
+        .labels-column {
+            width: 140px;
+            position: sticky;
+            left: 0;
+            z-index: 50;
+            background: var(--color-bg-alt);
+            border-right: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .lane-label {
+            padding: 20px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--color-primary);
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid var(--color-border);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .lane-label svg {
+            width: 16px;
+            height: 16px;
+            margin-right: 8px;
+            color: var(--color-accent);
+        }
+
+        .h-stage { height: 60px; background: var(--color-primary); color: white; }
+        .h-activity { height: 120px; }
+        .h-touchpoint { height: 100px; }
+        .h-stories { flex-grow: 1; align-items: flex-start; padding-top: 48px; border-bottom: none; }
+        .h-reqs { height: auto; min-height: 160px; border-top: 1px solid var(--color-border); background: var(--color-bg-alt); }
+
+        /* Content Area */
+        .content-area {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .stages-row {
+            display: flex;
+        }
+
+        .stage-column {
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--color-border);
+        }
+
+        .stage-column:last-child { border-right: none; }
+
+        .stage-header {
+            height: 60px;
+            background: var(--color-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 15px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .activities-container {
+            display: flex;
+        }
+
+        .activity-column {
+            width: 260px;
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid var(--color-bg-alt);
+        }
+
+        .activity-column:last-child { border-right: none; }
+
+        /* Activity Cell */
+        .activity-cell {
+            height: 120px;
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .activity-card {
+            width: 100%;
+            height: 100%;
+            background: var(--color-bg-alt);
+            border: 2px solid var(--color-accent);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-weight: 700;
+            font-size: 14px;
+            color: var(--color-primary);
+            padding: 12px;
+            box-shadow: 0 4px 6px rgba(93, 178, 226, 0.1);
+        }
+
+        /* Touchpoint Cell */
+        .touchpoint-cell {
+            height: 100px;
+            padding: 16px;
+            background: white;
+            border-bottom: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 4px;
+        }
+
+        .tp-item {
+            font-size: 12px;
+            color: var(--color-text-muted);
+            line-height: 1.4;
+            font-weight: 500;
+        }
+
+        /* User Story Cell */
+        .stories-cell {
+            padding: 24px 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            background: white;
+            flex-grow: 1;
+            min-height: 400px;
+        }
+
+        .story-card {
+            background: white;
+            border: 1px solid var(--color-border);
+            border-radius: var(--radius-md);
+            padding: 16px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            transition: all 0.2s ease-out;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .story-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
+            border-color: var(--color-accent);
+        }
+
+        .persona-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--color-text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .story-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--color-primary);
+            line-height: 1.5;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 4px;
+        }
+
+        .priority-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+        }
+
+        .must { background: var(--priority-must); box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1); }
+        .should { background: var(--priority-should); box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.1); }
+        .could { background: var(--priority-could); box-shadow: 0 0 0 3px rgba(93, 178, 226, 0.1); }
+
+        .info-trigger {
+            color: var(--color-accent);
+            opacity: 0.6;
+        }
+
+        /* Supporting Requirements Cell */
+        .reqs-cell {
+            min-height: 160px;
+            padding: 20px 16px;
+            background: var(--color-bg-alt);
+            border-top: 1px solid var(--color-border);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .req-item {
+            background: white;
+            border: 1px solid var(--color-border);
+            border-radius: 6px;
+            padding: 10px 12px;
+            font-size: 12px;
+            color: var(--color-primary);
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.02);
+        }
+
+        .req-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--color-accent);
+            margin-top: 5px;
+            flex-shrink: 0;
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 32px;
+            right: 32px;
+            background: var(--color-primary);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            display: none;
+            z-index: 1000;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            border: 1px solid var(--color-accent);
+        }
+
+        /* SVG Icons */
+        .icon { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    </style>
+</head>
+<body>
+    <header class="page-header">
+        <div class="header-content">
+            <h1>
+                <svg class="icon" style="width: 24px; height: 24px; color: var(--color-accent);" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                {{ data.title }}
+            </h1>
+            <p>基于用户旅程的结构化需求分析地图</p>
+        </div>
+        <div style="display: flex; gap: 12px;">
+            <button class="btn-secondary" onclick="exportMap()">导出图片</button>
+            <button class="btn-copy-yaml" onclick="copyYAML()">
+                <svg class="icon" viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path><rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect></svg>
+                复制原始 YAML
+            </button>
+        </div>
+    </header>
+
+    <div class="map-viewport">
+        <div class="map-canvas">
+            <!-- Left Sticky Labels -->
+            <div class="labels-column">
+                <div class="lane-label h-stage">
+                    <svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                    阶段
+                </div>
+                <div class="lane-label h-activity">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                    活动
+                </div>
+                <div class="lane-label h-touchpoint">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+                    接触点
+                </div>
+                <div class="lane-label h-stories">
+                    <svg class="icon" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                    用户故事
+                </div>
+                <div class="lane-label h-reqs">
+                    <svg class="icon" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line><line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line></svg>
+                    支撑需求
+                </div>
+            </div>
+
+            <!-- Content -->
+            <div class="content-area">
+                <div class="stages-row">
+                    {% for stage in data.stages %}
+                    <div class="stage-column">
+                        <div class="stage-header">{{ stage.name }}</div>
+                        <div class="activities-container">
+                            {% for activity in stage.activities %}
+                            <div class="activity-column">
+                                <div class="activity-cell">
+                                    <div class="activity-card">{{ activity.name }}</div>
+                                </div>
+                                <div class="touchpoint-cell">
+                                    {% if activity.touchpoints %}
+                                        {% for tp in activity.touchpoints.split('\n') %}
+                                        <div class="tp-item">{{ tp }}</div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                <div class="stories-cell">
+                                    {% for story in activity.stories %}
+                                    <div class="story-card" title="双击进行细化分析">
+                                        <div class="persona-badge">
+                                            <svg class="icon" viewBox="0 0 24 24" style="width: 12px; height: 12px; stroke-width: 2.5;"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
+                                            {{ story.role }}
+                                        </div>
+                                        <div class="story-text">
+                                            我想{{ story.action }}
+                                        </div>
+                                        <div class="card-footer">
+                                            <div class="priority-dot {{ story.priority }}"></div>
+                                            <div class="info-trigger">
+                                                <svg class="icon" style="width: 14px; height: 14px;" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                                <div class="reqs-cell">
+                                    {% for req in activity.supporting_requirements %}
+                                    <div class="req-item">
+                                        <div class="req-dot"></div>
+                                        <span>{{ req.description }}</span>
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">已成功复制 YAML 数据</div>
+    
+    <script type="application/yaml" id="raw-yaml">
+{{ raw_yaml }}
+    </script>
+
+    <script>
+        function copyYAML() {
+            const yaml = document.getElementById('raw-yaml').textContent.trim();
+            navigator.clipboard.writeText(yaml).then(() => {
+                const toast = document.getElementById('toast');
+                toast.style.display = 'block';
+                setTimeout(() => { toast.style.display = 'none'; }, 2500);
+            });
+        }
+        function exportMap() {
+            window.print();
+        }
+    </script>
+</body>
+</html>

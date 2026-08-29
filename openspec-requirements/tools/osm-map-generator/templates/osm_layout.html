@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="{{ lang }}">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ title }}</title>
+  <style>
+    :root {
+      /* Inspire Design System Tokens (Standard Light Mode) */
+      --color-primary: #10213E;      /* Starry Blues */
+      --color-accent: #5DB2E2;       /* Creative Blue */
+      --color-secondary: #625D9C;    /* Amethyst */
+      --color-success: #00524C;      /* Myrtle Deep Green */
+      --color-info: #6FB1C8;         /* Cerulean Frost */
+      --color-warning: #F59E0B;      /* Warning */
+      --color-destructive: #EF4444;  /* Danger */
+      --color-background: #FFFFFF;   /* Pure White */
+      --color-bg-alt: #F5F5F6;       /* Tech Gray */
+      --color-foreground: #10213E;   /* Primary Text */
+      --color-text-muted: #64748B;   /* Text Secondary */
+      --color-border: #E2E8F0;       /* Border/Line */
+      
+      --shadow-sm: 0 2px 8px rgba(16, 33, 62, 0.08);
+      --shadow-md: 0 8px 16px -4px rgba(16, 33, 62, 0.1);
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --font-family: 'MiSans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --transition: 0.15s ease-out;
+    }
+
+    /* ===== Reset & Base ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: var(--font-family);
+      background: var(--color-bg-alt);
+      padding: 48px 24px;
+      color: var(--color-foreground);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== Page Container ===== */
+    .page-wrap {
+      background: var(--color-background);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 40px;
+      width: 95%;
+      max-width: 1600px;
+      margin: 0 auto;
+      border: 1px solid var(--color-border);
+    }
+
+    /* Standardized Header */
+    .page-header {
+      margin-bottom: 40px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .page-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--color-primary);
+      line-height: 1.2;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .page-header h1::before {
+      content: "";
+      display: block;
+      width: 4px;
+      height: 24px;
+      background: var(--color-accent);
+      border-radius: 2px;
+    }
+
+    .page-subtitle {
+      font-size: 16px;
+      color: var(--color-text-muted);
+      font-weight: 500;
+    }
+
+    .header-right {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .meta-info {
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+      justify-content: flex-end;
+    }
+
+    .btn-primary {
+      background: var(--color-primary);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .btn-primary:hover { opacity: 0.85; transform: translateY(-1px); }
+
+    .btn-secondary {
+      background: white;
+      color: var(--color-primary);
+      border: 1px solid var(--color-border);
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .btn-secondary:hover { background: var(--color-bg-alt); }
+    
+    .toast {
+      position: fixed; bottom: 32px; right: 32px;
+      background: var(--color-primary); color: #fff;
+      padding: 16px 32px; border-radius: var(--radius-md);
+      font-size: 14px; font-weight: 700;
+      display: none; z-index: 1000;
+      box-shadow: var(--shadow-md);
+      animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* ===== OSM Outer Container (Scrollable) ===== */
+    .osm-outer-container {
+      width: 100%;
+      overflow: auto;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      background: var(--color-bg-alt);
+      max-height: 85vh;
+      position: relative;
+    }
+
+    /* ===== OSM Canvas ===== */
+    .osm-canvas {
+      display: flex;
+      min-width: var(--osm-canvas-width, 960px);
+      position: relative;
+      background: var(--color-background);
+    }
+
+    /* ===== Lane Label (sticky left column) ===== */
+    .label-col {
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: sticky;
+      left: 0;
+      z-index: 100;
+      background: var(--color-bg-alt);
+      border-right: 2px solid var(--color-border);
+      box-shadow: 4px 0 8px rgba(0,0,0,0.05);
+    }
+
+    .lane-label {
+      display: flex;
+      align-items: center;
+      padding: 0 20px;
+      font-size: 11px;
+      font-weight: 800;
+      color: var(--color-text-muted);
+      background: var(--color-bg-alt);
+      border-bottom: 1px solid var(--color-border);
+      width: 120px;
+      min-width: 120px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      line-height: 1.5;
+      text-align: center;
+      justify-content: center;
+    }
+    .lane-label.obj { height: var(--osm-obj-lane-h, 200px); }
+    .lane-label.sub { height: var(--osm-sub-lane-h, 600px); }
+
+    /* ===== Content Lanes ===== */
+    .content-col { display: flex; flex-direction: column; flex-grow: 1; }
+
+    .obj-lane {
+      position: relative;
+      height: var(--osm-obj-lane-h, 200px);
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-bg-alt);
+    }
+    .sub-lane {
+      position: relative;
+      height: var(--osm-sub-lane-h, 600px);
+      background: var(--color-background);
+    }
+
+    /* ===== SVG connector overlay ===== */
+    .connector-svg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: visible;
+    }
+    .connector-path {
+      fill: none;
+      stroke: var(--color-border);
+      stroke-width: 2;
+      stroke-dasharray: 4 4;
+    }
+
+    /* ===== Objective Nodes ===== */
+    .node-obj {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--color-background);
+      border: 2px solid var(--color-accent);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      z-index: 10;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .node-obj:hover { transform: translate(-50%, -54%); box-shadow: var(--shadow-md); }
+    .node-obj .name { font-size: 16px; font-weight: 700; color: var(--color-primary); line-height: 1.4; }
+    .node-obj .val  { font-size: 13px; font-weight: 600; color: var(--color-accent); display: flex; align-items: center; justify-content: center; gap: 6px; }
+
+    .node-sub {
+      position: absolute;
+      transform: translateX(-50%);
+      background: var(--color-background);
+      border: 2px solid var(--color-success);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      z-index: 10;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .node-sub:hover { transform: translate(-50%, -4px); box-shadow: var(--shadow-md); }
+    .node-sub .name { font-size: 14px; font-weight: 700; color: var(--color-success); line-height: 1.4; }
+    .node-sub .val  { font-size: 12px; font-weight: 600; color: var(--color-text-muted); display: flex; align-items: center; justify-content: center; gap: 6px; }
+
+    /* ===== Card Blocks (Strategy / Metric / Scenario) ===== */
+    .card-block {
+      position: absolute;
+      transform: translateX(-50%);
+      background: var(--color-background);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      overflow-y: auto;
+      z-index: 5;
+      transition: var(--transition);
+    }
+    .card-block:hover { box-shadow: var(--shadow-md); border-color: var(--color-accent); }
+    .card-block.strategy  { width: var(--osm-box-w, 200px); height: 180px; }
+    .card-block.metric    { width: var(--osm-box-w, 200px); height: 180px; }
+    .card-block.scenario  { width: var(--osm-box-w, 200px); } /* height auto */
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--color-border);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .card-header.blue   { color: var(--color-accent); }
+    .card-header.green  { color: var(--color-success); }
+    .card-header.purple { color: var(--color-secondary); }
+
+    /* Strategy list */
+    .strat-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .strat-item {
+      font-size: 13px;
+      color: var(--color-foreground);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.5;
+    }
+    .strat-dot {
+      flex-shrink: 0;
+      width: 6px; height: 6px;
+      background: var(--color-accent);
+      border-radius: 50%;
+      margin-top: 7px;
+    }
+
+    /* Metric item */
+    .metric-item {
+      font-size: 13px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--color-bg-alt);
+    }
+    .metric-item:last-child { border-bottom: none; }
+    .metric-name { font-weight: 700; color: var(--color-primary); margin-bottom: 4px; }
+    .metric-calc { font-style: italic; color: var(--color-text-muted); font-size: 11px; margin-bottom: 4px; }
+    .metric-val  { display: flex; align-items: center; gap: 6px; color: var(--color-primary); font-weight: 600; }
+
+    /* Scenario item */
+    .scenario-item {
+      border-left: 4px solid var(--color-secondary);
+      padding: 12px;
+      margin-bottom: 12px;
+      background: var(--color-bg-alt);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      transition: var(--transition);
+    }
+    .scenario-item:hover { background: #E2E8F0; }
+    .scenario-item:last-child { margin-bottom: 0; }
+    .scenario-name { font-weight: 700; font-size: 14px; color: var(--color-primary); margin-bottom: 6px; }
+    .scenario-desc { font-size: 13px; color: var(--color-text-muted); line-height: 1.6; }
+
+    /* ===== Trend icons (inline SVG, color via CSS) ===== */
+    .icon-up    { color: var(--color-success); }
+    .icon-down  { color: var(--color-destructive); }
+    .icon-stable{ color: var(--color-warning); }
+    
+    .footer {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      margin-top: 32px;
+      text-align: right;
+      letter-spacing: 0.02em;
+    }
+
+    /* ===== Custom Scrollbar ===== */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--color-bg-alt); }
+    ::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #94A3B8; }
+  </style>
+  <style>
+    /* Jinja2-injected dynamic layout values */
+    :root {
+      --osm-canvas-width: {{ min_content_width }}px;
+      --osm-obj-lane-h:   {{ obj_lane_height }}px;
+      --osm-sub-lane-h:   {{ sub_lane_height }}px;
+      --osm-box-w:        {{ box_width }}px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <header class="page-header">
+      <div class="header-left">
+        <h1>{{ title }}</h1>
+      </div>
+      <div class="header-right">
+        <div class="btn-group">
+          <button class="btn-secondary" onclick="window.print()">导出 PDF / 打印</button>
+          <button class="btn-primary" onclick="copyYAML()">复制原始 YAML</button>
+        </div>
+      </div>
+    </header>
+
+    <div class="osm-outer-container">
+    <main class="osm-canvas">
+
+      <!-- Sticky Lane Labels -->
+      <div class="label-col">
+        <div class="lane-label obj">目标<br>Objective</div>
+        <div class="lane-label sub">策略与度量<br>Actions</div>
+      </div>
+
+      <!-- Content Area -->
+      <div class="content-col">
+
+        <!-- ── Row 1: Top-level Objective Bar ── -->
+        <div class="obj-lane">
+          <!-- SVG connectors from top-level objectives down to sub-objectives -->
+          <svg class="connector-svg" id="svg-top">
+            {% for conn in top_connectors %}
+            <path class="connector-path" d="{{ conn }}"/>
+            {% endfor %}
+          </svg>
+          {% for node in objective_nodes %}
+          <div class="node-obj" {{ 'style="left:' ~ node.cx ~ 'px; width:' ~ node.width ~ 'px;"' }}>
+            <div class="name">{{ node.name }}</div>
+            {% if node.val %}
+            <div class="val">{{ node.val }}{{ node.icon|safe }}</div>
+            {% endif %}
+          </div>
+          {% endfor %}
+        </div>
+
+        <!-- ── Row 2: Sub-objectives + Cards ── -->
+        <div class="sub-lane">
+          <!-- SVG connectors within sub-lane (sub→strategy→metric→scenario) -->
+          <svg class="connector-svg" id="svg-sub">
+            {% for conn in sub_connectors %}
+            <path class="connector-path" d="{{ conn }}"/>
+            {% endfor %}
+          </svg>
+
+          {% for node in sub_nodes %}
+          <!-- Sub-objective title -->
+          <div class="node-sub" {{ 'style="left:' ~ node.cx ~ 'px; top:' ~ node.top ~ 'px; width:' ~ node.width ~ 'px;"' }}>
+            <div class="name">{{ node.name }}</div>
+            {% if node.val %}
+            <div class="val">{{ node.val }}{{ node.icon|safe }}</div>
+            {% endif %}
+          </div>
+
+          <!-- Strategy card -->
+          {% if node.strategies %}
+          <div class="card-block strategy" {{ 'style="left:' ~ node.cx ~ 'px; top:' ~ node.strat_top ~ 'px;"' }}>
+            <div class="card-header blue">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+              策略 / Strategies
+            </div>
+            <ul class="strat-list">
+              {% for s in node.strategies %}
+              <li class="strat-item"><span class="strat-dot"></span><span>{{ s }}</span></li>
+              {% endfor %}
+            </ul>
+          </div>
+          {% endif %}
+
+          <!-- Metric card -->
+          {% if node.metrics %}
+          <div class="card-block metric" {{ 'style="left:' ~ node.cx ~ 'px; top:' ~ node.metric_top ~ 'px;"' }}>
+            <div class="card-header green">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              指标 / Metrics
+            </div>
+            {% for m in node.metrics %}
+            <div class="metric-item">
+              <div class="metric-name">{{ m.name }}</div>
+              {% if m.calc %}<div class="metric-calc">{{ m.calc }}</div>{% endif %}
+              {% if m.val %}<div class="metric-val">{{ m.val }}{{ m.icon|safe }}</div>{% endif %}
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          <!-- Scenario card -->
+          {% if node.scenarios %}
+          <div class="card-block scenario" {{ 'style="left:' ~ node.cx ~ 'px; top:' ~ node.scenario_top ~ 'px;"' }}>
+            <div class="card-header purple">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+              业务场景 / Scenarios
+            </div>
+            {% for sc in node.scenarios %}
+            <div class="scenario-item">
+              <div class="scenario-name">{{ sc.name }}</div>
+              <div class="scenario-desc">{{ sc.desc }}</div>
+            </div>
+            {% endfor %}
+          </div>
+          {% endif %}
+
+          {% endfor %}
+        </div>
+
+      </div><!-- /content-col -->
+    </main><!-- /osm-canvas -->
+    </div><!-- /osm-outer-container -->
+
+    <footer style="margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--color-border); text-align: center; font-size: 12px; color: var(--color-text-muted);">
+      Generated by osm-map-generator · {{ generated_at }} · &copy; 2026 Inspire AI4PM
+    </footer>
+  </div>
+  
+  <div class="toast" id="toast">已成功复制 YAML 数据</div>
+  <script type="application/yaml" id="raw-yaml">
+{{ raw_yaml }}
+  </script>
+  <script>
+    function copyYAML() {
+      const yaml = document.getElementById('raw-yaml').textContent.trim();
+      navigator.clipboard.writeText(yaml).then(() => {
+        const toast = document.getElementById('toast');
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 2500);
+      });
+    }
+  </script>
+</body>
+</html>

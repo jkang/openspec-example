@@ -1,0 +1,45 @@
+title: "用户租车自驾游体验旅程"
+config:
+  mode: "as-is" # 时空模式：现状诊断使用 "as-is" (红色警告痛点)，未来架构使用 "to-be" (橙色预期改进)
+  height:
+    experienceScore: 150
+stages:
+  - name: "预订准备阶段"
+    actions:
+      - name: "用户选择租车时间和地点"
+        owner: "用户"
+        touchpoints: "手机App/网站首页"
+        experienceScore: 8
+        thoughts:
+          - "希望能快速找到合适的取还车地点"
+          - "想知道不同地点的车辆是否有差异"
+          - "是否可以异地还车，费用如何计算"
+        painPoints:
+          - "部分城市的门店选择较少，不够便捷"
+          - "取还车时间选择不够灵活"
+          - "异地还车的信息不够明确"
+        aiusecase:
+          name: "智能车辆推荐系统"
+          description: "基于用户历史租车偏好、行程特点和实时库存，智能推荐最适合的车型，并提供详细的车型对比和真实用户评价，帮助用户快速找到最适合的车辆。"
+      - name: "用户浏览筛选车辆"
+        owner: "用户"
+        touchpoints: "App车辆列表页/筛选器"
+        experienceScore: 5
+        thoughts:
+          - "想找到性价比最高的车型"
+          - "希望能清楚了解每种车型的特点"
+        painPoints:
+          - "车型信息不够详细，难以比较"
+          - "筛选条件不够精确"
+        # 即使没有 aiusecase，也建议保持键为空或忽略，但建议强制保持全结构
+
+  - name: "订单确认阶段"
+    actions:
+      - name: "用户查看车辆详情"
+        owner: "用户"
+        touchpoints: "车辆详情页"
+        experienceScore: 4
+        thoughts:
+          - "想了解车辆的具体配置和状况"
+        painPoints:
+          - "车辆实际状况与描述不符"

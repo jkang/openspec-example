@@ -1,0 +1,40 @@
+// =========================================================
+// {{ productName }} · API 编排路由（由 mvp_spec 生成）
+// AI 能力 → aiService（Mock）；业务数据 → businessMock（Mock）
+// =========================================================
+import { Router } from 'express';
+import { aiService } from '../services/aiService.js';
+import { businessMock } from '../services/businessMock.js';
+
+const router = Router();
+
+// 统一错误包装
+const wrap = (fn) => async (req, res) => {
+  try {
+    const data = await fn(req.body || {}, req.query || {}, req.params || {});
+    res.json(data);
+  } catch (e) {
+    console.error('[api] 路由错误:', e);
+    res.status(500).json({ error: e.message || 'Internal Error' });
+  }
+};
+
+{% for route in apiRoutes %}
+// {{ route.method }} {{ route.path }}  →  {{ route.target }}
+router.{{ route.method_lower }}({{ route.path|tojson }}, wrap(async (body, query) => {
+{% if route.target_type == 'ai' %}
+  return await aiService.{{ route.target_method }}(body);
+{% elif route.target_type == 'business' %}
+  return await businessMock.{{ route.target_method }}(body);
+{% elif route.target_type == 'compose' %}
+  const [{{ route.compose_vars }}] = await Promise.all([
+{% for item in route.compose %}
+    {{ 'aiService' if item.service == 'ai' else 'businessMock' }}.{{ item.method }}(body),
+{% endfor %}
+  ]);
+  return { {{ route.compose_kv }} };
+{% endif %}
+}));
+{% endfor %}
+
+export default router;

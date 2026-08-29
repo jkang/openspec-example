@@ -1,0 +1,184 @@
+title: 餐厅就餐服务蓝图
+config:
+  height:
+    customerLayer: 150
+    frontstageLayer: 180
+    backstageLayer: 150
+phases:
+  - name: 到店前
+    customerLayer:
+      journeyStage: 到店前准备
+      actions:
+        - name: 查看距离、评价
+          touchpoints: 美团App
+          painPoints:
+            - 评价真实性难以判断
+            - 距离计算不够准确
+          expectations:
+            - 希望看到真实评价
+          experienceScore: 7
+        - name: 咨询/预订
+          touchpoints: 电话
+          painPoints:
+            - 电话占线难打通
+          expectations:
+            - 快速确认预订
+          experienceScore: 6
+    frontstageLayer:
+      processStage: 预订受理
+      activities:
+        - name: 答疑/接受预订
+          role: 迎宾员
+          systemTouchpoints: 座机
+          painPoints:
+            - 高峰期电话太多
+          cognitiveLoad: medium
+    backstageLayer:
+      supportProcess: 预订管理
+      activities:
+        - name: 餐位预留
+          role: 大堂经理
+          systemTouchpoints: 前堂管理系统
+          painPoints:
+            - 临时取消预订处理
+          cognitiveLoad: low
+
+  - name: 到店
+    customerLayer:
+      journeyStage: 到店等候
+      actions:
+        - name: 询问是否有位
+          touchpoints: 迎宾员
+          painPoints:
+            - 高峰期需要排队等位
+          expectations:
+            - 希望尽快入座
+          experienceScore: 5
+        - name: 领取号码牌
+          touchpoints: 迎宾员
+          painPoints:
+            - 等位时间不确定
+          expectations:
+            - 希望知道预计等候时间
+          experienceScore: 5
+        - name: 了解点餐流程
+          touchpoints: 领位员/桌卡
+          expectations:
+            - 希望流程简单易懂
+          experienceScore: 7
+    frontstageLayer:
+      processStage: 迎宾接待
+      activities:
+        - name: 欢迎/问候
+          role: 迎宾员
+          systemTouchpoints: 无
+          cognitiveLoad: low
+        - name: 为顾客取号
+          role: 迎宾员
+          systemTouchpoints: 平板电脑/小票机
+          painPoints:
+            - 高峰期取号量大
+          cognitiveLoad: medium
+        - name: 领位落座
+          role: 领位员
+          systemTouchpoints: 无
+          cognitiveLoad: low
+    backstageLayer:
+      supportProcess: 排队管理
+      activities:
+        - name: 排队队列管理
+          role: 后勤组
+          systemTouchpoints: 排队系统
+          painPoints:
+            - 高峰期调度困难
+          cognitiveLoad: medium
+
+  - name: 就餐
+    customerLayer:
+      journeyStage: 点餐用餐
+      actions:
+        - name: 扫码点餐
+          touchpoints: 微信小程序
+          painPoints:
+            - 菜品图片与实物有差异
+            - 小程序加载慢
+          expectations:
+            - 点餐流程顺畅
+          experienceScore: 7
+        - name: 用餐
+          touchpoints: 服务员
+          painPoints:
+            - 上菜慢
+          expectations:
+            - 菜品口味好
+          experienceScore: 7
+    frontstageLayer:
+      processStage: 餐间服务
+      activities:
+        - name: 菜品推荐
+          role: 服务员
+          systemTouchpoints: 无
+          painPoints:
+            - 需要记住大量菜品信息
+          cognitiveLoad: medium
+        - name: 餐间服务
+          role: 服务员
+          systemTouchpoints: 平板电脑
+          painPoints:
+            - 同时服务多桌压力大
+          cognitiveLoad: high
+    backstageLayer:
+      supportProcess: 后厨出餐
+      activities:
+        - name: 库存管理
+          role: 后勤组
+          systemTouchpoints: 库存管理系统
+          painPoints:
+            - 食材消耗预估困难
+          cognitiveLoad: medium
+        - name: 出餐调度
+          role: 厨师长
+          systemTouchpoints: 后厨管理系统
+          painPoints:
+            - 高峰期出餐压力大
+            - 多订单优先级管理
+          cognitiveLoad: high
+
+  - name: 离店
+    customerLayer:
+      journeyStage: 结账离店
+      actions:
+        - name: 团购券结账
+          touchpoints: 美团App/票据
+          painPoints:
+            - 优惠券使用规则复杂
+          expectations:
+            - 结账快速便捷
+          experienceScore: 6
+        - name: 获取停车券
+          touchpoints: 迎宾员
+          expectations:
+            - 离店体验好
+          experienceScore: 7
+    frontstageLayer:
+      processStage: 结账送客
+      activities:
+        - name: 核单/收银/打单
+          role: 服务员
+          systemTouchpoints: POS机/扫码枪
+          painPoints:
+            - 团购核销复杂
+          cognitiveLoad: high
+        - name: 欢送顾客
+          role: 迎宾员
+          systemTouchpoints: 无
+          cognitiveLoad: low
+    backstageLayer:
+      supportProcess: 财务结算
+      activities:
+        - name: 营收统计
+          role: 大堂经理
+          systemTouchpoints: 财务系统
+          painPoints:
+            - 多渠道对账复杂
+          cognitiveLoad: medium

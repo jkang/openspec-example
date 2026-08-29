@@ -1,0 +1,767 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SaaS产品增长战役·全年GMR突破</title>
+  <style>
+    :root {
+      /* Inspire Design System Tokens (Standard Light Mode) */
+      --color-primary: #10213E;      /* Starry Blues */
+      --color-accent: #5DB2E2;       /* Creative Blue */
+      --color-secondary: #625D9C;    /* Amethyst */
+      --color-success: #00524C;      /* Myrtle Deep Green */
+      --color-info: #6FB1C8;         /* Cerulean Frost */
+      --color-warning: #F59E0B;      /* Warning */
+      --color-destructive: #EF4444;  /* Danger */
+      --color-background: #FFFFFF;   /* Pure White */
+      --color-bg-alt: #F5F5F6;       /* Tech Gray */
+      --color-foreground: #10213E;   /* Primary Text */
+      --color-text-muted: #64748B;   /* Text Secondary */
+      --color-border: #E2E8F0;       /* Border/Line */
+      
+      --shadow-sm: 0 2px 8px rgba(16, 33, 62, 0.08);
+      --shadow-md: 0 8px 16px -4px rgba(16, 33, 62, 0.1);
+      --radius-sm: 4px;
+      --radius-md: 8px;
+      --radius-lg: 12px;
+      --font-family: 'MiSans', 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --transition: 0.15s ease-out;
+    }
+
+    /* ===== Reset & Base ===== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: var(--font-family);
+      background: var(--color-bg-alt);
+      padding: 48px 24px;
+      color: var(--color-foreground);
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    /* ===== Page Container ===== */
+    .page-wrap {
+      background: var(--color-background);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      padding: 40px;
+      width: 85%;
+      margin: 0 auto;
+      overflow: hidden;
+      border: 1px solid var(--color-border);
+    }
+
+    /* Standardized Header */
+    .page-header {
+      margin-bottom: 40px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--color-border);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+
+    .header-left {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .page-header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: var(--color-primary);
+      line-height: 1.2;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    .page-header h1::before {
+      content: "";
+      display: block;
+      width: 4px;
+      height: 24px;
+      background: var(--color-accent);
+      border-radius: 2px;
+    }
+
+    .page-subtitle {
+      font-size: 16px;
+      color: var(--color-text-muted);
+      font-weight: 500;
+    }
+
+    .header-right {
+      text-align: right;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .meta-info {
+      font-size: 12px;
+      color: var(--color-text-muted);
+    }
+
+    .btn-group {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+      justify-content: flex-end;
+    }
+
+    .btn-primary {
+      background: var(--color-primary);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .btn-primary:hover { opacity: 0.85; transform: translateY(-1px); }
+
+    .btn-secondary {
+      background: white;
+      color: var(--color-primary);
+      border: 1px solid var(--color-border);
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+    .btn-secondary:hover { background: var(--color-bg-alt); }
+    
+    .toast {
+      position: fixed; bottom: 32px; right: 32px;
+      background: var(--color-primary); color: #fff;
+      padding: 16px 32px; border-radius: var(--radius-md);
+      font-size: 14px; font-weight: 700;
+      display: none; z-index: 1000;
+      box-shadow: var(--shadow-md);
+      animation: slideUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    @keyframes slideUp {
+      from { transform: translateY(40px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* ===== OSM Canvas ===== */
+    .osm-canvas {
+      display: flex;
+      min-width: var(--osm-canvas-width, 960px);
+      position: relative;
+      background: var(--color-background);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+    }
+
+    /* ===== Lane Label (sticky left column) ===== */
+    .label-col {
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: sticky;
+      left: 0;
+      z-index: 30;
+      background: var(--color-background);
+      border-right: 1px solid var(--color-border);
+    }
+
+    .lane-label {
+      display: flex;
+      align-items: center;
+      padding: 0 24px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--color-text-muted);
+      background: var(--color-bg-alt);
+      border-bottom: 1px solid var(--color-border);
+      width: 140px;
+      min-width: 140px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      line-height: 1.4;
+    }
+    .lane-label.obj { height: var(--osm-obj-lane-h, 200px); }
+    .lane-label.sub { height: var(--osm-sub-lane-h, 600px); }
+
+    /* ===== Content Lanes ===== */
+    .content-col { display: flex; flex-direction: column; flex-grow: 1; }
+
+    .obj-lane {
+      position: relative;
+      height: var(--osm-obj-lane-h, 200px);
+      border-bottom: 1px solid var(--color-border);
+      background: var(--color-bg-alt);
+    }
+    .sub-lane {
+      position: relative;
+      height: var(--osm-sub-lane-h, 600px);
+      background: var(--color-background);
+    }
+
+    /* ===== SVG connector overlay ===== */
+    .connector-svg {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 1;
+      overflow: visible;
+    }
+    .connector-path {
+      fill: none;
+      stroke: var(--color-border);
+      stroke-width: 2;
+      stroke-dasharray: 4 4;
+    }
+
+    /* ===== Objective Nodes ===== */
+    .node-obj {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      background: var(--color-background);
+      border: 2px solid var(--color-accent);
+      border-radius: var(--radius-md);
+      padding: 16px 20px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      z-index: 10;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .node-obj:hover { transform: translate(-50%, -54%); box-shadow: var(--shadow-md); }
+    .node-obj .name { font-size: 16px; font-weight: 700; color: var(--color-primary); line-height: 1.4; }
+    .node-obj .val  { font-size: 13px; font-weight: 600; color: var(--color-accent); display: flex; align-items: center; justify-content: center; gap: 6px; }
+
+    .node-sub {
+      position: absolute;
+      transform: translateX(-50%);
+      background: var(--color-background);
+      border: 2px solid var(--color-success);
+      border-radius: var(--radius-md);
+      padding: 12px 18px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      z-index: 10;
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .node-sub:hover { transform: translate(-50%, -4px); box-shadow: var(--shadow-md); }
+    .node-sub .name { font-size: 14px; font-weight: 700; color: var(--color-success); line-height: 1.4; }
+    .node-sub .val  { font-size: 12px; font-weight: 600; color: var(--color-text-muted); display: flex; align-items: center; justify-content: center; gap: 6px; }
+
+    /* ===== Card Blocks (Strategy / Metric / Scenario) ===== */
+    .card-block {
+      position: absolute;
+      transform: translateX(-50%);
+      background: var(--color-background);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 16px;
+      box-shadow: var(--shadow-sm);
+      overflow-y: auto;
+      z-index: 5;
+      transition: var(--transition);
+    }
+    .card-block:hover { box-shadow: var(--shadow-md); border-color: var(--color-accent); }
+    .card-block.strategy  { width: var(--osm-box-w, 200px); height: 180px; }
+    .card-block.metric    { width: var(--osm-box-w, 200px); height: 180px; }
+    .card-block.scenario  { width: var(--osm-box-w, 200px); } /* height auto */
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid var(--color-border);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .card-header.blue   { color: var(--color-accent); }
+    .card-header.green  { color: var(--color-success); }
+    .card-header.purple { color: var(--color-secondary); }
+
+    /* Strategy list */
+    .strat-list { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .strat-item {
+      font-size: 13px;
+      color: var(--color-foreground);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      line-height: 1.5;
+    }
+    .strat-dot {
+      flex-shrink: 0;
+      width: 6px; height: 6px;
+      background: var(--color-accent);
+      border-radius: 50%;
+      margin-top: 7px;
+    }
+
+    /* Metric item */
+    .metric-item {
+      font-size: 13px;
+      padding: 8px 0;
+      border-bottom: 1px solid var(--color-bg-alt);
+    }
+    .metric-item:last-child { border-bottom: none; }
+    .metric-name { font-weight: 700; color: var(--color-primary); margin-bottom: 4px; }
+    .metric-calc { font-style: italic; color: var(--color-text-muted); font-size: 11px; margin-bottom: 4px; }
+    .metric-val  { display: flex; align-items: center; gap: 6px; color: var(--color-primary); font-weight: 600; }
+
+    /* Scenario item */
+    .scenario-item {
+      border-left: 4px solid var(--color-secondary);
+      padding: 12px;
+      margin-bottom: 12px;
+      background: var(--color-bg-alt);
+      border-radius: 0 var(--radius-md) var(--radius-md) 0;
+      transition: var(--transition);
+    }
+    .scenario-item:hover { background: #E2E8F0; }
+    .scenario-item:last-child { margin-bottom: 0; }
+    .scenario-name { font-weight: 700; font-size: 14px; color: var(--color-primary); margin-bottom: 6px; }
+    .scenario-desc { font-size: 13px; color: var(--color-text-muted); line-height: 1.6; }
+
+    /* ===== Trend icons (inline SVG, color via CSS) ===== */
+    .icon-up    { color: var(--color-success); }
+    .icon-down  { color: var(--color-destructive); }
+    .icon-stable{ color: var(--color-warning); }
+    
+    .footer {
+      font-size: 12px;
+      color: var(--color-text-muted);
+      margin-top: 32px;
+      text-align: right;
+      letter-spacing: 0.02em;
+    }
+  </style>
+  <style>
+    /* Jinja2-injected dynamic layout values */
+    :root {
+      --osm-canvas-width: 1010px;
+      --osm-obj-lane-h:   70px;
+      --osm-sub-lane-h:   764px;
+      --osm-box-w:        280px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page-wrap">
+    <header class="page-header">
+      <div class="header-left">
+        <h1>SaaS产品增长战役·全年GMR突破</h1>
+      </div>
+      <div class="header-right">
+        <div class="btn-group">
+          <button class="btn-secondary" onclick="window.print()">导出 PDF / 打印</button>
+          <button class="btn-primary" onclick="copyYAML()">复制原始 YAML</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="osm-canvas">
+
+      <!-- Sticky Lane Labels -->
+      <div class="label-col">
+        <div class="lane-label obj">目标<br>Objective</div>
+        <div class="lane-label sub">策略与度量<br>Actions</div>
+      </div>
+
+      <!-- Content Area -->
+      <div class="content-col">
+
+        <!-- ── Row 1: Top-level Objective Bar ── -->
+        <div class="obj-lane">
+          <!-- SVG connectors from top-level objectives down to sub-objectives -->
+          <svg class="connector-svg" id="svg-top">
+            
+            <path class="connector-path" d="M 490.0 58.0 C 490.0 79.0 180.0 79.0 180.0 100"/>
+            
+            <path class="connector-path" d="M 490.0 58.0 C 490.0 79.0 490.0 79.0 490.0 100"/>
+            
+            <path class="connector-path" d="M 490.0 58.0 C 490.0 79.0 800.0 79.0 800.0 100"/>
+            
+          </svg>
+          
+          <div class="node-obj" style="left:490.0px; width:280px;">
+            <div class="name">全年 ARR 增长 40%</div>
+            
+            <div class="val">目标: $12M ARR<svg class="icon-up" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+            
+          </div>
+          
+        </div>
+
+        <!-- ── Row 2: Sub-objectives + Cards ── -->
+        <div class="sub-lane">
+          <!-- SVG connectors within sub-lane (sub→strategy→metric→scenario) -->
+          <svg class="connector-svg" id="svg-sub">
+            
+            <path class="connector-path" d="M 180.0 74 L 180.0 102"/>
+            
+            <path class="connector-path" d="M 180.0 252 L 180.0 280"/>
+            
+            <path class="connector-path" d="M 180.0 430 L 180.0 458"/>
+            
+            <path class="connector-path" d="M 490.0 74 L 490.0 102"/>
+            
+            <path class="connector-path" d="M 490.0 252 L 490.0 280"/>
+            
+            <path class="connector-path" d="M 490.0 430 L 490.0 458"/>
+            
+            <path class="connector-path" d="M 800.0 74 L 800.0 102"/>
+            
+            <path class="connector-path" d="M 800.0 252 L 800.0 280"/>
+            
+            <path class="connector-path" d="M 800.0 430 L 800.0 458"/>
+            
+          </svg>
+
+          
+          <!-- Sub-objective title -->
+          <div class="node-sub" style="left:180.0px; top:30px; width:280px;">
+            <div class="name">新客获取提速</div>
+            
+            <div class="val">月新签客户 ≥ 80 家<svg class="icon-up" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+            
+          </div>
+
+          <!-- Strategy card -->
+          
+          <div class="card-block strategy" style="left:180.0px; top:102px;">
+            <div class="card-header blue">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+              策略 / Strategies
+            </div>
+            <ul class="strat-list">
+              
+              <li class="strat-item"><span class="strat-dot"></span><span>强化 SEO/内容营销漏斗，降低获客成本</span></li>
+              
+              <li class="strat-item"><span class="strat-dot"></span><span>建立合作伙伴渠道，每季引入 10 家系统集成商</span></li>
+              
+              <li class="strat-item"><span class="strat-dot"></span><span>精准 ABM 策略，聚焦 500-2000 人规模企业</span></li>
+              
+            </ul>
+          </div>
+          
+
+          <!-- Metric card -->
+          
+          <div class="card-block metric" style="left:180.0px; top:280px;">
+            <div class="card-header green">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              指标 / Metrics
+            </div>
+            
+            <div class="metric-item">
+              <div class="metric-name">月新签 MRR</div>
+              <div class="metric-calc">当月新签合同 MRR 求和</div>
+              <div class="metric-val">当前: $120K 目标: $180K<svg class="icon-up" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+            </div>
+            
+            <div class="metric-item">
+              <div class="metric-name">获客成本 CAC</div>
+              <div class="metric-calc">销售+市场成本 / 当月新签客户数</div>
+              <div class="metric-val">当前: $3.2K 目标: ≤$2.5K<svg class="icon-down" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg></div>
+            </div>
+            
+          </div>
+          
+
+          <!-- Scenario card -->
+          
+          <div class="card-block scenario" style="left:180.0px; top:458px;">
+            <div class="card-header purple">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+              业务场景 / Scenarios
+            </div>
+            
+            <div class="scenario-item">
+              <div class="scenario-name">官网 Demo 申请→Sales 跟进旅程</div>
+              <div class="scenario-desc">潜客通过官网&#34;免费 Demo&#34;按钮提交表单后，CRM 自动分派给对应区域 SDR，SDR 需在 4 小时内发出个性化邮件并预约 30 分钟演示，完成后推进至 AE 进行深度 Discovery Call。</div>
+            </div>
+            
+            <div class="scenario-item">
+              <div class="scenario-name">合作伙伴线索联合转化</div>
+              <div class="scenario-desc">ISV/SI 合作伙伴通过专属 Partner Portal 提交线索，系统自动触发 Channel Manager 跟进提醒，双方在 48 小时内联合拜访客户，并共享赢单佣金。</div>
+            </div>
+            
+            <div class="scenario-item">
+              <div class="scenario-name">ABM 定向广告召回冷线索</div>
+              <div class="scenario-desc">识别目标公司访问官网但未注册的匿名流量，在 LinkedIn 投放定制化行业痛点广告，配合 SDR 主动触达完成从&#34;冷&#34; 到&#34;热&#34;的孵化切换。</div>
+            </div>
+            
+          </div>
+          
+
+          
+          <!-- Sub-objective title -->
+          <div class="node-sub" style="left:490.0px; top:30px; width:280px;">
+            <div class="name">现有客户扩销增收</div>
+            
+            <div class="val">NRR &gt; 115%<svg class="icon-up" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+            
+          </div>
+
+          <!-- Strategy card -->
+          
+          <div class="card-block strategy" style="left:490.0px; top:102px;">
+            <div class="card-header blue">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+              策略 / Strategies
+            </div>
+            <ul class="strat-list">
+              
+              <li class="strat-item"><span class="strat-dot"></span><span>基于使用量数据驱动 CSM 主动扩座位建议</span></li>
+              
+              <li class="strat-item"><span class="strat-dot"></span><span>针对高健康评分账户推进模块 Upsell</span></li>
+              
+              <li class="strat-item"><span class="strat-dot"></span><span>推出企业级附加模块（AI 分析包、SSO 集成）</span></li>
+              
+            </ul>
+          </div>
+          
+
+          <!-- Metric card -->
+          
+          <div class="card-block metric" style="left:490.0px; top:280px;">
+            <div class="card-header green">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              指标 / Metrics
+            </div>
+            
+            <div class="metric-item">
+              <div class="metric-name">净收入留存率 NRR</div>
+              <div class="metric-calc">(月末ARR - 流失 + 扩销) / 月初ARR</div>
+              <div class="metric-val">当前: 108% 目标: 115%<svg class="icon-up" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+            </div>
+            
+            <div class="metric-item">
+              <div class="metric-name">扩销触达率</div>
+              <div class="metric-calc">CSM 主动联系扩销机会 / 健康账户总数</div>
+              <div class="metric-val">当前: 30% 目标: 60%<svg class="icon-up" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+            </div>
+            
+          </div>
+          
+
+          <!-- Scenario card -->
+          
+          <div class="card-block scenario" style="left:490.0px; top:458px;">
+            <div class="card-header purple">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+              业务场景 / Scenarios
+            </div>
+            
+            <div class="scenario-item">
+              <div class="scenario-name">CSM 健康评分预警 → 主动扩销</div>
+              <div class="scenario-desc">系统每周自动计算账户健康评分，对连续 3 周活跃度上升且用量利用率 &gt; 80% 的账户，触发 CSM 任务提醒，CSM 准备个性化扩座位 proposal 并预约 QBR 会议。</div>
+            </div>
+            
+            <div class="scenario-item">
+              <div class="scenario-name">AI 分析包 Upsell 漏斗</div>
+              <div class="scenario-desc">在产品内嵌入 Upsell 入口，当用户尝试访问高级 AI 报告时提示功能升级，联动 CSM 系统创建 Upsell 机会，并在 7 天内跟进报价。</div>
+            </div>
+            
+          </div>
+          
+
+          
+          <!-- Sub-objective title -->
+          <div class="node-sub" style="left:800.0px; top:30px; width:280px;">
+            <div class="name">流失控制与续约保障</div>
+            
+            <div class="val">年流失率 &lt; 8%<svg class="icon-down" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg></div>
+            
+          </div>
+
+          <!-- Strategy card -->
+          
+          <div class="card-block strategy" style="left:800.0px; top:102px;">
+            <div class="card-header blue">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg>
+              策略 / Strategies
+            </div>
+            <ul class="strat-list">
+              
+              <li class="strat-item"><span class="strat-dot"></span><span>建立流失预警模型，提前 90 天识别风险账户</span></li>
+              
+              <li class="strat-item"><span class="strat-dot"></span><span>为高风险客户配置专属 Executive Sponsor</span></li>
+              
+              <li class="strat-item"><span class="strat-dot"></span><span>推出 2 年期锁定合同并给予折扣激励</span></li>
+              
+            </ul>
+          </div>
+          
+
+          <!-- Metric card -->
+          
+          <div class="card-block metric" style="left:800.0px; top:280px;">
+            <div class="card-header green">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+              指标 / Metrics
+            </div>
+            
+            <div class="metric-item">
+              <div class="metric-name">季度 Logo 流失率</div>
+              <div class="metric-calc">流失客户数 / 期初客户总数</div>
+              <div class="metric-val">当前: 3.5%/季 目标: ≤2%/季<svg class="icon-down" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="22 17 13.5 8.5 8.5 13.5 2 7"/><polyline points="16 17 22 17 22 11"/></svg></div>
+            </div>
+            
+            <div class="metric-item">
+              <div class="metric-name">高风险账户挽救率</div>
+              <div class="metric-calc">挽救成功账户数 / 预警账户总数</div>
+              <div class="metric-val">当前: 40% 目标: 70%<svg class="icon-up" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/><polyline points="16 7 22 7 22 13"/></svg></div>
+            </div>
+            
+          </div>
+          
+
+          <!-- Scenario card -->
+          
+          <div class="card-block scenario" style="left:800.0px; top:458px;">
+            <div class="card-header purple">
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>
+              业务场景 / Scenarios
+            </div>
+            
+            <div class="scenario-item">
+              <div class="scenario-name">流失预警模型自动分级</div>
+              <div class="scenario-desc">每天凌晨运行 ML 模型，对全量账户按流失概率分为&#34;红/橙/绿&#34;三级，红色账户自动同步至 CSM 工作台，要求 24 小时内完成第一轮电话访谈。</div>
+            </div>
+            
+            <div class="scenario-item">
+              <div class="scenario-name">Executive Sponsor 挽留计划</div>
+              <div class="scenario-desc">当 CSM 判断客户流失概率极高时，升级至公司 VP/C-Level 进行一对一 Executive Briefing，展示产品路线图并提供专属 SLA 承诺，谈判 3 个月延期或转换方案。</div>
+            </div>
+            
+          </div>
+          
+
+          
+        </div>
+
+      </div><!-- /content-col -->
+    </main><!-- /osm-canvas -->
+
+    <footer style="margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--color-border); text-align: center; font-size: 12px; color: var(--color-text-muted);">
+      Generated by osm-map-generator · 2026-05-21 22:19 · &copy; 2026 Inspire AI4PM
+    </footer>
+  </div>
+  
+  <div class="toast" id="toast">已成功复制 YAML 数据</div>
+  <script type="application/yaml" id="raw-yaml">
+```yaml
+title: &#34;SaaS产品增长战役·全年GMR突破&#34;
+config:
+  height:
+    objectiveScore: 70
+objectives:
+  - name: 全年 ARR 增长 40%
+    value: &#34;目标: $12M ARR&#34;
+    trend: up
+    subObjectives:
+      - name: 新客获取提速
+        value: &#34;月新签客户 ≥ 80 家&#34;
+        trend: up
+        strategies:
+          - 强化 SEO/内容营销漏斗，降低获客成本
+          - 建立合作伙伴渠道，每季引入 10 家系统集成商
+          - 精准 ABM 策略，聚焦 500-2000 人规模企业
+        metrics:
+          - name: 月新签 MRR
+            calculation: &#34;当月新签合同 MRR 求和&#34;
+            value: &#34;当前: $120K 目标: $180K&#34;
+            trend: up
+          - name: 获客成本 CAC
+            calculation: &#34;销售+市场成本 / 当月新签客户数&#34;
+            value: &#34;当前: $3.2K 目标: ≤$2.5K&#34;
+            trend: down
+        relatedScenarios:
+          scenarios:
+            - name: 官网 Demo 申请→Sales 跟进旅程
+              description: 潜客通过官网&#34;免费 Demo&#34;按钮提交表单后，CRM 自动分派给对应区域 SDR，SDR 需在 4 小时内发出个性化邮件并预约 30 分钟演示，完成后推进至 AE 进行深度 Discovery Call。
+            - name: 合作伙伴线索联合转化
+              description: ISV/SI 合作伙伴通过专属 Partner Portal 提交线索，系统自动触发 Channel Manager 跟进提醒，双方在 48 小时内联合拜访客户，并共享赢单佣金。
+            - name: ABM 定向广告召回冷线索
+              description: 识别目标公司访问官网但未注册的匿名流量，在 LinkedIn 投放定制化行业痛点广告，配合 SDR 主动触达完成从&#34;冷&#34; 到&#34;热&#34;的孵化切换。
+      - name: 现有客户扩销增收
+        value: &#34;NRR &gt; 115%&#34;
+        trend: up
+        strategies:
+          - 基于使用量数据驱动 CSM 主动扩座位建议
+          - 针对高健康评分账户推进模块 Upsell
+          - 推出企业级附加模块（AI 分析包、SSO 集成）
+        metrics:
+          - name: 净收入留存率 NRR
+            calculation: &#34;(月末ARR - 流失 + 扩销) / 月初ARR&#34;
+            value: &#34;当前: 108% 目标: 115%&#34;
+            trend: up
+          - name: 扩销触达率
+            calculation: &#34;CSM 主动联系扩销机会 / 健康账户总数&#34;
+            value: &#34;当前: 30% 目标: 60%&#34;
+            trend: up
+        relatedScenarios:
+          scenarios:
+            - name: CSM 健康评分预警 → 主动扩销
+              description: 系统每周自动计算账户健康评分，对连续 3 周活跃度上升且用量利用率 &gt; 80% 的账户，触发 CSM 任务提醒，CSM 准备个性化扩座位 proposal 并预约 QBR 会议。
+            - name: AI 分析包 Upsell 漏斗
+              description: 在产品内嵌入 Upsell 入口，当用户尝试访问高级 AI 报告时提示功能升级，联动 CSM 系统创建 Upsell 机会，并在 7 天内跟进报价。
+      - name: 流失控制与续约保障
+        value: &#34;年流失率 &lt; 8%&#34;
+        trend: down
+        strategies:
+          - 建立流失预警模型，提前 90 天识别风险账户
+          - 为高风险客户配置专属 Executive Sponsor
+          - 推出 2 年期锁定合同并给予折扣激励
+        metrics:
+          - name: 季度 Logo 流失率
+            calculation: &#34;流失客户数 / 期初客户总数&#34;
+            value: &#34;当前: 3.5%/季 目标: ≤2%/季&#34;
+            trend: down
+          - name: 高风险账户挽救率
+            calculation: &#34;挽救成功账户数 / 预警账户总数&#34;
+            value: &#34;当前: 40% 目标: 70%&#34;
+            trend: up
+        relatedScenarios:
+          scenarios:
+            - name: 流失预警模型自动分级
+              description: 每天凌晨运行 ML 模型，对全量账户按流失概率分为&#34;红/橙/绿&#34;三级，红色账户自动同步至 CSM 工作台，要求 24 小时内完成第一轮电话访谈。
+            - name: Executive Sponsor 挽留计划
+              description: 当 CSM 判断客户流失概率极高时，升级至公司 VP/C-Level 进行一对一 Executive Briefing，展示产品路线图并提供专属 SLA 承诺，谈判 3 个月延期或转换方案。
+```
+
+  </script>
+  <script>
+    function copyYAML() {
+      const yaml = document.getElementById('raw-yaml').textContent.trim();
+      navigator.clipboard.writeText(yaml).then(() => {
+        const toast = document.getElementById('toast');
+        toast.style.display = 'block';
+        setTimeout(() => { toast.style.display = 'none'; }, 2500);
+      });
+    }
+  </script>
+</body>
+</html>

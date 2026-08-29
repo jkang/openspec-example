@@ -1,0 +1,28 @@
+// =========================================================
+// {{ productName }} · 主题配置（{{ theme_source }}模式）
+// 通过 Arco 设计令牌（CSS 变量）应用主色 {{ primary }} / 强调色 {{ accent }}
+// =========================================================
+export const brand = {
+  name: '{{ productName }}',
+  primary: '{{ primary }}',
+  accent: '{{ accent }}',
+};
+
+// Arco 10 级色阶（由主色自动生成）
+const palette = {
+  '--primary-1': '{{ shade_1 }}',
+  '--primary-2': '{{ shade_2 }}',
+  '--primary-3': '{{ shade_3 }}',
+  '--primary-4': '{{ shade_4 }}',
+  '--primary-5': '{{ shade_5 }}',
+  '--primary-6': '{{ shade_6 }}',
+  '--primary-7': '{{ shade_7 }}',
+  '--primary-8': '{{ shade_8 }}',
+  '--primary-9': '{{ shade_9 }}',
+  '--primary-10': '{{ shade_10 }}',
+};
+
+export function applyTheme() {
+  const style = document.documentElement.style;
+  Object.entries(palette).forEach(([k, v]) => style.setProperty(k, v));
+}

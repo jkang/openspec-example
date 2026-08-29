@@ -1,0 +1,27 @@
+// =========================================================
+// {{ productName }} · 角色与场景（由 mvp_spec.personas/scenarios 生成）
+// =========================================================
+
+export const personas = [
+{% for p in personas %}
+  {
+    id: '{{ p.id }}',
+    name: '{{ p.name }}',
+    role: '{{ p.role }}',
+    department: '{{ p.department }}',
+    goals: {{ p.goals|tojson }},
+  },
+{% endfor %}
+];
+
+export const scenarios = [
+{% for s in scenarios %}
+  {
+    id: '{{ s.id }}',
+    name: '{{ s.name }}',
+    personaId: '{{ s.personaId }}',
+    trigger: '{{ s.trigger }}',
+    goal: '{{ s.goal }}',
+  },
+{% endfor %}
+];

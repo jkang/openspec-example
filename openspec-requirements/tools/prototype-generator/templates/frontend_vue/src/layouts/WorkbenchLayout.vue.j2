@@ -1,0 +1,86 @@
+<template>
+  <a-layout style="min-height: 100vh">
+    <a-layout-sider :width="216" theme="dark" :collapsible="false" style="position: sticky; top: 0; height: 100vh">
+      <div class="brand">
+        <div class="brand-logo">{{ brand_initial }}</div>
+        <div class="brand-text">
+          <div class="brand-name">{{ productName }}</div>
+          <div class="brand-sub">AI-POWERED MVP</div>
+        </div>
+      </div>
+      <a-menu
+        :selected-keys="[route.path]"
+        theme="dark"
+        @menu-item-click="(key) => router.push(key)"
+      >
+        <a-menu-item v-for="item in menuItems" :key="item.key">
+          <template #icon><component :is="item.icon" /></template>
+          {{ '{{ item.label }}' }}
+        </a-menu-item>
+      </a-menu>
+      <div class="brand-foot">
+        {{ '{{ persona ? `当前角色：${persona.name}（${persona.role}）` : "" }}' }}
+      </div>
+    </a-layout-sider>
+    <a-layout>
+      <a-layout-header class="app-header">
+        <div class="header-title">{{ '{{ currentTitle }}' }}</div>
+        <div class="header-actions">
+          <a-select :model-value="personaId" style="width: 210px" @change="setPersonaId">
+            <a-option v-for="p in personas" :key="p.id" :value="p.id">{{ '{{ p.name }}（{{ p.role }}）' }}</a-option>
+          </a-select>
+          <a-badge :count="3">
+            <a-avatar shape="square"><icon-bell /></a-avatar>
+          </a-badge>
+        </div>
+      </a-layout-header>
+      <a-layout-content class="app-content">
+        <router-view />
+      </a-layout-content>
+    </a-layout>
+  </a-layout>
+</template>
+
+<script setup>
+import { computed, ref } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
+import { brand } from '../theme.js';
+import { personas } from '../data/appData.js';
+
+const route = useRoute();
+const router = useRouter();
+const personaId = ref(personas[0]?.id || '');
+const persona = computed(() => personas.find((p) => p.id === personaId.value) || personas[0]);
+
+const menuItems = [
+{% for page in pages %}
+  { key: '{{ page.route }}', label: '{{ page.title }}', icon: '{{ page.icon_arco }}' },
+{% endfor %}
+];
+
+const currentTitle = computed(() => {
+  const found = menuItems.find((m) => m.key === route.path);
+  return found ? found.label : '工作台';
+});
+</script>
+
+<style scoped>
+.brand { height: 56px; display: flex; align-items: center; gap: 10px; padding: 0 16px; color: #fff; }
+.brand-logo {
+  width: 32px; height: 32px; border-radius: 8px; flex-shrink: 0;
+  background: linear-gradient(135deg, {{ primary }}, {{ accent }});
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 17px;
+}
+.brand-name { font-weight: 700; font-size: 14px; line-height: 1.2; white-space: nowrap; }
+.brand-sub { font-size: 10px; opacity: 0.55; }
+.brand-foot { position: absolute; bottom: 16px; left: 16px; right: 16px; font-size: 11px; color: rgba(255,255,255,0.35); }
+.app-header {
+  background: #fff; height: 56px; padding: 0 24px; display: flex; align-items: center;
+  justify-content: space-between; box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+  position: sticky; top: 0; z-index: 10;
+}
+.header-title { font-size: 16px; font-weight: 600; color: #1d2129; }
+.header-actions { display: flex; align-items: center; gap: 16px; }
+.app-content { margin: 20px; min-height: calc(100vh - 96px); }
+</style>

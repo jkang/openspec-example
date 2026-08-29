@@ -1,0 +1,17 @@
+// =========================================================
+// Mock AI Service —— AI 能力独立 service 模块
+// 说明：当前为 Mock 实现（含模拟延迟），返回贴近真实业务的数据。
+//       后续可将本模块抽离为独立 AI 微服务（HTTP/gRPC 部署）。
+// =========================================================
+
+const latency = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+export const aiService = {
+{% for mock in aiMocks %}
+  // ---- {{ mock.name }} ----
+  async {{ mock.name }}(body = {}) {
+    await latency({{ mock.latency }});
+    return {{ mock.response|tojson }};
+  },
+{% endfor %}
+};

@@ -1,0 +1,1247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>餐厅就餐服务蓝图</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+                   "Noto Sans SC", "PingFang SC", Arial, sans-serif;
+      background: #f1f5f9;
+      padding: 24px;
+      color: #1e293b;
+    }
+
+    /* ── Page wrapper ── */
+    .page-wrap {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 16px rgba(0,0,0,.08);
+      padding: 24px;
+      overflow-x: auto;
+    }
+    .page-title {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: #0f172a;
+      margin-bottom: 20px;
+      padding-left: 14px;
+      border-left: 4px solid #0ea5e9;
+    }
+
+    /* ── Blueprint canvas ── */
+    .bp-canvas {
+      min-width: 1138px;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    /* ── Phase header row ── */
+    .phase-header-row {
+      display: flex;
+      background: #f8fafc;
+      border-bottom: 2px solid #e2e8f0;
+    }
+    .corner-cell {
+      width: 128px;
+      min-width: 128px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-right: 1px solid #e2e8f0;
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #64748b;
+      letter-spacing: .04em;
+      padding: 8px 4px;
+    }
+    .phase-headers { display: flex; }
+    .phase-header-cell {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 12px;
+      height: 44px;
+      background: #475569;
+      color: #fff;
+      font-size: 0.8rem;
+      font-weight: 600;
+      position: relative;
+      transition: background .15s;
+    }
+    /* arrow chevron shape */
+    .phase-header-cell.first-phase {
+      clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%);
+    }
+    .phase-header-cell.mid-phase {
+      clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%, 14px 50%);
+    }
+
+    /* ── Swimlane row ── */
+    .swimlane-row {
+      display: flex;
+      border-bottom: 1px solid #e2e8f0;
+      min-height: 44px;
+    }
+    .swimlane-row:last-child { border-bottom: none; }
+
+    .lane-label {
+      width: 128px;
+      min-width: 128px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px 4px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: #475569;
+      text-align: center;
+      border-right: 1px solid #e2e8f0;
+      line-height: 1.4;
+      background: #f1f5f9;  /* bg-slate-100 */
+    }
+
+    .lane-cells { display: flex; flex: 1; }
+
+    /* ── Phase cell ── */
+    .phase-cell {
+      flex-shrink: 0;
+      border-right: 1px solid #e2e8f0;
+      padding: 8px 10px;
+    }
+    .phase-cell:last-child { border-right: none; }
+
+    /* ── Layer divider (dashed) ── */
+    .layer-divider {
+      border-top: 1.5px dashed #cbd5e1;
+      margin: 2px 0;
+    }
+
+    /* ── Action / Activity card ── */
+    .cards-row { display: flex; flex-wrap: nowrap; gap: 6px; }
+    
+    .card-container {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+    
+    .card {
+      width: 100px;
+      border-radius: 4px;
+      padding: 4px 8px;
+      font-size: 0.68rem;
+      color: #334155;
+      line-height: 1.4;
+      text-align: center;
+    }
+    .card.front-card { background: #f0f9ff; }
+    .card.back-card  { background: #f0f9ff; } /* bg-sky-50 used universally in react cards */
+
+    .card-name { font-weight: 500; color: #334155; }
+    
+    .card-role {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.6rem;
+      color: #64748b;
+    }
+    .role-avatar {
+      width: 20px; height: 20px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .role-avatar svg { width: 12px; height: 12px; color: #475569; }
+
+    /* Touchpoint and System Chip container */
+    .chip-container {
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Touchpoint badge */
+    .touchpoint-badge {
+      display: inline-block;
+      font-size: 0.6rem;
+      background: #f1f5f9;
+      color: #475569;
+      border-radius: 4px;
+      padding: 2px 6px;
+      text-align: center;
+    }
+
+    /* System touchpoint chip */
+    .sys-chip {
+      display: inline-block;
+      font-size: 0.6rem;
+      background: #f1f5f9;
+      color: #475569;
+      border-radius: 4px;
+      padding: 2px 6px;
+      text-align: center;
+    }
+
+    /* Cognitive load badge */
+    .load-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.6rem;
+      border-radius: 999px;
+      padding: 2px 6px;
+      border-width: 1px;
+      border-style: solid;
+      margin-top: 2px;
+    }
+    .load-low      { background: #dcfce7; border-color: #86efac; color: #166534; }
+    .load-medium   { background: #fef9c3; border-color: #fde047; color: #713f12; }
+    .load-high     { background: #ffedd5; border-color: #fdba74; color: #9a3412; }
+    .load-critical { background: #fee2e2; border-color: #fca5a5; color: #991b1b; }
+
+    /* Pain point & expectation tags */
+    .pain-item {
+      display: flex; align-items: flex-start; gap: 4px;
+      font-size: 0.62rem; color: #2563eb; line-height: 1.45;
+    }
+    .pain-bullet { flex-shrink: 0; color: #60a5fa; }
+    .expect-item {
+      display: flex; align-items: flex-start; gap: 4px;
+      font-size: 0.62rem; color: #16a34a; line-height: 1.45;
+    }
+    .expect-bullet { flex-shrink: 0; }
+
+    /* Footer */
+    .bp-footer {
+      font-size: 0.62rem;
+      color: #94a3b8;
+      margin-top: 14px;
+      text-align: right;
+    }
+  </style>
+</head>
+<body>
+  
+
+  <div class="page-wrap">
+    <h1 class="page-title">餐厅就餐服务蓝图</h1>
+
+    <div class="bp-canvas">
+
+      
+      <div class="phase-header-row">
+        <div class="corner-cell">阶段<br>Phase</div>
+        <div class="phase-headers">
+          
+          <div class="phase-header-cell first-phase"
+               style="width: 226px;">
+            到店前
+          </div>
+          
+          <div class="phase-header-cell mid-phase"
+               style="width: 332px;">
+            到店
+          </div>
+          
+          <div class="phase-header-cell mid-phase"
+               style="width: 226px;">
+            就餐
+          </div>
+          
+          <div class="phase-header-cell mid-phase"
+               style="width: 226px;">
+            离店
+          </div>
+          
+        </div>
+      </div>
+
+      
+      
+      <div class="swimlane-row layer-customer">
+        <div class="lane-label">客户行为</div>
+        <div class="lane-cells">
+          
+          <div class="phase-cell" style="width: 226px; min-height: 50px;">
+            <div class="cards-row">
+              
+              <div class="card-container" style="width: 100px;">
+                <div class="card front-card">
+                  <div class="card-name">查看距离、评价</div>
+                </div>
+              </div>
+              
+              <div class="card-container" style="width: 100px;">
+                <div class="card front-card">
+                  <div class="card-name">咨询/预订</div>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 332px; min-height: 50px;">
+            <div class="cards-row">
+              
+              <div class="card-container" style="width: 100px;">
+                <div class="card front-card">
+                  <div class="card-name">询问是否有位</div>
+                </div>
+              </div>
+              
+              <div class="card-container" style="width: 100px;">
+                <div class="card front-card">
+                  <div class="card-name">领取号码牌</div>
+                </div>
+              </div>
+              
+              <div class="card-container" style="width: 100px;">
+                <div class="card front-card">
+                  <div class="card-name">了解点餐流程</div>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 226px; min-height: 50px;">
+            <div class="cards-row">
+              
+              <div class="card-container" style="width: 100px;">
+                <div class="card front-card">
+                  <div class="card-name">扫码点餐</div>
+                </div>
+              </div>
+              
+              <div class="card-container" style="width: 100px;">
+                <div class="card front-card">
+                  <div class="card-name">用餐</div>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 226px; min-height: 50px;">
+            <div class="cards-row">
+              
+              <div class="card-container" style="width: 100px;">
+                <div class="card front-card">
+                  <div class="card-name">团购券结账</div>
+                </div>
+              </div>
+              
+              <div class="card-container" style="width: 100px;">
+                <div class="card front-card">
+                  <div class="card-name">获取停车券</div>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+      
+      <div class="swimlane-row layer-customer">
+        <div class="lane-label">触点</div>
+        <div class="lane-cells">
+          
+          <div class="phase-cell" style="width: 226px; min-height: 40px;">
+            <div class="cards-row">
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="touchpoint-badge">美团App</span>
+                
+              </div>
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="touchpoint-badge">电话</span>
+                
+              </div>
+              
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 332px; min-height: 40px;">
+            <div class="cards-row">
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="touchpoint-badge">迎宾员</span>
+                
+              </div>
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="touchpoint-badge">迎宾员</span>
+                
+              </div>
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="touchpoint-badge">领位员/桌卡</span>
+                
+              </div>
+              
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 226px; min-height: 40px;">
+            <div class="cards-row">
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="touchpoint-badge">微信小程序</span>
+                
+              </div>
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="touchpoint-badge">服务员</span>
+                
+              </div>
+              
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 226px; min-height: 40px;">
+            <div class="cards-row">
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="touchpoint-badge">美团App/票据</span>
+                
+              </div>
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="touchpoint-badge">迎宾员</span>
+                
+              </div>
+              
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+      
+      <div class="swimlane-row layer-customer">
+        <div class="lane-label">痛点<br>期待</div>
+        <div class="lane-cells">
+          
+          <div class="phase-cell" style="width: 226px; min-height: 50px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+            
+              
+              <div class="pain-item"><span class="pain-bullet">•</span><span>评价真实性难以判断</span></div>
+              
+              <div class="pain-item"><span class="pain-bullet">•</span><span>距离计算不够准确</span></div>
+              
+              
+              <div class="expect-item"><span class="expect-bullet">○</span><span>希望看到真实评价</span></div>
+              
+            
+              
+              <div class="pain-item"><span class="pain-bullet">•</span><span>电话占线难打通</span></div>
+              
+              
+              <div class="expect-item"><span class="expect-bullet">○</span><span>快速确认预订</span></div>
+              
+            
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 332px; min-height: 50px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+            
+              
+              <div class="pain-item"><span class="pain-bullet">•</span><span>高峰期需要排队等位</span></div>
+              
+              
+              <div class="expect-item"><span class="expect-bullet">○</span><span>希望尽快入座</span></div>
+              
+            
+              
+              <div class="pain-item"><span class="pain-bullet">•</span><span>等位时间不确定</span></div>
+              
+              
+              <div class="expect-item"><span class="expect-bullet">○</span><span>希望知道预计等候时间</span></div>
+              
+            
+              
+              
+              <div class="expect-item"><span class="expect-bullet">○</span><span>希望流程简单易懂</span></div>
+              
+            
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 226px; min-height: 50px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+            
+              
+              <div class="pain-item"><span class="pain-bullet">•</span><span>菜品图片与实物有差异</span></div>
+              
+              <div class="pain-item"><span class="pain-bullet">•</span><span>小程序加载慢</span></div>
+              
+              
+              <div class="expect-item"><span class="expect-bullet">○</span><span>点餐流程顺畅</span></div>
+              
+            
+              
+              <div class="pain-item"><span class="pain-bullet">•</span><span>上菜慢</span></div>
+              
+              
+              <div class="expect-item"><span class="expect-bullet">○</span><span>菜品口味好</span></div>
+              
+            
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 226px; min-height: 50px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+            
+              
+              <div class="pain-item"><span class="pain-bullet">•</span><span>优惠券使用规则复杂</span></div>
+              
+              
+              <div class="expect-item"><span class="expect-bullet">○</span><span>结账快速便捷</span></div>
+              
+            
+              
+              
+              <div class="expect-item"><span class="expect-bullet">○</span><span>离店体验好</span></div>
+              
+            
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+      
+      <div class="layer-divider" style="margin: 0;"></div>
+
+      
+      
+      <div class="swimlane-row layer-front">
+        <div class="lane-label">前台活动</div>
+        <div class="lane-cells">
+          
+          <div class="phase-cell" style="width: 226px; min-height: 70px;">
+            <div class="cards-row">
+              
+              <div class="card-container" style="width: 100px;">
+                
+                <div class="card-role">
+                  <div class="role-avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </div>
+                  迎宾员
+                </div>
+                
+                <div class="card front-card">
+                  <div class="card-name">答疑/接受预订</div>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 332px; min-height: 70px;">
+            <div class="cards-row">
+              
+              <div class="card-container" style="width: 100px;">
+                
+                <div class="card-role">
+                  <div class="role-avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </div>
+                  迎宾员
+                </div>
+                
+                <div class="card front-card">
+                  <div class="card-name">欢迎/问候</div>
+                </div>
+              </div>
+              
+              <div class="card-container" style="width: 100px;">
+                
+                <div class="card-role">
+                  <div class="role-avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </div>
+                  迎宾员
+                </div>
+                
+                <div class="card front-card">
+                  <div class="card-name">为顾客取号</div>
+                </div>
+              </div>
+              
+              <div class="card-container" style="width: 100px;">
+                
+                <div class="card-role">
+                  <div class="role-avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </div>
+                  领位员
+                </div>
+                
+                <div class="card front-card">
+                  <div class="card-name">领位落座</div>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 226px; min-height: 70px;">
+            <div class="cards-row">
+              
+              <div class="card-container" style="width: 100px;">
+                
+                <div class="card-role">
+                  <div class="role-avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </div>
+                  服务员
+                </div>
+                
+                <div class="card front-card">
+                  <div class="card-name">菜品推荐</div>
+                </div>
+              </div>
+              
+              <div class="card-container" style="width: 100px;">
+                
+                <div class="card-role">
+                  <div class="role-avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </div>
+                  服务员
+                </div>
+                
+                <div class="card front-card">
+                  <div class="card-name">餐间服务</div>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 226px; min-height: 70px;">
+            <div class="cards-row">
+              
+              <div class="card-container" style="width: 100px;">
+                
+                <div class="card-role">
+                  <div class="role-avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </div>
+                  服务员
+                </div>
+                
+                <div class="card front-card">
+                  <div class="card-name">核单/收银/打单</div>
+                </div>
+              </div>
+              
+              <div class="card-container" style="width: 100px;">
+                
+                <div class="card-role">
+                  <div class="role-avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </div>
+                  迎宾员
+                </div>
+                
+                <div class="card front-card">
+                  <div class="card-name">欢送顾客</div>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+      
+      <div class="swimlane-row layer-front">
+        <div class="lane-label">系统触点</div>
+        <div class="lane-cells">
+          
+          <div class="phase-cell" style="width: 226px; min-height: 40px;">
+            <div class="cards-row">
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="sys-chip">座机</span>
+                
+              </div>
+              
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 332px; min-height: 40px;">
+            <div class="cards-row">
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="sys-chip">无</span>
+                
+              </div>
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="sys-chip">平板电脑/小票机</span>
+                
+              </div>
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="sys-chip">无</span>
+                
+              </div>
+              
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 226px; min-height: 40px;">
+            <div class="cards-row">
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="sys-chip">无</span>
+                
+              </div>
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="sys-chip">平板电脑</span>
+                
+              </div>
+              
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 226px; min-height: 40px;">
+            <div class="cards-row">
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="sys-chip">POS机/扫码枪</span>
+                
+              </div>
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="sys-chip">无</span>
+                
+              </div>
+              
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+      
+      <div class="swimlane-row layer-front">
+        <div class="lane-label">痛点<br>负荷</div>
+        <div class="lane-cells">
+          
+          <div class="phase-cell" style="width: 226px; min-height: 40px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+            
+              
+              <div class="pain-item"><span class="pain-bullet">•</span><span>高峰期电话太多</span></div>
+              
+              
+              <div>
+  
+  <span class="load-badge load-medium">
+    
+    <svg style="width:12px; height:12px; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    
+    medium
+  </span>
+  
+  </div>
+              
+            
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 332px; min-height: 40px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+            
+              
+              
+              <div>
+  
+  <span class="load-badge load-low">
+    
+    <svg style="width:12px; height:12px; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    
+    low
+  </span>
+  
+  </div>
+              
+            
+              
+              <div class="pain-item"><span class="pain-bullet">•</span><span>高峰期取号量大</span></div>
+              
+              
+              <div>
+  
+  <span class="load-badge load-medium">
+    
+    <svg style="width:12px; height:12px; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    
+    medium
+  </span>
+  
+  </div>
+              
+            
+              
+              
+              <div>
+  
+  <span class="load-badge load-low">
+    
+    <svg style="width:12px; height:12px; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    
+    low
+  </span>
+  
+  </div>
+              
+            
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 226px; min-height: 40px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+            
+              
+              <div class="pain-item"><span class="pain-bullet">•</span><span>需要记住大量菜品信息</span></div>
+              
+              
+              <div>
+  
+  <span class="load-badge load-medium">
+    
+    <svg style="width:12px; height:12px; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    
+    medium
+  </span>
+  
+  </div>
+              
+            
+              
+              <div class="pain-item"><span class="pain-bullet">•</span><span>同时服务多桌压力大</span></div>
+              
+              
+              <div>
+  
+  <span class="load-badge load-high">
+    
+    <svg style="width:12px; height:12px; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    
+    high
+  </span>
+  
+  </div>
+              
+            
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 226px; min-height: 40px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+            
+              
+              <div class="pain-item"><span class="pain-bullet">•</span><span>团购核销复杂</span></div>
+              
+              
+              <div>
+  
+  <span class="load-badge load-high">
+    
+    <svg style="width:12px; height:12px; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    
+    high
+  </span>
+  
+  </div>
+              
+            
+              
+              
+              <div>
+  
+  <span class="load-badge load-low">
+    
+    <svg style="width:12px; height:12px; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    
+    low
+  </span>
+  
+  </div>
+              
+            
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+      
+      <div class="layer-divider" style="margin: 0;"></div>
+
+      
+      
+      <div class="swimlane-row layer-back">
+        <div class="lane-label">支撑流程</div>
+        <div class="lane-cells">
+          
+          <div class="phase-cell" style="width: 226px; min-height: 60px;">
+            <div class="cards-row">
+              
+              <div class="card-container" style="width: 100px;">
+                
+                <div class="card-role">
+                  <div class="role-avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </div>
+                  大堂经理
+                </div>
+                
+                <div class="card back-card">
+                  <div class="card-name">餐位预留</div>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 332px; min-height: 60px;">
+            <div class="cards-row">
+              
+              <div class="card-container" style="width: 100px;">
+                
+                <div class="card-role">
+                  <div class="role-avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </div>
+                  后勤组
+                </div>
+                
+                <div class="card back-card">
+                  <div class="card-name">排队队列管理</div>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 226px; min-height: 60px;">
+            <div class="cards-row">
+              
+              <div class="card-container" style="width: 100px;">
+                
+                <div class="card-role">
+                  <div class="role-avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </div>
+                  后勤组
+                </div>
+                
+                <div class="card back-card">
+                  <div class="card-name">库存管理</div>
+                </div>
+              </div>
+              
+              <div class="card-container" style="width: 100px;">
+                
+                <div class="card-role">
+                  <div class="role-avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </div>
+                  厨师长
+                </div>
+                
+                <div class="card back-card">
+                  <div class="card-name">出餐调度</div>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 226px; min-height: 60px;">
+            <div class="cards-row">
+              
+              <div class="card-container" style="width: 100px;">
+                
+                <div class="card-role">
+                  <div class="role-avatar">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                      <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                  </div>
+                  大堂经理
+                </div>
+                
+                <div class="card back-card">
+                  <div class="card-name">营收统计</div>
+                </div>
+              </div>
+              
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+      
+      <div class="swimlane-row layer-back">
+        <div class="lane-label">后台系统</div>
+        <div class="lane-cells">
+          
+          <div class="phase-cell" style="width: 226px; min-height: 40px;">
+            <div class="cards-row">
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="sys-chip">前堂管理系统</span>
+                
+              </div>
+              
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 332px; min-height: 40px;">
+            <div class="cards-row">
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="sys-chip">排队系统</span>
+                
+              </div>
+              
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 226px; min-height: 40px;">
+            <div class="cards-row">
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="sys-chip">库存管理系统</span>
+                
+              </div>
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="sys-chip">后厨管理系统</span>
+                
+              </div>
+              
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 226px; min-height: 40px;">
+            <div class="cards-row">
+              
+              <div class="chip-container" style="width: 100px;">
+                
+                <span class="sys-chip">财务系统</span>
+                
+              </div>
+              
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+      
+      <div class="swimlane-row layer-back">
+        <div class="lane-label">痛点<br>负荷</div>
+        <div class="lane-cells">
+          
+          <div class="phase-cell" style="width: 226px; min-height: 40px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+            
+              
+              <div class="pain-item"><span class="pain-bullet">•</span><span>临时取消预订处理</span></div>
+              
+              
+              <div>
+  
+  <span class="load-badge load-low">
+    
+    <svg style="width:12px; height:12px; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+    
+    low
+  </span>
+  
+  </div>
+              
+            
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 332px; min-height: 40px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+            
+              
+              <div class="pain-item"><span class="pain-bullet">•</span><span>高峰期调度困难</span></div>
+              
+              
+              <div>
+  
+  <span class="load-badge load-medium">
+    
+    <svg style="width:12px; height:12px; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    
+    medium
+  </span>
+  
+  </div>
+              
+            
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 226px; min-height: 40px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+            
+              
+              <div class="pain-item"><span class="pain-bullet">•</span><span>食材消耗预估困难</span></div>
+              
+              
+              <div>
+  
+  <span class="load-badge load-medium">
+    
+    <svg style="width:12px; height:12px; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    
+    medium
+  </span>
+  
+  </div>
+              
+            
+              
+              <div class="pain-item"><span class="pain-bullet">•</span><span>高峰期出餐压力大</span></div>
+              
+              <div class="pain-item"><span class="pain-bullet">•</span><span>多订单优先级管理</span></div>
+              
+              
+              <div>
+  
+  <span class="load-badge load-high">
+    
+    <svg style="width:12px; height:12px; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    
+    high
+  </span>
+  
+  </div>
+              
+            
+            </div>
+          </div>
+          
+          <div class="phase-cell" style="width: 226px; min-height: 40px;">
+            <div style="display: flex; flex-direction: column; gap: 4px;">
+            
+              
+              <div class="pain-item"><span class="pain-bullet">•</span><span>多渠道对账复杂</span></div>
+              
+              
+              <div>
+  
+  <span class="load-badge load-medium">
+    
+    <svg style="width:12px; height:12px; flex-shrink:0;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+    
+    medium
+  </span>
+  
+  </div>
+              
+            
+            </div>
+          </div>
+          
+        </div>
+      </div>
+
+    </div>
+
+    <p class="bp-footer">Generated by blueprint-map-generator · 2026-04-21 16:33</p>
+  </div>
+</body>
+</html>
