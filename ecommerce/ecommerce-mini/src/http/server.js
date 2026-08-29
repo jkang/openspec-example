@@ -54,6 +54,15 @@ const initialCoupons = [
   { id: 'PERCENT9', name: '9 折数码券', type: 'PERCENTAGE', value: 9, minSpendCents: 10000, status: 'UNUSED', expiryDate: '2026-12-31', userId: null }
 ]
 
+// 注入初始演示用户数据（R-LOG-001 对应前端示例）
+const initialUsers = [
+  { 
+    id: 'user_1001', phone: '13912345678', nickname: '陈晓芸', 
+    passwordHash: 'scrypt:708139f4b3a834319eacf7c532b1e4c9:d850177ba1e6bf16d801ec85a8720a98be2b7cb42c1bbca37f30831827b4d09f5dcf8b641c8657c8f41ce154d35d4896e4312923c0e58da3baa8bd9594fb8f92', 
+    status: '正常', role: '客户', createdAt: '2026-08-29 08:00'
+  }
+]
+
 const readJson = async (req) => {
   return new Promise((resolve, reject) => {
     let body = ''
@@ -156,6 +165,7 @@ export function createServer() {
   initialProducts.forEach(p => productRepo.save({ ...p }))
   initialCoupons.forEach(c => couponRepo.save({ ...c }))
   initialCategories.forEach(c => categoryRepo.save({ ...c }))
+  initialUsers.forEach(u => userRepo.save({ ...u }))
 
   const catalogService = new CatalogService(productRepo, categoryRepo)
   const cartService = new CartService(cartRepo, productRepo)
@@ -199,6 +209,7 @@ export function createServer() {
         initialProducts.forEach(p => productRepo.save({ ...p }))
         initialCoupons.forEach(c => couponRepo.save({ ...c }))
         initialCategories.forEach(c => categoryRepo.save({ ...c }))
+        initialUsers.forEach(u => userRepo.save({ ...u }))
         return sendJson(res, 200, { ok: true })
       }
 
