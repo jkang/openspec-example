@@ -1,7 +1,6 @@
 import http from 'http'
-import fs from 'fs'
-import path from 'path'
 import { ProductRepo, CartRepo, OrderRepo, CouponRepo, IssuanceRepo, CategoryRepo, UserRepo, SessionRepo } from '../repo/memoryRepo.js'
+import { FileRepoAdapter, UserFileRepo, SessionFileRepo, resolveDataDir } from '../repo/fileRepo.js'
 import { CatalogService } from '../services/catalog.js'
 import { CartService } from '../services/cart.js'
 import { OrderService } from '../services/order.js'
@@ -150,22 +149,69 @@ function requireAdminRole(req, authService) {
   return user
 }
 
-export function createServer() {
-  // 每个 server 实例独立的仓储与服务（保证测试套件间状态隔离）
-  const productRepo = new ProductRepo()
-  const cartRepo = new CartRepo()
-  const orderRepo = new OrderRepo()
-  const couponRepo = new CouponRepo()
-  const issuanceRepo = new IssuanceRepo()
-  const categoryRepo = new CategoryRepo()
-  const userRepo = new UserRepo()
-  const sessionRepo = new SessionRepo()
+/**
+ * 存储后端选择（fix-data-persistence）：
+ * - 显式 storage 参数（memory|file）优先
+ * - 显式 STORAGE=memory|file 环境变量次之
+ * - 缺省：NODE_ENV=test → memory（测试隔离）；否则 → file（运行链路默认落盘）
+ * @param {string} [storage]
+ * @returns {'memory' | 'file'}
+ */
+function resolveStorage(storage) {
+  if (storage === 'memory' || storage === 'file') return storage
+  const env = process.env.STORAGE
+  if (env === 'memory' || env === 'file') return env
+  return process.env.NODE_ENV === 'test' ? 'memory' : 'file'
+}
 
-  // 克隆种子对象，避免跨 server 实例共享引用导致状态污染
-  initialProducts.forEach(p => productRepo.save({ ...p }))
-  initialCoupons.forEach(c => couponRepo.save({ ...c }))
-  initialCategories.forEach(c => categoryRepo.save({ ...c }))
-  initialUsers.forEach(u => userRepo.save({ ...u }))
+/** file 模式种子对齐：仅当数据文件缺失/为空时注入种子，已有数据一律保留 */
+function seedFileRepos({ productRepo, categoryRepo, couponRepo, userRepo }) {
+  if (productRepo.findAll().length === 0) initialProducts.forEach(p => productRepo.save({ ...p }))
+  if (categoryRepo.findAll().length === 0) initialCategories.forEach(c => categoryRepo.save({ ...c }))
+  if (couponRepo.findAll().length === 0) initialCoupons.forEach(c => couponRepo.save({ ...c }))
+  if (userRepo.findAll().length === 0) initialUsers.forEach(u => userRepo.save({ ...u }))
+}
+
+export function createServer({ storage, dataDir } = {}) {
+  // 每个 server 实例独立的仓储与服务（保证测试套件间状态隔离）
+  const useFile = resolveStorage(storage) === 'file'
+  const fileDataDir = resolveDataDir(dataDir)
+
+  let productRepo, cartRepo, orderRepo, couponRepo, issuanceRepo, categoryRepo, userRepo, sessionRepo
+  let testMode = false
+
+  if (useFile) {
+    // 文件存储（运行链路默认）：共享 FileStore 适配层，落盘 data/*.json
+    productRepo = new FileRepoAdapter({ filename: 'products.json', dataDir: fileDataDir })
+    cartRepo = new FileRepoAdapter({ filename: 'carts.json', keyField: 'userId', dataDir: fileDataDir })
+    orderRepo = new FileRepoAdapter({ filename: 'orders.json', dataDir: fileDataDir })
+    couponRepo = new FileRepoAdapter({ filename: 'coupons.json', dataDir: fileDataDir })
+    issuanceRepo = new FileRepoAdapter({ filename: 'issuances.json', dataDir: fileDataDir })
+    categoryRepo = new FileRepoAdapter({ filename: 'categories.json', dataDir: fileDataDir })
+    userRepo = new UserFileRepo({ dataDir: fileDataDir })
+    sessionRepo = new SessionFileRepo({ dataDir: fileDataDir })
+    // 种子对齐：products/categories/coupons 沿用既有种子；users 注入演示用户 user_1001；
+    // carts/orders/issuances/sessions 由 FileStore 初始化为空数据集
+    seedFileRepos({ productRepo, categoryRepo, couponRepo, userRepo })
+  } else {
+    // 内存存储（NODE_ENV=test 测试隔离）：保留既有行为
+    productRepo = new ProductRepo()
+    cartRepo = new CartRepo()
+    orderRepo = new OrderRepo()
+    couponRepo = new CouponRepo()
+    issuanceRepo = new IssuanceRepo()
+    categoryRepo = new CategoryRepo()
+    userRepo = new UserRepo()
+    sessionRepo = new SessionRepo()
+    // 测试后门仅 NODE_ENV=test + memory 模式生效（file 模式下必须 404）
+    testMode = process.env.NODE_ENV === 'test'
+
+    // 克隆种子对象，避免跨 server 实例共享引用导致状态污染
+    initialProducts.forEach(p => productRepo.save({ ...p }))
+    initialCoupons.forEach(c => couponRepo.save({ ...c }))
+    initialCategories.forEach(c => categoryRepo.save({ ...c }))
+    initialUsers.forEach(u => userRepo.save({ ...u }))
+  }
 
   const catalogService = new CatalogService(productRepo, categoryRepo)
   const cartService = new CartService(cartRepo, productRepo)
@@ -195,7 +241,7 @@ export function createServer() {
     try {
       // 测试后门：仅在 NODE_ENV=test 下启用，用于 E2E 数据隔离
       if (pathname === '/api/__test/reset' && req.method === 'POST') {
-        if (process.env.NODE_ENV !== 'test')
+        if (!testMode)
           return sendError(res, 'NOT_FOUND', 'Endpoint not found', 404)
         productRepo.products.clear()
         cartRepo.carts.clear()
@@ -215,7 +261,7 @@ export function createServer() {
 
       // 测试后门：设置用户状态（禁用/正常），仅 NODE_ENV=test 启用，供登录 E2E 禁用拦截场景使用
       if (pathname === '/api/__test/user-status' && req.method === 'POST') {
-        if (process.env.NODE_ENV !== 'test')
+        if (!testMode)
           return sendError(res, 'NOT_FOUND', 'Endpoint not found', 404)
         const body = await readJson(req)
         const user = userRepo.findByPhone(String(body.phone ?? '').trim())
@@ -226,7 +272,7 @@ export function createServer() {
 
       // 测试后门：设置用户角色（运营/客服/客户），仅 NODE_ENV=test 启用，供 B 端用户管理 E2E 创建运营/客服账号
       if (pathname === '/api/__test/user-role' && req.method === 'POST') {
-        if (process.env.NODE_ENV !== 'test')
+        if (!testMode)
           return sendError(res, 'NOT_FOUND', 'Endpoint not found', 404)
         const body = await readJson(req)
         const user = userRepo.findByPhone(String(body.phone ?? '').trim())
@@ -522,7 +568,8 @@ export function createServer() {
 
 if (process.argv[1] === new URL(import.meta.url).pathname) {
   const { server } = createServer()
-  server.listen(3000, () => {
-    console.log('Server running on port 3000')
+  const port = Number(process.env.PORT) || 3000
+  server.listen(port, () => {
+    console.log(`Server running on port ${port}`)
   })
 }
