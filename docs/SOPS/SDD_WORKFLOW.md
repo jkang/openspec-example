@@ -207,7 +207,7 @@ graph TD
 - **工作流**: 
   - 动态读取 `tasks.md` 中的复选框，完成一项则将 `- [ ]` 标记为 `- [x]`。
   - **测试驱动实现 (TDD/BDD)**: 必须严格按照 `spec.md` 上的标签 (`@unit`, `@api`, `@e2e`) 编写对应的测试代码。对于 `@e2e` 任务，必须在全局 `e2e-tests/` 目录中完成 Cucumber 步骤。
-  - **强制门禁 (Hard Gates)**: 开始实现前必须通过 `openspec validate --change "<name>"`，并在 `openspec/changes/<name>/verify.md` 初始化验证证据
+  - **强制门禁 (Hard Gates)**: 开始实现前必须通过 `openspec validate "<name>"`，并在 `openspec/changes/<name>/verify.md` 初始化验证证据
   - **强制门禁 (Hard Gates)**: 全部任务勾选完成后必须运行 `/opsx:verify <name>`，确保 Node 测试、Python 测试与前端构建均为 PASS，并将结果写入 `verify.md`
   - **建议门禁 (Soft Gates)**: E2E 建议运行 `./init.sh e2e:run`，失败时必须在 `verify.md` 记录失败摘要与原因
 

@@ -65,7 +65,7 @@ metadata:
 
 4. **运行硬门禁**
    ```bash
-   openspec validate --change "<name>"
+   openspec validate "<name>"
    ./init.sh node:test
    ./init.sh python:test
    ./init.sh vue:build

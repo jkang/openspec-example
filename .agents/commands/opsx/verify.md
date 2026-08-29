@@ -65,7 +65,7 @@ Run local verification gates for an OpenSpec change, and write evidence to `veri
 4. **Run hard gates**
    - Schema validate
      ```bash
-     openspec validate --change "<name>"
+     openspec validate "<name>"
      ```
    - Node test
      ```bash

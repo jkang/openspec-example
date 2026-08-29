@@ -15,17 +15,17 @@ artifacts:
 
       **流程分支控制**：如果是 Bug Fix 或 Tech Debt，请在提案中明确说明后续可能跳过原型 (Prototype) 并在 `.openspec.yaml` 中标记 `skip_specs: true`（若适用）。
 
-      章节结构：
-      - **Why (背景原因)**: 用 1-2 句话说明要解决的问题或抓住的机遇。这解决了什么问题？为什么现在要做？
-      - **What Changes (变更内容)**: 使用项目符号列出具体的变更点。明确说明新增功能、修改点或移除的内容。对于破坏性变更，请标记为 **BREAKING**。
-      - **Capabilities (系统能力)**: 明确指出将要创建或修改哪些规范 (specs)：
+      章节结构（**必须使用 `##` 标题级别**，与 `openspec/templates/proposal.md` 模板和 archive 校验器期望一致）：
+      - **`## Why (背景原因)`**: 用 1-2 句话说明要解决的问题或抓住的机遇。这解决了什么问题？为什么现在要做？
+      - **`## What Changes (变更内容)`**: 使用项目符号列出具体的变更点。明确说明新增功能、修改点或移除的内容。对于破坏性变更，请标记为 **BREAKING**。
+      - **`## Capabilities (系统能力)`**: 明确指出将要创建或修改哪些规范 (specs)：
         - **映射对齐约束**：此处列出的 Capabilities 必须与 `docs/baseline/domain_model.html` 中的映射表对齐。如果 proposal 写了一个未映射的 capability，你必须显式说明这是"新增 taxonomy"及其理由。
         - **边界引用约束**：必须显式列出受影响的 `Bounded Contexts`，说明每个 capability 归属到哪个治理边界。
         - **流程对齐约束 (Process Alignment)**: 必须明确列出本次变更受影响的流程节点 ID (来自 `business_process.html`)。
         - **蓝图对齐约束 (Service Blueprint Alignment)**: 必须明确列出本次变更受影响的服务蓝图节点 ID (来自 `service_blueprint.html`)，至少包含 `SB-STAGE-*` 与 `SB-<LANE>-*` 引用，并说明本次是新增、修改还是复用既有蓝图结构。
         - **新增能力 (New Capabilities)**: 列出引入的新能力。每个新能力将生成一个新的 `specs/<capability-path>/spec.md`。新增的路径片段必须使用烤串命名法（kebab-case，例如 `user-auth` 或 `identity/user-auth`），并遵循项目现有的规范组织结构。
         - **修改能力 (Modified Capabilities)**: 列出需求 (REQUIREMENTS)发生变化的现有能力。只有在规范级别的行为发生变化时才包含在此处（不仅仅是实现细节的改变）。每个被修改的能力都需要一个增量规范文件。必须使用 `openspec/specs/` 下完全相同的现有路径。如果没有需求变更，请留空。
-      - **Impact (影响范围)**: 受影响的代码、API、依赖项或系统模块。
+      - **`## Impact (影响范围)`**: 受影响的代码、API、依赖项或系统模块。
 
       重要提示：Capabilities (系统能力) 章节至关重要。它构成了提案阶段与规范阶段之间的契约。在填写此部分之前，请务必研究现有的规范。
       此处列出的每个能力都需要对应一个规范文件。

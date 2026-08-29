@@ -34,7 +34,7 @@ model: inherit
 
 - 加载 `apply-change` skill，按 `tasks.md` 逐项实施：
   - 严格遵循 BDD 标签（@unit / @api / @e2e）编写测试，测试金字塔：底层逻辑不推给 @e2e
-  - 实现前运行 `openspec validate --change "<name>"` 并确保 `<changeRoot>/verify.md` 存在
+  - 实现前运行 `openspec validate "<name>"` 并确保 `<changeRoot>/verify.md` 存在
   - 每完成一项：运行对应验证命令 → 更新 `verify.md` 证据 → 勾选 `tasks.md`（`- [ ]` → `- [x]`）
   - `@e2e` 任务在全局 `e2e-tests/` 完成 Cucumber 步骤
 - 全部完成：运行 `/opsx:verify`（或 `./init.sh` 对应测试），确保 Node 测试、Python 测试、前端构建均为 PASS。

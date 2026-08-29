@@ -58,6 +58,3 @@ rules:
     - 指出每个任务适用于哪个实现版本 (Node.js / Python / Frontend / 全部)
     - 包含全链路验证 (E2E) 任务，明确执行 init.sh 中的测试入口
     - 按依赖关系排序任务，确保测试覆盖
-  archive:
-    - 归档后必须更新对应的 epic-*.story-list.json 状态（将匹配 changeName 的 Story 标记为 done）
-    - 如果 Epic 下所有 Story 已完成，必须将该 story-list.json 归档至 openspec/changes/archive/ 目录（文件名加 YYYY-MM-DD- 前缀），保留 Epic 交付记录，禁止直接删除

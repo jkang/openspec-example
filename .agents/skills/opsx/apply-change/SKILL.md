@@ -39,7 +39,7 @@ Implement tasks from an OpenSpec change.
 3. **Preflight hard gates and initialize evidence**
 
    ```bash
-   openspec validate --change "<name>"
+   openspec validate "<name>"
    ```
 
    - If validation fails, stop and fix the planning artifacts before implementing
@@ -178,7 +178,7 @@ What would you like to do?
 **Guardrails**
 - Keep going through tasks until done or blocked
 - Always read context files before starting (from the apply instructions output)
-- Always run `openspec validate --change "<name>"` before implementing
+- Always run `openspec validate "<name>"` before implementing
 - Only consider apply complete when local hard gates are PASS and `verify.md` is updated
 - If task is ambiguous, pause and ask before implementing
 - If implementation reveals issues, pause and suggest artifact updates

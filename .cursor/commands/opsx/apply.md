@@ -35,7 +35,7 @@ Implement tasks from an OpenSpec change.
 3. **Preflight hard gates and initialize evidence**
 
    ```bash
-   openspec validate --change "<name>"
+   openspec validate "<name>"
    ```
 
    - If validation fails, stop and fix the planning artifacts before implementing
