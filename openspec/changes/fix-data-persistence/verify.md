@@ -16,7 +16,7 @@
 
 | 门禁 | 命令 | 状态 | 证据 |
 | :--- | :--- | :--- | :--- |
-| 既有 E2E 回归（24 场景） | `./init.sh e2e:run` | ✅ PASS | 24 scenarios (24 passed) / 132 steps (132 passed)；`NODE_ENV=test` 内存语义不变，`--profile e2e` 排除 `@persist` 互不干扰 |
+| 既有 E2E 回归 + smoke 主链路（25 场景） | `./init.sh e2e:run` | ✅ PASS | 25 scenarios (25 passed) / 153 steps (153 passed)；`smoke.feature` 由「仅 storefront load」扩展为覆盖**交易主链路一体化场景**（注册新账户自动登录 → 加购两件商品 → 结算侧边栏自动推荐「9 折数码券」最优方案，减免 -¥38.80、最终总额 ¥349.20 → 确认结算待支付 → 模拟支付 → 我的订单展示已支付订单），复用既有 steps（注册/加购/结算/支付/我的订单）14 个 + 新增 3 个通用衔接步骤（`steps/smoke_journey.js`：用户返回店铺首页 / 用户将第 N 件商品加入购物车 / 用户点击"继续购物"）；`NODE_ENV=test` 内存语义 + reset 后门隔离不变，`--profile e2e` 排除 `@persist` 互不干扰 |
 | 持久化 E2E（进程级重启） | `./init.sh e2e:persist` | ✅ PASS | 1 scenario / 8 steps passed；`STORAGE=file` + 独立临时 `DATA_DIR` + 端口 3011，进程级 kill→重启后原会话凭证/历史订单/状态 PAID/原手机号登录全部恢复 |
 
 ## 手动验证（门禁 7 补充证据）

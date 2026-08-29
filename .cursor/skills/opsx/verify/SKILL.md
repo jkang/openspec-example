@@ -28,6 +28,7 @@ metadata:
   4. 前端构建通过
 - **Soft Gates（软门禁）**:
   - E2E cucumber 应通过；失败不阻塞（默认），但必须在 verify.md 记录失败摘要。
+  - **E2E 覆盖完整性审查（软门禁）**: 对照本 change 的 proposal/specs，审查 `e2e-tests/features/` 是否覆盖受影响的用户旅程——核心交易主链路（注册/登录→选购→加购→优惠券→结算→支付→订单可见/履约）是否在 `smoke.feature` 或完整旅程场景中覆盖；缺口须记录到 verify.md 并列入技术债/后续任务，不得静默放行。
 
 ## Steps
 
@@ -82,7 +83,12 @@ metadata:
    ```
    失败: 标记 FAIL 并记录简短失败摘要；除非用户要求本次视为硬门禁，否则继续。
 
-6. **定稿**
+6. **E2E 覆盖完整性审查**
+   - 列出 `e2e-tests/features/*.feature`，对照本 change 的 proposal/specs 确认受影响旅程已有对应 `@e2e` 场景。
+   - 确认 `smoke.feature`（或等价完整旅程场景）仍覆盖核心交易主链路（注册/登录→选购→加购→优惠券→结算→支付→订单可见）。
+   - 审查结论写入 verify.md：`Coverage: FULL`（无缺口）或 `Coverage: GAP`（列出缺口 + 处理建议）。
+
+7. **定稿**
    - 更新 verify.md，逐项标记 PASS / FAIL。
    - 输出紧凑摘要，包含 verify.md 路径与门禁结果。
 

@@ -200,6 +200,7 @@ graph TD
   - **同步预判**: `design.md` 必须包含 `Service Blueprint Sync Assessment`，明确判断本次变更是否需要在 `sync` 阶段回写 `docs/baseline/service_blueprint.html`，以及触发原因。
   - **同步预判**: `design.md` 必须包含 `Domain Model Sync Assessment`，明确判断本次变更是否需要在 `sync` 阶段回写 `docs/baseline/domain_model.html`，以及触发原因。
   - 生成的任务清单必须包含 E2E 验证步骤。
+  - **E2E 覆盖审查（强制，防 smoke/e2e 脱节）**: 每个影响用户可观察流程的 change，spec-design 必须审查既有 `e2e-tests/features/`（尤其 `smoke.feature`）的覆盖：① smoke 是否以一体化场景覆盖核心交易主链路（注册/登录→选购→加购→优惠券→结算→支付→订单可见/履约）；② 本 change 新增/修改交互是否有对应 @e2e 场景；③ 行为变更是否使既有场景失效。任何缺口必须转化为 tasks.md 显式任务（如「补强 smoke 主链路场景」），严禁在完整使用流程未被覆盖的情况下进入 apply。
 
 ### 6. 应用阶段 (Apply)
 - **指令**: `/opsx:apply`
@@ -209,7 +210,7 @@ graph TD
   - **测试驱动实现 (TDD/BDD)**: 必须严格按照 `spec.md` 上的标签 (`@unit`, `@api`, `@e2e`) 编写对应的测试代码。对于 `@e2e` 任务，必须在全局 `e2e-tests/` 目录中完成 Cucumber 步骤。
   - **强制门禁 (Hard Gates)**: 开始实现前必须通过 `openspec validate "<name>"`，并在 `openspec/changes/<name>/verify.md` 初始化验证证据
   - **强制门禁 (Hard Gates)**: 全部任务勾选完成后必须运行 `/opsx:verify <name>`，确保 Node 测试、Python 测试与前端构建均为 PASS，并将结果写入 `verify.md`
-  - **建议门禁 (Soft Gates)**: E2E 建议运行 `./init.sh e2e:run`，失败时必须在 `verify.md` 记录失败摘要与原因
+  - **建议门禁 (Soft Gates)**: E2E 建议运行 `./init.sh e2e:run`，失败时必须在 `verify.md` 记录失败摘要与原因；同时执行 **E2E 覆盖完整性审查**（对照 proposal/specs 确认受影响旅程已覆盖、smoke 主链路完整），结论（FULL/GAP）写入 verify.md。
 
 ### 7. 更新阶段 (Update) - 可选
 - **指令**: `/opsx:update`

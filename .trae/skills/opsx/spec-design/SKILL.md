@@ -53,7 +53,22 @@ I'll create the following artifacts:
       - Write the file to `resolvedOutputPath`.
       - Show progress: "Created <artifact-id>"
 
-3. **Final Status Check**
+3. **E2E 覆盖审查 (Coverage Review) — 强制步骤**
+
+   在生成 tasks 后、定稿前，**必须**执行 E2E 覆盖审查，确保完整使用流程被 E2E 覆盖（防止 smoke/e2e 与功能演进脱节）：
+
+   a. **读取现有 E2E 资产**：列出 `e2e-tests/features/*.feature`（尤其 `smoke.feature`）与 `docs/TESTING_STRATEGY.md`。
+
+   b. **识别本 change 影响的用户旅程**：基于 proposal/specs 列出受影响的 C 端/B 端可观察流程。核心交易主链路为：**注册/登录 → 选购 → 加购 → 优惠券 → 结算 → 支付 → 订单可见/履约**。
+
+   c. **三问审查（逐项回答并记录）**:
+      - ① **smoke 主链路完整性**：`smoke.feature` 是否以一体化场景覆盖核心交易主链路？若 smoke 仅剩局部/页面加载级场景，必须补强任务。
+      - ② **新增功能覆盖**：本 change 新增/修改的交互是否已有对应 `@e2e` 场景？缺失则补。
+      - ③ **既有场景回归风险**：本 change 是否改变行为导致既有 @e2e 场景失效或语义漂移？若影响，列入适配/更新任务。
+
+   d. **缺口落盘**：任何覆盖缺口（①②③）必须转化为 `tasks.md` 中的显式任务（如「补强 smoke 主链路场景」「新增 X 的 E2E 旅程」），并标注所属实现版本。
+
+4. **Final Status Check**
    
    ```bash
    openspec status --change "<name>"
@@ -70,3 +85,4 @@ Prompt: "Planning is complete. When you are ready, run `/opsx:apply` to start im
 - This workflow ONLY creates `specs`, `design`, and `tasks`. Do NOT proceed to implementation.
 - Always read the approved `prototype.html` (if any) and the linked requirements-side `story.md` (if handoff) before creating specs.
 - Ensure `tasks.md` contains E2E validation steps.
+- **E2E 覆盖审查（强制）**: 每个影响用户可观察流程的 change，必须执行 E2E 覆盖审查（含 smoke 主链路完整性），并将覆盖缺口写入 `tasks.md`；严禁在 smoke/完整旅程未覆盖的情况下进入 apply。
