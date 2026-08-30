@@ -10,8 +10,6 @@
     <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Mermaid.js -->
-    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -46,257 +44,259 @@
             max-width: 1280px;
             aspect-ratio: 16 / 9;
             background: white;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.15);
             margin: 40px auto;
-            padding: 60px;
+            padding: 50px 80px;
             position: relative;
             overflow: hidden;
             display: flex;
             flex-direction: column;
         }
-        .mermaid {
-            background: transparent !important;
-            flex-grow: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
         .aidd-green { color: #00b96b; }
         .aidd-bg-green { background-color: #00b96b; }
         .aidd-blue { color: #1677ff; }
+        .aidd-bg-blue { background-color: #1677ff; }
         .aidd-border-green { border-color: #00b96b; }
+        .aidd-border-blue { border-color: #1677ff; }
         
-        /* Mermaid styling overrides */
-        .node rect, .node circle, .node polygon {
-            stroke-width: 2px !important;
+        /* Workflow Components */
+        .node {
+            @apply flex flex-col items-center justify-center p-5 border-2 rounded-2xl bg-white transition-all duration-300;
+            min-width: 220px;
         }
-        .edgePath path {
-            stroke-width: 2.5px !important;
+        .node-main { @apply border-aidd-green text-slate-900 font-black shadow-lg text-2xl; }
+        .node-sub { @apply border-slate-200 text-slate-500 text-xl border-dashed font-bold; }
+        .node-blue { @apply border-aidd-blue text-aidd-blue font-black shadow-lg text-2xl; }
+        .node-dark { @apply bg-slate-900 border-slate-900 text-white font-black shadow-xl text-xl; }
+        
+        .arrow-v-bold {
+            @apply w-2 h-12 bg-slate-100 relative;
         }
-        .label {
-            font-family: 'JetBrains Mono', monospace !important;
-            font-weight: 700 !important;
+        .arrow-v-bold::after {
+            content: '';
+            @apply absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0 border-x-[12px] border-x-transparent border-t-[18px] border-t-slate-100;
+        }
+        .arrow-v-main { @apply bg-aidd-green; }
+        .arrow-v-main::after { @apply border-t-aidd-green; }
+        .arrow-v-blue { @apply bg-aidd-blue; }
+        .arrow-v-blue::after { @apply border-t-aidd-blue; }
+
+        .bridge-container {
+            @apply flex flex-col items-center justify-center px-10 relative;
+        }
+        .bridge-line {
+            @apply h-2 bg-aidd-blue w-full absolute top-1/2 -translate-y-1/2 z-0;
+        }
+        .bridge-box {
+            @apply px-10 py-12 border-4 border-aidd-blue bg-white rounded-[40px] text-aidd-blue font-black text-3xl text-center shadow-[0_30px_70px_-15px_rgba(22,119,255,0.5)] relative z-10 transform -rotate-2;
+        }
+        
+        .pillar {
+            @apply flex-1 flex flex-col items-center p-8 rounded-[50px] border-4 border-dashed relative;
         }
     </style>
 </head>
 <body class="py-10 font-sans antialiased">
 
     <!-- Slide 1: Cover -->
-    <section class="slide border-t-[8px] border-aidd-green">
+    <section class="slide border-t-[15px] border-aidd-green">
         <div class="flex-grow flex flex-col justify-center text-center">
-            <div class="flex items-center justify-center gap-4 mb-8">
-                <span class="text-3xl font-black tracking-tighter text-slate-800">AIDD <span class="aidd-green font-normal text-xl">City Lab | 成都站</span></span>
+            <div class="flex items-center justify-center gap-6 mb-12">
+                <span class="text-4xl font-black tracking-tighter text-slate-800 uppercase">AIDD <span class="aidd-green font-normal text-2xl">City Lab | 成都站</span></span>
             </div>
-            <h1 class="text-6xl md:text-8xl font-serif font-black tracking-tight text-slate-900 mb-8 leading-tight">
+            <h1 class="text-8xl md:text-[10rem] font-serif font-black tracking-tight text-slate-900 mb-12 leading-tight">
                 从 PRD 到 Specs:<br/><span class="aidd-blue">AI 重塑需求工程</span>
             </h1>
-            <div class="w-32 h-1 aidd-bg-green mx-auto mb-8"></div>
-            <p class="text-2xl text-slate-500 font-medium tracking-widest uppercase">
+            <div class="w-64 h-2 aidd-bg-green mx-auto mb-12"></div>
+            <p class="text-4xl text-slate-500 font-bold tracking-[0.3em] uppercase">
                 OpenSpec 分层治理体系全景图
             </p>
         </div>
-        <div class="mt-auto flex justify-between items-end border-t border-slate-100 pt-8 text-slate-400 font-mono text-sm">
-            <span>2026.09.19</span>
+        <div class="mt-auto flex justify-between items-end border-t-4 border-slate-100 pt-10 text-slate-400 font-mono text-2xl">
+            <span>2026.09.19 | 成都</span>
             <span>POWERED BY OPEN SPECIFICATION FRAMEWORK</span>
         </div>
     </section>
 
-    <!-- Slide 2: Layer 01 -->
+    <!-- Slide 2: Layer 01 - 极简交付 (Vertical Flow) -->
     <section class="slide">
         <div class="flex justify-between items-start mb-10">
             <div>
-                <span class="inline-block px-3 py-1 bg-green-50 text-aidd-green text-sm font-bold uppercase rounded border border-green-100 mb-2">Layer 01</span>
-                <h2 class="text-4xl font-serif font-black text-slate-900">极简交付 (Minimalist Delivery)</h2>
+                <span class="inline-block px-5 py-2 bg-green-50 text-aidd-green text-xl font-black uppercase rounded-xl border-2 border-green-100 mb-4">Layer 01</span>
+                <h2 class="text-6xl font-serif font-black text-slate-900">极简交付 (Minimalist Delivery)</h2>
             </div>
             <div class="text-right">
-                <p class="text-slate-400 font-mono text-sm italic">适用：极简变更 / 简单 Bug Fix / 技术债</p>
+                <p class="text-slate-400 font-mono text-xl italic">单 Change 闭环 / 快速响应</p>
             </div>
         </div>
         
-        <div class="mermaid">
-graph LR
-    A[探索 Explore<br/>/opsx:explore] == 主干 ==> B[提案 Propose<br/>/opsx:propose]
-    B == 主干 ==> C[实施 Apply<br/>/opsx:apply]
-    C == 主干 ==> D[同步 Sync<br/>/opsx:sync]
-    D == 主干 ==> E[归档 Archive<br/>/opsx:archive]
-
-    style A fill:#fff,stroke:#00b96b,stroke-width:2px,color:#1e293b
-    style B fill:#fff,stroke:#00b96b,stroke-width:2px,color:#1e293b
-    style C fill:#fff,stroke:#00b96b,stroke-width:2px,color:#1e293b
-    style D fill:#fff,stroke:#00b96b,stroke-width:2px,color:#1e293b
-    style E fill:#fff,stroke:#00b96b,stroke-width:2px,color:#1e293b
+        <div class="flex-grow flex items-center justify-center">
+            <div class="flex flex-col items-center">
+                <div class="node node-main px-20 py-8">探索 Explore</div>
+                <div class="arrow-v-bold arrow-v-main h-10"></div>
+                <div class="node node-main px-20 py-8">提案 Propose</div>
+                <div class="arrow-v-bold arrow-v-main h-10"></div>
+                <div class="node node-main px-20 py-8">实施 Apply</div>
+                <div class="arrow-v-bold arrow-v-main h-10"></div>
+                <div class="node node-main px-20 py-8 bg-aidd-green text-white">同步归档 Sync & Archive</div>
+            </div>
         </div>
 
-        <div class="mt-10 grid grid-cols-2 gap-10">
-            <div class="p-6 bg-slate-50 rounded-xl">
-                <h3 class="font-bold mb-2 text-aidd-green">核心价值</h3>
-                <p class="text-slate-600 text-sm">确立“意图 -> 规格 -> 代码”的线性转换管线，极致追求交付响应速度。</p>
+        <div class="mt-auto grid grid-cols-2 gap-16">
+            <div class="p-8 bg-slate-50 rounded-[40px] border-2 border-slate-100 flex items-start gap-6">
+                <div class="w-16 h-16 rounded-2xl aidd-bg-green flex items-center justify-center text-white text-3xl font-black shrink-0">01</div>
+                <div>
+                    <h3 class="text-2xl font-black mb-2 text-slate-900">线性管线</h3>
+                    <p class="text-slate-500 text-xl leading-relaxed">确立“意图 -> 规格 -> 代码”的原始管线能力。</p>
+                </div>
             </div>
-            <div class="p-6 bg-slate-50 rounded-xl">
-                <h3 class="font-bold mb-2 text-aidd-green">核心能力</h3>
-                <p class="text-slate-600 text-sm">单 Change 闭环交付，最小化流程负载，适合高默契的单兵协作。</p>
+            <div class="p-8 bg-slate-50 rounded-[40px] border-2 border-slate-100 flex items-start gap-6">
+                <div class="w-16 h-16 rounded-2xl aidd-bg-green flex items-center justify-center text-white text-3xl font-black shrink-0">02</div>
+                <div>
+                    <h3 class="text-2xl font-black mb-2 text-slate-900">低负载交付</h3>
+                    <p class="text-slate-500 text-xl leading-relaxed">最小化流程开销，适合单兵或高默契协作。</p>
+                </div>
             </div>
         </div>
     </section>
 
-    <!-- Slide 3: Layer 02 -->
+    <!-- Slide 3: Layer 02 - 轻量产品 (Optimized Layout) -->
+    <section class="slide">
+        <div class="flex justify-between items-start mb-8">
+            <div>
+                <span class="inline-block px-5 py-2 bg-blue-50 text-aidd-blue text-xl font-black uppercase rounded-xl border-2 border-blue-100 mb-4">Layer 02</span>
+                <h2 class="text-6xl font-serif font-black text-slate-900">轻量产品 (Lightweight Product)</h2>
+            </div>
+            <div class="text-right text-slate-400 font-mono text-xl italic">基线驱动 / 多 Story 循环</div>
+        </div>
+        
+        <div class="flex-grow flex items-center justify-center gap-12">
+            <!-- Pillar 1: Baseline -->
+            <div class="flex flex-col items-center gap-6">
+                <div class="text-lg font-black text-slate-400 uppercase tracking-widest">Baseline</div>
+                <div class="node node-sub">规划基线</div>
+                <div class="node node-sub">业务基线</div>
+            </div>
+
+            <div class="w-12 h-1 bg-slate-200"></div>
+
+            <!-- Pillar 2: Execution -->
+            <div class="flex flex-col items-center">
+                <div class="node node-main mb-6">需求探索</div>
+                <div class="node node-main mb-6">方案提案</div>
+                
+                <!-- Loop -->
+                <div class="p-10 border-4 border-aidd-blue border-dashed rounded-[50px] bg-blue-50/20 flex flex-col items-center gap-6 relative">
+                    <div class="absolute -top-6 bg-white px-6 text-aidd-blue text-2xl font-black tracking-widest italic">Multi-Story Loop</div>
+                    <div class="node node-blue">原型 Prototype</div>
+                    <div class="arrow-v-bold arrow-v-blue h-8"></div>
+                    <div class="node node-blue">业务故事 Story</div>
+                    <div class="arrow-v-bold arrow-v-blue h-8"></div>
+                    <div class="node node-blue">开发实施</div>
+                </div>
+            </div>
+
+            <div class="w-12 h-1 bg-slate-200"></div>
+
+            <!-- Pillar 3: Result -->
+            <div class="flex flex-col items-center gap-6">
+                <div class="text-lg font-black text-slate-400 uppercase tracking-widest">Result</div>
+                <div class="node node-dark py-10 px-12">同步归档</div>
+            </div>
+        </div>
+
+        <div class="mt-auto grid grid-cols-2 gap-10">
+            <div class="p-6 border-l-[12px] border-aidd-blue bg-blue-50 rounded-r-[30px] shadow-md">
+                <h3 class="text-2xl font-black text-aidd-blue mb-2">基线护栏</h3>
+                <p class="text-slate-600 text-xl leading-relaxed">引入 Planning 与 Business 基线，确保需求不偏离产品核心价值。</p>
+            </div>
+            <div class="p-6 border-l-[12px] border-aidd-blue bg-blue-50 rounded-r-[30px] shadow-md">
+                <h3 class="text-2xl font-black text-aidd-blue mb-2">分而治之</h3>
+                <p class="text-slate-600 text-xl leading-relaxed">支持将复杂变更拆分为多个 Story 循环交付，降低一次性冻结风险。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 4: Layer 03 - 业务产品 (Vertical Pillar Layout) -->
     <section class="slide">
         <div class="flex justify-between items-start mb-6">
             <div>
-                <span class="inline-block px-3 py-1 bg-blue-50 text-aidd-blue text-sm font-bold uppercase rounded border border-blue-100 mb-2">Layer 02</span>
-                <h2 class="text-4xl font-serif font-black text-slate-900">轻量产品 (Lightweight Product)</h2>
+                <span class="inline-block px-5 py-2 bg-slate-100 text-slate-600 text-xl font-black uppercase rounded-xl border-2 border-slate-200 mb-3">Layer 03</span>
+                <h2 class="text-6xl font-serif font-black text-slate-900">业务产品 (Business Product)</h2>
             </div>
-            <div class="text-right">
-                <p class="text-slate-400 font-mono text-sm italic">适用：中等复杂度功能 / 业务迭代</p>
-            </div>
+            <div class="text-right text-slate-400 font-mono text-xl italic">解耦协作 / 确定性漏斗 / 分层同步</div>
         </div>
         
-        <div class="mermaid">
-flowchart LR
-    subgraph Baseline [基线治理层]
-        direction LR
-        A([规划基线]) ==> B([业务基线])
-    end
+        <div class="flex-grow flex items-stretch gap-8">
+            <!-- Definition Pillar -->
+            <div class="pillar border-green-100 bg-green-50/30">
+                <div class="absolute -top-6 bg-white px-6 text-aidd-green text-2xl font-black tracking-widest italic">DEFINITION (PM)</div>
+                <div class="flex flex-col items-center justify-between h-full w-full py-4">
+                    <div class="node node-main w-full">需求调研</div>
+                    <div class="arrow-v-bold arrow-v-main h-8"></div>
+                    <div class="node node-main w-full">需求探索</div>
+                    <div class="arrow-v-bold arrow-v-main h-8"></div>
+                    <div class="node node-main w-full">原型设计 / 拆分</div>
+                    <div class="arrow-v-bold arrow-v-main h-8"></div>
+                    <div class="node node-main w-full bg-aidd-green text-white shadow-[0_20px_40px_-10px_rgba(0,185,107,0.4)]">Story 业务冻结</div>
+                </div>
+            </div>
 
-    subgraph Loop [多故事执行循环]
-        direction LR
-        E{涉及 UI?} -.-> F[原型 Prototype]
-        F --> G[故事 Story]
-        E -- 否 --> G
-        G == 主干 ==> H[实施与验证]
-        H -.-> |Next Story| E
-    end
+            <!-- Transition Bridge -->
+            <div class="bridge-container">
+                <div class="bridge-line"></div>
+                <div class="bridge-box">
+                    强契约交接<br/><span class="text-5xl tracking-tighter">HANDOFF</span>
+                </div>
+                <!-- Baseline Bar -->
+                <div class="absolute top-4 w-full flex flex-col items-center gap-4">
+                    <div class="text-sm font-black text-slate-300 tracking-[0.4em]">GOVERNANCE BASELINE</div>
+                    <div class="flex gap-4">
+                        <div class="px-5 py-2 border-2 border-slate-200 rounded-full text-sm font-bold text-slate-400 bg-white">规划基线</div>
+                        <div class="px-5 py-2 border-2 border-slate-200 rounded-full text-sm font-bold text-slate-400 bg-white">业务基线</div>
+                    </div>
+                </div>
+                <!-- Loops -->
+                <div class="absolute bottom-4 w-full flex flex-col gap-4 px-6">
+                    <div class="node node-sub border-aidd-green border-solid text-aidd-green text-lg py-4">规格同步 Spec Sync</div>
+                    <div class="node node-sub border-aidd-green border-solid text-aidd-green text-lg py-4">基线回流 Baseline Sync</div>
+                </div>
+            </div>
 
-    B == 主干 ==> C[需求探索]
-    C == 主干 ==> D[方案提案]
-    D == 主干 ==> E
-    H == 主干 ==> K[基线回流]
-    K == 主干 ==> L([变更归档])
-    L -.-> M[周期回顾]
-    M -.-> A
-
-    style Baseline fill:#f8fafc,stroke:#e2e8f0,stroke-dasharray: 5 5
-    style Loop fill:#f0f7ff,stroke:#dbeafe,stroke-dasharray: 5 5
-    style A fill:#fff,stroke:#1677ff,stroke-width:2px
-    style B fill:#fff,stroke:#1677ff,stroke-width:2px
-    style H fill:#fff,stroke:#1677ff,stroke-width:3px
-    style K fill:#fff,stroke:#1677ff,stroke-width:2px
-    style L fill:#fff,stroke:#1677ff,stroke-width:2px
+            <!-- Execution Pillar -->
+            <div class="pillar border-blue-100 bg-blue-50/30">
+                <div class="absolute -top-6 bg-white px-6 text-aidd-blue text-2xl font-black tracking-widest italic">EXECUTION (ENG)</div>
+                <div class="flex flex-col items-center justify-between h-full w-full py-4">
+                    <div class="node node-blue w-full">方案提案 Proposal</div>
+                    <div class="arrow-v-bold arrow-v-blue h-8"></div>
+                    <div class="node node-blue w-full">行为规格 Specs</div>
+                    <div class="arrow-v-bold arrow-v-blue h-8"></div>
+                    <div class="node node-blue w-full">技术设计 Design</div>
+                    <div class="arrow-v-bold arrow-v-blue h-8"></div>
+                    <div class="node node-dark w-full py-8 text-3xl shadow-[0_20px_50px_-10px_rgba(30,41,59,0.5)]">APPLY</div>
+                </div>
+            </div>
         </div>
 
-        <div class="mt-6 grid grid-cols-2 gap-6">
-            <div class="p-5 border-l-4 border-aidd-blue bg-blue-50">
-                <h3 class="font-bold text-aidd-blue mb-1">基线护栏</h3>
-                <p class="text-slate-600 text-sm">引入 Planning 与 Business 基线，确保需求不偏离产品核心价值。</p>
+        <div class="mt-6 grid grid-cols-4 gap-8 pt-8 border-t-4 border-slate-100">
+            <div class="space-y-2">
+                <h3 class="font-black text-slate-900 text-xl uppercase">01 解耦协作</h3>
+                <p class="text-slate-500 text-lg leading-tight">业务语义与技术规格解耦，高并发协作。</p>
             </div>
-            <div class="p-5 border-l-4 border-aidd-blue bg-blue-50">
-                <h3 class="font-bold text-aidd-blue mb-1">分而治之</h3>
-                <p class="text-slate-600 text-sm">支持复杂变更拆分为 Multi-Story 循环交付，降低一次性冻结风险。</p>
+            <div class="space-y-2">
+                <h3 class="font-black text-slate-900 text-xl uppercase">02 确定性</h3>
+                <p class="text-slate-500 text-lg leading-tight">标准化工序消除歧义，确保交付即所需。</p>
+            </div>
+            <div class="space-y-2">
+                <h3 class="font-black text-slate-900 text-xl uppercase">03 资产化</h3>
+                <p class="text-slate-500 text-lg leading-tight">分层同步保障基线与规格的持续演进。</p>
+            </div>
+            <div class="space-y-2">
+                <h3 class="font-black text-slate-900 text-xl uppercase">04 治理护栏</h3>
+                <p class="text-slate-500 text-lg leading-tight">全流程受控于规划与业务基线护栏。</p>
             </div>
         </div>
     </section>
 
-    <!-- Slide 4: Layer 03 -->
-    <section class="slide">
-        <div class="flex justify-between items-start mb-4">
-            <div>
-                <span class="inline-block px-3 py-1 bg-slate-100 text-slate-600 text-sm font-bold uppercase rounded border border-slate-200 mb-1">Layer 03</span>
-                <h2 class="text-4xl font-serif font-black text-slate-900">业务产品 (Business Product)</h2>
-            </div>
-            <div class="text-right">
-                <p class="text-slate-400 font-mono text-sm italic">适用：复杂业务系统 / 史诗级需求 / 大团队协作</p>
-            </div>
-        </div>
-        
-        <div class="mermaid">
-flowchart LR
-    %% ===== 基线与入口 =====
-    A([规划基线]) ==> B([业务基线])
-    B ==> R{任务类型?}
-
-    %% ===== 需求侧 =====
-    subgraph Req [需求侧 · PM 主导]
-        direction LR
-        P1[调研] ==> P2[探索] ==> P4{涉及 UI?}
-        P4 -- 是 --> P5[原型] --> P3[拆分]
-        P4 -- 否 --> P3
-        P3 ==> P6[Story 业务冻结]
-    end
-
-    %% ===== 交接与交付 =====
-    R -- 大块 Epic --> P1
-    R -- 简单变更 --> D1
-    
-    P6 == 强契约交接 ==> H1[handoff]
-    H1 ==> D1
-
-    subgraph Dev [交付侧 · 工程师主导]
-        direction LR
-        D1[提案] ==> D2[规格] ==> D3[设计] ==> D4[实施验证]
-    end
-
-    %% ===== 同步与循环 (核心 Loop) =====
-    D4 == 主干 ==> K1[Spec Sync] ==> L[归档 Archive]
-    
-    %% Story Loop
-    L -- Epic 未完: 下一个 Story --> P6
-    
-    %% Baseline Sync & Planning Loop
-    L -- Epic 已完 --> K2[Baseline Sync]
-    K2 -.-> B
-    K2 ==> M[周期回顾]
-    M -.-> A
-
-    %% 样式微调
-    style Req fill:#f6ffed,stroke:#b7eb8f,stroke-dasharray: 5 5
-    style Dev fill:#f0f7ff,stroke:#adc6ff,stroke-dasharray: 5 5
-    style H1 fill:#fff,stroke:#1677ff,stroke-width:2px
-    style D4 fill:#fff,stroke:#1677ff,stroke-width:3px
-    style K1 fill:#fff,stroke:#00b96b,stroke-width:2px
-    style K2 fill:#fff,stroke:#00b96b,stroke-width:3px
-    style L fill:#fff,stroke:#1e293b,stroke-width:2px
-        </div>
-
-        <div class="mt-4 grid grid-cols-4 gap-4">
-            <div class="p-4 border-t-2 border-slate-200">
-                <h3 class="font-bold text-slate-900 text-sm mb-1">解耦协作</h3>
-                <p class="text-slate-500 text-xs">PM 冻结业务语义，工程师实施行为规格，并行不交叉。</p>
-            </div>
-            <div class="p-4 border-t-2 border-slate-200">
-                <h3 class="font-bold text-slate-900 text-sm mb-1">确定性漏斗</h3>
-                <p class="text-slate-500 text-xs">通过调研到 Story 的标准化工序，消除需求模糊性。</p>
-            </div>
-            <div class="p-4 border-t-2 border-slate-200">
-                <h3 class="font-bold text-slate-900 text-sm mb-1">分层同步</h3>
-                <p class="text-slate-500 text-xs">Spec 与 Baseline 分层回流，保障架构长期演进一致性。</p>
-            </div>
-            <div class="p-4 border-t-2 border-slate-200">
-                <h3 class="font-bold text-slate-900 text-sm mb-1">治理护栏</h3>
-                <p class="text-slate-500 text-xs">所有的变更必须长在 Planning 与 Business 基线内。</p>
-            </div>
-        </div>
-    </section>
-
-    <script>
-        mermaid.initialize({
-            startOnLoad: true,
-            theme: 'base',
-            themeVariables: {
-                primaryColor: '#ffffff',
-                primaryTextColor: '#1e293b',
-                primaryBorderColor: '#00b96b',
-                lineColor: '#cbd5e1',
-                secondaryColor: '#f8fafc',
-                tertiaryColor: '#ffffff',
-                fontFamily: 'JetBrains Mono',
-                fontSize: '14px'
-            },
-            flowchart: {
-                htmlLabels: true,
-                curve: 'basis',
-                useMaxWidth: false
-            }
-        });
-    </script>
 </body>
 </html>

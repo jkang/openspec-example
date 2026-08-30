@@ -25,29 +25,28 @@
 
 ```html
 <!-- 成功通知模态框 -->
-<div v-if="showSuccess" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/80 backdrop-blur-sm">
-    <div class="w-full max-w-xs bg-white flat-border p-8 space-y-6 text-center">
-        <!-- 成功图标 -->
+<div v-if="isCheckoutSuccess" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+    <div class="w-full max-w-xs bg-card border border-border p-8 space-y-6 text-center">
+        <!-- 成功文字标识 -->
         <div class="flex justify-center">
-            <i data-lucide="check-circle" class="w-12 h-12 text-slate-900"></i>
+            <div class="text-2xl font-black tracking-tighter text-foreground border-4 border-primary px-2 py-1">下单成功</div>
         </div>
-
         <!-- 文字信息 -->
         <div class="space-y-2">
-            <h2 class="text-lg font-bold text-slate-900">订单提交成功</h2>
-            <p class="text-sm text-slate-500">感谢您的购买，我们将尽快为您发货。</p>
+            <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold text-foreground">订单提交成功</h2>
+            <p class="text-sm text-muted-foreground">感谢您的购买，我们将尽快为您发货。</p>
         </div>
-
         <!-- 订单号 -->
-        <div class="py-2 px-3 bg-slate-50 flat-border border-dashed border-slate-300">
-            <p class="text-xs text-slate-400 uppercase tracking-wider mb-1">订单编号</p>
-            <p class="text-sm font-mono font-bold text-slate-900">#ORD-2026-814-XYZ</p>
+        <div class="py-2 px-3 bg-muted border border-border border-dashed space-y-2">
+            <div class="flex justify-between items-center">
+                <p class="text-[10px] text-muted-foreground uppercase tracking-wider">订单编号</p>
+                <p class="text-sm font-mono font-bold text-foreground">#ORD-2026-814-XYZ</p>
+            </div>
         </div>
-
         <!-- 操作按钮 -->
-        <button 
-            @click="resetState"
-            class="w-full py-2 px-4 flat-border border-slate-900 text-slate-900 font-semibold hover:bg-slate-50 transition-colors"
+        <button
+            @click="resetCheckoutState"
+            class="w-full py-2 px-4 border border-primary text-foreground font-semibold hover:bg-muted transition-colors uppercase text-xs tracking-widest"
         >
             继续购物
         </button>
