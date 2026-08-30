@@ -56,43 +56,20 @@
         .aidd-bg-green { background-color: #00b96b; }
         .aidd-blue { color: #1677ff; }
         .aidd-bg-blue { background-color: #1677ff; }
-        .aidd-border-green { border-color: #00b96b; }
-        .aidd-border-blue { border-color: #1677ff; }
         
-        /* Workflow Components */
         .node {
-            @apply flex flex-col items-center justify-center p-5 border-2 rounded-2xl bg-white transition-all duration-300;
-            min-width: 220px;
+            @apply flex flex-col items-center justify-center p-4 border-2 rounded-2xl bg-white shadow-sm relative z-10;
         }
-        .node-main { @apply border-aidd-green text-slate-900 font-black shadow-lg text-2xl; }
-        .node-sub { @apply border-slate-200 text-slate-500 text-xl border-dashed font-bold; }
-        .node-blue { @apply border-aidd-blue text-aidd-blue font-black shadow-lg text-2xl; }
-        .node-dark { @apply bg-slate-900 border-slate-900 text-white font-black shadow-xl text-xl; }
-        
-        .arrow-v-bold {
-            @apply w-2 h-12 bg-slate-100 relative;
-        }
-        .arrow-v-bold::after {
-            content: '';
-            @apply absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0 border-x-[12px] border-x-transparent border-t-[18px] border-t-slate-100;
-        }
-        .arrow-v-main { @apply bg-aidd-green; }
-        .arrow-v-main::after { @apply border-t-aidd-green; }
-        .arrow-v-blue { @apply bg-aidd-blue; }
-        .arrow-v-blue::after { @apply border-t-aidd-blue; }
+        .node-main { @apply border-aidd-green text-slate-900 font-black text-xl; }
+        .node-blue { @apply border-aidd-blue text-aidd-blue font-black text-xl; }
+        .node-sub { @apply border-slate-200 text-slate-500 font-bold text-lg border-dashed; }
+        .node-dark { @apply bg-slate-900 border-slate-900 text-white font-black text-xl; }
 
-        .bridge-container {
-            @apply flex flex-col items-center justify-center px-10 relative;
-        }
-        .bridge-line {
-            @apply h-2 bg-aidd-blue w-full absolute top-1/2 -translate-y-1/2 z-0;
-        }
-        .bridge-box {
-            @apply px-10 py-12 border-4 border-aidd-blue bg-white rounded-[40px] text-aidd-blue font-black text-3xl text-center shadow-[0_30px_70px_-15px_rgba(22,119,255,0.5)] relative z-10 transform -rotate-2;
-        }
+        .label-mono { @apply font-mono text-xs uppercase tracking-tighter opacity-60 mt-1; }
         
-        .pillar {
-            @apply flex-1 flex flex-col items-center p-8 rounded-[50px] border-4 border-dashed relative;
+        /* SVG Overlay Layer */
+        .svg-layer {
+            @apply absolute inset-0 pointer-events-none z-0;
         }
     </style>
 </head>
@@ -102,198 +79,221 @@
     <section class="slide border-t-[15px] border-aidd-green">
         <div class="flex-grow flex flex-col justify-center text-center">
             <div class="flex items-center justify-center gap-6 mb-12">
-                <span class="text-4xl font-black tracking-tighter text-slate-800 uppercase">AIDD <span class="aidd-green font-normal text-2xl">City Lab | 成都站</span></span>
+                <span class="text-4xl font-black tracking-tighter text-slate-800 uppercase italic">AIDD <span class="aidd-green font-normal text-2xl not-italic">City Lab | 成都站</span></span>
             </div>
-            <h1 class="text-8xl md:text-[10rem] font-serif font-black tracking-tight text-slate-900 mb-12 leading-tight">
+            <h1 class="text-8xl md:text-[9rem] font-serif font-black tracking-tight text-slate-900 mb-12 leading-tight">
                 从 PRD 到 Specs:<br/><span class="aidd-blue">AI 重塑需求工程</span>
             </h1>
-            <div class="w-64 h-2 aidd-bg-green mx-auto mb-12"></div>
-            <p class="text-4xl text-slate-500 font-bold tracking-[0.3em] uppercase">
+            <div class="w-48 h-2 aidd-bg-green mx-auto mb-12"></div>
+            <p class="text-3xl text-slate-500 font-bold tracking-[0.4em] uppercase">
                 OpenSpec 分层治理体系全景图
             </p>
         </div>
-        <div class="mt-auto flex justify-between items-end border-t-4 border-slate-100 pt-10 text-slate-400 font-mono text-2xl">
+        <div class="mt-auto flex justify-between items-end border-t-2 border-slate-100 pt-8 text-slate-400 font-mono text-xl">
             <span>2026.09.19 | 成都</span>
             <span>POWERED BY OPEN SPECIFICATION FRAMEWORK</span>
         </div>
     </section>
 
-    <!-- Slide 2: Layer 01 - 极简交付 (Vertical Flow) -->
+    <!-- Slide 2: Layer 01 - 极简交付 -->
     <section class="slide">
-        <div class="flex justify-between items-start mb-10">
+        <div class="flex justify-between items-start mb-16">
             <div>
-                <span class="inline-block px-5 py-2 bg-green-50 text-aidd-green text-xl font-black uppercase rounded-xl border-2 border-green-100 mb-4">Layer 01</span>
+                <span class="inline-block px-4 py-1.5 bg-green-50 text-aidd-green text-lg font-black uppercase rounded-lg border-2 border-green-100 mb-3">Layer 01</span>
                 <h2 class="text-6xl font-serif font-black text-slate-900">极简交付 (Minimalist Delivery)</h2>
             </div>
             <div class="text-right">
-                <p class="text-slate-400 font-mono text-xl italic">单 Change 闭环 / 快速响应</p>
+                <p class="text-slate-400 font-mono text-xl italic">单 Change 闭环 / 快速响应管线</p>
             </div>
         </div>
         
-        <div class="flex-grow flex items-center justify-center">
-            <div class="flex flex-col items-center">
-                <div class="node node-main px-20 py-8">探索 Explore</div>
-                <div class="arrow-v-bold arrow-v-main h-10"></div>
-                <div class="node node-main px-20 py-8">提案 Propose</div>
-                <div class="arrow-v-bold arrow-v-main h-10"></div>
-                <div class="node node-main px-20 py-8">实施 Apply</div>
-                <div class="arrow-v-bold arrow-v-main h-10"></div>
-                <div class="node node-main px-20 py-8 bg-aidd-green text-white">同步归档 Sync & Archive</div>
-            </div>
-        </div>
+        <div class="flex-grow flex items-center justify-center relative px-20">
+            <svg class="svg-layer" viewBox="0 0 1280 720">
+                <defs>
+                    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#cbd5e1" />
+                    </marker>
+                    <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                        <polygon points="0 0, 10 3.5, 0 7" fill="#00b96b" />
+                    </marker>
+                </defs>
+                <path d="M250 360 L1030 360" stroke="#00b96b" stroke-width="4" marker-end="url(#arrowhead-green)" />
+            </svg>
 
-        <div class="mt-auto grid grid-cols-2 gap-16">
-            <div class="p-8 bg-slate-50 rounded-[40px] border-2 border-slate-100 flex items-start gap-6">
-                <div class="w-16 h-16 rounded-2xl aidd-bg-green flex items-center justify-center text-white text-3xl font-black shrink-0">01</div>
-                <div>
-                    <h3 class="text-2xl font-black mb-2 text-slate-900">线性管线</h3>
-                    <p class="text-slate-500 text-xl leading-relaxed">确立“意图 -> 规格 -> 代码”的原始管线能力。</p>
+            <div class="flex items-center justify-between w-full relative z-10">
+                <div class="node node-main min-w-[180px]">
+                    探索 Explore
+                    <span class="label-mono">/opsx:explore</span>
                 </div>
-            </div>
-            <div class="p-8 bg-slate-50 rounded-[40px] border-2 border-slate-100 flex items-start gap-6">
-                <div class="w-16 h-16 rounded-2xl aidd-bg-green flex items-center justify-center text-white text-3xl font-black shrink-0">02</div>
-                <div>
-                    <h3 class="text-2xl font-black mb-2 text-slate-900">低负载交付</h3>
-                    <p class="text-slate-500 text-xl leading-relaxed">最小化流程开销，适合单兵或高默契协作。</p>
+                <div class="node node-main min-w-[180px]">
+                    提案 Propose
+                    <span class="label-mono">/opsx:propose</span>
                 </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Slide 3: Layer 02 - 轻量产品 (Optimized Layout) -->
-    <section class="slide">
-        <div class="flex justify-between items-start mb-8">
-            <div>
-                <span class="inline-block px-5 py-2 bg-blue-50 text-aidd-blue text-xl font-black uppercase rounded-xl border-2 border-blue-100 mb-4">Layer 02</span>
-                <h2 class="text-6xl font-serif font-black text-slate-900">轻量产品 (Lightweight Product)</h2>
-            </div>
-            <div class="text-right text-slate-400 font-mono text-xl italic">基线驱动 / 多 Story 循环</div>
-        </div>
-        
-        <div class="flex-grow flex items-center justify-center gap-12">
-            <!-- Pillar 1: Baseline -->
-            <div class="flex flex-col items-center gap-6">
-                <div class="text-lg font-black text-slate-400 uppercase tracking-widest">Baseline</div>
-                <div class="node node-sub">规划基线</div>
-                <div class="node node-sub">业务基线</div>
-            </div>
-
-            <div class="w-12 h-1 bg-slate-200"></div>
-
-            <!-- Pillar 2: Execution -->
-            <div class="flex flex-col items-center">
-                <div class="node node-main mb-6">需求探索</div>
-                <div class="node node-main mb-6">方案提案</div>
-                
-                <!-- Loop -->
-                <div class="p-10 border-4 border-aidd-blue border-dashed rounded-[50px] bg-blue-50/20 flex flex-col items-center gap-6 relative">
-                    <div class="absolute -top-6 bg-white px-6 text-aidd-blue text-2xl font-black tracking-widest italic">Multi-Story Loop</div>
-                    <div class="node node-blue">原型 Prototype</div>
-                    <div class="arrow-v-bold arrow-v-blue h-8"></div>
-                    <div class="node node-blue">业务故事 Story</div>
-                    <div class="arrow-v-bold arrow-v-blue h-8"></div>
-                    <div class="node node-blue">开发实施</div>
+                <div class="node node-main min-w-[180px]">
+                    实施 Apply
+                    <span class="label-mono">/opsx:apply</span>
                 </div>
-            </div>
-
-            <div class="w-12 h-1 bg-slate-200"></div>
-
-            <!-- Pillar 3: Result -->
-            <div class="flex flex-col items-center gap-6">
-                <div class="text-lg font-black text-slate-400 uppercase tracking-widest">Result</div>
-                <div class="node node-dark py-10 px-12">同步归档</div>
+                <div class="node node-main min-w-[180px]">
+                    同步 Sync
+                    <span class="label-mono">/opsx:sync</span>
+                </div>
+                <div class="node node-main min-w-[180px]">
+                    归档 Archive
+                    <span class="label-mono">/opsx:archive</span>
+                </div>
             </div>
         </div>
 
         <div class="mt-auto grid grid-cols-2 gap-10">
-            <div class="p-6 border-l-[12px] border-aidd-blue bg-blue-50 rounded-r-[30px] shadow-md">
-                <h3 class="text-2xl font-black text-aidd-blue mb-2">基线护栏</h3>
-                <p class="text-slate-600 text-xl leading-relaxed">引入 Planning 与 Business 基线，确保需求不偏离产品核心价值。</p>
+            <div class="p-6 bg-slate-50 rounded-3xl border-2 border-slate-100">
+                <h3 class="text-2xl font-black mb-2 text-aidd-green">核心价值</h3>
+                <p class="text-slate-600 text-lg">确立“意图 -> 规格 -> 代码”的线性转换管线，极致追求交付响应速度。</p>
             </div>
-            <div class="p-6 border-l-[12px] border-aidd-blue bg-blue-50 rounded-r-[30px] shadow-md">
-                <h3 class="text-2xl font-black text-aidd-blue mb-2">分而治之</h3>
-                <p class="text-slate-600 text-xl leading-relaxed">支持将复杂变更拆分为多个 Story 循环交付，降低一次性冻结风险。</p>
+            <div class="p-6 bg-slate-50 rounded-3xl border-2 border-slate-100">
+                <h3 class="text-2xl font-black mb-2 text-aidd-green">交付模式</h3>
+                <p class="text-slate-600 text-lg">单 Change 闭环交付，最小化流程负载，适合高默契的单兵作战。</p>
             </div>
         </div>
     </section>
 
-    <!-- Slide 4: Layer 03 - 业务产品 (Vertical Pillar Layout) -->
+    <!-- Slide 3: Layer 02 - 轻量产品 -->
+    <section class="slide">
+        <div class="flex justify-between items-start mb-10">
+            <div>
+                <span class="inline-block px-4 py-1.5 bg-blue-50 text-aidd-blue text-lg font-black uppercase rounded-lg border-2 border-blue-100 mb-3">Layer 02</span>
+                <h2 class="text-6xl font-serif font-black text-slate-900">轻量产品 (Lightweight Product)</h2>
+            </div>
+            <div class="text-right">
+                <p class="text-slate-400 font-mono text-xl italic">基线护栏 / 多 Story 循环</p>
+            </div>
+        </div>
+        
+        <div class="flex-grow flex flex-col items-center justify-center relative">
+            <svg class="svg-layer" viewBox="0 0 1280 720">
+                <!-- Main Flow -->
+                <path d="M150 360 L380 360" stroke="#cbd5e1" stroke-width="2" marker-end="url(#arrowhead)" />
+                <path d="M460 360 L1100 360" stroke="#1677ff" stroke-width="3" marker-end="url(#arrowhead)" stroke-dasharray="8 4" />
+                <!-- Loop -->
+                <path d="M1020 420 Q1020 500 680 500 Q340 500 340 420" fill="none" stroke="#1677ff" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#arrowhead)" />
+            </svg>
+
+            <!-- Baseline Row -->
+            <div class="flex gap-10 mb-20 relative z-10">
+                <div class="node node-sub px-10">规划基线</div>
+                <div class="node node-sub px-10">业务基线</div>
+            </div>
+
+            <!-- Execution Row -->
+            <div class="flex items-center gap-8 relative z-10">
+                <div class="node node-main">需求探索</div>
+                <div class="node node-main">方案提案</div>
+                
+                <div class="flex items-center gap-4 p-6 border-4 border-aidd-blue border-dashed rounded-[40px] bg-blue-50/20">
+                    <div class="node node-blue">原型 Prototype</div>
+                    <div class="node node-blue">业务故事 Story</div>
+                    <div class="node node-blue">实施与验证</div>
+                </div>
+
+                <div class="node node-dark px-10">归档 Archive</div>
+            </div>
+            
+            <div class="absolute bottom-24 text-aidd-blue font-mono font-bold text-sm tracking-widest uppercase bg-white px-4">Multi-Story Execution Loop</div>
+        </div>
+
+        <div class="mt-auto grid grid-cols-2 gap-8">
+            <div class="p-6 border-l-8 border-aidd-blue bg-blue-50 rounded-r-3xl">
+                <h3 class="text-2xl font-black text-aidd-blue mb-2">基线护栏</h3>
+                <p class="text-slate-600 text-lg leading-relaxed">引入 Planning 与 Business 基线，确保研发方向不偏离核心业务价值。</p>
+            </div>
+            <div class="p-6 border-l-8 border-aidd-blue bg-blue-50 rounded-r-3xl">
+                <h3 class="text-2xl font-black text-aidd-blue mb-2">复杂解构</h3>
+                <p class="text-slate-600 text-lg leading-relaxed">支持将复杂变更拆分为多个 Story 循环交付，降低系统性风险。</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 4: Layer 03 - 业务产品 -->
     <section class="slide">
         <div class="flex justify-between items-start mb-6">
             <div>
-                <span class="inline-block px-5 py-2 bg-slate-100 text-slate-600 text-xl font-black uppercase rounded-xl border-2 border-slate-200 mb-3">Layer 03</span>
+                <span class="inline-block px-4 py-1.5 bg-slate-100 text-slate-600 text-lg font-black uppercase rounded-lg border-2 border-slate-200 mb-3">Layer 03</span>
                 <h2 class="text-6xl font-serif font-black text-slate-900">业务产品 (Business Product)</h2>
             </div>
-            <div class="text-right text-slate-400 font-mono text-xl italic">解耦协作 / 确定性漏斗 / 分层同步</div>
+            <div class="text-right text-slate-400 font-mono text-xl italic italic">解耦协作 / 确定性漏斗 / 分层同步</div>
         </div>
         
-        <div class="flex-grow flex items-stretch gap-8">
-            <!-- Definition Pillar -->
-            <div class="pillar border-green-100 bg-green-50/30">
-                <div class="absolute -top-6 bg-white px-6 text-aidd-green text-2xl font-black tracking-widest italic">DEFINITION (PM)</div>
-                <div class="flex flex-col items-center justify-between h-full w-full py-4">
-                    <div class="node node-main w-full">需求调研</div>
-                    <div class="arrow-v-bold arrow-v-main h-8"></div>
-                    <div class="node node-main w-full">需求探索</div>
-                    <div class="arrow-v-bold arrow-v-main h-8"></div>
-                    <div class="node node-main w-full">原型设计 / 拆分</div>
-                    <div class="arrow-v-bold arrow-v-main h-8"></div>
-                    <div class="node node-main w-full bg-aidd-green text-white shadow-[0_20px_40px_-10px_rgba(0,185,107,0.4)]">Story 业务冻结</div>
+        <div class="flex-grow flex items-stretch gap-8 relative">
+            <svg class="svg-layer" viewBox="0 0 1280 720">
+                <!-- Handoff Arrows -->
+                <path d="M420 300 L500 300" stroke="#1677ff" stroke-width="4" marker-end="url(#arrowhead)" />
+                <path d="M780 300 L860 300" stroke="#1677ff" stroke-width="4" marker-end="url(#arrowhead)" />
+                
+                <!-- Feedback Loops -->
+                <path d="M1100 450 Q1100 550 640 550 Q180 550 180 450" fill="none" stroke="#00b96b" stroke-width="2" stroke-dasharray="5 5" marker-end="url(#arrowhead-green)" />
+            </svg>
+
+            <!-- Pillar 1: PM Side -->
+            <div class="flex-1 flex flex-col items-center p-8 rounded-[50px] border-4 border-green-100 border-dashed bg-green-50/30 relative">
+                <div class="absolute -top-6 bg-white px-6 text-aidd-green text-2xl font-black italic tracking-widest">DEFINITION (PM)</div>
+                <div class="flex-grow flex flex-col justify-between w-full py-4">
+                    <div class="node node-main">需求调研 <span class="label-mono">/req:research</span></div>
+                    <div class="node node-main">需求探索 <span class="label-mono">/req:explore</span></div>
+                    <div class="node node-main">原型与拆分 <span class="label-mono">/req:storymap</span></div>
+                    <div class="node node-main bg-aidd-green text-white shadow-xl scale-110">Story 业务冻结</div>
                 </div>
             </div>
 
-            <!-- Transition Bridge -->
-            <div class="bridge-container">
-                <div class="bridge-line"></div>
-                <div class="bridge-box">
-                    强契约交接<br/><span class="text-5xl tracking-tighter">HANDOFF</span>
-                </div>
-                <!-- Baseline Bar -->
-                <div class="absolute top-4 w-full flex flex-col items-center gap-4">
-                    <div class="text-sm font-black text-slate-300 tracking-[0.4em]">GOVERNANCE BASELINE</div>
+            <!-- Middle: Handoff & Governance -->
+            <div class="w-[360px] flex flex-col items-center justify-center relative">
+                <!-- Baseline floating above -->
+                <div class="absolute top-0 w-full flex flex-col items-center gap-4">
+                    <div class="text-xs font-black text-slate-400 tracking-[0.4em] uppercase">Governance Guardrails</div>
                     <div class="flex gap-4">
-                        <div class="px-5 py-2 border-2 border-slate-200 rounded-full text-sm font-bold text-slate-400 bg-white">规划基线</div>
-                        <div class="px-5 py-2 border-2 border-slate-200 rounded-full text-sm font-bold text-slate-400 bg-white">业务基线</div>
+                        <div class="px-5 py-2 border-2 border-slate-200 rounded-full font-bold text-slate-400 text-sm bg-white">规划基线</div>
+                        <div class="px-5 py-2 border-2 border-slate-200 rounded-full font-bold text-slate-400 text-sm bg-white">业务基线</div>
                     </div>
                 </div>
-                <!-- Loops -->
-                <div class="absolute bottom-4 w-full flex flex-col gap-4 px-6">
-                    <div class="node node-sub border-aidd-green border-solid text-aidd-green text-lg py-4">规格同步 Spec Sync</div>
-                    <div class="node node-sub border-aidd-green border-solid text-aidd-green text-lg py-4">基线回流 Baseline Sync</div>
+
+                <!-- Handoff Box -->
+                <div class="px-10 py-12 border-4 border-aidd-blue bg-white rounded-[40px] text-aidd-blue font-black text-4xl text-center shadow-2xl z-20 transform -rotate-2">
+                    契约交接<br/><span class="text-5xl tracking-tighter uppercase">Handoff</span>
+                </div>
+
+                <!-- Sync Nodes -->
+                <div class="absolute bottom-4 w-full flex flex-col gap-4 px-8">
+                    <div class="node node-sub border-aidd-green border-solid text-aidd-green text-base py-4">规格同步 Spec Sync</div>
+                    <div class="node node-sub border-aidd-green border-solid text-aidd-green text-base py-4">基线同步 Baseline Sync</div>
                 </div>
             </div>
 
-            <!-- Execution Pillar -->
-            <div class="pillar border-blue-100 bg-blue-50/30">
-                <div class="absolute -top-6 bg-white px-6 text-aidd-blue text-2xl font-black tracking-widest italic">EXECUTION (ENG)</div>
-                <div class="flex flex-col items-center justify-between h-full w-full py-4">
-                    <div class="node node-blue w-full">方案提案 Proposal</div>
-                    <div class="arrow-v-bold arrow-v-blue h-8"></div>
-                    <div class="node node-blue w-full">行为规格 Specs</div>
-                    <div class="arrow-v-bold arrow-v-blue h-8"></div>
-                    <div class="node node-blue w-full">技术设计 Design</div>
-                    <div class="arrow-v-bold arrow-v-blue h-8"></div>
-                    <div class="node node-dark w-full py-8 text-3xl shadow-[0_20px_50px_-10px_rgba(30,41,59,0.5)]">APPLY</div>
+            <!-- Pillar 2: Engineering Side -->
+            <div class="flex-1 flex flex-col items-center p-8 rounded-[50px] border-4 border-blue-100 border-dashed bg-blue-50/30 relative">
+                <div class="absolute -top-6 bg-white px-6 text-aidd-blue text-2xl font-black italic tracking-widest">EXECUTION (ENG)</div>
+                <div class="flex-grow flex flex-col justify-between w-full py-4">
+                    <div class="node node-blue">方案提案 <span class="label-mono">/opsx:propose</span></div>
+                    <div class="node node-blue">行为规格 <span class="label-mono">/opsx:spec-design</span></div>
+                    <div class="node node-blue">技术设计 <span class="label-mono">/opsx:spec-design</span></div>
+                    <div class="node node-dark py-8 text-4xl shadow-2xl">APPLY</div>
                 </div>
             </div>
         </div>
 
-        <div class="mt-6 grid grid-cols-4 gap-8 pt-8 border-t-4 border-slate-100">
+        <div class="mt-8 grid grid-cols-4 gap-8 pt-8 border-t-4 border-slate-100">
             <div class="space-y-2">
                 <h3 class="font-black text-slate-900 text-xl uppercase">01 解耦协作</h3>
-                <p class="text-slate-500 text-lg leading-tight">业务语义与技术规格解耦，高并发协作。</p>
+                <p class="text-slate-500 text-lg leading-tight">业务语义与技术实现彻底解耦，消除沟通瓶颈。</p>
             </div>
             <div class="space-y-2">
                 <h3 class="font-black text-slate-900 text-xl uppercase">02 确定性</h3>
-                <p class="text-slate-500 text-lg leading-tight">标准化工序消除歧义，确保交付即所需。</p>
+                <p class="text-slate-500 text-lg leading-tight">标准化工序消除需求模糊性，确保交付确定性。</p>
             </div>
             <div class="space-y-2">
                 <h3 class="font-black text-slate-900 text-xl uppercase">03 资产化</h3>
-                <p class="text-slate-500 text-lg leading-tight">分层同步保障基线与规格的持续演进。</p>
+                <p class="text-slate-500 text-lg leading-tight">通过分层同步机制，将研发认知持续沉淀为资产。</p>
             </div>
             <div class="space-y-2">
                 <h3 class="font-black text-slate-900 text-xl uppercase">04 治理护栏</h3>
-                <p class="text-slate-500 text-lg leading-tight">全流程受控于规划与业务基线护栏。</p>
+                <p class="text-slate-500 text-lg leading-tight">全流程受控于基线，确保持续演进而不偏离目标。</p>
             </div>
         </div>
     </section>

@@ -16,7 +16,7 @@ Token architecture, component specifications, systematic design, slide generatio
 > **本仓库适配说明 (本仓库用法)**:
 > - 本工具用于**需求侧 prototype 前置**：为产品设计 design system（三层 token + 组件规格 + CSS 变量 + Tailwind 集成）。
 > - 产品级产物输出到 `docs/baseline/design-system/`（产品级资产，Baseline Sync 维护）；单 Epic 原型可引用其中的 tokens。
-> - **必须遵循 `docs/FRONTEND.md` 极简约束**：slate 色系（slate-50/200/900）、禁止圆角（radius=0）、禁止阴影、禁止装饰性 Emoji。design tokens 的原始值以此为基准，不得引入圆角/阴影/花哨配色。
+> - **权威设计系统已存在（ZAPP）**：`docs/baseline/design-system/` 现为系统唯一 UI 事实来源（ZAPP · Memphis × Zine × Dark Premium 暗黑高端）。**本工具不再重新生成设计系统**；新 Epic 直接**引用**现有 ZAPP 权威 tokens（`guidelines/Guidelines.md` + `src/index.css`）。仅当该目录缺失时，须按 ZAPP 语义生成（背景 `#08080E`、面板 `#0F0F1C`、前景 `#EFEFFA`、边框 `#222238`；主色 `#C8FF00` 荧光绿、强调 `#FF2D6B` 热情粉、电光 `#3B6DFF`、警示 `#FF9A00`、成功 `#00E5A0`；三字体 Exo 2 / DM Sans / JetBrains Mono；仅 `radius=0`/`2px`，禁阴影、禁装饰性 Emoji）。
 > - **Slide 子系统（本文档后半部分）为可选能力**：仅当用户明确要求生成演示文稿时使用；产品 design system 生成不依赖它。
 
 > [!IMPORTANT]
