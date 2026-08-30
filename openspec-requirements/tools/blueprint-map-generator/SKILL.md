@@ -21,12 +21,12 @@ author: KK
 > 1. **结构化 YAML**: 用于下一步的自动化处理和数据存档。
 > 2. **交互式 HTML**: 用于最终用户的直观审查与演示。
 > 
-> **输出路径与命名规范 (Output Path & Naming Convention)**:
-> - **目录**: 所有输出文件必须放在当前工作目录下的一个新子目录中，目录名为 `[公司/业务名]` (例如：`张雪机车海外销售/`)。
-> - **文件名**: HTML 文件名必须反映内容，格式为 `[公司/业务名]-[业务类型].html` (例如：`张雪机车海外销售-服务蓝图.html`)。
+> **输出路径与命名规范 (本仓库适配)**:
+> - **目录**: 产物输出到业务基线 `docs/baseline/`（由 `baseline/blueprint` skill 编排，作为 `service_blueprint.html` 的渲染管线）。
+> - **文件名**: 数据文件 `docs/baseline/data/service_blueprint.yaml`，渲染产物 `docs/baseline/service_blueprint.html`。
 > 
 > **视觉设计规范 (Visual Design Standard)**:
-> - **样式风格**: 默认按照 `ai4pm-skills/design.md` 进行样式输出。
+> - **样式风格**: 默认按照 `openspec-requirements/tools/design.md` 进行样式输出。
 > - **底色模式**: 默认使用 **浅色底 (Light Mode)**。
 > - **页面布局**: HTML 内容占据页面 **85%** 宽度，保持简洁的 Header 设计（参考简洁 Header 规范）。
 
@@ -53,11 +53,13 @@ author: KK
 
 ### Step 2 · 生成 YAML
 - 读取 `references/blueprint_prompts.md`（角色设定 + 字段规范 + 输出铁律）
-- 将生成 YAML 保存至 `examples/<标识>.yaml`
+- 将生成 YAML 保存至 `docs/baseline/data/service_blueprint.yaml`
 
 ### Step 3 · 编译 HTML
 ```bash
-python3 scripts/build_blueprint.py examples/<输入>.yaml examples/<输出>.html
+python3 openspec-requirements/tools/blueprint-map-generator/scripts/build_blueprint.py \
+  docs/baseline/data/service_blueprint.yaml \
+  docs/baseline/service_blueprint.html
 ```
 
 ### Step 4 · 交付
@@ -77,7 +79,7 @@ blueprint-map-generator/
 │   └── blueprint_layout.html       # Jinja2 模板（HTML/CSS 与算法解耦）
 ├── scripts/
 │   └── build_blueprint.py          # 核心编译引擎
-└── examples/                       # 存放每次生成的 YAML & HTML
+└── examples/                       # 示例成品 HTML（输出参考，非产物目录；产物在 docs/baseline/）
 ```
 
 ---

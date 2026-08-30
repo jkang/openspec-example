@@ -43,6 +43,13 @@ storymap 用于把大需求（Epic 级）拆分为多个可独立交付的 Story
 | Candidate Capability: ... | story-<epic-key>-<功能2> | ✅ 覆盖 / ❌ 未覆盖 |
 | In Scope: B 端 ... | story-<epic-key>-<功能3> | ✅ 覆盖 / ❌ 未覆盖 |
 
+## 分析制品索引 (Analysis Artifacts)
+<!--
+可选增强（tools/）：storymap 阶段可调用 story-map-generator 生成 4 层故事地图可视化。
+覆盖对账（承诺项→承接 Story）仍以本 storymap.md 为唯一权威，可视化仅作审查辅助。
+- 用户故事地图（4 层）: epics/<epic-key>/analysis/storymap/{storymap.yaml,storymap.html} — [✅ 已生成 / ❌ 未生成]
+-->
+
 ## 治理映射对齐
 <!--
 - Impacted Bounded Contexts: [...]（新增需显式标注）

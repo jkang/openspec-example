@@ -71,6 +71,13 @@ Story 是需求侧唯一冻结交付物（业务面）。
 - Sync Assessment: [Yes/No + 原因]
 -->
 
+## 分析制品索引 (Analysis Artifacts)
+<!--
+可选增强（tools/）：story 阶段可调用 story-narrative-generator 生成故事详述（角色画像/交互逻辑/AC/业务价值）。
+仅作业务面质量增强，不生成行为规格 specs（那由开发侧在 proposal 后产出）。
+- 故事详述: epics/<epic-key>/analysis/narrative/<story-key>/narrative.md — [✅ 已生成 / ❌ 未生成]
+-->
+
 ## 交接状态 (Handoff Status)
 <!--
 - [ ] 待开发交接 (openspec-handoff)

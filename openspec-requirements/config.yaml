@@ -6,6 +6,11 @@ context: |
   项目: ecommerce-mini - 一个展示 OpenSpec 规格驱动开发 (SDD) 的极简电商系统。
   需求侧工作区: openspec-requirements/ - 产品经理 (PM) 专属，仅用于大块 Epic 需求。
   需求漏斗: research → explore → prototype(Epic整体) → storymap → story（业务面交付物）。
+  需求分析工具箱: openspec-requirements/tools/ - 8 个 AI4PM 需求工程工具（可选增强，产物在 epics/<key>/analysis/ 或 docs/baseline/design-system/）。
+    工具映射: osm=osm-map-generator, process=business-process-deep-analyzer, journey=journey-map-generator,
+    blueprint=blueprint-map-generator, design-system=brand-design-system, working-prototype=prototype-generator,
+    storymap-visual=story-map-generator, narrative=story-narrative-generator。
+    调用契约: LLM → YAML → Python/Jinja2 → HTML；工具 SKILL.md 为操作指南，references/*.md 为数据铁律。
   规划来源: docs/ROADMAP.md 是唯一权威（按阶段组织，每阶段条目即 Epic，一阶段可多 Epic）；需求侧不再产 roadmap。
   交接边界: 需求侧冻结交付物 story.md 通过 /req:handoff（skill: handoff）交给开发侧 openspec/changes/<name>/，
     由 handoff 合成 proposal.md 后开发侧从 proposal 起步；行为规格 specs（Story-specs）由开发侧在 proposal 后按 capability 拆分生成。
@@ -43,6 +48,7 @@ rules:
     - 任务类型确认：Bug Fix / Tech Debt / 简单功能修改 → 直走交付侧，不继续需求漏斗
     - 治理映射对齐：domain_model (Bounded Context) / business_process (L1/L2/L3) / service_blueprint (SB-STAGE-*/SB-<LANE>-*)
     - 拒绝空洞占位符，必须使用真实业务数据
+    - 可选分析增强（tools/）：可调用 osm-map-generator（OSM 度量）、business-process-deep-analyzer（To-Be Process L1/L2 可视化）、journey-map-generator（To-Be Journey 可视化），产物落位 epics/<key>/analysis/{osm,process,journey}/，并在 idea.md「分析制品索引」引用；均为 optional，不强制
   prototype:
     - 在需求拆分（storymap）之前完成，针对 Epic 整体做原型（一次完成）
     - 必须严格遵循 docs/FRONTEND.md 的 UI 规范
@@ -51,6 +57,9 @@ rules:
     - 数据要求：严禁使用空洞模板（foo/test），必须填充真实的业务数据示例
     - 交互界面：必须完全使用中文
     - 技术实现：使用 Vue 3 (CDN) + Tailwind CSS (CDN) 的可交互 HTML
+    - 分支 A（默认）：简单 UI → Vue3+Tailwind HTML 原型（如上约束）
+    - 分支 B（复杂业务）：多角色/多流程/需真实数据交互验证的 Epic → 调用 prototype-generator（tools/）生成可工作原型，产物 epics/<key>/prototypes/working/mvp-prototype/；配色强制用 design-system tokens
+    - 前置 design system（产品级）：首个涉及 UI 的 Epic 前，调用 brand-design-system（tools/）生成 docs/baseline/design-system/（三层 tokens + 组件规格），遵循 FRONTEND.md 极简约束；产品级资产由 Baseline Sync 维护
     - 产出后必须等待用户确认 (HITL)
   storymap:
     - 仅用于大需求/复杂 idea 拆分为多个 Story
@@ -58,6 +67,7 @@ rules:
     - 粒度原则：每个 Story 是一个完整端到端功能（不拆到行为/UI 细节级），避免破坏上下文
     - 每个拆分出的 Story 必须有人物 (role)、价值 (value)、目标 (goal) 三要素
     - 必须给出各 Story 的依赖关系与优先级 (P0/P1/P2)
+    - 可选分析增强（tools/）：可调用 story-map-generator 生成 4 层故事地图可视化（阶段-活动-接触点-用户故事 + must/should/could），产物 epics/<key>/analysis/storymap/；覆盖对账仍以 storymap.md 为唯一权威
   story:
     - 需求侧唯一冻结交付物（业务面），交给开发侧作为 proposal 输入
     - 只含业务面：用户场景 / 范围 / 业务规则 / E2E 验收 / 治理映射
@@ -66,3 +76,4 @@ rules:
     - 验收标准必须同时映射到 service_blueprint.html 中的 SB-STAGE-* 与 SB-<LANE>-* 节点
     - 若涉及 UI，必须引用已确认的 Epic 整体原型 epics/<epic-key>/prototypes/*.html；无已确认原型禁止勾选"待开发交接"
     - 拒绝空洞占位符，必须使用真实业务数据
+    - 可选分析增强（tools/）：可调用 story-narrative-generator 生成故事详述（角色画像/交互逻辑/AC/业务价值），产物 epics/<key>/analysis/narrative/<story-key>/narrative.md，story.md「分析制品索引」引用

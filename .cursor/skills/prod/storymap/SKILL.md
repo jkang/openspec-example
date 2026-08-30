@@ -42,11 +42,13 @@ metadata:
 1. **读上下文**：读已确认的 `epics/<epic-key>/idea.md`、`epics/<epic-key>/research.md` 与 `epics/<epic-key>/prototypes/*.html`（若 UI）。
 2. **应用规则**：读 `openspec-requirements/config.yaml` 的 `rules.storymap`。
 3. **生成 storymap.md**：按 `openspec-requirements/templates/storymap.md` 产出（拆分明细表 + 覆盖对账表 + 治理映射）。
-4. **HITL**：产出后暂停确认，确认后每个 Story 可进入 story。
+4. **可选分析增强（tools/）**：调用 `openspec-requirements/tools/story-map-generator/SKILL.md` 生成 4 层用户故事地图可视化（阶段-活动-接触点-用户故事 + must/should/could 优先级），产物 `epics/<key>/analysis/storymap/{storymap.yaml,storymap.html}`，storymap.md「分析制品索引」引用。**覆盖对账（承诺项→承接 Story）仍以 storymap.md 为唯一权威**，可视化仅作 HITL 审查辅助。
+5. **HITL**：产出后暂停确认，确认后每个 Story 可进入 story。
 
 ## Guardrails
 
 - 只写需求侧拆分制品，不写代码。
 - 覆盖对账是强制步骤，禁止跳过后直接产出拆分明细。
 - 一个 Story 对应一个交付 change 为宜。
+- 分析制品（storymap 可视化）为 optional，不生成不影响进入下一阶段。
 - 产出后必须 HITL 确认；**未确认不得进入下一阶段（强制门禁）**。

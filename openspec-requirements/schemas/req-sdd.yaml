@@ -1,6 +1,18 @@
 name: req-sdd
-version: 4
+version: 5
 description: 需求侧工作流（仅用于大块 Epic 需求） - 需求调研 (research) → 探索 (explore) → 原型 (prototype，Epic 整体) → 需求拆分 (storymap) → 需求单元交付物 (story)。规划（roadmap·每阶段多 Epic）在起点 docs/ROADMAP.md 已有，需求侧直接消费。需求侧只产出业务面 story.md；行为规格（Story-specs，按 capability 拆分的 specs）由开发侧在 handoff 合成 proposal 之后生成。Bug Fix / Tech Debt / 简单功能修改不走本流程，直接进入交付侧。
+analysis:
+  description: 需求分析工具箱（可选增强） - openspec-requirements/tools/ 下的 8 个 AI4PM 需求工程工具，为 explore/prototype/storymap/story 阶段提供可选的结构化分析与可视化产物。所有分析制品均为 optional，缺省不影响原漏斗 HITL 门禁。
+  tools_path: openspec-requirements/tools/
+  tool_map:
+    osm: osm-map-generator
+    process: business-process-deep-analyzer
+    journey: journey-map-generator
+    blueprint: blueprint-map-generator
+    design-system: brand-design-system
+    working-prototype: prototype-generator
+    storymap-visual: story-map-generator
+    narrative: story-narrative-generator
 artifacts:
   - id: research
     generates: epics/<epic-key>/research.md
@@ -43,22 +55,140 @@ artifacts:
     requires:
       - research
 
+  - id: analysis-osm
+    optional: true
+    generates: epics/<epic-key>/analysis/osm/{osm.yaml,osm.html}
+    description: （可选）Epic 目标-策略-度量（OSM），为 Exit Criteria 提供可度量指标锚点
+    template: null
+    tool: openspec-requirements/tools/osm-map-generator/SKILL.md
+    instruction: |
+      调用分析工具 `osm-map-generator`（openspec-requirements/tools/）生成 Epic 的 OSM 地图（Objective → Strategy → Metric）。
+
+      时机：explore 阶段（可选增强），在产出 idea.md 后对 Epic 整体目标做度量分解。
+
+      必须：
+      1. **Objective**：对齐 ROADMAP 阶段条目与 idea 的业务意图，定义 1 个主目标。
+      2. **Strategy**：拆出 2-4 条达成策略。
+      3. **Metric**：每个策略给出可量化指标（含当前值/目标值），作为 storymap 覆盖对账与开发侧 Exit Criteria 的度量锚点。
+      4. **真实数据**：拒绝空洞占位符，指标须为真实业务量级。
+      5. 产物：`epics/<key>/analysis/osm/osm.yaml` + `osm.html`，idea.md「分析制品索引」引用。
+
+      **HITL**：产物纳入 explore 的 HITL 确认范围。
+    requires:
+      - research
+
+  - id: analysis-process
+    optional: true
+    generates: epics/<epic-key>/analysis/process/{process.yaml,process.html}
+    description: （可选）To-Be Process 深度分析（L1/L2 + 痛点热力），升级 idea 的纯文本流程
+    template: null
+    tool: openspec-requirements/tools/business-process-deep-analyzer/SKILL.md
+    instruction: |
+      调用分析工具 `business-process-deep-analyzer`（openspec-requirements/tools/）生成 To-Be Process 可视化。
+
+      时机：explore 阶段（可选增强），与 idea.md 的 To-Be Process 章节并行产出。
+
+      必须：
+      1. **业务类型分型**：业务模式/产品类型/市场类型。
+      2. **L1 价值流**：端到端价值流阶段（与 business_process.html 的 L1 口径对齐）。
+      3. **L2 流程**：每阶段展开活动/角色/系统/输入输出/业务规则。
+      4. **痛点**：标注 critical/high/medium/low，含根因分析。
+      5. **真实数据**：拒绝空洞占位符。
+      6. 产物：`epics/<key>/analysis/process/process.yaml` + `process.html`，idea.md「分析制品索引」引用。
+
+      **HITL**：产物纳入 explore 的 HITL 确认范围。
+    requires:
+      - research
+
+  - id: analysis-journey
+    optional: true
+    generates: epics/<epic-key>/analysis/journey/{journey.yaml,journey.html}
+    description: （可选）To-Be Journey 可视化（阶段/行为/触点/情绪/痛点），升级 idea 的纯文本旅程
+    template: null
+    tool: openspec-requirements/tools/journey-map-generator/SKILL.md
+    instruction: |
+      调用分析工具 `journey-map-generator`（openspec-requirements/tools/）生成 To-Be Journey 可视化。
+
+      时机：explore 阶段（可选增强），与 idea.md 的 To-Be Journey 章节并行产出。
+
+      必须：
+      1. **mode: to-be**：目标旅程设计（非现状诊断）。
+      2. **阶段**：≥3 个旅程阶段；每阶段 1-3 个核心用户动作。
+      3. **维度**：每个动作含 触点 / 情绪体验分(1-10) / 想法 / 痛点或期望改善。
+      4. **真实数据**：拒绝空洞占位符，使用真实业务场景。
+      5. 产物：`epics/<key>/analysis/journey/journey.yaml` + `journey.html`，idea.md「分析制品索引」引用。
+
+      **HITL**：产物纳入 explore 的 HITL 确认范围。
+    requires:
+      - research
+
   - id: prototype
-    generates: epics/<epic-key>/prototypes/<page>.html（按页面命名，如 account-register.html）
-    description: 交互式 UI/UX 原型（Epic 整体，一次完成），用于前端需求验证
+    generates: epics/<epic-key>/prototypes/<page>.html（分支 A）或 epics/<epic-key>/prototypes/working/mvp-prototype/（分支 B）
+    description: 交互式 UI/UX 原型（Epic 整体，一次完成），用于前端需求验证；分支 B 为复杂业务可工作原型
     template: prototype.html
     instruction: |
-      调用 `prototype` skill 为涉及 UI 的 Epic 生成交互式 HTML 原型（**Epic 整体**）。
+      调用 `prototype` skill 为涉及 UI 的 Epic 生成原型（**Epic 整体**）。
 
       **时机**：在需求拆分（storymap）之前完成——有了 idea 后，先对 Epic 整体做原型设计，再拆分。
 
-      必须严格遵循 `docs/FRONTEND.md`：
+      **分支决策**：
+      - **分支 A（默认，简单 UI）**：Vue 3 (CDN) + Tailwind CSS (CDN) 的交互式 HTML 原型，严格遵循 `docs/FRONTEND.md`：
         - 禁止圆角 / 阴影 / 装饰性 Emoji
         - slate 色系，1px 实线边框
         - 真实业务数据（严禁 foo/test 占位符），全中文
-        - Vue 3 (CDN) + Tailwind CSS (CDN)
+      - **分支 B（复杂业务）**：多角色协作 / 多流程编排 / 需真实数据交互验证的 Epic → 调用 `prototype-generator`（openspec-requirements/tools/）生成可工作原型，产物 `epics/<key>/prototypes/working/mvp-prototype/`；上游输入 = idea.md 的 To-Be 章节 + design-system tokens；启动验证（npm install + npm run dev + curl API + 浏览器逐页）为强制步骤；slate 色系/真实中文数据/禁装饰 Emoji 仍强制，圆角阴影放宽。
+
+      **前置（产品级，可选）**：首个涉及 UI 的 Epic 前，用 `brand-design-system`（tools/）生成 `docs/baseline/design-system/`（三层 tokens + 组件规格）。
 
       **HITL 强制门禁**：产出后必须等待用户确认；未确认不得进入下一阶段（storymap）。涉及 UI 的 Epic 无已确认原型不得拆分/交接。
+    requires:
+      - explore
+
+  - id: design-system
+    optional: true
+    generates: docs/baseline/design-system/{design-tokens.json,design-tokens.css,design-system.html,component-specs.md}
+    description: （可选）产品级 design system（三层 tokens + 组件规格 + CSS 变量），prototype 前置
+    template: null
+    tool: openspec-requirements/tools/brand-design-system/SKILL.md
+    instruction: |
+      调用分析工具 `brand-design-system`（openspec-requirements/tools/）为产品设计 design system。
+
+      时机：prototype 阶段前置（产品级一次生成，非单 Epic 产物）；首个涉及 UI 的 Epic 原型前执行。
+
+      必须：
+      1. **三层 token 架构**：Primitive（原始值）→ Semantic（语义别名）→ Component（组件级）。
+      2. **遵循 `docs/FRONTEND.md` 极简约束**：slate 色系（slate-50/200/900）、禁止圆角（radius=0）、禁止阴影、禁止装饰性 Emoji。
+      3. **输出**：`docs/baseline/design-system/design-tokens.json`（数据）+ `design-tokens.css`（CSS 变量）+ `component-specs.md`（组件规格）+ `design-system.html`（可视化审查）。
+      4. **产品级**：design system 是产品资产，跨 Epic 复用，由 Baseline Sync 维护；单 Epic 原型引用其中 tokens。
+      5. Slide 子系统为可选能力，仅用户明确要求演示文稿时使用。
+
+      **HITL**：产物纳入 prototype 的 HITL 确认范围。
+    requires:
+      - explore
+
+  - id: working-prototype
+    optional: true
+    generates: epics/<epic-key>/prototypes/working/mvp-prototype/
+    description: （可选）复杂业务产品的可工作原型（前后端一体化，React/Vue + Express + Mock 服务）
+    template: null
+    tool: openspec-requirements/tools/prototype-generator/SKILL.md
+    instruction: |
+      调用分析工具 `prototype-generator`（openspec-requirements/tools/）为**复杂业务产品**生成可工作原型。
+
+      时机：prototype 阶段的分支 B（分支 A = 简单 UI 的 Vue3+Tailwind HTML 原型）。
+
+      触发条件（满足其一即走分支 B）：
+      1. 多角色协作（B 端配置 + C 端交互）；
+      2. 多流程编排（跨多个 L1/L2 流程节点）；
+      3. 需要真实数据交互验证（表单→API→落库→展示闭环）。
+
+      必须：
+      1. **上游输入**：`epics/<key>/idea.md` 的 To-Be 章节 + `docs/baseline/design-system/` tokens。
+      2. **UI 约束**：slate 色系（用 design-system tokens）、真实中文数据、禁装饰 Emoji；圆角/阴影规则对可工作原型放宽（组件库默认样式）。
+      3. **启动验证**：`npm install && npm run dev`，curl API + 浏览器逐页验证。
+      4. **产物**：`epics/<epic-key>/prototypes/working/mvp-prototype/`（含 README）。
+
+      **HITL 强制门禁**：产出后必须等待用户确认；未确认不得进入下一阶段（storymap）。
     requires:
       - explore
 
@@ -77,6 +207,28 @@ artifacts:
       5. **治理映射对齐**：参考治理基线识别 Bounded Contexts / 流程节点 / 蓝图节点。
 
       **HITL 强制门禁**：产出后必须暂停征求用户确认；未确认不得进入下一阶段（story）。
+    requires:
+      - explore
+
+  - id: analysis-storymap
+    optional: true
+    generates: epics/<epic-key>/analysis/storymap/{storymap.yaml,storymap.html}
+    description: （可选）用户故事地图 4 层可视化（阶段-活动-接触点-用户故事 + MVP 优先级），storymap 的可视化补充
+    template: null
+    tool: openspec-requirements/tools/story-map-generator/SKILL.md
+    instruction: |
+      调用分析工具 `story-map-generator`（openspec-requirements/tools/）生成用户故事地图可视化。
+
+      时机：storymap 阶段（可选增强），与 storymap.md 并行产出。
+
+      必须：
+      1. **4 层结构**：阶段 → 活动 → 接触点 → 用户故事（"作为[角色]，我想...以便..."）。
+      2. **优先级标注**：must（MVP 核心）/ should / could，与 storymap.md 的 P0/P1/P2 对齐。
+      3. **覆盖对账仍以 storymap.md 为准**：本工具只做可视化骨架，覆盖对账表（承诺项→承接 Story）以 storymap.md 为唯一权威。
+      4. **真实数据**：拒绝空洞占位符。
+      5. 产物：`epics/<key>/analysis/storymap/storymap.yaml` + `storymap.html`，storymap.md「分析制品索引」引用。
+
+      **HITL**：产物纳入 storymap 的 HITL 确认范围。
     requires:
       - explore
 
@@ -103,6 +255,30 @@ artifacts:
       **UI 门禁**：涉及 UI 的 Story，若无已确认的 Epic 整体原型，禁止勾选「待开发交接」。
 
       **交接**：**HITL 强制门禁**：产出后必须由用户确认验收标准；未确认禁止交接（`/req:handoff`）。交接后这是需求侧唯一冻结交付物。
+    requires:
+      - storymap
+
+  - id: analysis-narrative
+    optional: true
+    generates: epics/<epic-key>/analysis/narrative/<story-key>/narrative.md
+    description: （可选）故事详述（角色画像/AC/交互逻辑/业务价值），story.md 的质量增强
+    template: null
+    tool: openspec-requirements/tools/story-narrative-generator/SKILL.md
+    instruction: |
+      调用分析工具 `story-narrative-generator`（openspec-requirements/tools/）生成故事详述。
+
+      时机：story 阶段（可选增强），与 story.md 并行产出。
+
+      必须：
+      1. **核心描述**：细化 As-a / I-want / So-that。
+      2. **角色画像**：该 Story 涉及的用户特征与痛点。
+      3. **验收标准**：Given/When/Then 或列表边界条件（与 story.md 的 E2E 验收一致）。
+      4. **交互逻辑**：关键 UI 元素行为与异常处理。
+      5. **业务价值**：对业务指标的贡献。
+      6. **不生成行为规格 specs**：本工具只是需求侧业务面详述，行为规格仍由开发侧在 proposal 后生成。
+      7. 产物：`epics/<key>/analysis/narrative/<story-key>/narrative.md`，story.md「分析制品索引」引用。
+
+      **HITL**：产物纳入 story 的 HITL 确认范围。
     requires:
       - storymap
 

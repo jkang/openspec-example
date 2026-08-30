@@ -22,12 +22,12 @@ author: KK
 > 1. **结构化 YAML**: 用于下一步的自动化处理和数据存档。
 > 2. **交互式 HTML**: 用于最终用户的直观审查与演示。
 > 
-> **输出路径与命名规范 (Output Path & Naming Convention)**:
-> - **目录**: 所有输出文件必须放在当前工作目录下的一个新子目录中，目录名为 `[公司/业务名]` (例如：`张雪机车海外销售/`)。
-> - **文件名**: HTML 文件名必须反映内容，格式为 `[公司/业务名]-[业务类型].html` (例如：`张雪机车海外销售-用户故事地图.html`)。
+> **输出路径与命名规范 (本仓库适配)**:
+> - **目录**: 产物必须输出到需求侧工作区 `epics/<epic-key>/analysis/storymap/`（`<epic-key>` 为需求侧 Epic key）。
+> - **文件名**: 数据文件 `storymap.yaml`，可视化文件 `storymap.html`。
 > 
 > **视觉设计规范 (Visual Design Standard)**:
-> - **样式风格**: 默认按照 `ai4pm-skills/design.md` 进行样式输出。
+> - **样式风格**: 默认按照 `openspec-requirements/tools/design.md` 进行样式输出。
 > - **底色模式**: 默认使用 **浅色底 (Light Mode)**。
 > - **页面布局**: HTML 内容占据页面 **85%** 宽度，保持简洁的 Header 设计（参考简洁 Header 规范）。
 
@@ -43,7 +43,9 @@ LLM 会根据描述生成包含阶段、活动、接触点和用户故事的 YAM
 使用内置的 Python 编译器生成可视化 HTML。
 
 ```bash
-python3 scripts/build_storymap.py input.yaml output.html
+python3 openspec-requirements/tools/story-map-generator/scripts/build_storymap.py \
+  epics/<epic-key>/analysis/storymap/storymap.yaml \
+  epics/<epic-key>/analysis/storymap/storymap.html
 ```
 
 ## 数据结构定义

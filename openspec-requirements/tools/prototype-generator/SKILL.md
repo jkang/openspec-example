@@ -17,17 +17,25 @@ author: KK
 
 # Prototype Generator (MVP 原型生成器)
 
-承接 `ai-canvas-generator`（AI 场景定义）与 `ai-product-journey-generator`（To-be 旅程设计），
-以 **AI 产品 MVP 架构师** 的视角，编译出一个**可一键启动、前后端一体、UI 专业**的 MVP 应用。
+承接需求侧 **`epics/<epic-key>/idea.md`（To-Be Process / To-Be Journey 章节）与 `docs/baseline/design-system/`（design tokens）**，
+以 **产品 MVP 架构师** 的视角，编译出一个**可一键启动、前后端一体、UI 专业**的可工作原型。
+
+> [!IMPORTANT]
+> **本仓库适配说明 (本仓库用法)**:
+> - 本工具在需求侧 **prototype 阶段**使用，**仅用于复杂业务产品**（多角色/多流程/需真实数据交互验证）。
+> - 简单 UI 场景仍走既有 `Vue3+Tailwind CDN` HTML 原型（见 `prototype` skill 分支 A）。
+> - **上游输入适配**：原设计输入为 "AI Canvas + To-be Journey YAML"；本仓库统一改为 `epics/<key>/idea.md` 的 To-Be 章节（用户场景/流程/旅程）+ `docs/baseline/design-system/` tokens。
+> - **输出落位**：`epics/<epic-key>/prototypes/working/mvp-prototype/`。
+> - **UI 约束**：原型仍须遵循 `docs/FRONTEND.md` 极简约束（slate 色系、真实中文数据、禁装饰 Emoji）；圆角/阴影规则对可工作原型**放宽**（组件库默认样式），但配色强制使用 design-system tokens。
 
 ```
-AI Canvas YAML + To-be Journey YAML（+ 用户偏好：前端框架/配色）
+idea.md To-Be 章节 + design-system tokens（+ 用户偏好：前端框架/配色）
         │
         ▼
 【LLM】推演 MVP 设计规格 mvp_spec.yaml
         │
         ▼
-【Python 脚手架】scaffold_mvp.py 编译 → <案例>/<场景>/mvp-prototype/
+【Python 脚手架】scaffold_mvp.py 编译 → epics/<epic-key>/prototypes/working/mvp-prototype/
         │
         ▼
 【验证】npm install → npm run dev → curl + 浏览器实测
@@ -44,7 +52,7 @@ AI Canvas YAML + To-be Journey YAML（+ 用户偏好：前端框架/配色）
 | ③ 业务系统交互 mock | `server/services/businessMock.js` 独立模块（ERP/SRM/HR 数据接口） |
 | ④ 专业设计系统 | AntD / Arco 工作台布局（侧边栏+顶栏+卡片/表格/表单/对话组件） |
 | ⑤ 主题配色 | 用户提供配色→直接用；否则按业务域自动推导（供应链→蓝+橙；金融→深蓝+金…） |
-| ⑥ 输出目录 | `<客户案例目录>/<场景目录>/mvp-prototype/`（脚手架 `--case` / `--scenario` 指定） |
+| ⑥ 输出目录 | `epics/<epic-key>/prototypes/working/mvp-prototype/`（脚手架 `--output` 指定） |
 | ⑦ 启动验证 | 安装依赖 → 启动 → curl API 实测 + 浏览器打开前端验证 UI 与 AI 交互 |
 
 ---
@@ -57,26 +65,26 @@ AI Canvas YAML + To-be Journey YAML（+ 用户偏好：前端框架/配色）
 3. **端口偏好**：默认 Vite `:5173` / API `:8080`，是否冲突？
 
 ### Step 1 · 解析输入
-- **优先**：读取 AI Canvas YAML + To-be Journey YAML（同为 `examples/` 中已生成的场景）。
-- **兜底**：用户仅提供自然语言场景描述时，先按 AI Canvas 十维结构推演画布，再进入 Step 2。
+- **本仓库输入**：读取 `epics/<epic-key>/idea.md` 的 To-Be 章节（用户场景 / To-Be Process / To-Be Journey）+ `docs/baseline/design-system/` tokens。
+- **兜底**：用户仅提供自然语言场景描述时，先按 idea 结构推演，再进入 Step 2。
 
 ### Step 2 · 推演 mvp_spec.yaml（LLM 产物）
 - 严格遵循 `references/mvp_prompts.md` 铁律（承接规则、元素类型白名单、主题推导表、防呆结构）。
-- 保存至 `examples/<标识>_mvp_spec.yaml`。
+- 保存至 `epics/<epic-key>/analysis/prototype/mvp_spec.yaml`（或 `prototypes/working/mvp_spec.yaml`）。
 
 ### Step 3 · 脚手架编译
 ```bash
-# 在项目根目录（含 客户案例目录 的层级）执行：
-python3 .opencode/skills/ai4pm-skills/prototype-generator/scripts/scaffold_mvp.py \
-  .opencode/skills/ai4pm-skills/prototype-generator/examples/<标识>_mvp_spec.yaml \
-  --case "<客户案例目录>" --scenario "<场景目录>"
+# 在仓库根目录执行：
+python3 openspec-requirements/tools/prototype-generator/scripts/scaffold_mvp.py \
+  epics/<epic-key>/analysis/prototype/mvp_spec.yaml \
+  --output epics/<epic-key>/prototypes/working/mvp-prototype
 ```
-- 产物位于 **`<客户案例目录>/<场景目录>/mvp-prototype/`**。
-- 也可用 `--output <显式路径>` 覆盖；`--force` 覆盖已存在目录。
+- 产物位于 **`epics/<epic-key>/prototypes/working/mvp-prototype/`**。
+- `--force` 覆盖已存在目录。
 
 ### Step 4 · 启动验证（必须执行）
 ```bash
-cd "<客户案例目录>/<场景目录>/mvp-prototype"
+cd "epics/<epic-key>/prototypes/working/mvp-prototype"
 npm install          # 一次性安装全部依赖
 npm run dev          # 开发模式：API(:8080) + Vite 前端(:5173)
 ```
@@ -127,16 +135,16 @@ prototype-generator/
 │   └── scaffold_mvp.py             # 脚手架编译引擎（--case/--scenario/--output/--force）
 ├── assets/_legacy/                 # 旧 Next.js 模板归档
 └── examples/
-    └── dreame_mvp_spec.yaml        # 演示：dreame 采购订单场景
+    └── dreame_mvp_spec.yaml        # 演示：mvp_spec 数据契约参考（非产物目录）
 ```
 
 ---
 
 ## 与上下游 Skill 的关系
 
-| 关系 | Skill | 说明 |
+| 关系 | Skill/制品 | 说明 |
 |------|-------|------|
-| 上游输入 | `ai-canvas-generator` | AI 场景定义（Canvas YAML） |
-| 上游输入 | `ai-product-journey-generator` | To-be 旅程设计（personas/scenarios/AI 交互细节） |
-| 下游/协作 | `story-map-generator` | MVP 功能可进一步拆解为用户故事地图 |
-| 调用方 | `prototype-designer`（Subagent） | 方案设计顾问，负责调度本 Skill 全流程 |
+| 上游输入 | `epics/<key>/idea.md` | To-Be 章节（用户场景 / Process / Journey） |
+| 上游输入 | `docs/baseline/design-system/` | design tokens（brand-design-system 产物） |
+| 下游/协作 | `story-map-generator` | 可工作原型的功能可进一步拆解为用户故事地图 |
+| 编排方 | `prototype` skill（需求侧） | 负责分支决策（简单 UI→HTML；复杂业务→本工具） |

@@ -13,17 +13,24 @@ metadata:
 Token architecture, component specifications, systematic design, slide generation.
 
 > [!IMPORTANT]
+> **本仓库适配说明 (本仓库用法)**:
+> - 本工具用于**需求侧 prototype 前置**：为产品设计 design system（三层 token + 组件规格 + CSS 变量 + Tailwind 集成）。
+> - 产品级产物输出到 `docs/baseline/design-system/`（产品级资产，Baseline Sync 维护）；单 Epic 原型可引用其中的 tokens。
+> - **必须遵循 `docs/FRONTEND.md` 极简约束**：slate 色系（slate-50/200/900）、禁止圆角（radius=0）、禁止阴影、禁止装饰性 Emoji。design tokens 的原始值以此为基准，不得引入圆角/阴影/花哨配色。
+> - **Slide 子系统（本文档后半部分）为可选能力**：仅当用户明确要求生成演示文稿时使用；产品 design system 生成不依赖它。
+
+> [!IMPORTANT]
 > **双重输出规范 (Dual Output Standard)**: 
 > 当你使用此 Skill 时，必须**同时**输出两个部分：
 > 1. **结构化 YAML/JSON**: 用于下一步的自动化处理和数据存档。
 > 2. **交互式 HTML**: 用于最终用户的直观审查与演示。HTML 内部已集成“复制数据”功能，确保数据可溯源。
 > 
-> **输出路径与命名规范 (Output Path & Naming Convention)**:
-> - **目录**: 所有输出文件必须放在当前工作目录下的一个新子目录中，目录名为 `[公司/业务名]` (例如：`张雪机车海外销售/`)。
-> - **文件名**: HTML 文件名必须反映内容，格式为 `[公司/业务名]-[业务类型].html` (例如：`张雪机车海外销售-品牌设计规范.html`)。
+> **输出路径与命名规范 (本仓库适配)**:
+> - **目录**: 产品级 design system 输出到 `docs/baseline/design-system/`（产品级资产，非单 Epic 产物）。
+> - **文件名**: `design-tokens.json`（三层 token 数据）、`design-tokens.css`（CSS 变量）、`design-system.html`（可视化审查）、`component-specs.md`（组件规格）。
 > 
 > **视觉设计规范 (Visual Design Standard)**:
-> - **样式风格**: 默认按照 `ai4pm-skills/design.md` 进行样式输出。
+> - **样式风格**: 默认按照 `openspec-requirements/tools/design.md` 进行样式输出。
 > - **底色模式**: 默认使用 **浅色底 (Light Mode)**。
 > - **页面布局**: HTML 内容占据页面 **85%** 宽度，保持简洁的 Header 设计（参考简洁 Header 规范）。
 

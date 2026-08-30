@@ -27,9 +27,10 @@ Story 是需求侧**唯一冻结交付物（业务面）**。开发侧经 `/req:
    - E2E 验收标准（Given/When/Then，映射 L1/L2 与 SB-STAGE-*/SB-CUSTOMER-*）
    - 治理映射对齐（Bounded Context / L3 / SB-<LANE>-*，新增 taxonomy 显式标注）
    - 若涉及 UI：引用【已确认】的 Epic 整体原型 `epics/<epic-key>/prototypes/<capability>.html`
-4. **UI 门禁**：涉及 UI 的 Story，若无已确认的 Epic 整体原型 → **禁止**勾选「待开发交接」，提示先跑 `prototype`（Epic 整体）。
-5. **HITL**：产出后暂停确认。
-6. **交接**：确认后提示执行 `/req:handoff`（合成开发侧 proposal）。
+4. **可选分析增强（tools/）**：调用 `openspec-requirements/tools/story-narrative-generator/SKILL.md` 生成故事详述（角色画像/交互逻辑/AC/业务价值），产物 `epics/<key>/analysis/narrative/<story-key>/narrative.md`，story.md「分析制品索引」引用。仅作业务面质量增强，**不生成行为规格 specs**（由开发侧在 proposal 后产出）。
+5. **UI 门禁**：涉及 UI 的 Story，若无已确认的 Epic 整体原型 → **禁止**勾选「待开发交接」，提示先跑 `prototype`（Epic 整体）。
+6. **HITL**：产出后暂停确认。
+7. **交接**：确认后提示执行 `/req:handoff`（合成开发侧 proposal）。
 
 ## 明确不做的事
 

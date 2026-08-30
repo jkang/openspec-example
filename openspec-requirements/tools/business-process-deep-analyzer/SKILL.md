@@ -108,7 +108,7 @@ business-process-deep-analyzer/
 │   └── process_layout.html         # Jinja2 HTML/CSS 可视化模板
 ├── scripts/
 │   └── build_process.py            # 核心编译引擎
-└── examples/                       # 存放生成产物 (.yaml & .html)
+└── examples/                       # 示例 YAML（数据契约参考，非产物目录；产物在 epics/<key>/analysis/process/）
 ```
 
 ## 可视化设计说明

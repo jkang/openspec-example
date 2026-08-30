@@ -32,6 +32,11 @@ metadata:
    - **候选 Capabilities（关键）**：参考 `docs/baseline/domain_model.html` 的 BC→Capability 映射，识别新增/修改 Capability（新增标"新增 taxonomy"及理由）。这是 handoff 合成 proposal 与开发侧 specs/<capability>/ 落位的依据。
    - **治理映射对齐**：`business_process.html`（L1/L2/L3）、`service_blueprint.html`（SB-STAGE-*/SB-<LANE>-*）。
    - **需求拆分建议 + 架构影响分析**。
+   - **可选分析增强（tools/）**：调用 `openspec-requirements/tools/` 下 AI4PM 需求工程工具，为 idea.md 生成结构化分析与可视化（产物落位 `epics/<key>/analysis/`，idea.md「分析制品索引」引用）：
+     - `osm-map-generator` → `analysis/osm/`（Epic 目标-策略-度量，Exit Criteria 度量锚点）
+     - `business-process-deep-analyzer` → `analysis/process/`（To-Be Process L1/L2 + 痛点热力）
+     - `journey-map-generator` → `analysis/journey/`（To-Be Journey 可视化，mode: to-be）
+     - 均为 **optional**：缺省不影响进入下一阶段；生成后纳入本次 HITL 确认范围。
 4. **HITL**：产出后暂停确认，确认后才可进入 prototype（若 UI）或 storymap。
 
 ## Guardrails

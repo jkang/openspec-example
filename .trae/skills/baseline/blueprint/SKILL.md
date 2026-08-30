@@ -161,6 +161,27 @@ Service Blueprint 中出现的 capability 必须遵循以下规则：
 5. **更新日期**:
    - 更新文档末尾的 `Last Updated` 日期。
 
+## 渲染管线增强（可选，blueprint-map-generator）
+
+本 Skill 引入 `openspec-requirements/tools/blueprint-map-generator`（AI4PM 需求分析工具箱）作为 `service_blueprint.html` 的 **YAML → HTML 渲染管线**，增强可视化表达（三层泳道：客户层 / 前台层 / 后台层 + 认知负荷标记）。
+
+**唯一事实来源不变**：`docs/baseline/service_blueprint.html` 的稳定锚点（`SB-STAGE-*` / `SB-LANE-*` / `SB-<LANE>-*`）、capability 口径与状态（已落地/规划中/横切支撑）仍由本文件定义。渲染管线只负责把同一份治理数据用更专业的可视化呈现，**不得改变数据与锚点**。
+
+使用方式（可选触发）：
+1. **数据建模**：把当前 `service_blueprint.html` 的治理数据（阶段/泳道/能力分布）结构化到 `docs/baseline/data/service_blueprint.yaml`（按工具 `references/schema.yaml` 数据契约，三层泳道映射：CUSTOMER→客户层，OPS→前台层，BACKSTAGE→后台层；`SB-<LANE>-<NN>` 锚点必须保留在节点元数据中）。
+2. **渲染**：
+   ```bash
+   python3 openspec-requirements/tools/blueprint-map-generator/scripts/build_blueprint.py \
+     docs/baseline/data/service_blueprint.yaml \
+     docs/baseline/service_blueprint.html
+   ```
+3. **校验**：渲染后必须校验稳定锚点与 capability 状态未丢失，且满足本文件「视觉与设计标准」「最小结构要求」。
+
+约束：
+- 渲染管线是**可选增强**：缺省仍按既有"直接编辑 HTML"方式维护；仅在需要更新可视化表达时触发。
+- 若渲染产物与既有 HTML 结构（Header/Intro Grid/Board/Cross-stage/Capability Mapping Table）冲突，以本文件「最小结构要求」为准，必要时在渲染后手工补全结构。
+- 本增强同步到 `.trae/`、`.cursor/`、`.agents/` 三目录。
+
 ## 输出契约
 
 1. **双重输出**:

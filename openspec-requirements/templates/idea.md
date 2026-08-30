@@ -63,7 +63,17 @@
 - Impacted Bounded Contexts: [例如：Order Context, Coupon Context（新增需标注）]
 -->
 
-## 7. 治理映射对齐 (Governance Mapping)
+## 7. 分析制品索引 (Analysis Artifacts)
+<!--
+可选增强（tools/）：explore 阶段可调用 AI4PM 需求分析工具箱生成结构化分析与可视化，产物落位 epics/<epic-key>/analysis/。
+若未生成，保持占位并标注"未生成"。
+- OSM（目标-策略-度量）: epics/<epic-key>/analysis/osm/{osm.yaml,osm.html} — [✅ 已生成 / ❌ 未生成]
+- To-Be Process（L1/L2 + 痛点）: epics/<epic-key>/analysis/process/{process.yaml,process.html} — [✅ / ❌]
+- To-Be Journey（体验旅程）: epics/<epic-key>/analysis/journey/{journey.yaml,journey.html} — [✅ / ❌]
+- 说明：分析制品均为可选，不生成不影响进入下一阶段；生成后须纳入本次 HITL 确认范围。
+-->
+
+## 8. 治理映射对齐 (Governance Mapping)
 <!--
 并参考 docs/baseline/business_process.html 与 docs/baseline/service_blueprint.html 识别受影响的流程节点与服务蓝图节点。
 - Impacted Process Nodes: [例如：L1-04 下单结算, L2-03 选择优惠方案]
@@ -73,7 +83,7 @@
 - Preliminary Sync Assessment: [Yes/No + 原因]
 -->
 
-## 8. 需求拆分建议 (Requirement Splitting)
+## 9. 需求拆分建议 (Requirement Splitting)
 <!--
 如果需求较为复杂，建议在此进行分阶段 / 拆分 storymap。
 - Phase 1: 核心链路 (P0)
@@ -81,7 +91,7 @@
 - Phase 3: 异常边界 (P2)
 -->
 
-## 9. 架构影响分析 (Architectural Impact & Ideas)
+## 10. 架构影响分析 (Architectural Impact & Ideas)
 <!--
 识别对现有系统架构的影响。
 - 涉及哪些后端服务 (Node.js / Python)？
@@ -90,7 +100,7 @@
 - 是否涉及跨域 (CORS) 或数据同步问题？
 -->
 
-## 10. 确认结论 (User Confirmation)
+## 11. 确认结论 (User Confirmation)
 <!--
 记录与用户达成共识的最终结论。
 在此处明确方案是否可以进入下一步（原型 prototype 或 直接 storymap 拆分）。
