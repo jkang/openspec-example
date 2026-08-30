@@ -49,24 +49,24 @@
 ```mermaid
 graph LR
     subgraph LeadAgent [Lead Agent]
-        direction LR
+        direction TB
         E[归档 Archive<br/><small>Command: /opsx:archive<br/>Skill: archive-change</small>]
     end
 
     subgraph EngineerAgent [Engineer Agent]
         direction LR
-        A[探索 Explore<br/><small>Command: /opsx:explore<br/>Skill: explore</small>] ==> B[提案 Propose<br/><small>Command: /opsx:propose<br/>Skill: propose</small>]
-        B ==> C[实施 Apply<br/><small>Command: /opsx:apply<br/>Skill: apply-change</small>]
-        C ==> D[同步 Sync<br/><small>Command: /opsx:sync<br/>Skill: sync-specs</small>]
+        A[探索 Explore<br/><small>业务设计 (idea.md)<br/>Command: /opsx:explore<br/>Skill: explore</small>] ==> B[提案 Propose<br/><small>工程提案 + 原型设计<br/>Command: /opsx:propose<br/>Skill: propose</small>]
+        B ==> C[实施 Apply<br/><small>代码实施与验证<br/>Command: /opsx:apply<br/>Skill: apply-change</small>]
+        C ==> D[同步 Sync<br/><small>规格同步 Spec Sync<br/>Command: /opsx:sync<br/>Skill: sync-specs</small>]
     end
 
     D ==> E
 
-    style A fill:#fff,stroke:#00b96b,stroke-width:4px
-    style B fill:#fff,stroke:#00b96b,stroke-width:4px
-    style C fill:#fff,stroke:#00b96b,stroke-width:4px
-    style D fill:#fff,stroke:#00b96b,stroke-width:4px
-    style E fill:#f8fafc,stroke:#94a3b8,stroke-width:4px
+    style A fill:#fff,stroke:#00b96b,stroke-width:6px
+    style B fill:#fff,stroke:#00b96b,stroke-width:6px
+    style C fill:#fff,stroke:#00b96b,stroke-width:6px
+    style D fill:#fff,stroke:#00b96b,stroke-width:6px
+    style E fill:#f8fafc,stroke:#94a3b8,stroke-width:6px
 ```
 
 ### 形态二：轻量产品 (Lightweight Product)
@@ -110,8 +110,8 @@ flowchart LR
     H ==> I ==> J ==> K
     K -.-> A
 
-    style A fill:#fff,stroke:#1677ff,stroke-width:4px
-    style B fill:#fff,stroke:#1677ff,stroke-width:4px
+    style A fill:#fff,stroke:#1677ff,stroke-width:6px
+    style B fill:#fff,stroke:#1677ff,stroke-width:6px
     style C fill:#fff,stroke:#1677ff,stroke-width:4px
     style D fill:#fff,stroke:#1677ff,stroke-width:4px
     style MultiStoryLoop fill:#f0f7ff,stroke:#dbeafe,stroke-dasharray: 5 5
@@ -179,15 +179,15 @@ flowchart LR
     K2 -.-> B
     K2 ==> M ==> A
 
-    style A fill:#fff,stroke:#00b96b,stroke-width:4px
-    style B fill:#fff,stroke:#00b96b,stroke-width:4px
+    style A fill:#fff,stroke:#00b96b,stroke-width:6px
+    style B fill:#fff,stroke:#00b96b,stroke-width:6px
     style ReqSide fill:#f6ffed,stroke:#b7eb8f,stroke-dasharray: 5 5
     style DevSide fill:#f0f7ff,stroke:#adc6ff,stroke-dasharray: 5 5
-    style HandoffZone fill:#fff,stroke:#1677ff,stroke-width:4px
-    style K1 fill:#fff,stroke:#00b96b,stroke-width:4px
-    style L fill:#f8fafc,stroke:#94a3b8,stroke-width:4px
-    style K2 fill:#fff,stroke:#00b96b,stroke-width:4px
-    style M fill:#fff,stroke:#00b96b,stroke-width:4px
+    style HandoffZone fill:#fff,stroke:#1677ff,stroke-width:6px
+    style K1 fill:#fff,stroke:#00b96b,stroke-width:6px
+    style L fill:#f8fafc,stroke:#94a3b8,stroke-width:6px
+    style K2 fill:#fff,stroke:#00b96b,stroke-width:6px
+    style M fill:#fff,stroke:#00b96b,stroke-width:6px
 ```
 
 ---

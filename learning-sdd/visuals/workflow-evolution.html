@@ -126,9 +126,9 @@ graph LR
 
     subgraph EngineerAgent [Engineer Agent]
         direction LR
-        A[探索 Explore<br/><small>Command: /opsx:explore<br/>Skill: explore</small>] ==> B[提案 Propose<br/><small>Command: /opsx:propose<br/>Skill: propose</small>]
-        B ==> C[实施 Apply<br/><small>Command: /opsx:apply<br/>Skill: apply-change</small>]
-        C ==> D[同步 Sync<br/><small>Command: /opsx:sync<br/>Skill: sync-specs</small>]
+        A[探索 Explore<br/><small>业务设计 (idea.md)<br/>Command: /opsx:explore<br/>Skill: explore</small>] ==> B[提案 Propose<br/><small>工程提案 + 原型设计<br/>Command: /opsx:propose<br/>Skill: propose</small>]
+        B ==> C[实施 Apply<br/><small>代码实施与验证<br/>Command: /opsx:apply<br/>Skill: apply-change</small>]
+        C ==> D[同步 Sync<br/><small>规格同步 Spec Sync<br/>Command: /opsx:sync<br/>Skill: sync-specs</small>]
     end
 
     D ==> E
