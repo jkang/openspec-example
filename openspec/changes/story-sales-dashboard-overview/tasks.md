@@ -41,8 +41,8 @@
 
 ## 4. 验证与同步
 
-- [ ] 4.1 运行 `./init.sh node:test`（单元 + API 测试全绿）
-- [ ] 4.2 运行 `./init.sh e2e:run`（全部 E2E 通过，场景数 ≥ 既有 26 + 新增）
-- [ ] 4.3 浏览器验证前端（Chrome DevTools）：看板渲染、时间切换联动、客服角色无入口
-- [ ] 4.4 在 `verify.md` 记录 Hard Gates（node test / e2e / 浏览器验证）PASS 证据
-- [ ] 4.5 Spec Sync（change 级）：`/opsx:sync` 将 delta specs 回流 `openspec/specs/`（sales-dashboard 新增、user-admin/order-management 增量追加）
+- [x] 4.1 运行 `./init.sh node:test`（单元 + API 测试全绿）
+- [x] 4.2 运行 `./init.sh e2e:run`（全部 E2E 通过，场景数 ≥ 既有 26 + 新增）
+- [x] 4.3 浏览器验证前端（Chrome DevTools）：看板渲染、时间切换联动、客服角色无入口
+- [x] 4.4 在 `verify.md` 记录 Hard Gates（node test / e2e / 浏览器验证）PASS 证据
+- [x] 4.5 Spec Sync（change 级）：`/opsx:sync` 将 delta specs 回流 `openspec/specs/`（sales-dashboard 新增、user-admin/order-management 增量追加）
