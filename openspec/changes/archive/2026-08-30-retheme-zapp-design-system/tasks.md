@@ -64,9 +64,9 @@
 
 ## 5. 基准回流与收尾
 
-- [ ] 5.1 Spec Sync（change 级）：`/opsx:sync` 将 `specs/frontend-ui/spec.md`（delta MODIFIED/ADDED）合并进 `openspec/specs/frontend-ui/spec.md`。
-- [ ] 5.2 Baseline Sync（Epic/变更级）评估：`design.md` Sync Assessment 判定服务蓝图与领域模型均**显式 No-op**（`frontend-ui` taxonomy/边界/状态不变）；`baseline/sync` 无需执行（仅建议知悉 `domain_model.html` `bc-shared→cap-ui` 规则文字可选更新，不触发结构回流）。
-- [ ] 5.3 `/opsx:archive` 归档，移至 `openspec/changes/archive/<YYYY-MM-DD>-retheme-zapp-design-system/`。
+- [x] 5.1 Spec Sync（change 级）：`/opsx:sync` 将 `specs/frontend-ui/spec.md`（delta MODIFIED/ADDED）合并进 `openspec/specs/frontend-ui/spec.md`。
+- [x] 5.2 Baseline Sync（Epic/变更级）评估：`design.md` Sync Assessment 判定服务蓝图与领域模型均**显式 No-op**（`frontend-ui` taxonomy/边界/状态不变）；`baseline/sync` 无需执行；已顺带更新 `domain_model.html` `bc-shared→cap-ui` 规则文字为 ZAPP 措辞（不触发结构回流）。
+- [x] 5.3 `/opsx:archive` 归档，移至 `openspec/changes/archive/2026-08-30-retheme-zapp-design-system/`。
 
 ## 附录：类名映射速查（供 engineer 实施参考）
 

@@ -2,13 +2,13 @@
 
 > 类型：**Tech Debt / 跨切面前端重排**（含外部可见行为变化——整体视觉呈现）。直走交付侧（`/opsx:propose` 起）。**跳过 Prototype**，以已确认的 `docs/baseline/design-system/`（ZAPP）为视觉唯一事实来源。
 
-## Why (背景原因)
+## Why
 
 电商前端当前采用"现代扁平 slate 极简"视觉（浅色 `slate-50` 背景 + `slate-900` 主色 + `border-slate-200`），与产品定位不符，且缺乏品牌一致性。已新增权威设计系统 **ZAPP（Memphis × Zine × Dark Premium 暗黑高端）** 于 `docs/baseline/design-system/`。本变更新旧设计系统替换：让**整个电商系统**（C 端店铺 + B 端运营后台）按 ZAPP 呈现，并使后续 Feature 均遵循 ZAPP（经 `docs/FRONTEND.md` + `openspec/config.yaml` `rules.prototype` + `skills/prod/prototype` + `skills/opsx/verify` 在阶段1已同步锚定为 ZAPP）。
 
-## What Changes (变更内容)
+## What Changes
 
-- **ZAPP 设计令牌注入**：`ecommerce/ecommerce-mini-frontend/src/index.css` 以 `@theme inline` 注入 ZAPP 语义令牌（`bg-background #08080E`、`bg-card #0F0F1C`、`text-foreground #EFEFFA`、`text-muted-foreground #6E6E9A`、`border-border #222238`；`bg-primary #C8FF00`、`bg-accent #FF2D6B`、`bg-electric #3B6DFF`、`bg-warning #FF9A00`、`bg-success #00E5A0`）与三字体（Exo 2 / DM Sans / JetBrains Mono），并移除硬编码 hex 依赖。
+- **ZAPP 设计令牌注入**：`ecommerce/ecommerce-mini-frontend/src/style.css` 以 `@theme inline` 注入 ZAPP 语义令牌（`bg-background #08080E`、`bg-card #0F0F1C`、`text-foreground #EFEFFA`、`text-muted-foreground #6E6E9A`、`border-border #222238`；`bg-primary #C8FF00`、`bg-accent #FF2D6B`、`bg-electric #3B6DFF`、`bg-warning #FF9A00`、`bg-success #00E5A0`）与三字体（Exo 2 / DM Sans / JetBrains Mono），并移除硬编码 hex 依赖。
 - **`App.vue` 全量视觉重排**：将现有 `slate`/浅色/极简类名**整体映射**为 ZAPP 暗黑语义令牌：
   - 页面地面 `bg-white`/`bg-slate-50` → `bg-background`；面板/卡片 → `bg-card`。
   - 主文本 `text-slate-900` → `text-foreground`；次级 → `text-muted-foreground`。
@@ -58,7 +58,7 @@
 
 ## Impact (影响范围)
 
-- **前端（Vue）**：`ecommerce/ecommerce-mini-frontend/src/index.css`（令牌注入）、`ecommerce/ecommerce-mini-frontend/src/App.vue`（全量类名重映射）。构建产物 `dist/` 随之重建。
+- **前端（Vue）**：`ecommerce/ecommerce-mini-frontend/src/style.css`（令牌注入）、`ecommerce/ecommerce-mini-frontend/src/App.vue`（全量类名重映射）。构建产物 `dist/` 随之重建。
 - **依赖**：不新增第三方依赖（零新库）。三种 Google Fonts 通过 `@import` 引入。
 - **治理**（阶段1已同步）：`docs/FRONTEND.md`、`openspec/config.yaml`、`.agents|.trae|.cursor/skills/{prod/prototype,opsx/verify,prod/product-vision}`、`AGENTS.md`。
 - **测试**：功能性 E2E（`smoke`/`mvp_trading`/`sales_dashboard` 等）依赖文案与交互，不依赖颜色，视觉重排不破坏功能性 E2E；`verify` 的浏览器视觉自检已更新为 ZAPP 清单。

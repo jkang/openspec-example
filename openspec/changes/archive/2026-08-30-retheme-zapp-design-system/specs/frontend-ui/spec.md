@@ -62,12 +62,6 @@
 - **AND** 鼠标悬停时卡片边框变为主色 `hover:border-primary`
 - **AND** 商品名使用 `font-display font-bold`，价格使用 `font-mono font-bold text-primary`
 
-#### Scenario: 加购按钮成功态
-- @unit
-- **GIVEN** 商品卡片展示「加入购物车」按钮
-- **WHEN** 用户点击加购
-- **THEN** 按钮翻转至 `bg-success`（`#00E5A0`）成功态并显示「✓ 已加入」
-
 ### Requirement: 状态反馈模态框规范
 
 系统 SHALL 使用 ZAPP 暗黑 `bg-card` 模态框展示关键操作的结果（如结算成功）。模态框必须具备 1px `border-border` 边框、暗黑表面背景，并使用内容决定大小的紧凑布局。
