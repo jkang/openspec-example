@@ -210,34 +210,51 @@ flowchart LR
         
         <div class="mermaid">
 flowchart LR
+    %% ===== 基线与入口 =====
+    A([规划基线]) ==> B([业务基线])
+    B ==> R{任务类型?}
+
+    %% ===== 需求侧 =====
     subgraph Req [需求侧 · PM 主导]
         direction LR
-        P1[调研] ==> P2[探索] ==> P4{UI?}
+        P1[调研] ==> P2[探索] ==> P4{涉及 UI?}
         P4 -- 是 --> P5[原型] --> P3[拆分]
         P4 -- 否 --> P3
-        P3 ==> P6[Story]
+        P3 ==> P6[Story 业务冻结]
     end
 
-    subgraph Handoff [契约交接]
-        H1[handoff]
-    end
+    %% ===== 交接与交付 =====
+    R -- 大块 Epic --> P1
+    R -- 简单变更 --> D1
+    
+    P6 == 强契约交接 ==> H1[handoff]
+    H1 ==> D1
 
     subgraph Dev [交付侧 · 工程师主导]
         direction LR
         D1[提案] ==> D2[规格] ==> D3[设计] ==> D4[实施验证]
     end
 
-    P6 == 主干 ==> H1 == 主干 ==> D1
+    %% ===== 同步与循环 (核心 Loop) =====
     D4 == 主干 ==> K1[Spec Sync] ==> L[归档 Archive]
-    L -.-> |Epic 未完| P6
-    L ==> K2[Baseline Sync]
+    
+    %% Story Loop
+    L -- Epic 未完: 下一个 Story --> P6
+    
+    %% Baseline Sync & Planning Loop
+    L -- Epic 已完 --> K2[Baseline Sync]
+    K2 -.-> B
+    K2 ==> M[周期回顾]
+    M -.-> A
 
+    %% 样式微调
     style Req fill:#f6ffed,stroke:#b7eb8f,stroke-dasharray: 5 5
     style Dev fill:#f0f7ff,stroke:#adc6ff,stroke-dasharray: 5 5
-    style Handoff fill:#fff,stroke:#1677ff,stroke-width:2px
+    style H1 fill:#fff,stroke:#1677ff,stroke-width:2px
     style D4 fill:#fff,stroke:#1677ff,stroke-width:3px
     style K1 fill:#fff,stroke:#00b96b,stroke-width:2px
-    style K2 fill:#fff,stroke:#00b96b,stroke-width:2px
+    style K2 fill:#fff,stroke:#00b96b,stroke-width:3px
+    style L fill:#fff,stroke:#1e293b,stroke-width:2px
         </div>
 
         <div class="mt-4 grid grid-cols-4 gap-4">
