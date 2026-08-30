@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenSpec 工作流演进 - 从极简到全治理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#f1f5f9',
+                primaryTextColor: '#1e293b',
+                primaryBorderColor: '#cbd5e1',
+                lineColor: '#64748b',
+                secondaryColor: '#e2e8f0',
+                tertiaryColor: '#f8fafc',
+                fontSize: '14px',
+                fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif'
+            },
+            flowchart: {
+                curve: 'basis',
+                padding: 20
+            }
+        });
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;500&display=swap');
+        
+        body {
+            background-color: #f8fafc;
+            color: #334155;
+            font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+        }
+        
+        h1, h2 {
+            font-family: 'Noto Serif SC', serif;
+        }
+
+        .mermaid-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .mermaid-card:hover {
+            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            border-color: #94a3b8;
+        }
+
+        .step-badge {
+            background: #f1f5f9;
+            color: #475569;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            border: 1px solid #e2e8f0;
+        }
+
+        .intro-gradient {
+            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        }
+    </style>
+</head>
+<body class="p-8 md:p-16">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <header class="mb-16 text-center">
+            <div class="inline-block px-4 py-1 mb-4 text-xs font-bold tracking-widest uppercase bg-indigo-100 text-indigo-700 rounded-full">
+                Knowledge Asset
+            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-6">OpenSpec 工作流演进全景</h1>
+            <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+                从“指令驱动”到“治理驱动”，见证 AI 辅助软件工程如何通过结构化契约与分层治理，彻底解决需求漂移。
+            </p>
+        </header>
+
+        <!-- Section 1: v1.5 Minimal -->
+        <section class="mb-24">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="intro-gradient text-white w-12 h-12 flex items-center justify-center rounded-lg font-bold text-xl shadow-lg">1</div>
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">v1.5 极简版：线性单路闭环</h2>
+                    <p class="text-slate-500">最原始的 SDD 范式，确立了“意图 -> 规格 -> 代码”的流水线。</p>
+                </div>
+            </div>
+            <div class="mermaid-card p-8 flex justify-center">
+                <div class="mermaid w-full">
+graph LR
+    E[Explore 探索] --> P[Propose 提案] --> A[Apply 实施] --> S[Sync 同步] --> Ar[Archive 归档]
+
+    style E fill:#fff,stroke:#64748b,stroke-width:2px
+    style P fill:#fff,stroke:#64748b,stroke-width:2px
+    style A fill:#fff,stroke:#64748b,stroke-width:2px
+    style S fill:#fff,stroke:#64748b,stroke-width:2px
+    style Ar fill:#f1f5f9,stroke:#64748b,stroke-width:2px
+                </div>
+            </div>
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-slate-600">
+                <div class="p-4 bg-white border border-slate-100 rounded-lg">
+                    <span class="font-bold text-slate-800">核心特征</span>：单向线性流，无复杂任务分支。
+                </div>
+                <div class="p-4 bg-white border border-slate-100 rounded-lg">
+                    <span class="font-bold text-slate-800">适用场景</span>：小型项目，单人开发，需求极度明确。
+                </div>
+                <div class="p-4 bg-white border border-slate-100 rounded-lg">
+                    <span class="font-bold text-slate-800">局限性</span>：缺乏上游治理，难以处理复杂的 UI 交互与业务规则。
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2: Lightweight SDD -->
+        <section class="mb-24">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="intro-gradient text-white w-12 h-12 flex items-center justify-center rounded-lg font-bold text-xl shadow-lg">2</div>
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">轻量版 SDD：多 Story 执行循环</h2>
+                    <p class="text-slate-500">引入基线概念，支持一个 Change 内包含多个 Story 的迭代。</p>
+                </div>
+            </div>
+            <div class="mermaid-card p-8 flex justify-center">
+                <div class="mermaid w-full">
+flowchart TD
+    A([规划基线<br/>产品定位 / 路线图])
+    B([业务基线<br/>领域模型 / 流程])
+    C[需求探索<br/>/opsx:explore]
+    D[方案提案<br/>/opsx:propose]
+    
+    subgraph MultiStoryLoop [Multi-Story 执行循环]
+        direction TB
+        E{涉及 UI 变更?}
+        F[原型设计<br/>/opsx:prototype + HITL 确认]
+        G[业务故事<br/>/opsx:story + HITL 确认]
+        H[开发实现<br/>规格设计 -> 实施 -> 验证]
+    end
+    
+    K[基线同步<br/>/opsx:sync 回流]
+    L([变更归档<br/>/opsx:archive])
+    M[周期回顾<br/>更新 Roadmap]
+
+    A ==> B
+    B ==> C
+    C ==> D
+    D ==> E
+    
+    E -- 是 --> F
+    E -- 否 --> G
+    F --> G
+    G --> H
+    
+    H -- 下一个 Story --> E
+    H ==> K
+    K -.-> B
+    K ==> L
+    L ==> M
+    M -.-> A
+
+    style A fill:#eff6ff,stroke:#2563eb,stroke-width:2px
+    style B fill:#eff6ff,stroke:#2563eb,stroke-width:2px
+    style MultiStoryLoop fill:#f8fafc,stroke:#94a3b8,stroke-dasharray: 5 5
+    style F fill:#f0fdf4,stroke:#16a34a,stroke-width:2px
+    style G fill:#f0fdf4,stroke:#16a34a,stroke-width:2px
+    style L fill:#f1f5f9,stroke:#64748b,stroke-width:2px
+                </div>
+            </div>
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-slate-600">
+                <div class="p-4 bg-white border border-slate-100 rounded-lg">
+                    <span class="font-bold text-slate-800">核心特征</span>：引入基线 (Baseline)，支持 Multi-Story 循环。
+                </div>
+                <div class="p-4 bg-white border border-slate-100 rounded-lg">
+                    <span class="font-bold text-slate-800">适用场景</span>：中型业务，需要频繁迭代 UI 与业务规则。
+                </div>
+                <div class="p-4 bg-white border border-slate-100 rounded-lg">
+                    <span class="font-bold text-slate-800">价值点</span>：通过 HITL (人机协同) 确保原型与业务规则的确定性。
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3: Full SDD -->
+        <section class="mb-24">
+            <div class="flex items-center gap-4 mb-8">
+                <div class="intro-gradient text-white w-12 h-12 flex items-center justify-center rounded-lg font-bold text-xl shadow-lg">3</div>
+                <div>
+                    <h2 class="text-2xl font-bold text-slate-800">完整版 SDD：端到端治理闭环 (v2.0)</h2>
+                    <p class="text-slate-500">需求侧与交付侧深度解耦，全链路资产化管理，支持规模化协作。</p>
+                </div>
+            </div>
+            <div class="mermaid-card p-8 flex justify-center">
+                <div class="mermaid w-full">
+flowchart TD
+    A([规划基线<br/>/opsx:planning:*])
+    B([业务基线<br/>/opsx:baseline/sync])
+    R{任务路由?}
+
+    subgraph ReqSide [需求侧 · PM 主导]
+        direction TB
+        P1[需求调研]
+        P2[探索]
+        P4{UI?}
+        P5[原型设计]
+        P3[需求拆分]
+        P6[Story 交付物]
+    end
+
+    subgraph Handoff [交接边界]
+        H1[handoff<br/>合成提案]
+    end
+
+    subgraph DevSide [交付侧 · Engineer 主导]
+        direction TB
+        D1[提案]
+        D2[行为规格]
+        D3[设计]
+        D4[实施与验证]
+    end
+
+    K1[Spec Sync]
+    L([归档])
+    K2[Baseline Sync]
+    M[周期回顾]
+
+    A ==> B
+    B ==> R
+    R -- 大块 Epic --> P1
+    R -- 简单任务 --> D1
+    P1 ==> P2 ==> P4
+    P4 -- 是 --> P5 --> P3
+    P4 -- 否 --> P3
+    P3 ==> P6 ==> H1 ==> D1
+    D1 ==> D2 ==> D3 ==> D4 ==> K1 ==> L
+    L -- 循环 --> P6
+    L -- 结束 --> K2 -.-> B
+    K2 ==> M -.-> A
+
+    style ReqSide fill:#f0fdf4,stroke:#16a34a,stroke-dasharray: 5 5
+    style DevSide fill:#f5f3ff,stroke:#7c3aed,stroke-dasharray: 5 5
+    style Handoff fill:#fffbeb,stroke:#d97706,stroke-dasharray: 5 5
+    style A fill:#eff6ff,stroke:#2563eb,stroke-width:2px
+    style B fill:#eff6ff,stroke:#2563eb,stroke-width:2px
+                </div>
+            </div>
+            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-slate-600">
+                <div class="p-4 bg-white border border-slate-100 rounded-lg">
+                    <span class="font-bold text-slate-800">核心特征</span>：两侧解耦（Req/Dev），全漏斗覆盖，分层同步。
+                </div>
+                <div class="p-4 bg-white border border-slate-100 rounded-lg">
+                    <span class="font-bold text-slate-800">适用场景</span>：复杂企业级业务，多 Epic 并行，高成熟度团队。
+                </div>
+                <div class="p-4 bg-white border border-slate-100 rounded-lg">
+                    <span class="font-bold text-slate-800">终极价值</span>：需求资产随开发自然沉淀，基线稳固演进，彻底解决 Blocker。
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="mt-32 pt-8 border-t border-slate-200 text-center text-slate-400 text-xs">
+            <p>© 2026 OpenSpec Practice - 规格驱动开发实战</p>
+        </footer>
+    </div>
+</body>
+</html>

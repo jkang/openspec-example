@@ -1690,7 +1690,7 @@ const fetchSalesDashboard = async () => {
   dashboardError.value = ''
   dashboardLoading.value = true
   try {
-    const response = await fetch(`${API_BASE}/api/admin/dashboard/sales?dimension=${dashboardRange.value}`, authHeaders())
+    const response = await fetch(`${API_BASE}/api/admin/dashboard/sales?dimension=${dashboardRange.value}`, { headers: authHeaders() })
     if (response.status === 403) {
       dashboardError.value = '无权限访问销售看板'
       dashboardData.value = null

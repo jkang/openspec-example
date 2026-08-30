@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理入口可见性 - 极简电商 ADMIN</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        * { border-radius: 0 !important; box-shadow: none !important; }
+        body { background-color: #f8fafc; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .border-slate-200 { border-color: #e2e8f0; }
+        input:focus, select:focus { outline: none; border-color: #0f172a; }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div id="app" class="flex min-h-screen">
+        <!-- 左侧导航 -->
+        <aside class="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0">
+            <div class="h-16 flex items-center px-6 border-b border-slate-200">
+                <h1 class="text-xl font-bold tracking-tight">极简电商 ADMIN</h1>
+            </div>
+            <nav class="flex-1 py-4">
+                <div class="px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">交易管理</div>
+                <a class="flex items-center px-6 py-3 border-l-4 border-transparent text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer">订单列表</a>
+                <a class="flex items-center px-6 py-3 border-l-4 border-transparent text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer">商品管理</a>
+                <a class="flex items-center px-6 py-3 border-l-4 border-transparent text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer">分类管理</a>
+                <div class="mt-8 px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">营销中心</div>
+                <a class="flex items-center px-6 py-3 border-l-4 border-transparent text-slate-600 hover:bg-slate-50 transition-colors cursor-pointer">优惠券管理</a>
+
+                <!-- 账户中心分组：由当前会话真实角色决定可见性 -->
+                <div v-if="isOperator || showPermissionPanel" class="mt-8">
+                    <div class="px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">账户中心</div>
+
+                    <!-- 运营视角：用户管理链接可见 -->
+                    <a v-if="isOperator" @click="tab = 'user'"
+                       :class="['flex items-center px-6 py-3 border-l-4 transition-colors cursor-pointer', tab === 'user' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']">用户管理</a>
+
+                    <!-- 顾客/未登录视角：不空悬，显式权限引导 -->
+                    <div v-else class="px-6 py-3 text-sm text-slate-500">
+                        <div class="flex items-center gap-2">
+                            <span class="text-slate-400">仅运营角色可见</span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- 右侧内容区 -->
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0">
+                <div class="text-slate-600">当前路径: <span class="text-slate-900 font-medium">{{ tab === 'user' ? '账户中心 / 用户管理' : '营销中心 / 优惠券管理' }}</span></div>
+                <!-- 角色标签：真实 currentUser 渲染，非硬编码 -->
+                <div class="flex items-center gap-4">
+                    <span class="text-sm text-slate-500">
+                        运营专员: <span class="font-medium">{{ (isOperator && currentUser.nickname) || '—' }}</span>
+                    </span>
+                    <!-- 角色视角切换（原型演示用） -->
+                    <select v-model="demoRole" class="text-xs border border-slate-200 px-2 py-1 bg-white">
+                        <option value="operator">演示：运营角色 (陈晓芸)</option>
+                        <option value="customer">演示：顾客角色 (持久化测试)</option>
+                        <option value="guest">演示：未登录</option>
+                    </select>
+                </div>
+            </header>
+
+            <div class="flex-1 overflow-y-auto p-8">
+                <div class="max-w-5xl mx-auto">
+
+                    <!-- 优惠券管理（默认 tab，仅供背景） -->
+                    <div v-if="tab === 'coupon'" class="bg-white border border-slate-200 p-8">
+                        <h2 class="text-lg font-bold mb-4 border-b border-slate-200 pb-4">新建优惠券规则</h2>
+                        <p class="text-sm text-slate-600">此处为背景视图。请切换右侧「角色视角」查看账户中心/用户管理入口的不同表现。</p>
+                    </div>
+
+                    <!-- 用户管理 tab -->
+                    <div v-else-if="tab === 'user'">
+                        <!-- 运营视角：完整用户管理 -->
+                        <template v-if="isOperator">
+                            <div class="bg-white border border-slate-200 p-8">
+                                <div class="flex items-center justify-between mb-6">
+                                    <h2 class="text-lg font-bold border-b border-slate-200 pb-4">用户管理</h2>
+                                    <span class="border border-slate-200 px-3 py-1 text-xs text-slate-600">当前角色：运营 · {{ currentUser.nickname }}</span>
+                                </div>
+                                <div class="flex items-center gap-2 mb-4">
+                                    <input v-model.trim="keyword" @keyup.enter="search" type="text" placeholder="按手机号或昵称搜索，例如 139 或 陈" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-slate-400">
+                                    <button @click="search" class="px-6 py-2 border border-slate-900 bg-slate-900 text-white text-sm font-medium">搜索</button>
+                                    <button @click="reset" class="px-6 py-2 border border-slate-200 text-slate-600 text-sm font-medium">重置</button>
+                                </div>
+                                <p class="text-xs text-slate-500 mt-2 mb-3">共 {{ filtered.length }} 位用户</p>
+                                <table class="w-full text-sm">
+                                    <thead>
+                                        <tr class="border-b border-slate-200 text-left text-slate-500">
+                                            <th class="py-3 pr-4">用户ID</th><th class="py-3 pr-4">昵称</th><th class="py-3 pr-4">手机号</th><th class="py-3 pr-4">订单数</th><th class="py-3 pr-4">注册日期</th><th class="py-3 pr-4">状态</th><th class="py-3">操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr v-for="u in filtered" :key="u.id" class="border-b border-slate-200">
+                                            <td class="py-3 pr-4 font-mono">{{ u.id }}</td>
+                                            <td class="py-3 pr-4">{{ u.nickname }}</td>
+                                            <td class="py-3 pr-4 font-mono">{{ u.phone }}</td>
+                                            <td class="py-3 pr-4">{{ u.orderCount }}</td>
+                                            <td class="py-3 pr-4">{{ u.createdAt }}</td>
+                                            <td class="py-3 pr-4">{{ u.status }}</td>
+                                            <td class="py-3">
+                                                <button @click="toggleStatus(u)" class="border border-slate-900 px-3 py-1 text-xs font-medium text-slate-900">{{ u.status === '正常' ? '禁用' : '启用' }}</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <p class="text-xs text-slate-500 mt-4">本视图演示运营角色登录后「账户中心 / 用户管理」完整可达（列表/检索/启停）。</p>
+                        </template>
+
+                        <!-- 顾客/未登录视角：显式无权限引导 -->
+                        <template v-else>
+                            <div class="bg-white border border-slate-200 p-8">
+                                <h2 class="text-lg font-bold mb-4 border-b border-slate-200 pb-4">用户管理</h2>
+                                <p class="text-sm text-slate-700">无权限访问用户管理：本入口仅「运营」角色可见。手机号等用户资料属敏感信息，客服与普通账号无法查看。</p>
+                                <p v-if="!session" class="text-sm text-slate-700 mt-3">当前未登录，请先使用运营账号（如 13912345678 / 陈晓芸）登录后再访问。</p>
+                            </div>
+                        </template>
+                    </div>
+
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+
+        createApp({
+            setup() {
+                // 真实 seed 数据（对齐 ecommerce/ecommerce-mini/data/users.json）
+                const REAL_OPERATOR = { id: 'user_1001', nickname: '陈晓芸', phone: '13912345678', role: '运营', status: '正常', createdAt: '2026-08-27 15:00' };
+                const REAL_CUSTOMER = { id: 'user_1002', nickname: '持久化测试', phone: '13800002222', role: '客户', status: '正常', createdAt: '2026-08-29 08:27' };
+
+                const users = [
+                    { id: 'user_1001', nickname: '陈晓芸', phone: '13912345678', orderCount: 3, createdAt: '2026-08-27', status: '正常' },
+                    { id: 'user_1002', nickname: '持久化测试', phone: '13800002222', orderCount: 1, createdAt: '2026-08-29', status: '正常' },
+                    { id: 'user_1003', nickname: '林晓明', phone: '13888218888', orderCount: 2, createdAt: '2026-08-29', status: '正常' },
+                ];
+
+                const tab = ref('coupon');
+                const keyword = ref('');
+                const filtered = ref([...users]);
+
+                // 演示用角色视角
+                const demoRole = ref('customer');
+                const currentUser = computed(() =>
+                    demoRole.value === 'operator' ? REAL_OPERATOR :
+                    demoRole.value === 'customer' ? REAL_CUSTOMER : null
+                );
+                const isOperator = computed(() => currentUser.value?.role === '运营');
+                const session = computed(() => demoRole.value !== 'guest');
+                // 非运营/未登录时仍展示账户中心分组（权限引导态），避免空悬
+                const showPermissionPanel = computed(() => !isOperator.value);
+
+                const search = () => {
+                    const k = keyword.value.trim();
+                    filtered.value = k ? users.filter(u => u.phone.includes(k) || u.nickname.includes(k)) : [...users];
+                };
+                const reset = () => { keyword.value = ''; filtered.value = [...users]; };
+                const toggleStatus = (u) => { u.status = u.status === '正常' ? '禁用' : '正常'; };
+
+                return { tab, keyword, filtered, demoRole, currentUser, isOperator, session, showPermissionPanel, search, reset, toggleStatus };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>
