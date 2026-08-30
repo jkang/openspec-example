@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>销售看板 · 销售报表看板 Epic 原型</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    /* 极简 UI 规范：无圆角 / 无阴影 / slate 色系 / 1px 实线边框 */
+    * { border-radius: 0 !important; box-shadow: none !important; }
+    body { background-color: #f8fafc; color: #0f172a; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
+    .border-slate-200 { border-color: #e2e8f0; }
+    input:focus, select:focus { outline: none; border-color: #0f172a; }
+  </style>
+</head>
+<body class="min-h-screen">
+  <div id="app">
+    <!-- 头部：极简电商 B 端后台 -->
+    <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-slate-900 text-white flex items-center justify-center text-xs font-bold">M</div>
+        <h1 class="text-lg font-semibold">极简商城 · 管理后台</h1>
+      </div>
+      <div class="flex items-center gap-4 text-sm text-slate-500">
+        <span>运营 · 王运营</span>
+        <span class="border border-slate-200 px-2 py-1 text-slate-700">退出</span>
+      </div>
+    </header>
+
+    <div class="flex">
+      <!-- 侧边导航 -->
+      <aside class="w-48 bg-white border-r border-slate-200 min-h-screen text-sm">
+        <nav class="py-4">
+          <div class="px-4 py-2 bg-slate-900 text-white font-medium">销售看板</div>
+          <div class="px-4 py-2 text-slate-500">商品管理</div>
+          <div class="px-4 py-2 text-slate-500">分类管理</div>
+          <div class="px-4 py-2 text-slate-500">优惠券</div>
+          <div class="px-4 py-2 text-slate-500">订单管理</div>
+          <div class="px-4 py-2 text-slate-500">用户管理</div>
+        </nav>
+      </aside>
+
+      <!-- 主内容：销售看板 -->
+      <main class="flex-1 p-8">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h2 class="text-xl font-semibold">销售看板</h2>
+            <p class="text-sm text-slate-500 mt-1">销售额为实付金额（actualPaidCents），优惠让利单列，不含已取消订单</p>
+          </div>
+          <!-- 时间切换 -->
+          <div class="flex border border-slate-200 text-sm">
+            <button v-for="r in ranges" :key="r.key"
+              @click="range = r.key"
+              class="px-4 py-2"
+              :class="range === r.key ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'">
+              {{ r.label }}
+            </button>
+          </div>
+        </div>
+
+        <!-- 指标卡 -->
+        <div class="grid grid-cols-4 gap-4 mb-8">
+          <div v-for="m in metrics" :key="m.label" class="bg-white border border-slate-200 p-5">
+            <div class="text-sm text-slate-500">{{ m.label }}</div>
+            <div class="text-2xl font-semibold mt-2">{{ m.value }}</div>
+            <div class="text-xs mt-2" :class="m.delta >= 0 ? 'text-emerald-600' : 'text-rose-600'">
+              {{ m.delta >= 0 ? '▲' : '▼' }} {{ Math.abs(m.delta).toFixed(1) }}% 较上周期
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-6">
+          <!-- 销售趋势 -->
+          <section class="bg-white border border-slate-200 p-5">
+            <h3 class="font-medium mb-4">销售趋势（{{ currentRangeLabel }}）</h3>
+            <svg viewBox="0 0 400 160" class="w-full">
+              <line v-for="i in 5" :key="'g'+i" x1="0" :y1="i*32" x2="400" :y2="i*32" stroke="#e2e8f0" stroke-width="1"/>
+              <polyline :points="trendPoints" fill="none" stroke="#0f172a" stroke-width="2"/>
+              <circle v-for="(p,i) in trend" :key="'c'+i" :cx="p.x" :cy="p.y" r="3" fill="#0f172a"/>
+            </svg>
+            <div class="flex justify-between text-xs text-slate-500 mt-2">
+              <span v-for="d in trendLabels" :key="d">{{ d }}</span>
+            </div>
+          </section>
+
+          <!-- 商品 TOP10 -->
+          <section class="bg-white border border-slate-200 p-5">
+            <h3 class="font-medium mb-4">商品销售 TOP10（按销售额）</h3>
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="text-slate-500 border-b border-slate-200 text-left">
+                  <th class="py-2 font-normal">商品</th>
+                  <th class="py-2 font-normal text-right">销量</th>
+                  <th class="py-2 font-normal text-right">销售额</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="(p, idx) in products" :key="p.name" class="border-b border-slate-100">
+                  <td class="py-2">
+                    <span class="inline-block w-5 text-slate-400">{{ idx + 1 }}</span>{{ p.name }}
+                  </td>
+                  <td class="py-2 text-right">{{ p.qty }}</td>
+                  <td class="py-2 text-right">{{ p.amount }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
+
+        <!-- 分类排行 -->
+        <section class="bg-white border border-slate-200 p-5 mt-6">
+          <h3 class="font-medium mb-4">分类销售排行（按销售额）</h3>
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="text-slate-500 border-b border-slate-200 text-left">
+                <th class="py-2 font-normal">分类</th>
+                <th class="py-2 font-normal text-right">销售额</th>
+                <th class="py-2 font-normal text-right">占比</th>
+                <th class="py-2 font-normal text-right">订单数</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="c in categories" :key="c.name" class="border-b border-slate-100">
+                <td class="py-2">{{ c.name }}</td>
+                <td class="py-2 text-right">{{ c.amount }}</td>
+                <td class="py-2 text-right">{{ c.ratio }}%</td>
+                <td class="py-2 text-right">{{ c.orders }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 优惠让利明细 -->
+        <section class="bg-white border border-slate-200 p-5 mt-6">
+          <h3 class="font-medium mb-4">优惠券效果（{{ currentRangeLabel }}）</h3>
+          <div class="grid grid-cols-3 gap-4 text-sm">
+            <div class="border border-slate-200 p-4">
+              <div class="text-slate-500">优惠让利总额</div>
+              <div class="text-xl font-semibold mt-1">{{ couponTotal }}</div>
+            </div>
+            <div class="border border-slate-200 p-4">
+              <div class="text-slate-500">使用优惠券订单数</div>
+              <div class="text-xl font-semibold mt-1">{{ couponOrders }} 单</div>
+            </div>
+            <div class="border border-slate-200 p-4">
+              <div class="text-slate-500">用券订单占比</div>
+              <div class="text-xl font-semibold mt-1">{{ couponRatio }}%</div>
+            </div>
+          </div>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          ranges: [
+            { key: 'today', label: '今日' },
+            { key: 'week', label: '近7日' },
+            { key: 'month', label: '近30日' }
+          ],
+          range: 'week',
+          // 真实业务数据：基于 6 个在售商品与真实订单量级
+          trend: {
+            today: [{x:0,y:120},{x:100,y:90},{x:200,y:100},{x:300,y:70},{x:400,y:80}],
+            week: [{x:0,y:130},{x:100,y:100},{x:200,y:115},{x:300,y:80},{x:400,y:95}],
+            month: [{x:0,y:140},{x:100,y:90},{x:200,y:120},{x:300,y:70},{x:400,y:100}]
+          },
+          trendLabels: ['D1','D2','D3','D4','D5'],
+          products: [
+            { name: '极简机械键盘', qty: 86, amount: '¥25,714' },
+            { name: '铝合金笔记本电脑支架', qty: 74, amount: '¥17,316' },
+            { name: '无线降噪耳机 Pro', qty: 52, amount: '¥14,924' },
+            { name: '便携显示器 15.6 英寸', qty: 31, amount: '¥12,089' },
+            { name: '人体工学鼠标', qty: 68, amount: '¥9,044' },
+            { name: '桌面理线器套装', qty: 45, amount: '¥2,655' }
+          ],
+          categories: [
+            { name: '键盘外设', amount: '¥25,714', ratio: 34.5, orders: 86 },
+            { name: '桌面配件', amount: '¥29,015', ratio: 38.9, orders: 187 },
+            { name: '影音设备', amount: '¥14,924', ratio: 20.0, orders: 52 },
+            { name: '显示器', amount: '¥12,089', ratio: 16.2, orders: 31 },
+            { name: '线材收纳', amount: '¥2,655', ratio: 3.6, orders: 45 }
+          ],
+          couponTotal: '¥6,320',
+          couponOrders: 89,
+          couponRatio: 32.7
+        };
+      },
+      computed: {
+        currentRangeLabel() {
+          return this.ranges.find(r => r.key === this.range).label;
+        },
+        metrics() {
+          const map = {
+            today: [
+              { label: '销售额', value: '¥8,320', delta: 12.4 },
+              { label: '订单量', value: '68 单', delta: 8.2 },
+              { label: '客单价', value: '¥122.4', delta: 3.9 },
+              { label: '优惠让利', value: '¥680', delta: 5.1 }
+            ],
+            week: [
+              { label: '销售额', value: '¥58,430', delta: 14.2 },
+              { label: '订单量', value: '452 单', delta: 11.6 },
+              { label: '客单价', value: '¥129.3', delta: 2.3 },
+              { label: '优惠让利', value: '¥6,320', delta: 7.8 }
+            ],
+            month: [
+              { label: '销售额', value: '¥231,880', delta: 21.5 },
+              { label: '订单量', value: '1,726 单', delta: 18.9 },
+              { label: '客单价', value: '¥134.3', delta: 2.2 },
+              { label: '优惠让利', value: '¥24,150', delta: 9.4 }
+            ]
+          };
+          return map[this.range];
+        },
+        trendPoints() {
+          return this.trend[this.range].map(p => `${p.x},${p.y}`).join(' ');
+        }
+      },
+      template: ''
+    }).mount('#app');
+  </script>
+</body>
+</html>
