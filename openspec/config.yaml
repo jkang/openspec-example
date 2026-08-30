@@ -3,12 +3,12 @@ schema: spec-driven
 
 # 全局上下文注入
 context: |
-  项目: ecommerce-mini - 一个展示 OpenSpec 规范驱动开发 (SDD) 的极简电商系统。
+  项目: ecommerce-mini - 一个展示 OpenSpec 规范驱动开发 (SDD) 的电商系统，采用 ZAPP Design System。
   治理文档 (唯一事实来源):
     - 流程 SOP: docs/SOPS/SDD_WORKFLOW.md (分支流转与指令规范)
     - 产品定位: docs/PRODUCT.md (Elevator Pitch 与业务导向)
     - 产品路线图: docs/ROADMAP.md (当前阶段目标与需求探索边界)
-    - 前端规范: docs/FRONTEND.md (极简 UI 约束与浏览器验证闭环)
+    - 前端规范: docs/FRONTEND.md + 设计系统 docs/baseline/design-system/ (ZAPP 暗黑高端 UI 约束与浏览器验证闭环，唯一 UI 事实来源)
     - 后端架构: docs/ARCHITECTURE.md (Node.js/Python 四层架构设计)
     - 测试策略: docs/TESTING_STRATEGY.md (BDD 标签与 Cucumber E2E 规范)
     - 质量标准: docs/QUALITY_SCORE.md (交付底线)
@@ -31,9 +31,10 @@ rules:
     - 必须说明受影响的实现版本 (Node.js / Python / Frontend / 全部)
     - 说明后续流程分支（是否跳过 Prototype 或 Specs）
   prototype:
-    - 必须严格遵循 docs/FRONTEND.md 的 UI 规范
-    - 现代扁平化：禁止圆角 (rounded-none)、禁止阴影 (shadow-none)、禁止装饰性 Emoji
-    - 颜色方案：使用 slate 色系 (slate-50 背景, slate-200 边框, slate-900 强调色)
+    - 必须严格遵循 docs/FRONTEND.md 与 docs/baseline/design-system/ (ZAPP) 的 UI 规范
+    - ZAPP 暗黑高端：只允许 rounded-none/rounded-sm，禁止 box-shadow 与 linear-gradient，禁止装饰性 Emoji
+    - 颜色方案：使用语义令牌 (bg-background #08080E / bg-card #0F0F1C / border-border #222238 / text-foreground #EFEFFA; primary #C8FF00 荧光绿, accent #FF2D6B 热情粉, electric #3B6DFF, warning #FF9A00, success #00E5A0)，禁止硬编码 hex
+    - 字体方案：标题 font-display (Exo 2) uppercase font-black；价格 font-mono (JetBrains Mono) font-bold text-primary；标签 font-mono uppercase tracking-widest text-muted-foreground
     - 数据要求：严禁使用空洞模板（foo/test），必须填充真实的业务数据示例
     - 交互界面：必须完全使用中文
     - 技术实现：使用 Vue 3 (CDN) + Tailwind CSS (CDN) 的可交互 HTML

@@ -17,7 +17,7 @@ metadata:
 
 **工具降级路径（浏览器 UI 验证不可用时）**：
 - 首选：Chrome DevTools / webapp-testing 验证前端视觉与交互（FRONTEND.md §6 自检）。
-- 降级：若 MCP 浏览器实例不可用/被占用，先 `--isolated` 重试；仍不可用时按 `docs/FRONTEND.md` 静态自检清单（无圆角 `border-radius:0`、无阴影 `box-shadow:none`、slate 色系、真实中文数据、无占位符）审查，并在 verify.md 中记录"静态自检"而非"浏览器验证"。
+- 降级：若 MCP 浏览器实例不可用/被占用，先 `--isolated` 重试；仍不可用时按 `docs/FRONTEND.md` 静态自检清单（仅 `rounded-none`/`rounded-sm` 无大圆角、无 `box-shadow`/`linear-gradient`、ZAPP 暗黑令牌 bg-background #08080E / bg-card #0F0F1C / border-border #222238、标题 font-display font-black uppercase、价格 font-mono font-bold text-primary、真实中文数据、无占位符）审查，并在 verify.md 中记录"静态自检"而非"浏览器验证"。
 
 ## 门禁定义
 

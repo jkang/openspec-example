@@ -35,13 +35,14 @@ metadata:
 3. **分支决策**：判断业务复杂度——
    - 简单 UI → **分支 A**（Vue3+Tailwind CDN HTML，走下方"分支 A 生成"）。
    - 复杂业务（多角色/多流程/真实数据闭环）→ **分支 B**：按 `openspec-requirements/tools/prototype-generator/SKILL.md` 调用 `scaffold_mvp.py` 生成可工作原型；上游输入取 idea.md 的 To-Be 章节 + design-system tokens；完成后必须 `npm install && npm run dev` + curl API + 浏览器逐页验证。
-4. **前置 design system（产品级，仅首次）**：若 `docs/baseline/design-system/` 尚不存在，先按 `openspec-requirements/tools/brand-design-system/SKILL.md` 生成（遵循 FRONTEND.md 极简约束：slate 色系、radius=0、无阴影、无装饰 Emoji）。
+4. **前置 design system（产品级，仅首次）**：若 `docs/baseline/design-system/` 尚不存在，先按 `openspec-requirements/tools/brand-design-system/SKILL.md` 生成（遵循 FRONTEND.md ZAPP 约束：暗黑高端背景 #08080E、语义令牌色彩、radius=0/2px、无阴影、无装饰 Emoji）。
 5. **HITL**：产出后暂停确认，确认后方可进入 storymap 拆分。
 
 ## 分支 A 生成规范（HTML 原型）
 
-   - 禁止圆角（rounded-none）、禁止阴影（shadow-none）、禁止装饰性 Emoji
-   - slate 色系（slate-50 背景 / slate-200 边框 / slate-900 强调色），1px 实线边框
+   - 只允许圆角 rounded-none/rounded-sm（禁止大圆角），禁止 box-shadow 与 linear-gradient，禁止装饰性 Emoji
+   - ZAPP 暗黑语义令牌（bg-background #08080E / bg-card #0F0F1C / border-border #222238 / text-foreground #EFEFFA；primary #C8FF00 荧光绿, accent #FF2D6B 热情粉, electric #3B6DFF, warning #FF9A00, success #00E5A0），1px 实线边框
+   - 标题 font-display (Exo 2) uppercase font-black；价格 font-mono (JetBrains Mono) font-bold text-primary；标签 font-mono uppercase tracking-widest text-muted-foreground
    - 真实业务数据（严禁 foo/test 占位符），全中文
 
 ## 验证降级路径（浏览器不可用时）
@@ -49,14 +50,14 @@ metadata:
 - **首选**：通过浏览器验证原型（Chrome DevTools / webapp-testing）检查视觉约束与交互。
 - **降级路径（若 MCP 浏览器实例不可用/被占用）**：
   1. 使用独立浏览器上下文（如 `--isolated`）重试；
-  2. 仍不可用时，按 `docs/FRONTEND.md` 自检清单**人工/静态审查**：无圆角（`border-radius:0`）、无阴影（`box-shadow:none`）、slate 色系（#f8fafc/#e2e8f0/#0f172a）、真实中文数据、无 foo/test 占位符、Vue3+Tailwind CDN 加载正常；
+  2. 仍不可用时，按 `docs/FRONTEND.md` 自检清单**人工/静态审查**：仅 `rounded-none`/`rounded-sm`（无大圆角）、无 `box-shadow`/`linear-gradient`、ZAPP 暗黑令牌（背景 `#08080E`、卡片 `#0F0F1C`、边框 `#222238`，主色 `#C8FF00`）、标题 `font-display font-black uppercase`、价格 `font-mono font-bold text-primary`、真实中文数据、无 foo/test 占位符、Vue3+Tailwind CDN 加载正常；
   3. 将审查结果与待用户确认项一并呈报（HITL 不因工具不可用而跳过）。
 
 ## Guardrails
 
 - 只写需求侧原型，不写业务代码。
 - 原型为 Epic 整体，一次完成，不按 Story 拆散。
-- 分支 B 可工作原型仍须：slate 色系（design-system tokens）、真实中文数据、禁装饰 Emoji；圆角/阴影规则对可工作原型放宽（组件库默认样式）。
+- 分支 B 可工作原型仍须：ZAPP 暗黑令牌（design-system tokens）、真实中文数据、禁装饰 Emoji；圆角/阴影规则对可工作原型放宽（组件库默认样式）。
 - 原型确认后是 UI 逻辑唯一事实来源。
 - 涉及 UI 的 Epic 无已确认原型不得拆分/交接。
 - 产出后必须 HITL 确认；**未确认不得进入下一阶段（强制门禁）**。

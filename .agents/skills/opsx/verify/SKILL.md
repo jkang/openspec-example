@@ -17,7 +17,7 @@ metadata:
 
 **工具降级路径（浏览器 UI 验证不可用时）**：
 - 首选：Chrome DevTools / webapp-testing 验证前端视觉与交互（FRONTEND.md §6 自检）。
-- 降级：若 MCP 浏览器实例不可用/被占用，先 `--isolated` 重试；仍不可用时按 `docs/FRONTEND.md` 静态自检清单（无圆角 `border-radius:0`、无阴影 `box-shadow:none`、slate 色系、真实中文数据、无占位符）审查，并在 verify.md 中记录"静态自检"而非"浏览器验证"。
+- 降级：若 MCP 浏览器实例不可用/被占用，先 `--isolated` 重试；仍不可用时按 `docs/FRONTEND.md` 静态自检清单（仅 `rounded-none`/`rounded-sm` 无大圆角、无 `box-shadow`/`linear-gradient`、ZAPP 暗黑令牌 bg-background #08080E / bg-card #0F0F1C / border-border #222238、标题 font-display font-black uppercase、价格 font-mono font-bold text-primary、真实中文数据、无占位符）审查，并在 verify.md 中记录"静态自检"而非"浏览器验证"。
 
 ## 门禁定义
 
@@ -39,7 +39,7 @@ metadata:
    ```bash
    openspec status --change "<name>" --json
    ```
-   使用 `changeRoot` 作为证据文件的基础路径。
+   使用 `changeRoot` 作为证据文件的基础路径。视觉验证截图落位 `<changeRoot>/verify-evidence/`（见 `docs/FRONTEND.md` §6.4）。
 
 3. **确保 verify.md 存在**
    - 证据路径: `<changeRoot>/verify.md`
@@ -66,6 +66,7 @@ metadata:
    ## Evidence Index
    - 关联测试文件: <paths>
    - 关键断言: <assertions>
+   - 视觉验证截图: `verify-evidence/<描述>.png`（浏览器视觉验证产出时；截图 MUST 落位 `<changeRoot>/verify-evidence/`，禁止散落到 `learning-sdd/` 等非制品目录，详见 `docs/FRONTEND.md` §6.4）
    ```
 
 4. **运行硬门禁**

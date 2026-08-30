@@ -26,7 +26,7 @@ metadata:
    - What must the product achieve?
    - What is explicitly out of scope?
 3. **Establish Product Principles**:
-   - What are the core values or UI/UX constraints (e.g., minimalist, slate-themed, no rounded corners)?
+   - What are the core values or UI/UX constraints (e.g., ZAPP dark-premium, semantic design tokens, no rounded corners, no shadows)?
 4. **Update Documentation**:
    - Read the existing `docs/PRODUCT.md`.
    - Update the sections based on the discussion.
