@@ -142,6 +142,13 @@
 - **根因**：需求侧以展示文案描述状态（「已禁用」），开发侧以领域枚举建模（`禁用`）；二者未在 handoff 时归一。
 - **建议修复**：（a）领域/接口契约统一用 `正常`/`禁用`（当前实现，保持与 `assertUserEnabled` 一致）；（b）需求侧 story.md/原型若需展示态，注明「展示文案『已禁用』= 领域值 `禁用`」；（c）E2E 断言优先断言行为信号（按钮状态翻转/接口返回）而非文案本身（已采用）。
 
+### ISSUE-017: 浏览器视觉验证截图无落位规范，散落到 learning-sdd 等非制品目录
+**状态：✅ 已修复**（截图移至 `verify-evidence/` + 补 FRONTEND.md §6.4 + verify skill 三目录同步）
+- **现象**：变更 `fix-admin-user-mgmt-visibility` 的浏览器视觉验证截图 `admin-users-fixed.png` 散落在 `learning-sdd/`（学习/文档目录），与 SDD 讲义、flow-issues-log 等学习资料混叠，且全库无任何引用、被 git 跟踪（提交 `8c2b9a5 add e2e tests`）。
+- **影响**：① 学习目录被非学习制品污染；② 视觉验证证据（截图）与对应 change 脱节，无法追溯是哪次验证的产物；③ 违反"单一事实来源"——截图无引用，信息孤岛。
+- **根因**：`docs/FRONTEND.md` §6「UI 验证闭环 SOP」只规定"怎么验证"（启动服务 / 快照自检 / 交互 HITL），**未规定验证产出的截图文件存哪里**；`verify` skill 只说视觉证据写入 `verify.md`（文字证据），但 `verify.md` 是文字、**没有配套截图附件落位约定**。验证代理浏览器截图后无规范指引，随手放入工作目录直觉位置 → 误入 `learning-sdd/`。
+- **建议修复**（已实施）：（a）在 `docs/FRONTEND.md` 新增 **§6.4 视觉验证截图落位**——截图 MUST 落位 `openspec/changes/<name>/verify-evidence/<描述>.png`，归档随 change 目录一并移入 `archive/YYYY-MM-DD-<name>/`，verify.md 须引用，禁止散落到 `learning-sdd/` 等非制品目录；（b）`verify` skill（`.agents/.trae/.cursor` 三目录同步）在 Evidence Index 与步骤 2 补充截图落位约定；（c）存量散落截图移到对应归档变更的 `verify-evidence/` 并在 verify.md 引用。
+
 
 
 ---
@@ -174,3 +181,8 @@
 - 数字型手机号绕过唯一性校验（ISSUE-011）——演练发现真实安全缺陷并修复
 - 会话归属后购物车探测污染订单快照（ISSUE-014）——边界交互真实缺陷
 - **价值**：流程演练不仅验证流程，还暴露了实现层的真实缺陷，证明"规格驱动 + E2E 回归"闭环有效
+
+### F. 制品落位/证据规范化（ISSUE-017）
+- **视觉验证截图落位缺失**：`FRONTEND.md` §6 只规定"怎么验证"未规定"截图存哪"，导致验证截图散落 `learning-sdd/` 等非制品目录、与 change 脱节。
+- **已修复**：新增 `docs/FRONTEND.md` §6.4（截图落位 `openspec/changes/<name>/verify-evidence/` + 归档联动 + verify.md 引用闭环 + 禁止散落非制品目录）；`verify` skill 三目录同步补 Evidence Index 截图约定；存量截图归位 `archive/.../verify-evidence/` 并在 verify.md 引用。
+- **建议**：在 QA 复审或 CI 中加入「制品落位一致性」检查（扫描 `learning-sdd/`、仓库根、`docs/` 等非制品目录，排查游离的验证截图/临时产物），防止类似"截图误放"再度发生。

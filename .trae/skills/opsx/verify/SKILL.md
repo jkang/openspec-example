@@ -39,7 +39,7 @@ metadata:
    ```bash
    openspec status --change "<name>" --json
    ```
-   使用 `changeRoot` 作为证据文件的基础路径。
+   使用 `changeRoot` 作为证据文件的基础路径。视觉验证截图落位 `<changeRoot>/verify-evidence/`（见 `docs/FRONTEND.md` §6.4）。
 
 3. **确保 verify.md 存在**
    - 证据路径: `<changeRoot>/verify.md`
@@ -66,6 +66,7 @@ metadata:
    ## Evidence Index
    - 关联测试文件: <paths>
    - 关键断言: <assertions>
+   - 视觉验证截图: `verify-evidence/<描述>.png`（浏览器视觉验证产出时；截图 MUST 落位 `<changeRoot>/verify-evidence/`，禁止散落到 `learning-sdd/` 等非制品目录，详见 `docs/FRONTEND.md` §6.4）
    ```
 
 4. **运行硬门禁**
