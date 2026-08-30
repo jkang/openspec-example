@@ -5,7 +5,7 @@
       <!-- 左侧品牌（C/B 共用） -->
       <div class="flex items-center gap-2">
         <div class="w-8 h-8 bg-primary flex items-center justify-center text-primary-foreground text-xs font-black font-display">M</div>
-        <h1 class="text-lg font-semibold tracking-tight uppercase">Minimal Store</h1>
+        <h1 class="font-display font-black uppercase tracking-tight text-lg">Minimal Store</h1>
       </div>
 
       <!-- ============ C 端 header：仅顾客操作 + 独立「运营后台」入口 ============ -->
@@ -99,10 +99,10 @@
             <div class="p-5 flex flex-col gap-4 flex-1">
               <div class="flex justify-between items-start">
                 <div class="flex-1 min-w-0 pr-2">
-                  <h3 class="font-medium text-foreground truncate">{{ product.name }}</h3>
+                  <h3 class="font-display font-bold text-foreground truncate">{{ product.name }}</h3>
                   <p class="text-xs text-muted-foreground mt-1 line-clamp-2">{{ product.description }}</p>
                 </div>
-                <span class="font-semibold text-sm whitespace-nowrap">¥{{ (product.priceCents / 100).toFixed(2) }}</span>
+                <span class="font-mono font-bold text-primary text-sm whitespace-nowrap">¥{{ (product.priceCents / 100).toFixed(2) }}</span>
               </div>
               <button 
                 @click="addToCart(product)"
@@ -120,7 +120,7 @@
         :class="['w-80 flex-shrink-0 bg-card border-l border-border flex flex-col transition-all duration-300 transform', isCartOpen ? 'translate-x-0' : 'translate-x-full absolute right-0 h-full z-20 md:relative md:translate-x-0']"
       >
         <div class="p-6 border-b border-border flex items-center justify-between">
-          <h2 class="font-semibold tracking-tight uppercase text-xs">购物车 ({{ cartTotalItems }})</h2>
+          <h2 class="font-display font-black uppercase tracking-tight text-xs">购物车 ({{ cartTotalItems }})</h2>
           <button @click="isCartOpen = false" class="md:hidden text-xs font-bold text-muted-foreground">关闭</button>
         </div>
 
@@ -138,7 +138,7 @@
                 <button @click="removeFromCart(item.productId)" class="text-[10px] text-muted-foreground hover:text-accent font-bold">删除</button>
               </div>
               <div class="flex justify-between items-end">
-                <span class="text-xs font-semibold">¥{{ (item.priceCents * item.quantity / 100).toFixed(2) }}</span>
+                <span class="font-mono font-bold text-primary text-xs">¥{{ (item.priceCents * item.quantity / 100).toFixed(2) }}</span>
                 <div class="flex items-center border border-border bg-muted">
                   <button @click="decreaseQuantity(item)" class="w-6 h-6 flex items-center justify-center text-xs hover:bg-muted border-r border-border">-</button>
                   <span class="w-8 text-[10px] text-center font-medium">{{ item.quantity }}</span>
@@ -152,7 +152,7 @@
         <div class="p-6 border-t border-border space-y-6 bg-muted">
           <!-- 优惠券选择章节 -->
           <div class="space-y-3">
-            <h3 class="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">选择优惠券</h3>
+            <h3 class="font-mono text-[10px] font-bold uppercase tracking-widest text-muted-foreground">选择优惠券</h3>
             <div class="space-y-2">
               <button 
                 v-for="coupon in coupons" 
@@ -183,15 +183,15 @@
           <div class="space-y-2 pt-4 border-t border-border">
             <div class="flex justify-between text-xs text-muted-foreground">
               <span>商品总额</span>
-              <span>¥{{ (cartTotalPrice / 100).toFixed(2) }}</span>
+              <span class="font-mono font-bold text-primary">¥{{ (cartTotalPrice / 100).toFixed(2) }}</span>
             </div>
             <div v-if="couponDiscount > 0" class="flex justify-between text-xs text-accent font-medium">
               <span>优惠减免</span>
-              <span>-¥{{ (couponDiscount / 100).toFixed(2) }}</span>
+              <span class="font-mono font-bold">-¥{{ (couponDiscount / 100).toFixed(2) }}</span>
             </div>
             <div class="flex justify-between items-end pt-2 border-t border-border">
               <span class="text-xs text-foreground font-bold uppercase tracking-widest">最终总额</span>
-              <span class="font-bold text-xl">¥{{ (finalTotalPrice / 100).toFixed(2) }}</span>
+              <span class="font-mono font-bold text-primary text-xl">¥{{ (finalTotalPrice / 100).toFixed(2) }}</span>
             </div>
           </div>
           <button 
@@ -210,7 +210,7 @@
       <div class="max-w-2xl mx-auto space-y-6">
         <header class="border border-border bg-card p-6 flex items-center justify-between">
           <div>
-            <h2 class="text-xl font-bold mb-2">注册新账户</h2>
+            <h2 class="font-display font-black uppercase tracking-tight text-xl font-bold mb-2">注册新账户</h2>
             <p class="text-sm text-muted-foreground">手机号 + 密码即可完成注册，注册成功将自动登录</p>
           </div>
           <div class="text-sm text-muted-foreground">
@@ -272,7 +272,7 @@
         </section>
 
         <footer class="border border-border bg-card p-6">
-          <h3 class="text-sm font-semibold mb-3">已注册用户示例</h3>
+          <h3 class="font-display font-black uppercase tracking-tight text-sm font-semibold mb-3">已注册用户示例</h3>
           <table class="w-full text-sm">
             <thead>
               <tr class="border-b border-border text-left text-muted-foreground">
@@ -298,7 +298,7 @@
       <div class="max-w-2xl mx-auto space-y-6">
         <header class="border border-border bg-card p-6 flex items-center justify-between">
           <div>
-            <h2 class="text-xl font-bold mb-2">登录</h2>
+            <h2 class="font-display font-black uppercase tracking-tight text-xl font-bold mb-2">登录</h2>
             <p class="text-sm text-muted-foreground">登录后可下单、查看「我的订单」，购物车将跟随你的账户</p>
           </div>
           <div class="text-sm text-muted-foreground">
@@ -352,7 +352,7 @@
         </section>
 
         <footer class="border border-border bg-card p-6">
-          <h3 class="text-sm font-semibold mb-3">为什么需要登录？</h3>
+          <h3 class="font-display font-black uppercase tracking-tight text-sm font-semibold mb-3">为什么需要登录？</h3>
           <ul class="text-sm text-muted-foreground space-y-1 list-disc list-inside">
             <li>订单将归属于你的账户，「我的订单」只展示你自己的订单。</li>
             <li>购物车跟随账户，换设备不丢失。</li>
@@ -364,7 +364,7 @@
 
     <!-- 主内容区 (C 端我的订单) -->
     <main v-else-if="viewMode === 'orders'" class="flex-1 overflow-y-auto p-8 bg-background scrollbar-hide">      <div class="max-w-3xl mx-auto space-y-6">
-        <h2 class="text-xl font-bold tracking-tight border-b-2 border-primary pb-4">我的订单</h2>
+        <h2 class="font-display font-black uppercase tracking-tight text-xl font-bold border-b-2 border-primary pb-4">我的订单</h2>
 
         <section v-for="o in myOrders" :key="o.id" class="bg-card border border-border">
           <div class="px-6 py-4 border-b border-border flex items-center justify-between">
@@ -379,15 +379,15 @@
           </div>
           <div class="px-6 py-3 flex items-center justify-between text-sm">
             <span class="text-foreground">{{ o.items[0].name }}<template v-if="o.items.length > 1"> 等 {{ o.items.reduce((n, i) => n + i.quantity, 0) }} 件</template></span>
-            <span class="font-mono font-bold">¥{{ (o.actualPaidCents / 100).toFixed(2) }}</span>
+            <span class="font-mono font-bold text-primary">¥{{ (o.actualPaidCents / 100).toFixed(2) }}</span>
           </div>
 
           <div v-if="expandedMyOrderId === o.id" class="border-t border-border px-6 py-4 space-y-3">
             <div class="grid grid-cols-2 gap-3 text-sm">
-              <div><span class="text-muted-foreground">商品总额:</span> <span class="font-mono">¥{{ (o.totalCents / 100).toFixed(2) }}</span></div>
+              <div><span class="text-muted-foreground">商品总额:</span> <span class="font-mono text-primary">¥{{ (o.totalCents / 100).toFixed(2) }}</span></div>
               <div><span class="text-muted-foreground">优惠券:</span> <span class="font-mono">{{ o.couponId || '无' }}</span></div>
-              <div><span class="text-muted-foreground">折扣:</span> <span class="font-mono">-¥{{ (o.discountCents / 100).toFixed(2) }}</span></div>
-              <div><span class="text-muted-foreground">实付:</span> <span class="font-mono font-bold">¥{{ (o.actualPaidCents / 100).toFixed(2) }}</span></div>
+              <div><span class="text-muted-foreground">折扣:</span> <span class="font-mono text-accent">-¥{{ (o.discountCents / 100).toFixed(2) }}</span></div>
+              <div><span class="text-muted-foreground">实付:</span> <span class="font-mono font-bold text-primary">¥{{ (o.actualPaidCents / 100).toFixed(2) }}</span></div>
             </div>
             <div class="flex items-center gap-1 text-[10px] text-muted-foreground mt-2">
               <span v-for="(s, i) in ['待支付', '已支付', '已发货', '已完成']" :key="i"
@@ -397,7 +397,7 @@
             <div class="flex flex-col gap-1 mt-2 text-sm">
               <div v-for="it in o.items" :key="it.productId" class="flex justify-between text-muted-foreground">
                 <span>{{ it.name }} × {{ it.quantity }}</span>
-                <span class="font-mono">¥{{ (it.priceCents * it.quantity / 100).toFixed(2) }}</span>
+                <span class="font-mono text-primary">¥{{ (it.priceCents * it.quantity / 100).toFixed(2) }}</span>
               </div>
             </div>
           </div>
@@ -414,21 +414,21 @@
         <nav class="flex-1 py-4">
           <div v-if="isDashboardRole" class="px-6 py-2 text-sm font-medium text-muted-foreground uppercase tracking-wider">经营分析</div>
           <a v-if="isDashboardRole" @click="adminTab = 'dashboard'"
-             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'dashboard' ? 'border-primary bg-muted text-foreground font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">销售看板</a>
+             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'dashboard' ? 'border-primary bg-primary/5 text-primary font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">销售看板</a>
           <div class="mt-8 px-6 py-2 text-sm font-medium text-muted-foreground uppercase tracking-wider">交易管理</div>
           <a @click="adminTab = 'order'"
-             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'order' ? 'border-primary bg-muted text-foreground font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">订单列表</a>
+             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'order' ? 'border-primary bg-primary/5 text-primary font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">订单列表</a>
           <a @click="adminTab = 'product'"
-             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'product' ? 'border-primary bg-muted text-foreground font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">商品管理</a>
+             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'product' ? 'border-primary bg-primary/5 text-primary font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">商品管理</a>
           <a @click="adminTab = 'category'"
-             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'category' ? 'border-primary bg-muted text-foreground font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">分类管理</a>
+             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'category' ? 'border-primary bg-primary/5 text-primary font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">分类管理</a>
           <div class="mt-8 px-6 py-2 text-sm font-medium text-muted-foreground uppercase tracking-wider">营销中心</div>
           <a @click="adminTab = 'coupon'"
-             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'coupon' ? 'border-primary bg-muted text-foreground font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">优惠券管理</a>
+             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'coupon' ? 'border-primary bg-primary/5 text-primary font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">优惠券管理</a>
           <div class="mt-8">
             <div class="px-6 py-2 text-sm font-medium text-muted-foreground uppercase tracking-wider">账户中心</div>
             <a v-if="isOperator" @click="adminTab = 'user'"
-               :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'user' ? 'border-primary bg-muted text-foreground font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">用户管理</a>
+               :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'user' ? 'border-primary bg-primary/5 text-primary font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">用户管理</a>
             <div v-else class="px-6 py-3 text-sm text-muted-foreground">
               <span class="text-muted-foreground">仅运营角色可见</span>
             </div>
@@ -445,7 +445,7 @@
 
             <!-- 无权限兜底：非运营/老板越权进入 -->
             <section v-if="!isDashboardRole" class="bg-card border border-border p-8">
-              <h2 class="text-lg font-bold mb-4 border-b border-border pb-4">销售看板</h2>
+              <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold mb-4 border-b border-border pb-4">销售看板</h2>
               <p class="text-sm text-foreground">无权限访问销售看板：本入口仅「运营」与「老板」角色可见。销售数据属经营敏感信息。</p>
             </section>
 
@@ -454,7 +454,7 @@
               <section class="bg-card border border-border p-8">
                 <div class="flex items-center justify-between mb-6">
                   <div>
-                    <h2 class="text-lg font-bold">销售看板</h2>
+                    <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold">销售看板</h2>
                     <p class="text-sm text-muted-foreground mt-1">销售额为实付金额（actualPaidCents），优惠让利单列，不含已取消订单</p>
                   </div>
                   <div class="flex border border-border text-sm">
@@ -471,19 +471,19 @@
                 <div class="grid grid-cols-4 gap-4">
                   <div class="bg-card border border-border p-5">
                     <div class="text-sm text-muted-foreground">销售额</div>
-                    <div class="text-2xl font-semibold mt-2">{{ formatMoney(dashboardMetrics.sales) }}</div>
+                    <div class="font-mono font-bold text-primary text-2xl mt-2">{{ formatMoney(dashboardMetrics.sales) }}</div>
                   </div>
                   <div class="bg-card border border-border p-5">
                     <div class="text-sm text-muted-foreground">订单量</div>
-                    <div class="text-2xl font-semibold mt-2">{{ dashboardMetrics.orders }} 单</div>
+                    <div class="font-mono font-bold text-primary text-2xl mt-2">{{ dashboardMetrics.orders }} 单</div>
                   </div>
                   <div class="bg-card border border-border p-5">
                     <div class="text-sm text-muted-foreground">客单价</div>
-                    <div class="text-2xl font-semibold mt-2">{{ formatMoney(dashboardMetrics.avgOrder) }}</div>
+                    <div class="font-mono font-bold text-primary text-2xl mt-2">{{ formatMoney(dashboardMetrics.avgOrder) }}</div>
                   </div>
                   <div class="bg-card border border-border p-5">
                     <div class="text-sm text-muted-foreground">优惠让利</div>
-                    <div class="text-2xl font-semibold mt-2">{{ formatMoney(dashboardMetrics.discount) }}</div>
+                    <div class="font-mono font-bold text-primary text-2xl mt-2">{{ formatMoney(dashboardMetrics.discount) }}</div>
                   </div>
                 </div>
               </section>
@@ -491,13 +491,13 @@
               <!-- 销售趋势（CSS/SVG 手写折线，零第三方图表库） -->
               <section class="bg-card border border-border p-8">
                 <div class="flex items-center justify-between mb-4">
-                  <h3 class="font-medium">销售趋势（{{ currentRangeLabel }}）</h3>
+                  <h3 class="font-display font-black uppercase tracking-tight font-medium">销售趋势（{{ currentRangeLabel }}）</h3>
                   <span class="text-xs text-muted-foreground">区间合计 {{ formatMoney(trendSum) }}</span>
                 </div>
                 <svg viewBox="0 0 560 160" class="w-full">
-                  <line v-for="i in 4" :key="'g'+i" x1="0" :y1="i*32" x2="560" :y2="i*32" stroke="#e2e8f0" stroke-width="1"/>
-                  <polyline :points="trendPointsStr" fill="none" stroke="#0f172a" stroke-width="2"/>
-                  <circle v-for="(p, i) in trendPointsArray" :key="'c'+i" :cx="p.x" :cy="p.y" r="3" fill="#0f172a"/>
+                  <line v-for="i in 4" :key="'g'+i" x1="0" :y1="i*32" x2="560" :y2="i*32" stroke="var(--border)" stroke-width="1"/>
+                  <polyline :points="trendPointsStr" fill="none" stroke="var(--primary)" stroke-width="2"/>
+                  <circle v-for="(p, i) in trendPointsArray" :key="'c'+i" :cx="p.x" :cy="p.y" r="3" fill="var(--primary)"/>
                 </svg>
                 <div class="flex justify-between text-xs text-muted-foreground mt-2">
                   <span v-for="(d, i) in trendLabels" :key="i">{{ d }}</span>
@@ -506,19 +506,19 @@
 
               <!-- 优惠券效果（R-DASH-002 / sales-dashboard coupon 口径） -->
               <section class="bg-card border border-border p-8">
-                <h3 class="font-medium mb-4">优惠券效果（{{ currentRangeLabel }}）</h3>
+                <h3 class="font-display font-black uppercase tracking-tight font-medium mb-4">优惠券效果（{{ currentRangeLabel }}）</h3>
                 <div class="grid grid-cols-3 gap-4 text-sm">
                   <div class="border border-border p-4">
                     <div class="text-muted-foreground">优惠让利总额</div>
-                    <div class="text-xl font-semibold mt-1">{{ formatMoney(dashboardCoupon.discountCents) }}</div>
+                    <div class="font-mono font-bold text-primary text-xl mt-1">{{ formatMoney(dashboardCoupon.discountCents) }}</div>
                   </div>
                   <div class="border border-border p-4">
                     <div class="text-muted-foreground">使用优惠券订单数</div>
-                    <div class="text-xl font-semibold mt-1">{{ dashboardCoupon.couponOrders }} 单</div>
+                    <div class="font-mono font-bold text-primary text-xl mt-1">{{ dashboardCoupon.couponOrders }} 单</div>
                   </div>
                   <div class="border border-border p-4">
                     <div class="text-muted-foreground">用券订单占比</div>
-                    <div class="text-xl font-semibold mt-1">{{ dashboardCoupon.ratio }}%</div>
+                    <div class="font-mono font-bold text-primary text-xl mt-1">{{ dashboardCoupon.ratio }}%</div>
                   </div>
                 </div>
               </section>
@@ -526,7 +526,7 @@
               <!-- 商品销售 TOP10（R-RANK-001，销售额=订单快照价汇总，含已下架商品历史订单） -->
               <section class="bg-card border border-border p-8">
                 <div class="flex items-center justify-between mb-4">
-                  <h3 class="font-medium">商品销售 TOP10（{{ currentRangeLabel }}）</h3>
+                  <h3 class="font-display font-black uppercase tracking-tight font-medium">商品销售 TOP10（{{ currentRangeLabel }}）</h3>
                   <span class="text-xs text-muted-foreground">按订单快照价统计销售额，已下架商品历史订单仍计入</span>
                 </div>
                 <table class="w-full text-sm">
@@ -543,7 +543,7 @@
                       <td class="py-3">{{ i + 1 }}</td>
                       <td class="py-3 font-medium">{{ p.name }}</td>
                       <td class="py-3 text-right">{{ p.quantity }}</td>
-                      <td class="py-3 text-right font-mono">{{ formatMoney(p.salesCents) }}</td>
+                      <td class="py-3 text-right font-mono text-primary">{{ formatMoney(p.salesCents) }}</td>
                     </tr>
                     <tr v-if="rankingProductList.length === 0">
                       <td colspan="4" class="py-8 text-center text-muted-foreground">当前区间暂无成交商品</td>
@@ -555,7 +555,7 @@
               <!-- 分类销售排行（R-RANK-002，含未分类行，占比合计 100%） -->
               <section class="bg-card border border-border p-8">
                 <div class="flex items-center justify-between mb-4">
-                  <h3 class="font-medium">分类销售排行（{{ currentRangeLabel }}）</h3>
+                  <h3 class="font-display font-black uppercase tracking-tight font-medium">分类销售排行（{{ currentRangeLabel }}）</h3>
                   <span class="text-xs text-muted-foreground">未分类商品归「未分类」行，占比合计 100%</span>
                 </div>
                 <table class="w-full text-sm">
@@ -572,7 +572,7 @@
                     <tr v-for="(c, i) in rankingCategoryList" :key="String(c.categoryId)" class="border-b border-border">
                       <td class="py-3">{{ i + 1 }}</td>
                       <td class="py-3 font-medium">{{ c.name }}</td>
-                      <td class="py-3 text-right font-mono">{{ formatMoney(c.salesCents) }}</td>
+                      <td class="py-3 text-right font-mono text-primary">{{ formatMoney(c.salesCents) }}</td>
                       <td class="py-3 text-right">{{ c.ratio }}%</td>
                       <td class="py-3 text-right">{{ c.orderCount }} 单</td>
                     </tr>
@@ -591,7 +591,7 @@
 
           <!-- 章节一: 新建优惠券规则 -->
           <section class="bg-card border border-border p-8" id="create-section">
-            <h2 class="text-lg font-bold mb-6 border-b border-border pb-4">新建优惠券规则</h2>
+            <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold mb-6 border-b border-border pb-4">新建优惠券规则</h2>
             <form @submit.prevent="createCoupon" class="space-y-6">
               <div class="grid grid-cols-2 gap-6">
                 <div>
@@ -648,7 +648,7 @@
           <!-- 章节二: 优惠券列表 -->
           <section class="bg-card border border-border p-8">
             <div class="flex justify-between items-center mb-6 border-b border-border pb-4">
-              <h2 class="text-lg font-bold">优惠券列表</h2>
+              <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold">优惠券列表</h2>
               <span class="text-sm text-muted-foreground">共 {{ adminCoupons.length }} 条规则</span>
             </div>
             <table class="w-full text-sm">
@@ -693,7 +693,7 @@
 
           <!-- 章节三: 手动单人发券 -->
           <section class="bg-card border border-border p-8" id="issue-section">
-            <h2 class="text-lg font-bold mb-6 border-b border-border pb-4">手动发券 (单人)</h2>
+            <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold mb-6 border-b border-border pb-4">手动发券 (单人)</h2>
 
             <div v-if="!selectedIssueCoupon" class="border border-border bg-muted px-4 py-6 text-sm text-muted-foreground text-center">
               请先在上方列表中点击「发券」选择一张优惠券
@@ -739,7 +739,7 @@
 
           <!-- 章节四: 发放记录 -->
           <section class="bg-card border border-border p-8">
-            <h2 class="text-lg font-bold mb-6 border-b border-border pb-4">最近发放记录</h2>
+            <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold mb-6 border-b border-border pb-4">最近发放记录</h2>
             <table class="w-full text-sm">
               <thead>
                 <tr class="text-left text-muted-foreground border-b border-border">
@@ -773,7 +773,7 @@
             <!-- 章节一: 商品列表 -->
             <section class="bg-card border border-border p-8">
               <div class="flex items-center justify-between mb-6 border-b border-border pb-4">
-                <h2 class="text-lg font-bold">商品列表</h2>
+                <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold">商品列表</h2>
                 <button @click="openCreateProduct" class="bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:opacity-85 transition-colors">+ 新增商品</button>
               </div>
               <table class="w-full text-sm">
@@ -797,7 +797,7 @@
                         </div>
                       </div>
                     </td>
-                    <td class="py-3 font-mono">¥{{ (p.priceCents / 100).toFixed(2) }}</td>
+                    <td class="py-3 font-mono text-primary">¥{{ (p.priceCents / 100).toFixed(2) }}</td>
                     <td class="py-3">{{ p.stock }}</td>
                     <td class="py-3"><span class="text-xs font-bold text-foreground">{{ productStatusLabel(p.status) }}</span></td>
                     <td class="py-3 text-right">
@@ -811,7 +811,7 @@
 
             <!-- 章节二: 新增 / 编辑商品 -->
             <section class="bg-card border border-border p-8">
-              <h2 class="text-lg font-bold mb-6 border-b border-border pb-4">{{ productForm.id ? '编辑商品' : '新增商品' }}</h2>
+              <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold mb-6 border-b border-border pb-4">{{ productForm.id ? '编辑商品' : '新增商品' }}</h2>
               <form @submit.prevent="saveProduct" class="space-y-6">
                 <div class="grid grid-cols-2 gap-6">
                   <div>
@@ -857,7 +857,7 @@
 
             <!-- 章节三: 删除确认 -->
             <section v-if="pendingDeleteProduct" class="bg-card border border-border p-8">
-              <h2 class="text-lg font-bold mb-4 border-b border-border pb-4">删除确认</h2>
+              <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold mb-4 border-b border-border pb-4">删除确认</h2>
               <p class="text-sm text-foreground mb-6">确认下架商品「<span class="font-medium text-foreground">{{ pendingDeleteProduct.name }}</span>」吗？该商品将从 C 端商店与列表中移除，历史订单不受影响。</p>
               <div class="flex items-center space-x-3">
                 <button @click="doDeleteProduct" class="bg-primary text-primary-foreground px-6 py-2 text-sm font-medium hover:opacity-85 transition-colors">确认删除（下架）</button>
@@ -873,7 +873,7 @@
             <!-- 章节一: 分类列表 -->
             <section class="bg-card border border-border p-8">
               <div class="flex items-center justify-between mb-6 border-b border-border pb-4">
-                <h2 class="text-lg font-bold">分类列表</h2>
+                <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold">分类列表</h2>
                 <button @click="openCreateCategory" class="bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:opacity-85 transition-colors">+ 新增分类</button>
               </div>
               <table class="w-full text-sm">
@@ -903,7 +903,7 @@
 
             <!-- 章节二: 新增/编辑分类 -->
             <section class="bg-card border border-border p-8">
-              <h2 class="text-lg font-bold mb-6 border-b border-border pb-4">{{ categoryForm.id ? '编辑分类' : '新增分类' }}</h2>
+              <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold mb-6 border-b border-border pb-4">{{ categoryForm.id ? '编辑分类' : '新增分类' }}</h2>
               <form @submit.prevent="saveCategory" class="space-y-6">
                 <div class="grid grid-cols-2 gap-6">
                   <div>
@@ -927,7 +927,7 @@
 
             <!-- 章节三: 删除确认 -->
             <section v-if="pendingDeleteCategory" class="bg-card border border-border p-8">
-              <h2 class="text-lg font-bold mb-4 border-b border-border pb-4">删除确认</h2>
+              <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold mb-4 border-b border-border pb-4">删除确认</h2>
               <p class="text-sm text-foreground mb-6">确认删除分类「<span class="font-medium text-foreground">{{ pendingDeleteCategory.name }}</span>」吗？该分类将从 C 端筛选条移除，其下 {{ countByCategory(pendingDeleteCategory.id) }} 个商品将变为「未分类」，不影响销售。</p>
               <div class="flex items-center space-x-3">
                 <button @click="doDeleteCategory" class="bg-primary text-primary-foreground px-6 py-2 text-sm font-medium hover:opacity-85 transition-colors">确认删除（下架）</button>
@@ -942,7 +942,7 @@
 
             <!-- 无权限兜底：非运营越权进入（R-ADM-007 不返回敏感信息） -->
             <section v-if="!isOperator" class="bg-card border border-border p-8">
-              <h2 class="text-lg font-bold mb-4 border-b border-border pb-4">用户管理</h2>
+              <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold mb-4 border-b border-border pb-4">用户管理</h2>
               <p class="text-sm text-foreground">无权限访问用户管理：仅运营角色可见。手机号等用户资料属敏感信息，客服与普通账号无法查看。</p>
               <p v-if="!sessionToken" class="text-sm text-foreground mt-3">当前未登录，请先使用运营账号登录后再访问。</p>
             </section>
@@ -952,7 +952,7 @@
               <section class="bg-card border border-border p-8">
                 <div class="flex items-end justify-between mb-6 border-b border-border pb-4">
                   <div>
-                    <h2 class="text-lg font-bold">用户管理</h2>
+                    <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold">用户管理</h2>
                     <p class="text-sm text-muted-foreground mt-1">查看用户基础信息与订单归属，支持按手机号 / 昵称检索。手机号属敏感信息，仅运营角色可见。</p>
                   </div>
                   <span class="border border-border px-3 py-1 text-xs text-muted-foreground">当前角色：运营 · {{ currentUser?.nickname || '—' }}</span>
@@ -1009,7 +1009,7 @@
               <!-- 章节三: 用户详情（R-ADM-004 订单聚合） -->
               <section v-if="selectedAdminUser" class="bg-card border border-border p-8">
                 <div class="flex items-center justify-between mb-6 border-b border-border pb-4">
-                  <h2 class="text-lg font-bold">用户详情：{{ selectedAdminUser.nickname }}</h2>
+                  <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold">用户详情：{{ selectedAdminUser.nickname }}</h2>
                   <button @click="selectedAdminUser = null" class="text-sm text-muted-foreground underline underline-offset-4">关闭</button>
                 </div>
                 <div class="grid grid-cols-4 gap-4 text-sm mb-6">
@@ -1030,7 +1030,7 @@
                     <p>{{ selectedAdminUser.orders.length }} 笔</p>
                   </div>
                 </div>
-                <h3 class="text-sm font-semibold mb-3">该用户的订单</h3>
+                <h3 class="font-display font-black uppercase tracking-tight text-sm font-semibold mb-3">该用户的订单</h3>
                 <table class="w-full text-sm">
                   <thead>
                     <tr class="text-left text-muted-foreground border-b border-border">
@@ -1044,7 +1044,7 @@
                     <tr v-for="o in selectedAdminUser.orders" :key="o.id" class="border-b border-border">
                       <td class="py-3 pr-4 font-mono text-xs">{{ o.id }}</td>
                       <td class="py-3 pr-4">{{ (o.items || []).map(i => i.name).join('、') || '—' }}</td>
-                      <td class="py-3 pr-4 font-mono">¥{{ (o.actualPaidCents / 100).toFixed(2) }}</td>
+                      <td class="py-3 pr-4 font-mono text-primary">¥{{ (o.actualPaidCents / 100).toFixed(2) }}</td>
                       <td class="py-3">{{ orderStatusLabel(o.status) }}</td>
                     </tr>
                     <tr v-if="selectedAdminUser.orders.length === 0">
@@ -1063,7 +1063,7 @@
             <!-- 章节一: 订单列表 -->
             <section class="bg-card border border-border p-8">
               <div class="flex items-center justify-between mb-6 border-b border-border pb-4">
-                <h2 class="text-lg font-bold">订单列表</h2>
+                <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold">订单列表</h2>
                 <input v-model.trim="orderKeyword" type="text" placeholder="搜索订单号 / 用户 ID..."
                        class="w-64 border border-border px-3 py-2 text-sm bg-card focus:outline-none focus:border-primary">
               </div>
@@ -1092,7 +1092,7 @@
                     <td class="py-3 font-mono font-medium text-foreground">{{ o.id }}</td>
                     <td class="py-3 font-mono text-muted-foreground">{{ o.userId }}</td>
                     <td class="py-3">{{ o.items.reduce((n, i) => n + i.quantity, 0) }} 件</td>
-                    <td class="py-3 font-mono">¥{{ (o.actualPaidCents / 100).toFixed(2) }}</td>
+                    <td class="py-3 font-mono text-primary">¥{{ (o.actualPaidCents / 100).toFixed(2) }}</td>
                     <td class="py-3"><span class="text-xs font-bold border border-border px-2 py-1">{{ orderStatusLabel(o.status) }}</span></td>
                     <td class="py-3 text-right">
                       <button @click="toggleOrderDetail(o)" class="border border-border text-foreground px-3 py-1 text-xs font-medium hover:bg-muted transition-colors">{{ expandedOrderId === o.id ? '收起' : '详情' }}</button>
@@ -1109,14 +1109,14 @@
 
             <!-- 章节二: 订单详情 -->
             <section v-if="expandedAdminOrder" class="bg-card border border-border p-8">
-              <h2 class="text-lg font-bold mb-6 border-b border-border pb-4">订单详情 #{{ expandedAdminOrder.id }}</h2>
+              <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold mb-6 border-b border-border pb-4">订单详情 #{{ expandedAdminOrder.id }}</h2>
               <div class="grid grid-cols-2 gap-6 mb-6 text-sm">
                 <div><span class="text-muted-foreground">用户:</span> <span class="font-mono">{{ expandedAdminOrder.userId }}</span></div>
                 <div><span class="text-muted-foreground">状态:</span> <span class="font-bold">{{ orderStatusLabel(expandedAdminOrder.status) }}</span></div>
-                <div><span class="text-muted-foreground">商品总额:</span> <span class="font-mono">¥{{ (expandedAdminOrder.totalCents / 100).toFixed(2) }}</span></div>
+                <div><span class="text-muted-foreground">商品总额:</span> <span class="font-mono text-primary">¥{{ (expandedAdminOrder.totalCents / 100).toFixed(2) }}</span></div>
                 <div><span class="text-muted-foreground">优惠券:</span> <span class="font-mono">{{ expandedAdminOrder.couponId || '无' }}</span></div>
-                <div><span class="text-muted-foreground">折扣:</span> <span class="font-mono">-¥{{ (expandedAdminOrder.discountCents / 100).toFixed(2) }}</span></div>
-                <div><span class="text-muted-foreground">实付:</span> <span class="font-mono font-bold">¥{{ (expandedAdminOrder.actualPaidCents / 100).toFixed(2) }}</span></div>
+                <div><span class="text-muted-foreground">折扣:</span> <span class="font-mono text-accent">-¥{{ (expandedAdminOrder.discountCents / 100).toFixed(2) }}</span></div>
+                <div><span class="text-muted-foreground">实付:</span> <span class="font-mono font-bold text-primary">¥{{ (expandedAdminOrder.actualPaidCents / 100).toFixed(2) }}</span></div>
               </div>
               <table class="w-full text-sm border border-border">
                 <thead>
@@ -1130,9 +1130,9 @@
                 <tbody>
                   <tr v-for="it in expandedAdminOrder.items" :key="it.productId" class="border-t border-border">
                     <td class="py-2 px-4">{{ it.name }}</td>
-                    <td class="py-2 px-4 font-mono">¥{{ (it.priceCents / 100).toFixed(2) }}</td>
+                    <td class="py-2 px-4 font-mono text-primary">¥{{ (it.priceCents / 100).toFixed(2) }}</td>
                     <td class="py-2 px-4">{{ it.quantity }}</td>
-                    <td class="py-2 px-4 font-mono">¥{{ (it.priceCents * it.quantity / 100).toFixed(2) }}</td>
+                    <td class="py-2 px-4 font-mono text-primary">¥{{ (it.priceCents * it.quantity / 100).toFixed(2) }}</td>
                   </tr>
                 </tbody>
               </table>
@@ -1140,7 +1140,7 @@
 
             <!-- 章节三: 取消确认 -->
             <section v-if="pendingCancelOrder" class="bg-card border border-border p-8">
-              <h2 class="text-lg font-bold mb-4 border-b border-border pb-4">取消确认</h2>
+              <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold mb-4 border-b border-border pb-4">取消确认</h2>
               <p class="text-sm text-foreground mb-6">确认取消订单「<span class="font-mono font-medium text-foreground">{{ pendingCancelOrder.id }}</span>」吗？该订单未扣库存/未核销券，取消后进入「已取消」终态。</p>
               <div class="flex items-center space-x-3">
                 <button @click="doCancelOrder" class="bg-primary text-primary-foreground px-6 py-2 text-sm font-medium hover:opacity-85 transition-colors">确认取消</button>
@@ -1164,7 +1164,7 @@
 
         <!-- 文字信息 -->
         <div class="space-y-2">
-          <h2 class="text-lg font-bold text-foreground">订单提交成功</h2>
+          <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold text-foreground">订单提交成功</h2>
           <p class="text-sm text-muted-foreground">感谢您的购买，我们将尽快为您发货。</p>
         </div>
 
@@ -1180,7 +1180,7 @@
           </div>
           <div class="flex justify-between items-center">
             <p class="text-[10px] text-muted-foreground uppercase tracking-wider">实付金额</p>
-            <p class="text-sm font-mono font-bold text-foreground">¥{{ (lastOrderPaidCents / 100).toFixed(2) }}</p>
+            <p class="text-sm font-mono font-bold text-primary">¥{{ (lastOrderPaidCents / 100).toFixed(2) }}</p>
           </div>
         </div>
 
