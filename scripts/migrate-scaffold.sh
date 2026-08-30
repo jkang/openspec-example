@@ -44,14 +44,14 @@ mkdir -p "$TARGET_DIR/docs/governance"
 cp "$SOURCE_DIR/docs/SOPS/SDD_WORKFLOW.md" "$TARGET_DIR/docs/SOPS/"
 
 # 生成初始化的规划文档
-cat <<EOF > "$TARGET_DIR/docs/PRODUCT_SENSE.md"
+cat <<EOF > "$TARGET_DIR/docs/PRODUCT.md"
 ---
-name: Product Sense
-purpose: 定义产品定位、核心理念及 AI 决策准则
+name: Product Vision
+purpose: 定义产品定位与价值主张、核心理念及 AI 决策准则
 updated_at: $(date +%Y-%m-%d)
 ---
 
-# 产品定位
+# 产品定位与价值主张
 
 ## 1. 产品定位/电梯演讲
 - **目标用户**: [填写目标用户]

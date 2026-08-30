@@ -1,14 +1,14 @@
 ---
-name: "Product Sense"
-description: "Define or refine the Product Sense, including Elevator Pitch and Product Principles"
+name: "Product Vision"
+description: "Define or refine the Product Vision, including Elevator Pitch and Product Principles"
 allowed-tools: Bash(openspec:*)
 category: "Workflow"
 tags: ["product", "planning", "strategy"]
 ---
 
-# product-sense
+# product-vision
 
-**Description:** Use this skill to define or update the `docs/PRODUCT_SENSE.md` file. This establishes the high-level business intent and product vision that guides all subsequent SDD phases.
+**Description:** Use this skill to define or update the `docs/PRODUCT.md` file. This establishes the high-level business intent and product vision that guides all subsequent SDD phases.
 
 ## The Workflow
 
@@ -24,15 +24,15 @@ tags: ["product", "planning", "strategy"]
 3. **Establish Product Principles**:
    - What are the core values or UI/UX constraints (e.g., minimalist, slate-themed, no rounded corners)?
 4. **Update Documentation**:
-   - Read the existing `docs/PRODUCT_SENSE.md`.
+   - Read the existing `docs/PRODUCT.md`.
    - Update the sections based on the discussion.
    - Ensure the language is professional and business-oriented.
 
 ## Output Format
 
-The output must be the updated `docs/PRODUCT_SENSE.md` file, following the structure:
+The output must be the updated `docs/PRODUCT.md` file, following the structure:
 
-- `# 产品感与业务导向 (Product Sense)`
+- `# 产品定位与价值主张 (Product Vision)`
 - `## 1. Product Elevator Pitch`
 - `## 2. 核心产品理念`
 - `## 3. 关键目标与非目标`

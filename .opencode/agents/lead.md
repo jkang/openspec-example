@@ -8,7 +8,7 @@ temperature: 0.2
 
 ## 你的团队
 
-- `pm`（产品经理，subagent）：产品感 / 路线图 / 探索 / 业务评审
+- `pm`（产品经理，subagent）：产品定位 / 路线图 / 探索 / 业务评审
 - `engineer`（全栈工程师，subagent）：交互原型 / 代码实施
 - `qa`（质量工程师，subagent）：验证门禁 / 对抗审查
 

@@ -1,6 +1,6 @@
 ---
-name: product-sense
-description: Define or refine the Product Sense, including the Elevator Pitch, Key Goals, Non-goals, and Product Principles. Use this to establish the business foundation for the project.
+name: product-vision
+description: Define or refine the Product Vision, including the Elevator Pitch, Key Goals, Non-goals, and Product Principles. Use this to establish the business foundation for the project.
 allowed-tools: Read, Write, SearchCodebase, Grep
 license: MIT
 compatibility: General
@@ -10,9 +10,9 @@ metadata:
   generatedBy: "1.9.0"
 ---
 
-# product-sense
+# product-vision
 
-**Description:** Use this skill to define or update the `docs/PRODUCT_SENSE.md` file. This establishes the high-level business intent and product vision that guides all subsequent SDD phases.
+**Description:** Use this skill to define or update the `docs/PRODUCT.md` file. This establishes the high-level business intent and product vision that guides all subsequent SDD phases.
 
 ## The Workflow
 
@@ -28,15 +28,15 @@ metadata:
 3. **Establish Product Principles**:
    - What are the core values or UI/UX constraints (e.g., minimalist, slate-themed, no rounded corners)?
 4. **Update Documentation**:
-   - Read the existing `docs/PRODUCT_SENSE.md`.
+   - Read the existing `docs/PRODUCT.md`.
    - Update the sections based on the discussion.
    - Ensure the language is professional and business-oriented.
 
 ## Output Format
 
-The output must be the updated `docs/PRODUCT_SENSE.md` file, following the structure:
+The output must be the updated `docs/PRODUCT.md` file, following the structure:
 
-- `# 产品感与业务导向 (Product Sense)`
+- `# 产品定位与价值主张 (Product Vision)`
 - `## 1. Product Elevator Pitch`
 - `## 2. 核心产品理念`
 - `## 3. 关键目标与非目标`

@@ -19,7 +19,7 @@
 | 角色 | 职责 | opencode（权威） | Cursor |
 | :--- | :--- | :--- | :--- |
 | **lead** (Tech Lead/架构师, primary) | 编排交付（含需求侧漏斗路由与 `/req:handoff` 交接）、架构设计、流程收尾，用户唯一入口 | `.opencode/agents/lead.md` | `.cursor/agents/lead.md` |
-| **pm** (产品经理) | 产品感/路线图、需求侧工作区（需求漏斗，仅 Epic）、需求调研/探索、业务评审 | `.opencode/agents/pm.md` | `.cursor/agents/pm.md` |
+| **pm** (产品经理) | 产品定位/路线图、需求侧工作区（需求漏斗，仅 Epic）、需求调研/探索、业务评审 | `.opencode/agents/pm.md` | `.cursor/agents/pm.md` |
 | **engineer** (全栈工程师) | 从 proposal 起步：行为规格 specs/技术设计/代码实施（需求侧原型由 pm 承担） | `.opencode/agents/engineer.md` | `.cursor/agents/engineer.md` |
 | **qa** (质量工程师) | 验证门禁/对抗审查（含需求侧 req-sdd 制品质量兜底） | `.opencode/agents/qa.md` | `.cursor/agents/qa.md` |
 
@@ -31,13 +31,13 @@
 
 在编写任何代码或提出方案之前，你**必须**查阅相关的治理文档：
 
-- **[SDD 工作流 SOP](docs/SOPS/SDD_WORKFLOW.md)**: `/opsx:` 与 `/req:` 指令的使用规则（含规划层 `/opsx:planning:product-sense`、`/opsx:planning:product-planning`；需求侧 `/req:research → explore → prototype → storymap → story → handoff`）、HITL（人机协同）检查点以及**任务类型 (Epic/Bug Fix/Tech Debt/简单功能) 的分支策略**与**分层同步 (Spec Sync change 级 / Baseline Sync Epic 级)** 机制。**开始任务前必读**。
+- **[SDD 工作流 SOP](docs/SOPS/SDD_WORKFLOW.md)**: `/opsx:` 与 `/req:` 指令的使用规则（含规划层 `/opsx:planning:product-vision`、`/opsx:planning:product-planning`；需求侧 `/req:research → explore → prototype → storymap → story → handoff`）、HITL（人机协同）检查点以及**任务类型 (Epic/Bug Fix/Tech Debt/简单功能) 的分支策略**与**分层同步 (Spec Sync change 级 / Baseline Sync Epic 级)** 机制。**开始任务前必读**。
 - **[Service Blueprint 标准](.trae/skills/baseline/blueprint/SKILL.md)**: `service_blueprint.html` 的稳定锚点、引用方式、capability 口径与 sync 触发规则。凡是 planning artifacts 或 sync 涉及服务蓝图，必须先参考此文档。
 - **[业务基线治理]**: 包含 `service_blueprint.html` (Story 矩阵/服务蓝图)、`business_process.html` (流程图) 和 `domain_model.html` (Event-Storming 模型)。**位于 `docs/baseline/`**。
 - **[治理映射约束]**: **核心准则**：`Bounded Contexts` (Baseline) 治理 `Capabilities` (Spec Layer)。在 Explore/Propose 阶段必须参考 `domain_model.html` 中的映射表来识别 Impact Capabilities。
 - **[交付看板]**: `docs/governance/delivery_board.html` - 使用 `/opsx:governance:delivery-board` 生成，展示系统当前的交付状态与健康度。
 - **[产品路线图](docs/ROADMAP.md)**: 高阶业务规划，明确当前项目所处阶段，指导 Explore 探索的边界。
-- **[产品感与业务导向](docs/PRODUCT_SENSE.md)**: AI 决策准则、目标用户画像，确保构建“可视即价值”的极简电商。
+- **[产品定位与价值主张](docs/PRODUCT.md)**: AI 决策准则、目标用户画像，确保构建“可视即价值”的极简电商。
 - **[前端开发规范与验证闭环](docs/FRONTEND.md)**: 包含极简 UI 约束（无圆角、slate 色系、真实数据），以及通过浏览器验证视觉约束的闭环 SOP。
 - **[后端架构指南](docs/ARCHITECTURE.md)**: 适用于 Node.js 和 Python 的四层架构设计 (HTTP -> Service -> Domain -> Repo)。
 - **[质量与评估标准](docs/QUALITY_SCORE.md)**: 端到端 (E2E) 验证要求以及“代码即规范”的质量底线。
@@ -48,7 +48,7 @@
 本项目由 OpenSpec (v2.0) 框架进行治理。
 所有的需求、设计和任务都与代码一起进行版本控制：
 
-- `docs/PRODUCT_SENSE.md`: **[全局规划]** 定义产品灵魂、痛点及竞争优势。
+- `docs/PRODUCT.md`: **[全局规划]** 定义产品定位、价值主张、痛点及竞争优势。
 - `docs/ROADMAP.md`: **[全局规划]** 定义滚动路线图、阶段边界及当前 Baseline（**唯一权威**，按阶段组织，每阶段条目即 Epic，需求侧只消费其 Epic 不扩范围）。
 - `docs/baseline/`: **[业务基线]** 包含 Blueprint, Process Flow 和 Event-Storming Domain Model。这是系统认知的核心沉淀。
 - `openspec/schemas/spec-driven.yaml`: **[Schema 优先]** 定义了开发侧所有制品的生成指令和格式约束，是开发侧工作流的最底层事实来源。

@@ -38,7 +38,7 @@
 
 | 层级 | 核心工件 | 作用 |
 | :--- | :--- | :--- |
-| **Planning Baseline** | `PRODUCT_SENSE.md`, `ROADMAP.md` | 提供方向、范围和优先级边界（ROADMAP 按阶段组织，每阶段条目即 Epic） |
+| **Planning Baseline** | `PRODUCT.md`, `ROADMAP.md` | 提供方向、范围和优先级边界（ROADMAP 按阶段组织，每阶段条目即 Epic） |
 | **Business Baseline** | `domain_model.html`, `business_process.html`, `service_blueprint.html` | 提供稳定的业务边界与流程参照 (L1/L2/L3) |
 | **Requirements 需求侧** | `epics/<epic-key>/`（research/idea/prototypes/storymap/stories） | 需求漏斗：调研 → 探索 → 原型 → 拆分 → Story（业务面冻结交付物），PM 主导，仅 Epic |
 | **Working Loop 交付侧** | `proposal.md`, `specs/`, `design.md`, `tasks.md`, `verify.md` | 确保实现遵循契约，并将认知沉淀回基线，Engineer 主导 |
@@ -67,7 +67,7 @@
 
 ### 🛠️ AI 指令实战
 在 Trae 或 Cursor 的 AI 侧边栏输入以下指令开启 SDD 之旅：
-- **明确方向**：`/opsx:planning:product-sense` 确立产品灵魂。
+- **明确方向**：`/opsx:planning:product-vision` 确立产品定位。
 - **需求调研（Epic）**：`/req:research "调研用户账户体系需求"` 产出 `epics/<key>/research.md`。
 - **需求探索（Epic）**：`/req:explore` 将调研转化为产品设计思路（To-Be + 候选 Capabilities）。
 - **需求拆分（Epic）**：`/req:storymap` 拆分为多个 Story（覆盖对账）。
@@ -86,7 +86,7 @@
 3. 执行 `mkdir -p docs/baseline openspec/changes openspec-requirements/epics openspec-requirements/archive` 初始化目录。
 
 ### 4.2 第二步：重写并初始化业务基线
-1. **清空并重写** `PRODUCT_SENSE.md` 与 `ROADMAP.md`（每阶段条目即 Epic）。
+1. **清空并重写** `PRODUCT.md` 与 `ROADMAP.md`（每阶段条目即 Epic）。
 2. **初始化基线**：在 `docs/baseline/` 中录入当前系统真实的领域模型与流程。
 
 ### 4.3 第三步：执行首个 Epic 闭环（需求侧）
@@ -114,7 +114,7 @@
 ```text
 ├── .agents/ / .trae/ / .cursor/  # AI 指令与 SDD 规则集 (护栏)
 │   └── skills/
-│       ├── prod/                 # 需求侧 skill（research/explore/prototype/storymap/story/handoff + product-sense/product-planning/delivery-board）
+│       ├── prod/                 # 需求侧 skill（research/explore/prototype/storymap/story/handoff + product-vision/product-planning/delivery-board）
 │       ├── opsx/                 # 交付侧 skill（propose/spec-design/apply-change/verify/sync-specs/archive-change/update-change/prototype）
 │       └── baseline/             # 业务基线 skill（blueprint/domain-model/process-flow/render）
 ├── openspec/            # SDD 交付侧引擎工作区
@@ -125,7 +125,7 @@
 │   └── archive/         # 已完成 Epic 归档
 ├── docs/                # 治理与基线文档
 │   ├── baseline/        # 核心业务基线 (Domain Model / Process Flow / Blueprint)
-│   ├── PRODUCT_SENSE.md # 产品定位
+│   ├── PRODUCT.md       # 产品定位与价值主张
 │   └── ROADMAP.md       # 迭代路线图（每阶段条目即 Epic）
 ├── ecommerce/           # 示例系统实现 (Node.js/Python/Vue)
 └── init.sh              # 统一工程入口

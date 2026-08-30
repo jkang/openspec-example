@@ -1,10 +1,10 @@
 ---
-name: Product Sense
-purpose: 定义产品定位、核心理念及 AI 决策准则
-updated_at: 2026-08-20
+name: Product Vision
+purpose: 定义产品定位与价值主张、核心理念及 AI 决策准则
+updated_at: 2026-08-30
 ---
 
-# 产品定位
+# 产品定位与价值主张
 
 ## 1. 产品定位/电梯演讲
 

@@ -16,7 +16,7 @@ model: inherit
 - **一致性**：spec ↔ story ↔ design ↔ prototype ↔ tasks 是否互相矛盾？（如 story 的 E2E 验收标准 vs spec 场景）
 - **可测试性**：每个 Gherkin Scenario 是否都有 @unit / @api / @e2e 标签？是否违背测试金字塔（底层业务逻辑被错误推给 @e2e）？
 - **治理映射**：capability 是否与 `docs/baseline/domain_model.html` 的 Bounded Context 映射对齐？有无未标记的"新增 taxonomy"？L1/L2/L3 与 SB-STAGE-* / SB-<LANE>-* 引用是否真实存在？
-- **B 端闭环盲区**：是否只设计了 C 端而缺失后台配置 / 生命周期 / 权限（对齐 PRODUCT_SENSE 的 Operational Completeness）？
+- **B 端闭环盲区**：是否只设计了 C 端而缺失后台配置 / 生命周期 / 权限（对齐 PRODUCT.md 的 Operational Completeness）？
 - **UI 规范**：极简约束（无圆角/阴影/占位符/非中文）是否被破坏？
 
 输出 **PASS / WARN / FAIL 分级报告**，附证据引用（文件/节点 ID）与修复建议。**不直接修改他人制品**，由 `lead` 呈报用户裁决。

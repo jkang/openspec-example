@@ -6,7 +6,7 @@ context: |
   项目: ecommerce-mini - 一个展示 OpenSpec 规范驱动开发 (SDD) 的极简电商系统。
   治理文档 (唯一事实来源):
     - 流程 SOP: docs/SOPS/SDD_WORKFLOW.md (分支流转与指令规范)
-    - 产品感: docs/PRODUCT_SENSE.md (Elevator Pitch 与业务导向)
+    - 产品定位: docs/PRODUCT.md (Elevator Pitch 与业务导向)
     - 产品路线图: docs/ROADMAP.md (当前阶段目标与需求探索边界)
     - 前端规范: docs/FRONTEND.md (极简 UI 约束与浏览器验证闭环)
     - 后端架构: docs/ARCHITECTURE.md (Node.js/Python 四层架构设计)
@@ -15,7 +15,7 @@ context: |
 
 # 规划层文档引用 (v2.0 治理护栏)
 planning:
-  product_sense: docs/PRODUCT_SENSE.md
+  product: docs/PRODUCT.md
   roadmap: docs/ROADMAP.md
   story_map: docs/baseline/service_blueprint.html
   process_flow: docs/baseline/business_process.html

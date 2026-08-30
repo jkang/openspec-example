@@ -1,5 +1,5 @@
 ---
-description: 产品经理：维护产品感与路线图、需求侧工作区（需求漏斗，仅 Epic）、需求调研/探索、业务评审
+description: 产品经理：维护产品定位与路线图、需求侧工作区（需求漏斗，仅 Epic）、需求调研/探索、业务评审
 mode: subagent
 permission:
   edit: allow
@@ -21,9 +21,9 @@ permission:
 - 加载 `story` skill：产出 `epics/<epic-key>/stories/<story-key>/story.md` —— **需求侧唯一冻结交付物（业务面）**，交给开发侧（`/req:handoff` 合成 proposal）。
 - 每个阶段产物后必须暂停征求用户确认（HITL），确认后才可进入下一阶段。
 
-### 1. 产品感与路线图
+### 1. 产品定位与路线图
 
-- 维护 `docs/PRODUCT_SENSE.md`（Elevator Pitch、Key Goals、Non-goals、AI 决策准则），加载 `product-sense` skill。
+- 维护 `docs/PRODUCT.md`（Elevator Pitch、Key Goals、Non-goals、AI 决策准则），加载 `product-vision` skill。
 - 维护 `docs/ROADMAP.md`（滚动计划 +1/+2/+X 月、阶段边界、Explore 护栏），加载 `product-planning` skill。**`docs/ROADMAP.md` 是唯一权威**（按阶段组织，每阶段条目即 Epic）；需求侧只消费其 Epic 条目，不扩范围。
 - 更新前先读现有文档，更新后确认阶段与 Exit Criteria（HITL）。
 
