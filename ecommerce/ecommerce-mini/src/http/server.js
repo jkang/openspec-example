@@ -292,7 +292,7 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
   const cartService = new CartService(cartRepo, productRepo)
   const couponService = new CouponService(couponRepo)
   const adminCouponService = new AdminCouponService(couponRepo, issuanceRepo)
-  const orderService = new OrderService(cartRepo, orderRepo, productRepo, couponService)
+  const orderService = new OrderService(cartRepo, orderRepo, productRepo, couponService, categoryRepo)
   const categoryService = new CategoryService(categoryRepo, productRepo)
   const paymentService = new PaymentService(orderRepo, productRepo, couponService)
   const authService = new AuthService(userRepo, sessionRepo)
@@ -513,6 +513,25 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
             ratio: couponRatio
           },
           trend: agg.trend,
+          range: { dimension, from, to }
+        })
+      }
+
+      // ===== B 端销售看板排行（sales-dashboard capability / data-insights BC，运营/老板白名单；排行与总览同源同口径 R-RANK-001~005） =====
+      if (pathname === '/api/admin/dashboard/ranking' && req.method === 'GET') {
+        requireRole('运营', '老板')(req, authService)
+        const dimension = url.searchParams.get('dimension') || 'week'
+        const { from, to } = resolveDashboardRange(dimension, url)
+        const agg = orderService.aggregateSales({
+          from,
+          to,
+          statuses: SALES_STATUSES,
+          granularity: 'day',
+          groupBy: ['product', 'category']
+        })
+        return sendJson(res, 200, {
+          productRanking: agg.productRanking,
+          categoryRanking: agg.categoryRanking,
           range: { dimension, from, to }
         })
       }

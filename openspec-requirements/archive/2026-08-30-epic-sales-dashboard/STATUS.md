@@ -17,8 +17,8 @@
 
 | Story ID | 状态 | changeName | 开发侧归档 |
 | --- | --- | --- | --- |
-| story-sales-dashboard-overview | handoff | story-sales-dashboard-overview | ⬜ |
-| story-sales-dashboard-ranking | handoff | story-sales-dashboard-ranking | ⬜ |
+| story-sales-dashboard-overview | done | story-sales-dashboard-overview | ⬜ |
+| story-sales-dashboard-ranking | done | story-sales-dashboard-ranking | ⬜ |
 
 > Story 状态流转：`ready → handoff（/req:handoff 交接后）→ dev-in-progress（开发侧 change 创建）→ done（开发侧归档后由 lead 回填）`
 
@@ -26,7 +26,7 @@
 
 - [x] **active**（research 创建目录时）
 - [x] **all-handoff**（全部 Story 已交接开发侧）
-- [ ] **all-done**（全部 Story 开发侧已归档，`epic-<key>.story-list.json` 全 done）
-- [ ] **archived**（`epics/<epic-key>/` → `archive/YYYY-MM-DD-<epic-key>/`）
+- [x] **all-done**（全部 Story 开发侧已归档，`epic-<key>.story-list.json` 全 done）
+- [x] **archived**（`epics/<epic-key>/` → `archive/YYYY-MM-DD-<epic-key>/`）
 
 > 状态 owner：需求侧 skill（research→done / explore→done / prototype→done / storymap→done / handoff→handoff）；开发侧归档后由 `lead` 回填 done/archived。

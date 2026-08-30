@@ -23,8 +23,9 @@ AI Agent 在执行需求探索（`/req:explore`）阶段时，**必须首先查�
 - **用户账户体系（Phase 4 完成）**: 注册（手机号唯一 + 密码哈希 + 自动登录）/ 登录（统一失败提示防枚举 + 禁用拦截）/ 会话生命周期（全局校验 + 刷新保持 + 退出销毁 + 禁用即失效）；订单归属真实用户，替换 `user_dev` 占位；新增 `account-management` / `user-session` / `user-admin` 三个 capability taxonomy（User Context）。
 - **订单生命周期闭环**: `PENDING_PAYMENT → PAID → SHIPPED → COMPLETED / CANCELLED` 状态机；模拟支付（库存与券在支付成功时扣减/核销）。
 - **营销工具**: 优惠券系统闭环（B 端配置 → 发放 → C 端最优券结算核销）。
+- **销售报表看板（Phase 5 Epic 5.1 完成）**: B 端销售总览（4 指标卡：销售额/订单量/客单价/优惠让利 + 今日/近7日/近30日切换 + SVG 趋势 + 优惠券效果）+ 商品 TOP10 / 分类 TOP10 排行；新增 `role=老板`（只读看板视角）；仅运营/老板可访问（客服/未登录 403）；新增 `data-insights` BC 与 `sales-dashboard` capability（Baseline Sync 已完成）。
 - **持久化与真实数据**: JSON 文件持久化（products/categories/coupons/issuances/orders/carts/users/sessions），真实数据落地。
-- **SDD 工作流**: 基于 OpenSpec 的规格驱动开发闭环，Epic/Story/Bug Fix/Tech Debt 共 24 个变更已归档；E2E Cucumber 覆盖 26 场景（含用户账户体系 4 Story 的 13 条 E2E 旅程 + 持久化 1 场景）。
+- **SDD 工作流**: 基于 OpenSpec 的规格驱动开发闭环，Epic/Story/Bug Fix/Tech Debt 共 26 个变更已归档；E2E Cucumber 覆盖 30 场景（含销售看板 5 场景：总览 3 + 排行 2）。
 
 ### 🔍 现状评估 (Product Expert Review)
 
@@ -35,7 +36,7 @@ AI Agent 在执行需求探索（`/req:explore`）阶段时，**必须首先查�
 | 订单驱动库存实时变更 | ✅ 支付成功后扣减库存，取消（待支付）不占库存 | 已闭环 |
 | 订单可处理工作流 | ✅ 下单→支付→发货→完成/取消，B 端订单管理 + C 端我的订单 | 已闭环 |
 | 用户资产归属 | ✅ 注册/登录/会话闭环，订单归属真实用户，B 端用户管理（检索/详情/禁用） | 已闭环（Phase 4 完成） |
-| 数据驱动经营决策 | 未启动 | 订单/库存数据已成型，可沉淀为看板与预警（Phase 5） |
+| 数据驱动经营决策 | ✅ 销售报表看板（Phase 5 Epic 5.1）：总览 + 排行，只读聚合自订单明细 | 已闭环（Phase 5 完成） |
 | 回款节点驱动应收账款看板 | 未启动 | 无账期/回款概念，差异化承诺空白（Phase 6） |
 
 **数据资产盘点（Phase 5 输入）**:
@@ -44,7 +45,7 @@ AI Agent 在执行需求探索（`/req:explore`）阶段时，**必须首先查�
 - `User` 角色已含 `客户 / 运营 / 客服` → B 端权限模型可扩展「老板」视角（仅读看板）。
 - `domain_model.html` 已有前瞻 ReadModel `Operator 库存看板（运营查看销量与补货状态）` → 治理锚点已预留。
 
-**结论**: 「订单生命周期与履约闭环」（Phase 3）+「用户资产与账户体系」（Phase 4）已交付。下一阶段锁定 **Phase 5 数据洞察与经营决策**（数据已就绪、成本最低、为回款看板铺通用底座），随后进入 **Phase 6 回款与应收账款闭环**（产品差异化终点）。
+**结论**: 「订单生命周期与履约闭环」（Phase 3）+「用户资产与账户体系」（Phase 4）+「销售报表看板」（Phase 5 Epic 5.1）已交付。下一阶段：**Epic 5.2 库存预警与补货建议**（销售看板已沉淀数据聚合底座，库存洞察数据就绪），随后进入 **Phase 6 回款与应收账款闭环**（产品差异化终点）。
 
 ---
 

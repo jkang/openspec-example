@@ -3,7 +3,7 @@
 ## 01 背景与现状：交付瓶颈的深度漂移
 
 ### Slide 1｜封面
-- **主题**：从 PRD 到 Specs —— 智能开发时代的需求工程重塑
+- **主题**：从 PRD 到 Specs —— AI 重塑需求工程
 - **核心逻辑**：编码自动化之后，需求环节如何不再成为交付的 Blocker
 - **定位**：面向产品经理、BA、项目经理及管理者的研发效能升级指南
 
@@ -39,48 +39,54 @@
 
 ---
 
-## 01.5 进化可视化：OpenSpec 的成长之路
+## 01.5 分层治理可视化：OpenSpec 的三种形态
 
-> **提示**：为了获得最佳视觉体验，请查看 [OpenSpec 工作流演进全景图 (High-Fidelity)](file:///Users/superkkk/MyCoding/OpenSpec-practice/docs/visuals/workflow-evolution.html)。
+> **提示**：为了获得最佳视觉体验，请查看 [OpenSpec 分层治理体系全景图 (High-Fidelity)](file:///Users/superkkk/MyCoding/OpenSpec-practice/docs/visuals/workflow-evolution.html)。
 
-### 阶段一：v1.5 极简版（线性敏捷）
-专注于快速闭环，确立了“意图 -> 规格 -> 代码”的原始管线。
+### 形态一：极简交付 (Minimalist Delivery)
+专注于单 Change 的快速闭环，确立了“意图 -> 规格 -> 代码”的原始管线。
 
 ```mermaid
 graph LR
-    A[Explore] --> B[Propose]
-    B --> C[Apply]
-    C --> D[Sync]
-    D --> E[Archive]
+    A[探索 Explore<br/>/opsx:explore] --> B[提案 Propose<br/>/opsx:propose]
+    B --> C[实施 Apply<br/>/opsx:apply]
+    C --> D[同步 Sync<br/>/opsx:sync]
+    D --> E[归档 Archive<br/>/opsx:archive]
 ```
 
-### 阶段二：轻量版（基线与循环）
-引入了“基线 (Baseline)”概念，支持 Multi-Story 循环迭代，解决了复杂业务逻辑的拆解问题。
+### 形态二：轻量产品 (Lightweight Product)
+引入了“规划与业务基线”，支持 Multi-Story 循环迭代，解决了复杂业务逻辑的拆解与价值对齐问题。
 
 ```mermaid
 flowchart TD
     A([规划基线]) --> B([业务基线])
-    B --> C[需求探索]
-    C --> D[方案提案]
-    D --> E{Multi-Story?}
-    E -- Yes --> C
-    E -- No --> F[同步归档]
+    B --> C[需求探索 Explore]
+    C --> D[方案提案 Propose]
+    subgraph Loop [业务交付循环]
+        E{UI 变更?} --> F[原型 Prototype] --> G[故事 Story] --> H[实施验证]
+        E -- 否 --> G
+        H -- Next --> E
+    end
+    D --> E
+    H --> I[同步归档]
 ```
 
-### 阶段三：v2.0 完整版（解耦工程化）
-实现了需求侧与交付侧的深度解耦，通过标准化漏斗与分层同步，支持规模化协作。
+### 形态三：业务产品 (Business Product)
+实现了需求侧与交付侧的深度解耦，通过标准化漏斗、交接契约与分层同步，支持规模化协作与持续架构演进。
 
 ```mermaid
 flowchart TD
     subgraph Req[需求侧：PM 主导]
-        R1[调研] --> R2[探索] --> R3[原型] --> R4[拆分] --> R5[Story]
+        R1[调研] --> R2[探索] --> R3{UI?} --> R4[原型] --> R5[拆分] --> R6[Story]
+        R3 -- 否 --> R5
     end
-    R5 --> H[交接 Handoff]
+    R6 --> H[交接 Handoff]
     H --> D1[提案]
     subgraph Del[交付侧：工程师主导]
         D1 --> D2[规格设计] --> D3[实施验证]
     end
     D3 --> S[分层同步] --> Ar[归档]
+    Ar -- Loop --> R6
 ```
 
 ---

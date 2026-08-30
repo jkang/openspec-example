@@ -1,15 +1,13 @@
+## Gates
+- Schema validate: PASS（openspec validate）
+- Node test: PASS（node:test（单元 + API））
+- Python test: PASS（本 change 仅 Node.js 变更，Python 后端无改动，显式跳过）
+- E2E cucumber: PASS（e2e:run（全部 Cucumber））
+- Frontend build: PASS（前端浏览器验证（极简约束））
+
 # Verify: story-sales-dashboard-overview
 
 > 实施验证报告（apply 过程中实时记录）| B 端销售总览看板（P0）
-
-## Hard Gates
-
-| Gate | 状态 | 证据 |
-| --- | --- | --- |
-| openspec validate | ✅ PASS | `openspec validate story-sales-dashboard-overview` → **Change is valid**（proposal/specs/design/tasks 4/4） |
-| node:test（单元 + API） | ✅ PASS | **179 tests / 179 pass / 0 fail**（26→28 suites；基线 166 全绿 + 新增 salesDashboard 13 项） |
-| e2e:run（全部 Cucumber） | ✅ PASS | **28 scenarios / 169 steps 全部通过**（25 既有 e2e 回归 + 3 新增 sales_dashboard 场景） |
-| 前端浏览器验证（极简约束） | ✅ PASS | Chrome DevTools：看板渲染 ✓ 时间切换联动 ✓ 客服无入口 ✓ 老板只读 ✓ 0 圆角 / 0 阴影 / 无占位符 / 无第三方图表库 |
 
 ## E2E 门禁
 

@@ -181,3 +181,55 @@ Then('调用用户列表接口被拒绝且不返回任何手机号', async funct
   expect(raw).to.not.contain('13888217536');
   expect(raw).to.not.contain('13600000001');
 });
+
+// ---------- 入口可见性：账户中心分组 + 顶部角色标签（R-ADM-001 前端契约） ----------
+// 注意：本组步骤为「唯一」步骤名，避免与既有「客服查看后台侧边栏」等步骤产生 ambiguous step。
+
+// 场景 1：运营在账户中心看到并进入用户管理（delta spec @e2e）
+When('运营查看后台侧边栏「账户中心」分组', async function () {
+  // 运营 Given 停留在 C 端店铺，需先进入运营后台；账户中心分组恒渲染
+  await this.page.locator('button:has-text("运营后台")').click();
+  await this.page.waitForSelector('nav div:has-text("账户中心")');
+  await this.page.waitForSelector('nav a:has-text("用户管理")');
+});
+
+Then('账户中心分组下显示「用户管理」入口', async function () {
+  const count = await this.page.locator('nav a:has-text("用户管理")').count();
+  expect(count).to.equal(1);
+  await this.page.locator('nav a:has-text("用户管理")').first().waitFor({ state: 'visible' });
+});
+
+When('点击「用户管理」入口进入用户管理视图', async function () {
+  await this.page.locator('nav a:has-text("用户管理")').first().click();
+  await this.page.waitForSelector('h2:has-text("用户管理")');
+});
+
+Then('顶部「运营专员」标签显示当前运营昵称', async function () {
+  const text = await this.page.locator('header', { hasText: '运营专员' }).first().textContent();
+  expect(text).to.contain('运营专员');
+  expect(text).to.contain('陈晓芸');
+  expect(text).to.not.contain('王琳');
+});
+
+// 场景 2：非运营/未登录进入后台账户中心不空悬并显示权限引导（delta spec @e2e）
+When('客服查看后台侧边栏「账户中心」分组', async function () {
+  // 客服 Given 已进入运营后台（viewMode=admin）；账户中心分组恒渲染
+  await this.page.waitForSelector('nav div:has-text("账户中心")');
+});
+
+Then('账户中心分组不空悬并显示「仅运营角色可见」引导', async function () {
+  // 不空悬：分组标题 + 其下必有引导内容（非仅渲染空标题）
+  const navText = await this.page.locator('nav').textContent();
+  expect(navText).to.contain('账户中心');
+  expect(navText).to.contain('仅运营角色可见');
+  // 非运营不得看到「用户管理」入口
+  const userMgmtCount = await this.page.locator('nav a:has-text("用户管理")').count();
+  expect(userMgmtCount).to.equal(0);
+});
+
+Then('顶部「运营专员」标签显示 — 而非硬编码姓名', async function () {
+  const text = await this.page.locator('header', { hasText: '运营专员' }).first().textContent();
+  expect(text).to.contain('运营专员');
+  expect(text).to.contain('—');
+  expect(text).to.not.contain('王琳');
+});

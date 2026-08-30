@@ -56,7 +56,7 @@
             {{ cartTotalItems }}
           </span>
         </button>
-        <span v-if="viewMode === 'admin'" class="text-sm text-slate-500 font-normal">{{ currentUser?.role === '老板' ? '老板' : '运营专员' }}: {{ currentUser?.nickname || '王琳' }}</span>
+        <span v-if="viewMode === 'admin'" class="text-sm text-slate-500 font-normal">{{ currentUser?.role === '老板' ? '老板' : '运营专员' }}: {{ currentUser?.role === '老板' ? (currentUser?.nickname || '—') : ((isOperator && currentUser?.nickname) || '—') }}</span>
       </div>
     </header>
 
@@ -418,9 +418,14 @@
           <div class="mt-8 px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">营销中心</div>
           <a @click="adminTab = 'coupon'"
              :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'coupon' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']">优惠券管理</a>
-          <div class="mt-8 px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">账户中心</div>
-          <a v-if="isOperator" @click="adminTab = 'user'"
-             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'user' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']">用户管理</a>
+          <div class="mt-8">
+            <div class="px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">账户中心</div>
+            <a v-if="isOperator" @click="adminTab = 'user'"
+               :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'user' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']">用户管理</a>
+            <div v-else class="px-6 py-3 text-sm text-slate-500">
+              <span class="text-slate-400">仅运营角色可见</span>
+            </div>
+          </div>
         </nav>
       </aside>
 
@@ -509,6 +514,66 @@
                     <div class="text-xl font-semibold mt-1">{{ dashboardCoupon.ratio }}%</div>
                   </div>
                 </div>
+              </section>
+
+              <!-- 商品销售 TOP10（R-RANK-001，销售额=订单快照价汇总，含已下架商品历史订单） -->
+              <section class="bg-white border border-slate-200 p-8">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="font-medium">商品销售 TOP10（{{ currentRangeLabel }}）</h3>
+                  <span class="text-xs text-slate-500">按订单快照价统计销售额，已下架商品历史订单仍计入</span>
+                </div>
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="text-left text-slate-500 border-b border-slate-200">
+                      <th class="pb-3 font-medium">排名</th>
+                      <th class="pb-3 font-medium">商品</th>
+                      <th class="pb-3 font-medium text-right">销量</th>
+                      <th class="pb-3 font-medium text-right">销售额</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(p, i) in rankingProductList" :key="p.productId" class="border-b border-slate-200">
+                      <td class="py-3">{{ i + 1 }}</td>
+                      <td class="py-3 font-medium">{{ p.name }}</td>
+                      <td class="py-3 text-right">{{ p.quantity }}</td>
+                      <td class="py-3 text-right font-mono">{{ formatMoney(p.salesCents) }}</td>
+                    </tr>
+                    <tr v-if="rankingProductList.length === 0">
+                      <td colspan="4" class="py-8 text-center text-slate-400">当前区间暂无成交商品</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+
+              <!-- 分类销售排行（R-RANK-002，含未分类行，占比合计 100%） -->
+              <section class="bg-white border border-slate-200 p-8">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="font-medium">分类销售排行（{{ currentRangeLabel }}）</h3>
+                  <span class="text-xs text-slate-500">未分类商品归「未分类」行，占比合计 100%</span>
+                </div>
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="text-left text-slate-500 border-b border-slate-200">
+                      <th class="pb-3 font-medium">排名</th>
+                      <th class="pb-3 font-medium">分类</th>
+                      <th class="pb-3 font-medium text-right">销售额</th>
+                      <th class="pb-3 font-medium text-right">占比</th>
+                      <th class="pb-3 font-medium text-right">订单数</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="(c, i) in rankingCategoryList" :key="String(c.categoryId)" class="border-b border-slate-200">
+                      <td class="py-3">{{ i + 1 }}</td>
+                      <td class="py-3 font-medium">{{ c.name }}</td>
+                      <td class="py-3 text-right font-mono">{{ formatMoney(c.salesCents) }}</td>
+                      <td class="py-3 text-right">{{ c.ratio }}%</td>
+                      <td class="py-3 text-right">{{ c.orderCount }} 单</td>
+                    </tr>
+                    <tr v-if="rankingCategoryList.length === 0">
+                      <td colspan="5" class="py-8 text-center text-slate-400">当前区间暂无成交数据</td>
+                    </tr>
+                  </tbody>
+                </table>
               </section>
             </template>
 
@@ -871,7 +936,8 @@
             <!-- 无权限兜底：非运营越权进入（R-ADM-007 不返回敏感信息） -->
             <section v-if="!isOperator" class="bg-white border border-slate-200 p-8">
               <h2 class="text-lg font-bold mb-4 border-b border-slate-200 pb-4">用户管理</h2>
-              <p class="text-sm text-slate-700">无权限访问用户管理：本入口仅「运营」角色可见。手机号等用户资料属敏感信息，客服与普通账号无法查看。</p>
+              <p class="text-sm text-slate-700">无权限访问用户管理：仅运营角色可见。手机号等用户资料属敏感信息，客服与普通账号无法查看。</p>
+              <p v-if="!sessionToken" class="text-sm text-slate-700 mt-3">当前未登录，请先使用运营账号登录后再访问。</p>
             </section>
 
             <template v-else>
@@ -1710,10 +1776,28 @@ const fetchSalesDashboard = async () => {
   }
 }
 
+// 销售排行数据（R-RANK-001~005）：与总览同 dimension 联动刷新；销售额=订单快照价
+const rankingData = ref(null)
+const rankingProductList = computed(() => rankingData.value?.productRanking || [])
+const rankingCategoryList = computed(() => rankingData.value?.categoryRanking || [])
+
+const fetchSalesRanking = async () => {
+  if (!sessionToken.value) return
+  try {
+    const response = await fetch(`${API_BASE}/api/admin/dashboard/ranking?dimension=${dashboardRange.value}`, { headers: authHeaders() })
+    if (response.ok) {
+      rankingData.value = await response.json()
+    }
+  } catch (e) {
+    console.error('获取销售排行失败:', e)
+  }
+}
+
 const switchDashboardRange = (key) => {
   if (dashboardRange.value === key) return
   dashboardRange.value = key
   fetchSalesDashboard()
+  fetchSalesRanking()
 }
 const adminCoupons = ref([])
 const issueLog = ref([])
@@ -1740,6 +1824,7 @@ const switchViewMode = (mode) => {
   }
   if (mode === 'admin') {
     fetchSalesDashboard()
+    fetchSalesRanking()
     fetchAdminCoupons()
     fetchIssuances()
     fetchAdminProducts()

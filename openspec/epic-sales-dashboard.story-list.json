@@ -7,7 +7,7 @@
       "id": "story-sales-dashboard-overview",
       "title": "销售总览（指标卡 + 时间切换 + 趋势）",
       "description": "B 端销售看板：4 指标卡（销售额/订单量/客单价/优惠让利）+ 今日/近7日/近30日切换 + SVG 趋势图 + 优惠券效果区；仅运营/老板可访问",
-      "status": "in_progress",
+      "status": "done",
       "changeName": "story-sales-dashboard-overview",
       "priority": "P0"
     },
@@ -15,10 +15,10 @@
       "id": "story-sales-dashboard-ranking",
       "title": "商品/分类销售排行",
       "description": "销售看板排行区：商品 TOP10（销量/销售额）+ 分类 TOP10（销售额/占比/订单数），随时间维度联动，软删除商品历史订单计入",
-      "status": "in_progress",
+      "status": "done",
       "changeName": "story-sales-dashboard-ranking",
       "priority": "P1"
     }
   ],
-  "updatedAt": "2026-08-30T00:00:00Z"
+  "updatedAt": "2026-08-30T12:00:00Z"
 }
