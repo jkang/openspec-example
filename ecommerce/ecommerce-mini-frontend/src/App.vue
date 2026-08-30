@@ -1,10 +1,10 @@
 <template>
-  <div class="h-screen flex flex-col overflow-hidden bg-white text-slate-900 font-sans">
+  <div class="h-screen flex flex-col overflow-hidden bg-background text-foreground font-sans">
     <!-- 顶部导航 -->
-    <header class="h-16 flex-shrink-0 border-b border-slate-200 flex items-center justify-between px-8 bg-white z-10">
+    <header class="h-16 flex-shrink-0 border-b border-border flex items-center justify-between px-8 bg-card z-10">
       <!-- 左侧品牌（C/B 共用） -->
       <div class="flex items-center gap-2">
-        <div class="w-8 h-8 bg-slate-900 flex items-center justify-center text-white text-xs font-bold">M</div>
+        <div class="w-8 h-8 bg-primary flex items-center justify-center text-primary-foreground text-xs font-black font-display">M</div>
         <h1 class="text-lg font-semibold tracking-tight uppercase">Minimal Store</h1>
       </div>
 
@@ -15,39 +15,39 @@
             v-model="searchQuery"
             type="text"
             placeholder="搜索商品..."
-            class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-none focus:outline-none focus:border-slate-400 transition-colors text-sm"
+            class="w-full px-4 py-2 bg-muted border border-border rounded-none focus:outline-none focus:border-primary transition-colors text-sm"
           >
         </div>
-        <div v-else-if="viewMode === 'orders'" class="flex-1 mx-8 text-sm text-slate-500">
-          当前路径: <span class="text-slate-900 font-medium">我的订单</span>
+        <div v-else-if="viewMode === 'orders'" class="flex-1 mx-8 text-sm text-muted-foreground">
+          当前路径: <span class="text-foreground font-medium">我的订单</span>
         </div>
-        <div v-else-if="viewMode === 'register' || viewMode === 'login'" class="flex-1 mx-8 text-sm text-slate-500">
-          当前路径: <span class="text-slate-900 font-medium">{{ viewMode === 'register' ? '账户 / 注册' : '账户 / 登录' }}</span>
+        <div v-else-if="viewMode === 'register' || viewMode === 'login'" class="flex-1 mx-8 text-sm text-muted-foreground">
+          当前路径: <span class="text-foreground font-medium">{{ viewMode === 'register' ? '账户 / 注册' : '账户 / 登录' }}</span>
         </div>
 
         <div class="flex items-center gap-6 text-sm font-medium">
           <button v-if="viewMode === 'store' || viewMode === 'orders' || (viewMode === 'login' && sessionToken && loginSuccess)"
-                  :class="['py-1 px-2 border transition-colors', viewMode === 'orders' ? 'border-slate-900 text-slate-900' : 'border-slate-200 hover:bg-slate-50']"
+                  :class="['py-1 px-2 border transition-colors', viewMode === 'orders' ? 'border-primary text-foreground' : 'border-border hover:bg-muted']"
                   @click="goToOrders">
             我的订单
           </button>
-          <button v-if="viewMode === 'store' && !sessionToken" @click="switchToRegister" class="py-1 px-2 border border-slate-200 hover:bg-slate-50">
+          <button v-if="viewMode === 'store' && !sessionToken" @click="switchToRegister" class="py-1 px-2 border border-border hover:bg-muted">
             注册 / 登录
           </button>
-          <span v-if="sessionToken && currentUser" class="text-sm text-slate-600">
+          <span v-if="sessionToken && currentUser" class="text-sm text-muted-foreground">
             {{ currentUser.nickname }}
           </span>
-          <button v-if="sessionToken && currentUser" @click="logoutSession" class="py-1 px-2 border border-slate-900 bg-slate-900 text-white hover:bg-slate-700">
+          <button v-if="sessionToken && currentUser" @click="logoutSession" class="py-1 px-2 border border-primary bg-primary text-primary-foreground hover:opacity-85">
             退出登录
           </button>
-          <button v-if="viewMode === 'store'" @click="isCartOpen = !isCartOpen" class="relative py-1 px-2 border border-slate-200 hover:bg-slate-50">
+          <button v-if="viewMode === 'store'" @click="isCartOpen = !isCartOpen" class="relative py-1 px-2 border border-border hover:bg-muted">
             购物车
-            <span v-if="cartTotalItems > 0" class="absolute -top-1 -right-1 w-4 h-4 bg-slate-900 text-white text-[10px] flex items-center justify-center">
+            <span v-if="cartTotalItems > 0" class="absolute -top-1 -right-1 w-4 h-4 bg-primary text-primary-foreground text-[10px] flex items-center justify-center">
               {{ cartTotalItems }}
             </span>
           </button>
           <!-- 独立「运营后台」入口按钮（非「店铺 | 运营后台」分段切换控件） -->
-          <button @click="switchViewMode('admin')" class="py-1 px-2 border border-slate-200 text-slate-600 hover:bg-slate-50">
+          <button @click="switchViewMode('admin')" class="py-1 px-2 border border-border text-muted-foreground hover:bg-muted">
             运营后台
           </button>
         </div>
@@ -55,12 +55,12 @@
 
       <!-- ============ B 端 header：独立运营作用域（面包屑 + 角色标签 + 返回店铺） ============ -->
       <template v-else>
-        <div class="flex-1 mx-8 text-sm text-slate-500">
-          运营后台 / <span class="text-slate-900 font-medium">{{ pathMap[adminTab] }}</span>
+        <div class="flex-1 mx-8 text-sm text-muted-foreground">
+          运营后台 / <span class="text-foreground font-medium">{{ pathMap[adminTab] }}</span>
         </div>
         <div class="flex items-center gap-6 text-sm font-medium">
-          <span class="text-sm text-slate-500 font-normal">{{ currentUser?.role === '老板' ? '老板' : '运营专员' }}: {{ currentUser?.role === '老板' ? (currentUser?.nickname || '—') : ((isOperator && currentUser?.nickname) || '—') }}</span>
-          <button @click="switchViewMode('store')" class="py-1 px-2 border border-slate-200 text-slate-600 hover:bg-slate-50">
+          <span class="text-sm text-muted-foreground font-normal">{{ currentUser?.role === '老板' ? '老板' : '运营专员' }}: {{ currentUser?.role === '老板' ? (currentUser?.nickname || '—') : ((isOperator && currentUser?.nickname) || '—') }}</span>
+          <button @click="switchViewMode('store')" class="py-1 px-2 border border-border text-muted-foreground hover:bg-muted">
             返回店铺
           </button>
         </div>
@@ -70,24 +70,24 @@
     <!-- 主内容区 (C 端店铺) -->
     <main v-if="viewMode === 'store'" class="flex-1 flex overflow-hidden">
       <!-- 左侧商品网格 -->
-      <section class="flex-1 overflow-y-auto p-8 bg-slate-50 scrollbar-hide">
+      <section class="flex-1 overflow-y-auto p-8 bg-background scrollbar-hide">
         <!-- 分类筛选条 -->
         <div class="flex items-center gap-2 flex-wrap mb-6">
           <button @click="selectedCategory = null"
-                  :class="['px-4 py-2 border text-xs font-medium transition-colors', selectedCategory === null ? 'bg-slate-900 text-white' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50']">全部</button>
+                  :class="['px-4 py-2 border text-xs font-medium transition-colors', selectedCategory === null ? 'bg-primary text-primary-foreground' : 'bg-card border-border text-muted-foreground hover:bg-muted']">全部</button>
           <button v-for="c in activeCategories" :key="c.id" @click="selectedCategory = c.id"
-                  :class="['px-4 py-2 border text-xs font-medium transition-colors', selectedCategory === c.id ? 'bg-slate-900 text-white' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50']">{{ c.name }}</button>
+                  :class="['px-4 py-2 border text-xs font-medium transition-colors', selectedCategory === c.id ? 'bg-primary text-primary-foreground' : 'bg-card border-border text-muted-foreground hover:bg-muted']">{{ c.name }}</button>
         </div>
-        <div v-if="filteredProducts.length === 0" class="h-full flex flex-col items-center justify-center text-slate-400 space-y-4">
+        <div v-if="filteredProducts.length === 0" class="h-full flex flex-col items-center justify-center text-muted-foreground space-y-4">
           <p class="text-sm">未找到相关商品</p>
         </div>
         <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div 
             v-for="product in filteredProducts" 
             :key="product.id"
-            class="bg-white border border-slate-200 group transition-colors hover:border-slate-400 flex flex-col"
+            class="bg-card border border-border group transition-colors hover:border-primary flex flex-col"
           >
-            <div class="aspect-[4/3] overflow-hidden bg-slate-100 border-b border-slate-200 relative">
+            <div class="aspect-[4/3] overflow-hidden bg-muted border-b border-border relative">
               <img 
                 :src="product.imageUrl" 
                 :alt="product.name"
@@ -99,14 +99,14 @@
             <div class="p-5 flex flex-col gap-4 flex-1">
               <div class="flex justify-between items-start">
                 <div class="flex-1 min-w-0 pr-2">
-                  <h3 class="font-medium text-slate-900 truncate">{{ product.name }}</h3>
-                  <p class="text-xs text-slate-500 mt-1 line-clamp-2">{{ product.description }}</p>
+                  <h3 class="font-medium text-foreground truncate">{{ product.name }}</h3>
+                  <p class="text-xs text-muted-foreground mt-1 line-clamp-2">{{ product.description }}</p>
                 </div>
                 <span class="font-semibold text-sm whitespace-nowrap">¥{{ (product.priceCents / 100).toFixed(2) }}</span>
               </div>
               <button 
                 @click="addToCart(product)"
-                class="mt-auto w-full py-2 bg-slate-900 text-white text-xs font-bold tracking-widest uppercase hover:bg-slate-800 transition-colors flex items-center justify-center gap-2"
+                class="mt-auto w-full py-2 bg-primary text-primary-foreground text-xs font-bold tracking-widest uppercase hover:opacity-85 transition-colors flex items-center justify-center gap-2"
               >
                 加入购物车
               </button>
@@ -117,42 +117,42 @@
 
       <!-- 右侧购物车侧边栏 -->
       <aside 
-        :class="['w-80 flex-shrink-0 bg-white border-l border-slate-200 flex flex-col transition-all duration-300 transform', isCartOpen ? 'translate-x-0' : 'translate-x-full absolute right-0 h-full z-20 md:relative md:translate-x-0']"
+        :class="['w-80 flex-shrink-0 bg-card border-l border-border flex flex-col transition-all duration-300 transform', isCartOpen ? 'translate-x-0' : 'translate-x-full absolute right-0 h-full z-20 md:relative md:translate-x-0']"
       >
-        <div class="p-6 border-b border-slate-200 flex items-center justify-between">
+        <div class="p-6 border-b border-border flex items-center justify-between">
           <h2 class="font-semibold tracking-tight uppercase text-xs">购物车 ({{ cartTotalItems }})</h2>
-          <button @click="isCartOpen = false" class="md:hidden text-xs font-bold text-slate-400">关闭</button>
+          <button @click="isCartOpen = false" class="md:hidden text-xs font-bold text-muted-foreground">关闭</button>
         </div>
 
         <div class="flex-1 overflow-y-auto p-6 scrollbar-hide space-y-6">
-          <div v-if="cart.length === 0" class="h-full flex flex-col items-center justify-center text-slate-400 space-y-2">
+          <div v-if="cart.length === 0" class="h-full flex flex-col items-center justify-center text-muted-foreground space-y-2">
             <p class="text-[10px]">购物车为空</p>
           </div>
           <div v-for="item in cart" :key="item.id" class="flex gap-4">
-            <div class="w-16 h-16 flex-shrink-0 border border-slate-200 bg-slate-50 overflow-hidden">
+            <div class="w-16 h-16 flex-shrink-0 border border-border bg-muted overflow-hidden">
               <img :src="item.imageUrl" class="w-full h-full object-cover" @error="handleImageError">
             </div>
             <div class="flex-1 flex flex-col justify-between py-1">
               <div class="flex justify-between">
                 <h4 class="text-xs font-medium truncate pr-2">{{ item.name }}</h4>
-                <button @click="removeFromCart(item.productId)" class="text-[10px] text-slate-300 hover:text-red-500 font-bold">删除</button>
+                <button @click="removeFromCart(item.productId)" class="text-[10px] text-muted-foreground hover:text-accent font-bold">删除</button>
               </div>
               <div class="flex justify-between items-end">
                 <span class="text-xs font-semibold">¥{{ (item.priceCents * item.quantity / 100).toFixed(2) }}</span>
-                <div class="flex items-center border border-slate-200 bg-white">
-                  <button @click="decreaseQuantity(item)" class="w-6 h-6 flex items-center justify-center text-xs hover:bg-slate-50 border-r border-slate-200">-</button>
+                <div class="flex items-center border border-border bg-muted">
+                  <button @click="decreaseQuantity(item)" class="w-6 h-6 flex items-center justify-center text-xs hover:bg-muted border-r border-border">-</button>
                   <span class="w-8 text-[10px] text-center font-medium">{{ item.quantity }}</span>
-                  <button @click="addToCart(item, 1)" class="w-6 h-6 flex items-center justify-center text-xs hover:bg-slate-50 border-l border-slate-200">+</button>
+                  <button @click="addToCart(item, 1)" class="w-6 h-6 flex items-center justify-center text-xs hover:bg-muted border-l border-border">+</button>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="p-6 border-t border-slate-200 space-y-6 bg-slate-50/50">
+        <div class="p-6 border-t border-border space-y-6 bg-muted">
           <!-- 优惠券选择章节 -->
           <div class="space-y-3">
-            <h3 class="text-[10px] font-bold uppercase tracking-widest text-slate-400">选择优惠券</h3>
+            <h3 class="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">选择优惠券</h3>
             <div class="space-y-2">
               <button 
                 v-for="coupon in coupons" 
@@ -162,42 +162,42 @@
                 :class="[
                   'w-full text-left p-3 border transition-all duration-200 flex flex-col gap-1',
                   selectedCouponId === coupon.id 
-                    ? 'border-slate-900 bg-slate-900 text-white' 
-                    : 'border-slate-200 bg-white text-slate-900 hover:border-slate-400',
+                    ? 'border-primary bg-primary text-primary-foreground' 
+                    : 'border-border bg-card text-foreground hover:border-primary',
                   isCouponDisabled(coupon) ? 'opacity-40 cursor-not-allowed grayscale' : 'cursor-pointer'
                 ]"
               >
                 <div class="flex justify-between items-center w-full">
                   <div class="flex items-center gap-2">
                     <span class="text-xs font-bold uppercase tracking-tight">{{ coupon.name }}</span>
-                    <span v-if="coupon.id === bestCouponId" class="px-1 py-0.5 bg-slate-100 text-slate-900 text-[8px] font-bold uppercase tracking-tighter border border-slate-900">最优方案</span>
+                    <span v-if="coupon.id === bestCouponId" class="px-1 py-0.5 bg-primary text-primary-foreground text-[8px] font-black uppercase tracking-tighter border border-primary">最优方案</span>
                   </div>
                   <span v-if="coupon.status === 'USED'" class="text-[8px] uppercase tracking-tighter opacity-70">已使用</span>
                   <span v-else-if="isCouponDisabled(coupon)" class="text-[8px] uppercase tracking-tighter opacity-70">差 ¥{{ ((coupon.minSpendCents - cartTotalPrice) / 100).toFixed(2) }} 可用</span>
                 </div>
-                <p :class="['text-[10px]', selectedCouponId === coupon.id ? 'text-slate-300' : 'text-slate-500']">{{ coupon.description }}</p>
+                <p :class="['text-[10px]', selectedCouponId === coupon.id ? 'text-primary-foreground/70' : 'text-muted-foreground']">{{ coupon.description }}</p>
               </button>
             </div>
           </div>
 
-          <div class="space-y-2 pt-4 border-t border-slate-200">
-            <div class="flex justify-between text-xs text-slate-500">
+          <div class="space-y-2 pt-4 border-t border-border">
+            <div class="flex justify-between text-xs text-muted-foreground">
               <span>商品总额</span>
               <span>¥{{ (cartTotalPrice / 100).toFixed(2) }}</span>
             </div>
-            <div v-if="couponDiscount > 0" class="flex justify-between text-xs text-red-500 font-medium">
+            <div v-if="couponDiscount > 0" class="flex justify-between text-xs text-accent font-medium">
               <span>优惠减免</span>
               <span>-¥{{ (couponDiscount / 100).toFixed(2) }}</span>
             </div>
-            <div class="flex justify-between items-end pt-2 border-t border-slate-200">
-              <span class="text-xs text-slate-900 font-bold uppercase tracking-widest">最终总额</span>
+            <div class="flex justify-between items-end pt-2 border-t border-border">
+              <span class="text-xs text-foreground font-bold uppercase tracking-widest">最终总额</span>
               <span class="font-bold text-xl">¥{{ (finalTotalPrice / 100).toFixed(2) }}</span>
             </div>
           </div>
           <button 
             @click="checkout"
             :disabled="isProcessing || cart.length === 0"
-            class="w-full py-4 bg-slate-900 text-white text-xs font-bold tracking-[0.3em] uppercase hover:bg-slate-800 disabled:bg-slate-200 disabled:text-slate-400 disabled:cursor-not-allowed transition-all"
+            class="w-full py-4 bg-primary text-primary-foreground text-xs font-bold tracking-[0.3em] uppercase hover:opacity-85 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed transition-all"
           >
             {{ isProcessing ? '处理中...' : '确认结算' }}
           </button>
@@ -206,26 +206,26 @@
     </main>
 
     <!-- 主内容区 (C 端注册) -->
-    <main v-else-if="viewMode === 'register'" class="flex-1 overflow-y-auto p-8 bg-slate-50 scrollbar-hide">
+    <main v-else-if="viewMode === 'register'" class="flex-1 overflow-y-auto p-8 bg-background scrollbar-hide">
       <div class="max-w-2xl mx-auto space-y-6">
-        <header class="border border-slate-200 bg-white p-6 flex items-center justify-between">
+        <header class="border border-border bg-card p-6 flex items-center justify-between">
           <div>
             <h2 class="text-xl font-bold mb-2">注册新账户</h2>
-            <p class="text-sm text-slate-600">手机号 + 密码即可完成注册，注册成功将自动登录</p>
+            <p class="text-sm text-muted-foreground">手机号 + 密码即可完成注册，注册成功将自动登录</p>
           </div>
-          <div class="text-sm text-slate-600">
-            已有账户？<span class="text-slate-900 underline underline-offset-4 cursor-pointer" @click="switchToLogin()">直接登录</span>
+          <div class="text-sm text-muted-foreground">
+            已有账户？<span class="text-foreground underline underline-offset-4 cursor-pointer" @click="switchToLogin()">直接登录</span>
           </div>
         </header>
 
-        <section class="border border-slate-200 bg-white p-6">
+        <section class="border border-border bg-card p-6">
           <div class="max-w-xl mx-auto">
-            <div v-if="registerSuccess" class="border border-slate-200 bg-slate-50 p-4 mb-6 text-sm">
+            <div v-if="registerSuccess" class="border border-border bg-muted p-4 mb-6 text-sm">
               <p class="font-semibold mb-1">注册成功，已自动登录</p>
-              <p class="text-slate-600">欢迎回来，{{ currentUser?.nickname }}。你可以继续结算购物车，或前往「我的订单」。</p>
+              <p class="text-muted-foreground">欢迎回来，{{ currentUser?.nickname }}。你可以继续结算购物车，或前往「我的订单」。</p>
               <div class="mt-4 flex gap-3">
-                <button @click="switchViewMode('orders')" class="border border-slate-900 bg-slate-900 text-white px-4 py-2 text-sm">查看我的订单</button>
-                <button @click="switchViewMode('store')" class="border border-slate-200 px-4 py-2 text-sm text-slate-600">返回店铺</button>
+                <button @click="switchViewMode('orders')" class="border border-primary bg-primary text-primary-foreground px-4 py-2 text-sm">查看我的订单</button>
+                <button @click="switchViewMode('store')" class="border border-border px-4 py-2 text-sm text-muted-foreground">返回店铺</button>
               </div>
             </div>
 
@@ -233,59 +233,59 @@
               <div>
                 <label class="block text-sm font-medium mb-2">手机号</label>
                 <input v-model.trim="registerForm.phone" type="tel" maxlength="11" placeholder="请输入 11 位手机号，例如 13888217536"
-                  class="w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-slate-900" />
-                <p v-if="registerErrors.phone" class="text-sm text-red-600 mt-1">{{ registerErrors.phone }}</p>
+                  class="w-full border border-border bg-muted px-3 py-2 text-sm focus:outline-none focus:border-primary" />
+                <p v-if="registerErrors.phone" class="text-sm text-accent mt-1">{{ registerErrors.phone }}</p>
               </div>
 
               <div>
                 <label class="block text-sm font-medium mb-2">昵称</label>
                 <input v-model.trim="registerForm.nickname" type="text" maxlength="20" placeholder="例如：林晓明（不填则使用默认昵称）"
-                  class="w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-slate-900" />
-                <p v-if="registerErrors.nickname" class="text-sm text-red-600 mt-1">{{ registerErrors.nickname }}</p>
+                  class="w-full border border-border bg-muted px-3 py-2 text-sm focus:outline-none focus:border-primary" />
+                <p v-if="registerErrors.nickname" class="text-sm text-accent mt-1">{{ registerErrors.nickname }}</p>
               </div>
 
               <div>
                 <label class="block text-sm font-medium mb-2">密码</label>
                 <input v-model="registerForm.password" :type="showPassword ? 'text' : 'password'" maxlength="32" placeholder="设置密码，至少 6 位"
-                  class="w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-slate-900" />
+                  class="w-full border border-border bg-muted px-3 py-2 text-sm focus:outline-none focus:border-primary" />
                 <div class="mt-1 flex items-center justify-between">
-                  <p v-if="registerErrors.password" class="text-sm text-red-600">{{ registerErrors.password }}</p>
-                  <label class="text-sm text-slate-600 cursor-pointer">
+                  <p v-if="registerErrors.password" class="text-sm text-accent">{{ registerErrors.password }}</p>
+                  <label class="text-sm text-muted-foreground cursor-pointer">
                     <input type="checkbox" v-model="showPassword" class="mr-1" /> 显示密码
                   </label>
                 </div>
               </div>
 
-              <div v-if="registerServerError" class="border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+              <div v-if="registerServerError" class="border border-accent/40 bg-accent/10 p-3 text-sm text-accent">
                 {{ registerServerError }}
                 <span v-if="registerServerError.includes('已注册')" class="underline underline-offset-4 cursor-pointer ml-1" @click="switchToLogin()">去登录</span>
               </div>
 
               <button type="submit"
-                class="w-full border border-slate-900 bg-slate-900 text-white py-2 text-sm hover:bg-slate-700">
+                class="w-full border border-primary bg-primary text-primary-foreground py-2 text-sm hover:opacity-85">
                 注册并登录
               </button>
 
-              <p class="text-xs text-slate-500">注册即表示同意平台服务条款与隐私政策。手机号将作为登录凭证，请妥善保管。</p>
+              <p class="text-xs text-muted-foreground">注册即表示同意平台服务条款与隐私政策。手机号将作为登录凭证，请妥善保管。</p>
             </form>
           </div>
         </section>
 
-        <footer class="border border-slate-200 bg-white p-6">
+        <footer class="border border-border bg-card p-6">
           <h3 class="text-sm font-semibold mb-3">已注册用户示例</h3>
           <table class="w-full text-sm">
             <thead>
-              <tr class="border-b border-slate-200 text-left text-slate-600">
+              <tr class="border-b border-border text-left text-muted-foreground">
                 <th class="py-2 pr-4 font-medium">手机号</th>
                 <th class="py-2 pr-4 font-medium">昵称</th>
                 <th class="py-2 pr-4 font-medium">状态</th>
               </tr>
             </thead>
             <tbody>
-              <tr class="border-b border-slate-200">
+              <tr class="border-b border-border">
                 <td class="py-2 pr-4">13912345678</td>
                 <td class="py-2 pr-4">陈晓芸</td>
-                <td class="py-2"><span class="text-slate-600">正常</span></td>
+                <td class="py-2"><span class="text-muted-foreground">正常</span></td>
               </tr>
             </tbody>
           </table>
@@ -294,26 +294,26 @@
     </main>
 
     <!-- 主内容区 (C 端登录) -->
-    <main v-else-if="viewMode === 'login'" class="flex-1 overflow-y-auto p-8 bg-slate-50 scrollbar-hide">
+    <main v-else-if="viewMode === 'login'" class="flex-1 overflow-y-auto p-8 bg-background scrollbar-hide">
       <div class="max-w-2xl mx-auto space-y-6">
-        <header class="border border-slate-200 bg-white p-6 flex items-center justify-between">
+        <header class="border border-border bg-card p-6 flex items-center justify-between">
           <div>
             <h2 class="text-xl font-bold mb-2">登录</h2>
-            <p class="text-sm text-slate-600">登录后可下单、查看「我的订单」，购物车将跟随你的账户</p>
+            <p class="text-sm text-muted-foreground">登录后可下单、查看「我的订单」，购物车将跟随你的账户</p>
           </div>
-          <div class="text-sm text-slate-600">
-            还没有账户？<span class="text-slate-900 underline underline-offset-4 cursor-pointer" @click="switchToRegister()">立即注册</span>
+          <div class="text-sm text-muted-foreground">
+            还没有账户？<span class="text-foreground underline underline-offset-4 cursor-pointer" @click="switchToRegister()">立即注册</span>
           </div>
         </header>
 
-        <section class="border border-slate-200 bg-white p-6">
+        <section class="border border-border bg-card p-6">
           <div class="max-w-xl mx-auto">
-            <div v-if="loginSuccess" class="border border-slate-200 bg-slate-50 p-4 mb-6 text-sm">
+            <div v-if="loginSuccess" class="border border-border bg-muted p-4 mb-6 text-sm">
               <p class="font-semibold mb-1">登录成功，{{ currentUser?.nickname }}</p>
-              <p class="text-slate-600">会话已创建并保持，刷新页面不会退出登录。购物车将跟随你的账户。</p>
+              <p class="text-muted-foreground">会话已创建并保持，刷新页面不会退出登录。购物车将跟随你的账户。</p>
               <div class="mt-4 flex gap-3">
-                <button @click="goToOrders" class="border border-slate-900 bg-slate-900 text-white px-4 py-2 text-sm">查看我的订单</button>
-                <button @click="switchViewMode('store')" class="border border-slate-200 px-4 py-2 text-sm text-slate-600">返回店铺</button>
+                <button @click="goToOrders" class="border border-primary bg-primary text-primary-foreground px-4 py-2 text-sm">查看我的订单</button>
+                <button @click="switchViewMode('store')" class="border border-border px-4 py-2 text-sm text-muted-foreground">返回店铺</button>
               </div>
             </div>
 
@@ -321,39 +321,39 @@
               <div>
                 <label class="block text-sm font-medium mb-2">手机号</label>
                 <input v-model.trim="loginForm.phone" type="tel" maxlength="11" placeholder="请输入注册手机号，例如 13888217536"
-                  class="w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-slate-900" />
-                <p v-if="loginErrors.phone" class="text-sm text-red-600 mt-1">{{ loginErrors.phone }}</p>
+                  class="w-full border border-border bg-muted px-3 py-2 text-sm focus:outline-none focus:border-primary" />
+                <p v-if="loginErrors.phone" class="text-sm text-accent mt-1">{{ loginErrors.phone }}</p>
               </div>
 
               <div>
                 <label class="block text-sm font-medium mb-2">密码</label>
                 <input v-model="loginForm.password" :type="loginShowPassword ? 'text' : 'password'" maxlength="32" placeholder="请输入密码"
-                  class="w-full border border-slate-200 bg-white px-3 py-2 text-sm focus:outline-none focus:border-slate-900" />
+                  class="w-full border border-border bg-muted px-3 py-2 text-sm focus:outline-none focus:border-primary" />
                 <div class="mt-1 flex items-center justify-between">
-                  <p class="text-sm text-slate-500">忘记密码请联系平台客服（本阶段暂不提供自助找回）</p>
-                  <label class="text-sm text-slate-600 cursor-pointer">
+                  <p class="text-sm text-muted-foreground">忘记密码请联系平台客服（本阶段暂不提供自助找回）</p>
+                  <label class="text-sm text-muted-foreground cursor-pointer">
                     <input type="checkbox" v-model="loginShowPassword" class="mr-1" /> 显示密码
                   </label>
                 </div>
               </div>
 
-              <div v-if="loginServerError" class="border border-red-200 bg-red-50 p-3 text-sm text-red-700">
+              <div v-if="loginServerError" class="border border-accent/40 bg-accent/10 p-3 text-sm text-accent">
                 {{ loginServerError }}
               </div>
 
               <button type="submit"
-                class="w-full border border-slate-900 bg-slate-900 text-white py-2 text-sm hover:bg-slate-700">
+                class="w-full border border-primary bg-primary text-primary-foreground py-2 text-sm hover:opacity-85">
                 登录
               </button>
 
-              <p class="text-xs text-slate-500">登录即创建持久会话，你可以在任意设备查看自己的订单。</p>
+              <p class="text-xs text-muted-foreground">登录即创建持久会话，你可以在任意设备查看自己的订单。</p>
             </form>
           </div>
         </section>
 
-        <footer class="border border-slate-200 bg-white p-6">
+        <footer class="border border-border bg-card p-6">
           <h3 class="text-sm font-semibold mb-3">为什么需要登录？</h3>
-          <ul class="text-sm text-slate-600 space-y-1 list-disc list-inside">
+          <ul class="text-sm text-muted-foreground space-y-1 list-disc list-inside">
             <li>订单将归属于你的账户，「我的订单」只展示你自己的订单。</li>
             <li>购物车跟随账户，换设备不丢失。</li>
             <li>未登录时无法下单与查看订单，系统会引导你先登录。</li>
@@ -363,39 +363,39 @@
     </main>
 
     <!-- 主内容区 (C 端我的订单) -->
-    <main v-else-if="viewMode === 'orders'" class="flex-1 overflow-y-auto p-8 bg-slate-50 scrollbar-hide">      <div class="max-w-3xl mx-auto space-y-6">
-        <h2 class="text-xl font-bold tracking-tight border-b-2 border-slate-900 pb-4">我的订单</h2>
+    <main v-else-if="viewMode === 'orders'" class="flex-1 overflow-y-auto p-8 bg-background scrollbar-hide">      <div class="max-w-3xl mx-auto space-y-6">
+        <h2 class="text-xl font-bold tracking-tight border-b-2 border-primary pb-4">我的订单</h2>
 
-        <section v-for="o in myOrders" :key="o.id" class="bg-white border border-slate-200">
-          <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+        <section v-for="o in myOrders" :key="o.id" class="bg-card border border-border">
+          <div class="px-6 py-4 border-b border-border flex items-center justify-between">
             <div>
-              <div class="font-mono text-sm text-slate-500">#{{ o.id }}</div>
-              <div class="text-xs text-slate-400 mt-1">{{ formatOrderTime(o.createdAt) }}</div>
+              <div class="font-mono text-sm text-muted-foreground">#{{ o.id }}</div>
+              <div class="text-xs text-muted-foreground mt-1">{{ formatOrderTime(o.createdAt) }}</div>
             </div>
             <div class="flex items-center gap-4">
-              <span class="text-xs font-bold border border-slate-200 px-2 py-1">{{ orderStatusLabel(o.status) }}</span>
-              <button @click="toggleMyOrder(o)" class="border border-slate-200 px-3 py-1 text-xs font-medium hover:bg-slate-50 transition-colors">{{ expandedMyOrderId === o.id ? '收起' : '查看详情' }}</button>
+              <span class="text-xs font-bold border border-border px-2 py-1">{{ orderStatusLabel(o.status) }}</span>
+              <button @click="toggleMyOrder(o)" class="border border-border px-3 py-1 text-xs font-medium hover:bg-muted transition-colors">{{ expandedMyOrderId === o.id ? '收起' : '查看详情' }}</button>
             </div>
           </div>
           <div class="px-6 py-3 flex items-center justify-between text-sm">
-            <span class="text-slate-700">{{ o.items[0].name }}<template v-if="o.items.length > 1"> 等 {{ o.items.reduce((n, i) => n + i.quantity, 0) }} 件</template></span>
+            <span class="text-foreground">{{ o.items[0].name }}<template v-if="o.items.length > 1"> 等 {{ o.items.reduce((n, i) => n + i.quantity, 0) }} 件</template></span>
             <span class="font-mono font-bold">¥{{ (o.actualPaidCents / 100).toFixed(2) }}</span>
           </div>
 
-          <div v-if="expandedMyOrderId === o.id" class="border-t border-slate-200 px-6 py-4 space-y-3">
+          <div v-if="expandedMyOrderId === o.id" class="border-t border-border px-6 py-4 space-y-3">
             <div class="grid grid-cols-2 gap-3 text-sm">
-              <div><span class="text-slate-500">商品总额:</span> <span class="font-mono">¥{{ (o.totalCents / 100).toFixed(2) }}</span></div>
-              <div><span class="text-slate-500">优惠券:</span> <span class="font-mono">{{ o.couponId || '无' }}</span></div>
-              <div><span class="text-slate-500">折扣:</span> <span class="font-mono">-¥{{ (o.discountCents / 100).toFixed(2) }}</span></div>
-              <div><span class="text-slate-500">实付:</span> <span class="font-mono font-bold">¥{{ (o.actualPaidCents / 100).toFixed(2) }}</span></div>
+              <div><span class="text-muted-foreground">商品总额:</span> <span class="font-mono">¥{{ (o.totalCents / 100).toFixed(2) }}</span></div>
+              <div><span class="text-muted-foreground">优惠券:</span> <span class="font-mono">{{ o.couponId || '无' }}</span></div>
+              <div><span class="text-muted-foreground">折扣:</span> <span class="font-mono">-¥{{ (o.discountCents / 100).toFixed(2) }}</span></div>
+              <div><span class="text-muted-foreground">实付:</span> <span class="font-mono font-bold">¥{{ (o.actualPaidCents / 100).toFixed(2) }}</span></div>
             </div>
-            <div class="flex items-center gap-1 text-[10px] text-slate-500 mt-2">
+            <div class="flex items-center gap-1 text-[10px] text-muted-foreground mt-2">
               <span v-for="(s, i) in ['待支付', '已支付', '已发货', '已完成']" :key="i"
-                    :class="['px-2 py-1 border', orderStep(o.status) >= i ? 'border-slate-900 text-slate-900 font-bold' : 'border-slate-200']">{{ s }}</span>
-              <span v-if="o.status === 'CANCELLED'" class="ml-2 px-2 py-1 border border-slate-900 text-slate-900 font-bold">已取消</span>
+                    :class="['px-2 py-1 border', orderStep(o.status) >= i ? 'border-primary text-foreground font-bold' : 'border-border']">{{ s }}</span>
+              <span v-if="o.status === 'CANCELLED'" class="ml-2 px-2 py-1 border border-primary text-foreground font-bold">已取消</span>
             </div>
             <div class="flex flex-col gap-1 mt-2 text-sm">
-              <div v-for="it in o.items" :key="it.productId" class="flex justify-between text-slate-600">
+              <div v-for="it in o.items" :key="it.productId" class="flex justify-between text-muted-foreground">
                 <span>{{ it.name }} × {{ it.quantity }}</span>
                 <span class="font-mono">¥{{ (it.priceCents * it.quantity / 100).toFixed(2) }}</span>
               </div>
@@ -403,135 +403,135 @@
           </div>
         </section>
 
-        <div v-if="myOrders.length === 0" class="border border-slate-200 bg-white py-12 text-center text-sm text-slate-400">暂无订单</div>
+        <div v-if="myOrders.length === 0" class="border border-border bg-card py-12 text-center text-sm text-muted-foreground">暂无订单</div>
       </div>
     </main>
 
     <!-- 主内容区 (B 端运营后台) -->
     <main v-else class="flex-1 flex overflow-hidden">
       <!-- 左侧导航 -->
-      <aside class="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0">
+      <aside class="w-64 bg-card border-r border-border flex flex-col shrink-0">
         <nav class="flex-1 py-4">
-          <div v-if="isDashboardRole" class="px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">经营分析</div>
+          <div v-if="isDashboardRole" class="px-6 py-2 text-sm font-medium text-muted-foreground uppercase tracking-wider">经营分析</div>
           <a v-if="isDashboardRole" @click="adminTab = 'dashboard'"
-             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'dashboard' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']">销售看板</a>
-          <div class="mt-8 px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">交易管理</div>
+             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'dashboard' ? 'border-primary bg-muted text-foreground font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">销售看板</a>
+          <div class="mt-8 px-6 py-2 text-sm font-medium text-muted-foreground uppercase tracking-wider">交易管理</div>
           <a @click="adminTab = 'order'"
-             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'order' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']">订单列表</a>
+             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'order' ? 'border-primary bg-muted text-foreground font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">订单列表</a>
           <a @click="adminTab = 'product'"
-             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'product' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']">商品管理</a>
+             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'product' ? 'border-primary bg-muted text-foreground font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">商品管理</a>
           <a @click="adminTab = 'category'"
-             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'category' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']">分类管理</a>
-          <div class="mt-8 px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">营销中心</div>
+             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'category' ? 'border-primary bg-muted text-foreground font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">分类管理</a>
+          <div class="mt-8 px-6 py-2 text-sm font-medium text-muted-foreground uppercase tracking-wider">营销中心</div>
           <a @click="adminTab = 'coupon'"
-             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'coupon' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']">优惠券管理</a>
+             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'coupon' ? 'border-primary bg-muted text-foreground font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">优惠券管理</a>
           <div class="mt-8">
-            <div class="px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">账户中心</div>
+            <div class="px-6 py-2 text-sm font-medium text-muted-foreground uppercase tracking-wider">账户中心</div>
             <a v-if="isOperator" @click="adminTab = 'user'"
-               :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'user' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']">用户管理</a>
-            <div v-else class="px-6 py-3 text-sm text-slate-500">
-              <span class="text-slate-400">仅运营角色可见</span>
+               :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'user' ? 'border-primary bg-muted text-foreground font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">用户管理</a>
+            <div v-else class="px-6 py-3 text-sm text-muted-foreground">
+              <span class="text-muted-foreground">仅运营角色可见</span>
             </div>
           </div>
         </nav>
       </aside>
 
       <!-- 右侧内容区 -->
-      <div class="flex-1 overflow-y-auto p-8 bg-slate-50">
+      <div class="flex-1 overflow-y-auto p-8 bg-background">
         <div class="max-w-5xl mx-auto space-y-8">
 
           <!-- ===== 销售看板 tab（sales-dashboard / data-insights BC，运营/老板角色，R-DASH-006） ===== -->
           <div v-if="adminTab === 'dashboard'">
 
             <!-- 无权限兜底：非运营/老板越权进入 -->
-            <section v-if="!isDashboardRole" class="bg-white border border-slate-200 p-8">
-              <h2 class="text-lg font-bold mb-4 border-b border-slate-200 pb-4">销售看板</h2>
-              <p class="text-sm text-slate-700">无权限访问销售看板：本入口仅「运营」与「老板」角色可见。销售数据属经营敏感信息。</p>
+            <section v-if="!isDashboardRole" class="bg-card border border-border p-8">
+              <h2 class="text-lg font-bold mb-4 border-b border-border pb-4">销售看板</h2>
+              <p class="text-sm text-foreground">无权限访问销售看板：本入口仅「运营」与「老板」角色可见。销售数据属经营敏感信息。</p>
             </section>
 
             <template v-else>
               <!-- 标题 + 时间切换（今日/近7日/近30日，默认近7日 R-DASH-008） -->
-              <section class="bg-white border border-slate-200 p-8">
+              <section class="bg-card border border-border p-8">
                 <div class="flex items-center justify-between mb-6">
                   <div>
                     <h2 class="text-lg font-bold">销售看板</h2>
-                    <p class="text-sm text-slate-500 mt-1">销售额为实付金额（actualPaidCents），优惠让利单列，不含已取消订单</p>
+                    <p class="text-sm text-muted-foreground mt-1">销售额为实付金额（actualPaidCents），优惠让利单列，不含已取消订单</p>
                   </div>
-                  <div class="flex border border-slate-200 text-sm">
+                  <div class="flex border border-border text-sm">
                     <button v-for="r in dashboardRanges" :key="r.key" @click="switchDashboardRange(r.key)"
-                            :class="['px-4 py-2 transition-colors', dashboardRange === r.key ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100']">
+                            :class="['px-4 py-2 transition-colors', dashboardRange === r.key ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:bg-muted']">
                       {{ r.label }}
                     </button>
                   </div>
                 </div>
 
-                <div v-if="dashboardError" class="border border-slate-900 bg-slate-50 px-4 py-3 text-sm text-slate-900 mb-6">{{ dashboardError }}</div>
+                <div v-if="dashboardError" class="border border-accent/40 bg-accent/10 px-4 py-3 text-sm text-accent mb-6">{{ dashboardError }}</div>
 
                 <!-- 4 指标卡（R-DASH-001~004） -->
                 <div class="grid grid-cols-4 gap-4">
-                  <div class="bg-white border border-slate-200 p-5">
-                    <div class="text-sm text-slate-500">销售额</div>
+                  <div class="bg-card border border-border p-5">
+                    <div class="text-sm text-muted-foreground">销售额</div>
                     <div class="text-2xl font-semibold mt-2">{{ formatMoney(dashboardMetrics.sales) }}</div>
                   </div>
-                  <div class="bg-white border border-slate-200 p-5">
-                    <div class="text-sm text-slate-500">订单量</div>
+                  <div class="bg-card border border-border p-5">
+                    <div class="text-sm text-muted-foreground">订单量</div>
                     <div class="text-2xl font-semibold mt-2">{{ dashboardMetrics.orders }} 单</div>
                   </div>
-                  <div class="bg-white border border-slate-200 p-5">
-                    <div class="text-sm text-slate-500">客单价</div>
+                  <div class="bg-card border border-border p-5">
+                    <div class="text-sm text-muted-foreground">客单价</div>
                     <div class="text-2xl font-semibold mt-2">{{ formatMoney(dashboardMetrics.avgOrder) }}</div>
                   </div>
-                  <div class="bg-white border border-slate-200 p-5">
-                    <div class="text-sm text-slate-500">优惠让利</div>
+                  <div class="bg-card border border-border p-5">
+                    <div class="text-sm text-muted-foreground">优惠让利</div>
                     <div class="text-2xl font-semibold mt-2">{{ formatMoney(dashboardMetrics.discount) }}</div>
                   </div>
                 </div>
               </section>
 
               <!-- 销售趋势（CSS/SVG 手写折线，零第三方图表库） -->
-              <section class="bg-white border border-slate-200 p-8">
+              <section class="bg-card border border-border p-8">
                 <div class="flex items-center justify-between mb-4">
                   <h3 class="font-medium">销售趋势（{{ currentRangeLabel }}）</h3>
-                  <span class="text-xs text-slate-500">区间合计 {{ formatMoney(trendSum) }}</span>
+                  <span class="text-xs text-muted-foreground">区间合计 {{ formatMoney(trendSum) }}</span>
                 </div>
                 <svg viewBox="0 0 560 160" class="w-full">
                   <line v-for="i in 4" :key="'g'+i" x1="0" :y1="i*32" x2="560" :y2="i*32" stroke="#e2e8f0" stroke-width="1"/>
                   <polyline :points="trendPointsStr" fill="none" stroke="#0f172a" stroke-width="2"/>
                   <circle v-for="(p, i) in trendPointsArray" :key="'c'+i" :cx="p.x" :cy="p.y" r="3" fill="#0f172a"/>
                 </svg>
-                <div class="flex justify-between text-xs text-slate-500 mt-2">
+                <div class="flex justify-between text-xs text-muted-foreground mt-2">
                   <span v-for="(d, i) in trendLabels" :key="i">{{ d }}</span>
                 </div>
               </section>
 
               <!-- 优惠券效果（R-DASH-002 / sales-dashboard coupon 口径） -->
-              <section class="bg-white border border-slate-200 p-8">
+              <section class="bg-card border border-border p-8">
                 <h3 class="font-medium mb-4">优惠券效果（{{ currentRangeLabel }}）</h3>
                 <div class="grid grid-cols-3 gap-4 text-sm">
-                  <div class="border border-slate-200 p-4">
-                    <div class="text-slate-500">优惠让利总额</div>
+                  <div class="border border-border p-4">
+                    <div class="text-muted-foreground">优惠让利总额</div>
                     <div class="text-xl font-semibold mt-1">{{ formatMoney(dashboardCoupon.discountCents) }}</div>
                   </div>
-                  <div class="border border-slate-200 p-4">
-                    <div class="text-slate-500">使用优惠券订单数</div>
+                  <div class="border border-border p-4">
+                    <div class="text-muted-foreground">使用优惠券订单数</div>
                     <div class="text-xl font-semibold mt-1">{{ dashboardCoupon.couponOrders }} 单</div>
                   </div>
-                  <div class="border border-slate-200 p-4">
-                    <div class="text-slate-500">用券订单占比</div>
+                  <div class="border border-border p-4">
+                    <div class="text-muted-foreground">用券订单占比</div>
                     <div class="text-xl font-semibold mt-1">{{ dashboardCoupon.ratio }}%</div>
                   </div>
                 </div>
               </section>
 
               <!-- 商品销售 TOP10（R-RANK-001，销售额=订单快照价汇总，含已下架商品历史订单） -->
-              <section class="bg-white border border-slate-200 p-8">
+              <section class="bg-card border border-border p-8">
                 <div class="flex items-center justify-between mb-4">
                   <h3 class="font-medium">商品销售 TOP10（{{ currentRangeLabel }}）</h3>
-                  <span class="text-xs text-slate-500">按订单快照价统计销售额，已下架商品历史订单仍计入</span>
+                  <span class="text-xs text-muted-foreground">按订单快照价统计销售额，已下架商品历史订单仍计入</span>
                 </div>
                 <table class="w-full text-sm">
                   <thead>
-                    <tr class="text-left text-slate-500 border-b border-slate-200">
+                    <tr class="text-left text-muted-foreground border-b border-border">
                       <th class="pb-3 font-medium">排名</th>
                       <th class="pb-3 font-medium">商品</th>
                       <th class="pb-3 font-medium text-right">销量</th>
@@ -539,28 +539,28 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(p, i) in rankingProductList" :key="p.productId" class="border-b border-slate-200">
+                    <tr v-for="(p, i) in rankingProductList" :key="p.productId" class="border-b border-border">
                       <td class="py-3">{{ i + 1 }}</td>
                       <td class="py-3 font-medium">{{ p.name }}</td>
                       <td class="py-3 text-right">{{ p.quantity }}</td>
                       <td class="py-3 text-right font-mono">{{ formatMoney(p.salesCents) }}</td>
                     </tr>
                     <tr v-if="rankingProductList.length === 0">
-                      <td colspan="4" class="py-8 text-center text-slate-400">当前区间暂无成交商品</td>
+                      <td colspan="4" class="py-8 text-center text-muted-foreground">当前区间暂无成交商品</td>
                     </tr>
                   </tbody>
                 </table>
               </section>
 
               <!-- 分类销售排行（R-RANK-002，含未分类行，占比合计 100%） -->
-              <section class="bg-white border border-slate-200 p-8">
+              <section class="bg-card border border-border p-8">
                 <div class="flex items-center justify-between mb-4">
                   <h3 class="font-medium">分类销售排行（{{ currentRangeLabel }}）</h3>
-                  <span class="text-xs text-slate-500">未分类商品归「未分类」行，占比合计 100%</span>
+                  <span class="text-xs text-muted-foreground">未分类商品归「未分类」行，占比合计 100%</span>
                 </div>
                 <table class="w-full text-sm">
                   <thead>
-                    <tr class="text-left text-slate-500 border-b border-slate-200">
+                    <tr class="text-left text-muted-foreground border-b border-border">
                       <th class="pb-3 font-medium">排名</th>
                       <th class="pb-3 font-medium">分类</th>
                       <th class="pb-3 font-medium text-right">销售额</th>
@@ -569,7 +569,7 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="(c, i) in rankingCategoryList" :key="String(c.categoryId)" class="border-b border-slate-200">
+                    <tr v-for="(c, i) in rankingCategoryList" :key="String(c.categoryId)" class="border-b border-border">
                       <td class="py-3">{{ i + 1 }}</td>
                       <td class="py-3 font-medium">{{ c.name }}</td>
                       <td class="py-3 text-right font-mono">{{ formatMoney(c.salesCents) }}</td>
@@ -577,7 +577,7 @@
                       <td class="py-3 text-right">{{ c.orderCount }} 单</td>
                     </tr>
                     <tr v-if="rankingCategoryList.length === 0">
-                      <td colspan="5" class="py-8 text-center text-slate-400">当前区间暂无成交数据</td>
+                      <td colspan="5" class="py-8 text-center text-muted-foreground">当前区间暂无成交数据</td>
                     </tr>
                   </tbody>
                 </table>
@@ -590,55 +590,55 @@
           <div v-if="adminTab === 'coupon'">
 
           <!-- 章节一: 新建优惠券规则 -->
-          <section class="bg-white border border-slate-200 p-8" id="create-section">
-            <h2 class="text-lg font-bold mb-6 border-b border-slate-200 pb-4">新建优惠券规则</h2>
+          <section class="bg-card border border-border p-8" id="create-section">
+            <h2 class="text-lg font-bold mb-6 border-b border-border pb-4">新建优惠券规则</h2>
             <form @submit.prevent="createCoupon" class="space-y-6">
               <div class="grid grid-cols-2 gap-6">
                 <div>
-                  <label class="block text-sm font-medium text-slate-700 mb-2">优惠券名称</label>
+                  <label class="block text-sm font-medium text-foreground mb-2">优惠券名称</label>
                   <input v-model.trim="couponForm.name" type="text" placeholder="例如: 新客专享满减券"
-                         class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                         class="w-full border border-border px-3 py-2 text-sm bg-card focus:outline-none focus:border-primary">
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-slate-700 mb-2">优惠类型</label>
-                  <div class="flex border border-slate-200">
+                  <label class="block text-sm font-medium text-foreground mb-2">优惠类型</label>
+                  <div class="flex border border-border">
                     <button type="button" @click="couponForm.type = 'FLAT'"
-                            :class="['flex-1 py-2 text-sm transition-colors', couponForm.type === 'FLAT' ? 'bg-slate-900 text-white' : 'bg-white text-slate-600']">
+                            :class="['flex-1 py-2 text-sm transition-colors', couponForm.type === 'FLAT' ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground']">
                       满减券 (FLAT)
                     </button>
                     <button type="button" @click="couponForm.type = 'PERCENTAGE'"
-                            :class="['flex-1 py-2 text-sm border-l border-slate-200 transition-colors', couponForm.type === 'PERCENTAGE' ? 'bg-slate-900 text-white' : 'bg-white text-slate-600']">
+                            :class="['flex-1 py-2 text-sm border-l border-border transition-colors', couponForm.type === 'PERCENTAGE' ? 'bg-primary text-primary-foreground' : 'bg-card text-muted-foreground']">
                       折扣券 (PERCENTAGE)
                     </button>
                   </div>
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-slate-700 mb-2">
+                  <label class="block text-sm font-medium text-foreground mb-2">
                     {{ couponForm.type === 'FLAT' ? '减免金额 (元)' : '折扣比例 (折)' }}
                   </label>
                   <input v-model="couponForm.value" type="number" step="0.1" min="0"
                          :placeholder="couponForm.type === 'FLAT' ? '例如: 20' : '例如: 9 (表示 9 折)'"
-                         class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                         class="w-full border border-border px-3 py-2 text-sm bg-card focus:outline-none focus:border-primary">
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-slate-700 mb-2">使用门槛 (满多少元可用, 0 为无门槛)</label>
+                  <label class="block text-sm font-medium text-foreground mb-2">使用门槛 (满多少元可用, 0 为无门槛)</label>
                   <input v-model="couponForm.minSpend" type="number" step="1" min="0" placeholder="例如: 100"
-                         class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                         class="w-full border border-border px-3 py-2 text-sm bg-card focus:outline-none focus:border-primary">
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-slate-700 mb-2">有效期至</label>
+                  <label class="block text-sm font-medium text-foreground mb-2">有效期至</label>
                   <input v-model="couponForm.expiryDate" type="date"
-                         class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                         class="w-full border border-border px-3 py-2 text-sm bg-card focus:outline-none focus:border-primary">
                 </div>
               </div>
 
-              <div v-if="createError" class="border border-slate-900 bg-slate-50 px-4 py-3 text-sm text-slate-900">
+              <div v-if="createError" class="border border-accent/40 bg-accent/10 px-4 py-3 text-sm text-accent">
                 {{ createError }}
               </div>
 
-              <div class="flex items-center justify-between border-t border-slate-200 pt-6">
-                <p class="text-sm text-slate-500">创建后即刻生效 (ACTIVE)，可用于发放并参与结算页最优券推荐。适用范围: 全场通用。</p>
-                <button type="submit" class="bg-slate-900 text-white px-6 py-2 text-sm font-medium hover:bg-slate-700 transition-colors">
+              <div class="flex items-center justify-between border-t border-border pt-6">
+                <p class="text-sm text-muted-foreground">创建后即刻生效 (ACTIVE)，可用于发放并参与结算页最优券推荐。适用范围: 全场通用。</p>
+                <button type="submit" class="bg-primary text-primary-foreground px-6 py-2 text-sm font-medium hover:opacity-85 transition-colors">
                   创建并生效
                 </button>
               </div>
@@ -646,14 +646,14 @@
           </section>
 
           <!-- 章节二: 优惠券列表 -->
-          <section class="bg-white border border-slate-200 p-8">
-            <div class="flex justify-between items-center mb-6 border-b border-slate-200 pb-4">
+          <section class="bg-card border border-border p-8">
+            <div class="flex justify-between items-center mb-6 border-b border-border pb-4">
               <h2 class="text-lg font-bold">优惠券列表</h2>
-              <span class="text-sm text-slate-500">共 {{ adminCoupons.length }} 条规则</span>
+              <span class="text-sm text-muted-foreground">共 {{ adminCoupons.length }} 条规则</span>
             </div>
             <table class="w-full text-sm">
               <thead>
-                <tr class="text-left text-slate-500 border-b border-slate-200">
+                <tr class="text-left text-muted-foreground border-b border-border">
                   <th class="pb-3 font-medium">名称</th>
                   <th class="pb-3 font-medium">类型</th>
                   <th class="pb-3 font-medium">优惠内容</th>
@@ -666,10 +666,10 @@
               </thead>
               <tbody>
                 <tr v-for="coupon in adminCoupons" :key="coupon.id"
-                    :class="['border-b border-slate-200', issueForm.couponId === coupon.id ? 'bg-slate-50' : '']">
+                    :class="['border-b border-border', issueForm.couponId === coupon.id ? 'bg-muted' : '']">
                   <td class="py-4 font-medium">{{ coupon.name }}</td>
                   <td class="py-4">
-                    <span class="border border-slate-200 px-2 py-1 text-xs text-slate-600">
+                    <span class="border border-border px-2 py-1 text-xs text-muted-foreground">
                       {{ coupon.type === 'FLAT' ? '满减券' : '折扣券' }}
                     </span>
                   </td>
@@ -677,12 +677,12 @@
                   <td class="py-4">{{ coupon.minSpendCents === 0 ? '无门槛' : '满 ¥' + (coupon.minSpendCents / 100) }}</td>
                   <td class="py-4 font-mono">{{ coupon.expiryDate || '—' }}</td>
                   <td class="py-4">
-                    <span class="text-xs font-bold text-slate-900">{{ statusLabel(coupon.status) }}</span>
+                    <span class="text-xs font-bold text-foreground">{{ statusLabel(coupon.status) }}</span>
                   </td>
                   <td class="py-4 font-mono">{{ coupon.issuedCount }}</td>
                   <td class="py-4 text-right">
                     <button @click="selectForIssue(coupon)"
-                            class="border border-slate-900 text-slate-900 px-4 py-1 text-sm hover:bg-slate-900 hover:text-white transition-colors">
+                            class="border border-primary text-foreground px-4 py-1 text-sm hover:bg-primary hover:text-primary-foreground transition-colors">
                       发券
                     </button>
                   </td>
@@ -692,45 +692,45 @@
           </section>
 
           <!-- 章节三: 手动单人发券 -->
-          <section class="bg-white border border-slate-200 p-8" id="issue-section">
-            <h2 class="text-lg font-bold mb-6 border-b border-slate-200 pb-4">手动发券 (单人)</h2>
+          <section class="bg-card border border-border p-8" id="issue-section">
+            <h2 class="text-lg font-bold mb-6 border-b border-border pb-4">手动发券 (单人)</h2>
 
-            <div v-if="!selectedIssueCoupon" class="border border-slate-200 bg-slate-50 px-4 py-6 text-sm text-slate-500 text-center">
+            <div v-if="!selectedIssueCoupon" class="border border-border bg-muted px-4 py-6 text-sm text-muted-foreground text-center">
               请先在上方列表中点击「发券」选择一张优惠券
             </div>
 
             <form v-else @submit.prevent="issueCoupon" class="space-y-6">
-              <div class="border border-slate-200 bg-slate-50 p-4 flex justify-between items-center">
+              <div class="border border-border bg-muted p-4 flex justify-between items-center">
                 <div>
                   <div class="font-bold">{{ selectedIssueCoupon.name }}</div>
-                  <div class="text-sm text-slate-500 mt-1">
+                  <div class="text-sm text-muted-foreground mt-1">
                     {{ selectedIssueCoupon.type === 'FLAT' ? '满减券' : '折扣券' }} ·
                     {{ formatAdminValue(selectedIssueCoupon) }} ·
                     {{ selectedIssueCoupon.minSpendCents === 0 ? '无门槛' : '满 ¥' + (selectedIssueCoupon.minSpendCents / 100) + ' 可用' }} ·
                     有效期至 {{ selectedIssueCoupon.expiryDate || '—' }}
                   </div>
                 </div>
-                <button type="button" @click="issueForm.couponId = null" class="text-sm text-slate-500 underline">重新选择</button>
+                <button type="button" @click="issueForm.couponId = null" class="text-sm text-muted-foreground underline">重新选择</button>
               </div>
 
               <div class="grid grid-cols-2 gap-6">
                 <div>
-                  <label class="block text-sm font-medium text-slate-700 mb-2">目标用户 ID</label>
+                  <label class="block text-sm font-medium text-foreground mb-2">目标用户 ID</label>
                   <input v-model.trim="issueForm.userId" type="text" placeholder="例如: user_1003"
-                         class="w-full border border-slate-200 px-3 py-2 text-sm bg-white font-mono focus:outline-none focus:border-slate-900">
-                  <p class="text-xs text-slate-500 mt-2">仅支持单人发放。同一用户重复领取同一张券将被拒绝。</p>
+                         class="w-full border border-border px-3 py-2 text-sm bg-card font-mono focus:outline-none focus:border-primary">
+                  <p class="text-xs text-muted-foreground mt-2">仅支持单人发放。同一用户重复领取同一张券将被拒绝。</p>
                 </div>
               </div>
 
-              <div v-if="issueError" class="border border-slate-900 bg-slate-50 px-4 py-3 text-sm text-slate-900">
+              <div v-if="issueError" class="border border-accent/40 bg-accent/10 px-4 py-3 text-sm text-accent">
                 {{ issueError }}
               </div>
-              <div v-if="issueSuccess" class="border border-slate-900 bg-slate-900 px-4 py-3 text-sm text-white">
+              <div v-if="issueSuccess" class="border border-success bg-success px-4 py-3 text-sm text-success-foreground">
                 {{ issueSuccess }}
               </div>
 
-              <div class="flex justify-end border-t border-slate-200 pt-6">
-                <button type="submit" class="bg-slate-900 text-white px-6 py-2 text-sm font-medium hover:bg-slate-700 transition-colors">
+              <div class="flex justify-end border-t border-border pt-6">
+                <button type="submit" class="bg-primary text-primary-foreground px-6 py-2 text-sm font-medium hover:opacity-85 transition-colors">
                   确认发放
                 </button>
               </div>
@@ -738,11 +738,11 @@
           </section>
 
           <!-- 章节四: 发放记录 -->
-          <section class="bg-white border border-slate-200 p-8">
-            <h2 class="text-lg font-bold mb-6 border-b border-slate-200 pb-4">最近发放记录</h2>
+          <section class="bg-card border border-border p-8">
+            <h2 class="text-lg font-bold mb-6 border-b border-border pb-4">最近发放记录</h2>
             <table class="w-full text-sm">
               <thead>
-                <tr class="text-left text-slate-500 border-b border-slate-200">
+                <tr class="text-left text-muted-foreground border-b border-border">
                   <th class="pb-3 font-medium">时间</th>
                   <th class="pb-3 font-medium">优惠券</th>
                   <th class="pb-3 font-medium">用户 ID</th>
@@ -752,14 +752,14 @@
               </thead>
               <tbody>
                 <tr v-if="issueLog.length === 0">
-                  <td colspan="5" class="py-6 text-center text-slate-400">暂无发放记录</td>
+                  <td colspan="5" class="py-6 text-center text-muted-foreground">暂无发放记录</td>
                 </tr>
-                <tr v-for="record in issueLog" :key="record.id" class="border-b border-slate-200">
-                  <td class="py-3 font-mono text-slate-600">{{ record.time }}</td>
+                <tr v-for="record in issueLog" :key="record.id" class="border-b border-border">
+                  <td class="py-3 font-mono text-muted-foreground">{{ record.time }}</td>
                   <td class="py-3 font-medium">{{ record.couponName }}</td>
                   <td class="py-3 font-mono">{{ record.userId }}</td>
-                  <td class="py-3 text-slate-600">{{ record.operator }}</td>
-                  <td class="py-3"><span class="text-xs font-bold text-slate-900">未使用</span></td>
+                  <td class="py-3 text-muted-foreground">{{ record.operator }}</td>
+                  <td class="py-3"><span class="text-xs font-bold text-foreground">未使用</span></td>
                 </tr>
               </tbody>
             </table>
@@ -771,14 +771,14 @@
           <div v-else-if="adminTab === 'product'">
 
             <!-- 章节一: 商品列表 -->
-            <section class="bg-white border border-slate-200 p-8">
-              <div class="flex items-center justify-between mb-6 border-b border-slate-200 pb-4">
+            <section class="bg-card border border-border p-8">
+              <div class="flex items-center justify-between mb-6 border-b border-border pb-4">
                 <h2 class="text-lg font-bold">商品列表</h2>
-                <button @click="openCreateProduct" class="bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700 transition-colors">+ 新增商品</button>
+                <button @click="openCreateProduct" class="bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:opacity-85 transition-colors">+ 新增商品</button>
               </div>
               <table class="w-full text-sm">
                 <thead>
-                  <tr class="text-left text-slate-500 border-b border-slate-200">
+                  <tr class="text-left text-muted-foreground border-b border-border">
                     <th class="pb-3 font-medium">商品</th>
                     <th class="pb-3 font-medium">价格</th>
                     <th class="pb-3 font-medium">库存</th>
@@ -787,22 +787,22 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="p in adminProducts" :key="p.id" class="border-b border-slate-200">
+                  <tr v-for="p in adminProducts" :key="p.id" class="border-b border-border">
                     <td class="py-3">
                       <div class="flex items-center space-x-3">
-                        <img :src="p.imageUrl" :alt="p.name" class="w-10 h-10 object-cover border border-slate-200 shrink-0">
+                        <img :src="p.imageUrl" :alt="p.name" class="w-10 h-10 object-cover border border-border shrink-0">
                         <div>
-                          <div class="font-medium text-slate-900">{{ p.name }}</div>
-                          <div class="text-xs text-slate-500">{{ p.description }}</div>
+                          <div class="font-medium text-foreground">{{ p.name }}</div>
+                          <div class="text-xs text-muted-foreground">{{ p.description }}</div>
                         </div>
                       </div>
                     </td>
                     <td class="py-3 font-mono">¥{{ (p.priceCents / 100).toFixed(2) }}</td>
                     <td class="py-3">{{ p.stock }}</td>
-                    <td class="py-3"><span class="text-xs font-bold text-slate-900">{{ productStatusLabel(p.status) }}</span></td>
+                    <td class="py-3"><span class="text-xs font-bold text-foreground">{{ productStatusLabel(p.status) }}</span></td>
                     <td class="py-3 text-right">
-                      <button @click="openEditProduct(p)" class="border border-slate-200 text-slate-700 px-3 py-1 text-xs font-medium hover:bg-slate-50 transition-colors">编辑</button>
-                      <button @click="pendingDeleteProduct = p" class="border border-slate-200 text-slate-700 px-3 py-1 text-xs font-medium hover:bg-slate-50 transition-colors ml-2">删除</button>
+                      <button @click="openEditProduct(p)" class="border border-border text-foreground px-3 py-1 text-xs font-medium hover:bg-muted transition-colors">编辑</button>
+                      <button @click="pendingDeleteProduct = p" class="border border-border text-foreground px-3 py-1 text-xs font-medium hover:bg-muted transition-colors ml-2">删除</button>
                     </td>
                   </tr>
                 </tbody>
@@ -810,58 +810,58 @@
             </section>
 
             <!-- 章节二: 新增 / 编辑商品 -->
-            <section class="bg-white border border-slate-200 p-8">
-              <h2 class="text-lg font-bold mb-6 border-b border-slate-200 pb-4">{{ productForm.id ? '编辑商品' : '新增商品' }}</h2>
+            <section class="bg-card border border-border p-8">
+              <h2 class="text-lg font-bold mb-6 border-b border-border pb-4">{{ productForm.id ? '编辑商品' : '新增商品' }}</h2>
               <form @submit.prevent="saveProduct" class="space-y-6">
                 <div class="grid grid-cols-2 gap-6">
                   <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">商品名称</label>
+                    <label class="block text-sm font-medium text-foreground mb-2">商品名称</label>
                     <input v-model.trim="productForm.name" type="text" placeholder="例如: 极简机械键盘"
-                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                           class="w-full border border-border px-3 py-2 text-sm bg-card focus:outline-none focus:border-primary">
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">价格（元）</label>
+                    <label class="block text-sm font-medium text-foreground mb-2">价格（元）</label>
                     <input v-model="productForm.priceYuan" type="number" step="0.01" min="0.01" placeholder="例如: 299.00"
-                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                           class="w-full border border-border px-3 py-2 text-sm bg-card focus:outline-none focus:border-primary">
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">库存</label>
+                    <label class="block text-sm font-medium text-foreground mb-2">库存</label>
                     <input v-model.number="productForm.stock" type="number" min="0" placeholder="例如: 99"
-                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                           class="w-full border border-border px-3 py-2 text-sm bg-card focus:outline-none focus:border-primary">
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">图片链接</label>
+                    <label class="block text-sm font-medium text-foreground mb-2">图片链接</label>
                     <input v-model.trim="productForm.imageUrl" type="text" placeholder="例如: https://images.unsplash.com/..."
-                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                           class="w-full border border-border px-3 py-2 text-sm bg-card focus:outline-none focus:border-primary">
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">分类</label>
-                    <select v-model="productForm.categoryId" class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                    <label class="block text-sm font-medium text-foreground mb-2">分类</label>
+                    <select v-model="productForm.categoryId" class="w-full border border-border px-3 py-2 text-sm bg-card focus:outline-none focus:border-primary">
                       <option :value="null">未分类</option>
                       <option v-for="c in activeCategories" :key="c.id" :value="c.id">{{ c.name }}</option>
                     </select>
                   </div>
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-slate-700 mb-2">商品描述</label>
+                  <label class="block text-sm font-medium text-foreground mb-2">商品描述</label>
                   <input v-model.trim="productForm.description" type="text" placeholder="例如: 84键紧凑布局，红轴"
-                         class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                         class="w-full border border-border px-3 py-2 text-sm bg-card focus:outline-none focus:border-primary">
                 </div>
-                <div v-if="productError" class="border border-slate-900 bg-slate-50 px-4 py-3 text-sm text-slate-900">{{ productError }}</div>
-                <div class="flex items-center space-x-3 border-t border-slate-200 pt-6">
-                  <button type="submit" class="bg-slate-900 text-white px-6 py-2 text-sm font-medium hover:bg-slate-700 transition-colors">{{ productForm.id ? '保存修改' : '新增商品' }}</button>
-                  <button type="button" @click="resetProductForm" class="border border-slate-200 text-slate-600 px-6 py-2 text-sm font-medium">清空</button>
+                <div v-if="productError" class="border border-accent/40 bg-accent/10 px-4 py-3 text-sm text-accent">{{ productError }}</div>
+                <div class="flex items-center space-x-3 border-t border-border pt-6">
+                  <button type="submit" class="bg-primary text-primary-foreground px-6 py-2 text-sm font-medium hover:opacity-85 transition-colors">{{ productForm.id ? '保存修改' : '新增商品' }}</button>
+                  <button type="button" @click="resetProductForm" class="border border-border text-muted-foreground px-6 py-2 text-sm font-medium">清空</button>
                 </div>
               </form>
             </section>
 
             <!-- 章节三: 删除确认 -->
-            <section v-if="pendingDeleteProduct" class="bg-white border border-slate-200 p-8">
-              <h2 class="text-lg font-bold mb-4 border-b border-slate-200 pb-4">删除确认</h2>
-              <p class="text-sm text-slate-700 mb-6">确认下架商品「<span class="font-medium text-slate-900">{{ pendingDeleteProduct.name }}</span>」吗？该商品将从 C 端商店与列表中移除，历史订单不受影响。</p>
+            <section v-if="pendingDeleteProduct" class="bg-card border border-border p-8">
+              <h2 class="text-lg font-bold mb-4 border-b border-border pb-4">删除确认</h2>
+              <p class="text-sm text-foreground mb-6">确认下架商品「<span class="font-medium text-foreground">{{ pendingDeleteProduct.name }}</span>」吗？该商品将从 C 端商店与列表中移除，历史订单不受影响。</p>
               <div class="flex items-center space-x-3">
-                <button @click="doDeleteProduct" class="bg-slate-900 text-white px-6 py-2 text-sm font-medium hover:bg-slate-700 transition-colors">确认删除（下架）</button>
-                <button @click="pendingDeleteProduct = null" class="border border-slate-200 text-slate-600 px-6 py-2 text-sm font-medium">取消</button>
+                <button @click="doDeleteProduct" class="bg-primary text-primary-foreground px-6 py-2 text-sm font-medium hover:opacity-85 transition-colors">确认删除（下架）</button>
+                <button @click="pendingDeleteProduct = null" class="border border-border text-muted-foreground px-6 py-2 text-sm font-medium">取消</button>
               </div>
             </section>
 
@@ -871,14 +871,14 @@
           <div v-else-if="adminTab === 'category'">
 
             <!-- 章节一: 分类列表 -->
-            <section class="bg-white border border-slate-200 p-8">
-              <div class="flex items-center justify-between mb-6 border-b border-slate-200 pb-4">
+            <section class="bg-card border border-border p-8">
+              <div class="flex items-center justify-between mb-6 border-b border-border pb-4">
                 <h2 class="text-lg font-bold">分类列表</h2>
-                <button @click="openCreateCategory" class="bg-slate-900 text-white px-4 py-2 text-sm font-medium hover:bg-slate-700 transition-colors">+ 新增分类</button>
+                <button @click="openCreateCategory" class="bg-primary text-primary-foreground px-4 py-2 text-sm font-medium hover:opacity-85 transition-colors">+ 新增分类</button>
               </div>
               <table class="w-full text-sm">
                 <thead>
-                  <tr class="text-left text-slate-500 border-b border-slate-200">
+                  <tr class="text-left text-muted-foreground border-b border-border">
                     <th class="pb-3 font-medium">排序</th>
                     <th class="pb-3 font-medium">分类名称</th>
                     <th class="pb-3 font-medium">商品数</th>
@@ -887,14 +887,14 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="c in adminCategories" :key="c.id" class="border-b border-slate-200">
-                    <td class="py-3 text-slate-500">{{ c.sortOrder }}</td>
-                    <td class="py-3 font-medium text-slate-900">{{ c.name }}</td>
+                  <tr v-for="c in adminCategories" :key="c.id" class="border-b border-border">
+                    <td class="py-3 text-muted-foreground">{{ c.sortOrder }}</td>
+                    <td class="py-3 font-medium text-foreground">{{ c.name }}</td>
                     <td class="py-3">{{ countByCategory(c.id) }}</td>
-                    <td class="py-3"><span class="text-xs font-bold text-slate-900">{{ c.status === 'deleted' ? '已下架' : '生效中' }}</span></td>
+                    <td class="py-3"><span class="text-xs font-bold text-foreground">{{ c.status === 'deleted' ? '已下架' : '生效中' }}</span></td>
                     <td class="py-3 text-right">
-                      <button @click="openEditCategory(c)" class="border border-slate-200 text-slate-700 px-3 py-1 text-xs font-medium hover:bg-slate-50 transition-colors">编辑</button>
-                      <button @click="pendingDeleteCategory = c" class="border border-slate-200 text-slate-700 px-3 py-1 text-xs font-medium hover:bg-slate-50 transition-colors ml-2">删除</button>
+                      <button @click="openEditCategory(c)" class="border border-border text-foreground px-3 py-1 text-xs font-medium hover:bg-muted transition-colors">编辑</button>
+                      <button @click="pendingDeleteCategory = c" class="border border-border text-foreground px-3 py-1 text-xs font-medium hover:bg-muted transition-colors ml-2">删除</button>
                     </td>
                   </tr>
                 </tbody>
@@ -902,36 +902,36 @@
             </section>
 
             <!-- 章节二: 新增/编辑分类 -->
-            <section class="bg-white border border-slate-200 p-8">
-              <h2 class="text-lg font-bold mb-6 border-b border-slate-200 pb-4">{{ categoryForm.id ? '编辑分类' : '新增分类' }}</h2>
+            <section class="bg-card border border-border p-8">
+              <h2 class="text-lg font-bold mb-6 border-b border-border pb-4">{{ categoryForm.id ? '编辑分类' : '新增分类' }}</h2>
               <form @submit.prevent="saveCategory" class="space-y-6">
                 <div class="grid grid-cols-2 gap-6">
                   <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">分类名称</label>
+                    <label class="block text-sm font-medium text-foreground mb-2">分类名称</label>
                     <input v-model.trim="categoryForm.name" type="text" placeholder="例如: 键鼠外设"
-                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                           class="w-full border border-border px-3 py-2 text-sm bg-card focus:outline-none focus:border-primary">
                   </div>
                   <div>
-                    <label class="block text-sm font-medium text-slate-700 mb-2">排序号（越小越靠前）</label>
+                    <label class="block text-sm font-medium text-foreground mb-2">排序号（越小越靠前）</label>
                     <input v-model.number="categoryForm.sortOrder" type="number" min="0" placeholder="例如: 1"
-                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                           class="w-full border border-border px-3 py-2 text-sm bg-card focus:outline-none focus:border-primary">
                   </div>
                 </div>
-                <div v-if="categoryError" class="border border-slate-900 bg-slate-50 px-4 py-3 text-sm text-slate-900">{{ categoryError }}</div>
-                <div class="flex items-center space-x-3 border-t border-slate-200 pt-6">
-                  <button type="submit" class="bg-slate-900 text-white px-6 py-2 text-sm font-medium hover:bg-slate-700 transition-colors">{{ categoryForm.id ? '保存修改' : '新增分类' }}</button>
-                  <button type="button" @click="resetCategoryForm" class="border border-slate-200 text-slate-600 px-6 py-2 text-sm font-medium">清空</button>
+                <div v-if="categoryError" class="border border-accent/40 bg-accent/10 px-4 py-3 text-sm text-accent">{{ categoryError }}</div>
+                <div class="flex items-center space-x-3 border-t border-border pt-6">
+                  <button type="submit" class="bg-primary text-primary-foreground px-6 py-2 text-sm font-medium hover:opacity-85 transition-colors">{{ categoryForm.id ? '保存修改' : '新增分类' }}</button>
+                  <button type="button" @click="resetCategoryForm" class="border border-border text-muted-foreground px-6 py-2 text-sm font-medium">清空</button>
                 </div>
               </form>
             </section>
 
             <!-- 章节三: 删除确认 -->
-            <section v-if="pendingDeleteCategory" class="bg-white border border-slate-200 p-8">
-              <h2 class="text-lg font-bold mb-4 border-b border-slate-200 pb-4">删除确认</h2>
-              <p class="text-sm text-slate-700 mb-6">确认删除分类「<span class="font-medium text-slate-900">{{ pendingDeleteCategory.name }}</span>」吗？该分类将从 C 端筛选条移除，其下 {{ countByCategory(pendingDeleteCategory.id) }} 个商品将变为「未分类」，不影响销售。</p>
+            <section v-if="pendingDeleteCategory" class="bg-card border border-border p-8">
+              <h2 class="text-lg font-bold mb-4 border-b border-border pb-4">删除确认</h2>
+              <p class="text-sm text-foreground mb-6">确认删除分类「<span class="font-medium text-foreground">{{ pendingDeleteCategory.name }}</span>」吗？该分类将从 C 端筛选条移除，其下 {{ countByCategory(pendingDeleteCategory.id) }} 个商品将变为「未分类」，不影响销售。</p>
               <div class="flex items-center space-x-3">
-                <button @click="doDeleteCategory" class="bg-slate-900 text-white px-6 py-2 text-sm font-medium hover:bg-slate-700 transition-colors">确认删除（下架）</button>
-                <button @click="pendingDeleteCategory = null" class="border border-slate-200 text-slate-600 px-6 py-2 text-sm font-medium">取消</button>
+                <button @click="doDeleteCategory" class="bg-primary text-primary-foreground px-6 py-2 text-sm font-medium hover:opacity-85 transition-colors">确认删除（下架）</button>
+                <button @click="pendingDeleteCategory = null" class="border border-border text-muted-foreground px-6 py-2 text-sm font-medium">取消</button>
               </div>
             </section>
 
@@ -941,40 +941,40 @@
           <div v-else-if="adminTab === 'user'">
 
             <!-- 无权限兜底：非运营越权进入（R-ADM-007 不返回敏感信息） -->
-            <section v-if="!isOperator" class="bg-white border border-slate-200 p-8">
-              <h2 class="text-lg font-bold mb-4 border-b border-slate-200 pb-4">用户管理</h2>
-              <p class="text-sm text-slate-700">无权限访问用户管理：仅运营角色可见。手机号等用户资料属敏感信息，客服与普通账号无法查看。</p>
-              <p v-if="!sessionToken" class="text-sm text-slate-700 mt-3">当前未登录，请先使用运营账号登录后再访问。</p>
+            <section v-if="!isOperator" class="bg-card border border-border p-8">
+              <h2 class="text-lg font-bold mb-4 border-b border-border pb-4">用户管理</h2>
+              <p class="text-sm text-foreground">无权限访问用户管理：仅运营角色可见。手机号等用户资料属敏感信息，客服与普通账号无法查看。</p>
+              <p v-if="!sessionToken" class="text-sm text-foreground mt-3">当前未登录，请先使用运营账号登录后再访问。</p>
             </section>
 
             <template v-else>
               <!-- 章节一: 检索区（R-ADM-003） -->
-              <section class="bg-white border border-slate-200 p-8">
-                <div class="flex items-end justify-between mb-6 border-b border-slate-200 pb-4">
+              <section class="bg-card border border-border p-8">
+                <div class="flex items-end justify-between mb-6 border-b border-border pb-4">
                   <div>
                     <h2 class="text-lg font-bold">用户管理</h2>
-                    <p class="text-sm text-slate-500 mt-1">查看用户基础信息与订单归属，支持按手机号 / 昵称检索。手机号属敏感信息，仅运营角色可见。</p>
+                    <p class="text-sm text-muted-foreground mt-1">查看用户基础信息与订单归属，支持按手机号 / 昵称检索。手机号属敏感信息，仅运营角色可见。</p>
                   </div>
-                  <span class="border border-slate-200 px-3 py-1 text-xs text-slate-600">当前角色：运营 · {{ currentUser?.nickname || '—' }}</span>
+                  <span class="border border-border px-3 py-1 text-xs text-muted-foreground">当前角色：运营 · {{ currentUser?.nickname || '—' }}</span>
                 </div>
                 <div class="flex gap-3 items-end">
                   <div class="flex-1">
-                    <label class="block text-sm font-medium text-slate-700 mb-2">关键词</label>
+                    <label class="block text-sm font-medium text-foreground mb-2">关键词</label>
                     <input v-model.trim="adminUserKeyword" type="text" placeholder="按手机号或昵称搜索，例如 138 或 林晓明" @keyup.enter="searchAdminUsers"
-                           class="w-full border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                           class="w-full border border-border px-3 py-2 text-sm bg-card focus:outline-none focus:border-primary">
                   </div>
-                  <button @click="searchAdminUsers" class="border border-slate-900 bg-slate-900 text-white px-6 py-2 text-sm hover:bg-slate-700">搜索</button>
-                  <button @click="resetAdminUsers" class="border border-slate-200 px-6 py-2 text-sm text-slate-600">重置</button>
+                  <button @click="searchAdminUsers" class="border border-primary bg-primary text-primary-foreground px-6 py-2 text-sm hover:opacity-85">搜索</button>
+                  <button @click="resetAdminUsers" class="border border-border px-6 py-2 text-sm text-muted-foreground">重置</button>
                 </div>
-                <p class="text-xs text-slate-500 mt-3">共 {{ adminUsers.length }} 位用户</p>
-                <div v-if="adminUserError" class="border border-slate-900 bg-slate-50 px-4 py-3 text-sm text-slate-900 mt-3">{{ adminUserError }}</div>
+                <p class="text-xs text-muted-foreground mt-3">共 {{ adminUsers.length }} 位用户</p>
+                <div v-if="adminUserError" class="border border-accent/40 bg-accent/10 px-4 py-3 text-sm text-accent mt-3">{{ adminUserError }}</div>
               </section>
 
               <!-- 章节二: 用户列表（R-ADM-002） -->
-              <section class="bg-white border border-slate-200 p-8">
+              <section class="bg-card border border-border p-8">
                 <table class="w-full text-sm">
                   <thead>
-                    <tr class="text-left text-slate-500 border-b border-slate-200">
+                    <tr class="text-left text-muted-foreground border-b border-border">
                       <th class="pb-3 pr-4 font-medium">用户 ID</th>
                       <th class="pb-3 pr-4 font-medium">昵称</th>
                       <th class="pb-3 pr-4 font-medium">手机号</th>
@@ -985,55 +985,55 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="u in adminUsers" :key="u.id" class="border-b border-slate-200">
+                    <tr v-for="u in adminUsers" :key="u.id" class="border-b border-border">
                       <td class="py-3 pr-4 font-mono text-xs">{{ u.id }}</td>
                       <td class="py-3 pr-4">{{ u.nickname }}</td>
                       <td class="py-3 pr-4 font-mono text-xs">{{ u.phone }}</td>
                       <td class="py-3 pr-4">{{ u.orderCount }}</td>
                       <td class="py-3 pr-4">{{ u.createdAt }}</td>
                       <td class="py-3 pr-4">
-                        <span class="border px-2 py-0.5 text-xs" :class="u.status === '正常' ? 'border-slate-200 text-slate-700' : 'border-slate-900 text-slate-900'">{{ u.status }}</span>
+                        <span class="border px-2 py-0.5 text-xs" :class="u.status === '正常' ? 'border-border text-foreground' : 'border-primary text-foreground'">{{ u.status }}</span>
                       </td>
                       <td class="py-3">
-                        <button @click="toggleAdminUserStatus(u)" class="text-sm underline underline-offset-4 text-slate-900">{{ u.status === '正常' ? '禁用' : '启用' }}</button>
-                        <button @click="openAdminUserDetail(u)" class="text-sm underline underline-offset-4 text-slate-600 ml-4">详情</button>
+                        <button @click="toggleAdminUserStatus(u)" class="text-sm underline underline-offset-4 text-foreground">{{ u.status === '正常' ? '禁用' : '启用' }}</button>
+                        <button @click="openAdminUserDetail(u)" class="text-sm underline underline-offset-4 text-muted-foreground ml-4">详情</button>
                       </td>
                     </tr>
                     <tr v-if="adminUsers.length === 0">
-                      <td colspan="7" class="py-8 text-center text-slate-400">暂无匹配用户</td>
+                      <td colspan="7" class="py-8 text-center text-muted-foreground">暂无匹配用户</td>
                     </tr>
                   </tbody>
                 </table>
               </section>
 
               <!-- 章节三: 用户详情（R-ADM-004 订单聚合） -->
-              <section v-if="selectedAdminUser" class="bg-white border border-slate-200 p-8">
-                <div class="flex items-center justify-between mb-6 border-b border-slate-200 pb-4">
+              <section v-if="selectedAdminUser" class="bg-card border border-border p-8">
+                <div class="flex items-center justify-between mb-6 border-b border-border pb-4">
                   <h2 class="text-lg font-bold">用户详情：{{ selectedAdminUser.nickname }}</h2>
-                  <button @click="selectedAdminUser = null" class="text-sm text-slate-600 underline underline-offset-4">关闭</button>
+                  <button @click="selectedAdminUser = null" class="text-sm text-muted-foreground underline underline-offset-4">关闭</button>
                 </div>
                 <div class="grid grid-cols-4 gap-4 text-sm mb-6">
-                  <div class="border border-slate-200 p-3">
-                    <p class="text-slate-500 mb-1">用户 ID</p>
+                  <div class="border border-border p-3">
+                    <p class="text-muted-foreground mb-1">用户 ID</p>
                     <p class="font-mono text-xs">{{ selectedAdminUser.id }}</p>
                   </div>
-                  <div class="border border-slate-200 p-3">
-                    <p class="text-slate-500 mb-1">手机号</p>
+                  <div class="border border-border p-3">
+                    <p class="text-muted-foreground mb-1">手机号</p>
                     <p class="font-mono text-xs">{{ selectedAdminUser.phone }}</p>
                   </div>
-                  <div class="border border-slate-200 p-3">
-                    <p class="text-slate-500 mb-1">注册日期</p>
+                  <div class="border border-border p-3">
+                    <p class="text-muted-foreground mb-1">注册日期</p>
                     <p>{{ selectedAdminUser.createdAt }}</p>
                   </div>
-                  <div class="border border-slate-200 p-3">
-                    <p class="text-slate-500 mb-1">累计订单</p>
+                  <div class="border border-border p-3">
+                    <p class="text-muted-foreground mb-1">累计订单</p>
                     <p>{{ selectedAdminUser.orders.length }} 笔</p>
                   </div>
                 </div>
                 <h3 class="text-sm font-semibold mb-3">该用户的订单</h3>
                 <table class="w-full text-sm">
                   <thead>
-                    <tr class="text-left text-slate-500 border-b border-slate-200">
+                    <tr class="text-left text-muted-foreground border-b border-border">
                       <th class="pb-3 pr-4 font-medium">订单号</th>
                       <th class="pb-3 pr-4 font-medium">商品</th>
                       <th class="pb-3 pr-4 font-medium">实付金额</th>
@@ -1041,14 +1041,14 @@
                     </tr>
                   </thead>
                   <tbody>
-                    <tr v-for="o in selectedAdminUser.orders" :key="o.id" class="border-b border-slate-200">
+                    <tr v-for="o in selectedAdminUser.orders" :key="o.id" class="border-b border-border">
                       <td class="py-3 pr-4 font-mono text-xs">{{ o.id }}</td>
                       <td class="py-3 pr-4">{{ (o.items || []).map(i => i.name).join('、') || '—' }}</td>
                       <td class="py-3 pr-4 font-mono">¥{{ (o.actualPaidCents / 100).toFixed(2) }}</td>
                       <td class="py-3">{{ orderStatusLabel(o.status) }}</td>
                     </tr>
                     <tr v-if="selectedAdminUser.orders.length === 0">
-                      <td colspan="4" class="py-8 text-center text-slate-400">该用户暂无订单</td>
+                      <td colspan="4" class="py-8 text-center text-muted-foreground">该用户暂无订单</td>
                     </tr>
                   </tbody>
                 </table>
@@ -1061,24 +1061,24 @@
           <div v-else>
 
             <!-- 章节一: 订单列表 -->
-            <section class="bg-white border border-slate-200 p-8">
-              <div class="flex items-center justify-between mb-6 border-b border-slate-200 pb-4">
+            <section class="bg-card border border-border p-8">
+              <div class="flex items-center justify-between mb-6 border-b border-border pb-4">
                 <h2 class="text-lg font-bold">订单列表</h2>
                 <input v-model.trim="orderKeyword" type="text" placeholder="搜索订单号 / 用户 ID..."
-                       class="w-64 border border-slate-200 px-3 py-2 text-sm bg-white focus:outline-none focus:border-slate-900">
+                       class="w-64 border border-border px-3 py-2 text-sm bg-card focus:outline-none focus:border-primary">
               </div>
 
               <!-- 状态过滤 -->
               <div class="flex items-center gap-2 mb-6 flex-wrap">
                 <button v-for="f in orderFilters" :key="f.value" @click="orderFilter = f.value"
-                        :class="['px-4 py-2 border text-sm font-medium transition-colors', orderFilter === f.value ? 'bg-slate-900 text-white' : 'bg-white border-slate-200 text-slate-600 hover:bg-slate-50']">
+                        :class="['px-4 py-2 border text-sm font-medium transition-colors', orderFilter === f.value ? 'bg-primary text-primary-foreground' : 'bg-card border-border text-muted-foreground hover:bg-muted']">
                   {{ f.label }}<span v-if="f.value !== 'ALL'" class="ml-1 text-xs opacity-60">{{ adminOrdersCount[f.value] || 0 }}</span>
                 </button>
               </div>
 
               <table class="w-full text-sm">
                 <thead>
-                  <tr class="text-left text-slate-500 border-b border-slate-200">
+                  <tr class="text-left text-muted-foreground border-b border-border">
                     <th class="pb-3 font-medium">订单号</th>
                     <th class="pb-3 font-medium">用户</th>
                     <th class="pb-3 font-medium">商品数</th>
@@ -1088,39 +1088,39 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="o in filteredAdminOrders" :key="o.id" class="border-b border-slate-200">
-                    <td class="py-3 font-mono font-medium text-slate-900">{{ o.id }}</td>
-                    <td class="py-3 font-mono text-slate-600">{{ o.userId }}</td>
+                  <tr v-for="o in filteredAdminOrders" :key="o.id" class="border-b border-border">
+                    <td class="py-3 font-mono font-medium text-foreground">{{ o.id }}</td>
+                    <td class="py-3 font-mono text-muted-foreground">{{ o.userId }}</td>
                     <td class="py-3">{{ o.items.reduce((n, i) => n + i.quantity, 0) }} 件</td>
                     <td class="py-3 font-mono">¥{{ (o.actualPaidCents / 100).toFixed(2) }}</td>
-                    <td class="py-3"><span class="text-xs font-bold border border-slate-200 px-2 py-1">{{ orderStatusLabel(o.status) }}</span></td>
+                    <td class="py-3"><span class="text-xs font-bold border border-border px-2 py-1">{{ orderStatusLabel(o.status) }}</span></td>
                     <td class="py-3 text-right">
-                      <button @click="toggleOrderDetail(o)" class="border border-slate-200 text-slate-700 px-3 py-1 text-xs font-medium hover:bg-slate-50 transition-colors">{{ expandedOrderId === o.id ? '收起' : '详情' }}</button>
-                      <button v-if="o.status === 'PENDING_PAYMENT'" @click="pendingCancelOrder = o" class="border border-slate-200 text-slate-700 px-3 py-1 text-xs font-medium hover:bg-slate-50 transition-colors ml-2">取消</button>
-                      <button v-if="o.status === 'PAID'" @click="shipOrder(o)" class="bg-slate-900 text-white px-3 py-1 text-xs font-medium ml-2">发货</button>
+                      <button @click="toggleOrderDetail(o)" class="border border-border text-foreground px-3 py-1 text-xs font-medium hover:bg-muted transition-colors">{{ expandedOrderId === o.id ? '收起' : '详情' }}</button>
+                      <button v-if="o.status === 'PENDING_PAYMENT'" @click="pendingCancelOrder = o" class="border border-border text-foreground px-3 py-1 text-xs font-medium hover:bg-muted transition-colors ml-2">取消</button>
+                      <button v-if="o.status === 'PAID'" @click="shipOrder(o)" class="bg-primary text-primary-foreground px-3 py-1 text-xs font-medium ml-2">发货</button>
                     </td>
                   </tr>
                   <tr v-if="filteredAdminOrders.length === 0">
-                    <td colspan="6" class="py-8 text-center text-slate-400">暂无订单</td>
+                    <td colspan="6" class="py-8 text-center text-muted-foreground">暂无订单</td>
                   </tr>
                 </tbody>
               </table>
             </section>
 
             <!-- 章节二: 订单详情 -->
-            <section v-if="expandedAdminOrder" class="bg-white border border-slate-200 p-8">
-              <h2 class="text-lg font-bold mb-6 border-b border-slate-200 pb-4">订单详情 #{{ expandedAdminOrder.id }}</h2>
+            <section v-if="expandedAdminOrder" class="bg-card border border-border p-8">
+              <h2 class="text-lg font-bold mb-6 border-b border-border pb-4">订单详情 #{{ expandedAdminOrder.id }}</h2>
               <div class="grid grid-cols-2 gap-6 mb-6 text-sm">
-                <div><span class="text-slate-500">用户:</span> <span class="font-mono">{{ expandedAdminOrder.userId }}</span></div>
-                <div><span class="text-slate-500">状态:</span> <span class="font-bold">{{ orderStatusLabel(expandedAdminOrder.status) }}</span></div>
-                <div><span class="text-slate-500">商品总额:</span> <span class="font-mono">¥{{ (expandedAdminOrder.totalCents / 100).toFixed(2) }}</span></div>
-                <div><span class="text-slate-500">优惠券:</span> <span class="font-mono">{{ expandedAdminOrder.couponId || '无' }}</span></div>
-                <div><span class="text-slate-500">折扣:</span> <span class="font-mono">-¥{{ (expandedAdminOrder.discountCents / 100).toFixed(2) }}</span></div>
-                <div><span class="text-slate-500">实付:</span> <span class="font-mono font-bold">¥{{ (expandedAdminOrder.actualPaidCents / 100).toFixed(2) }}</span></div>
+                <div><span class="text-muted-foreground">用户:</span> <span class="font-mono">{{ expandedAdminOrder.userId }}</span></div>
+                <div><span class="text-muted-foreground">状态:</span> <span class="font-bold">{{ orderStatusLabel(expandedAdminOrder.status) }}</span></div>
+                <div><span class="text-muted-foreground">商品总额:</span> <span class="font-mono">¥{{ (expandedAdminOrder.totalCents / 100).toFixed(2) }}</span></div>
+                <div><span class="text-muted-foreground">优惠券:</span> <span class="font-mono">{{ expandedAdminOrder.couponId || '无' }}</span></div>
+                <div><span class="text-muted-foreground">折扣:</span> <span class="font-mono">-¥{{ (expandedAdminOrder.discountCents / 100).toFixed(2) }}</span></div>
+                <div><span class="text-muted-foreground">实付:</span> <span class="font-mono font-bold">¥{{ (expandedAdminOrder.actualPaidCents / 100).toFixed(2) }}</span></div>
               </div>
-              <table class="w-full text-sm border border-slate-200">
+              <table class="w-full text-sm border border-border">
                 <thead>
-                  <tr class="bg-slate-50 text-slate-500">
+                  <tr class="bg-muted text-muted-foreground">
                     <th class="py-2 px-4 text-left font-medium">商品</th>
                     <th class="py-2 px-4 text-left font-medium">单价</th>
                     <th class="py-2 px-4 text-left font-medium">数量</th>
@@ -1128,7 +1128,7 @@
                   </tr>
                 </thead>
                 <tbody>
-                  <tr v-for="it in expandedAdminOrder.items" :key="it.productId" class="border-t border-slate-200">
+                  <tr v-for="it in expandedAdminOrder.items" :key="it.productId" class="border-t border-border">
                     <td class="py-2 px-4">{{ it.name }}</td>
                     <td class="py-2 px-4 font-mono">¥{{ (it.priceCents / 100).toFixed(2) }}</td>
                     <td class="py-2 px-4">{{ it.quantity }}</td>
@@ -1139,12 +1139,12 @@
             </section>
 
             <!-- 章节三: 取消确认 -->
-            <section v-if="pendingCancelOrder" class="bg-white border border-slate-200 p-8">
-              <h2 class="text-lg font-bold mb-4 border-b border-slate-200 pb-4">取消确认</h2>
-              <p class="text-sm text-slate-700 mb-6">确认取消订单「<span class="font-mono font-medium text-slate-900">{{ pendingCancelOrder.id }}</span>」吗？该订单未扣库存/未核销券，取消后进入「已取消」终态。</p>
+            <section v-if="pendingCancelOrder" class="bg-card border border-border p-8">
+              <h2 class="text-lg font-bold mb-4 border-b border-border pb-4">取消确认</h2>
+              <p class="text-sm text-foreground mb-6">确认取消订单「<span class="font-mono font-medium text-foreground">{{ pendingCancelOrder.id }}</span>」吗？该订单未扣库存/未核销券，取消后进入「已取消」终态。</p>
               <div class="flex items-center space-x-3">
-                <button @click="doCancelOrder" class="bg-slate-900 text-white px-6 py-2 text-sm font-medium hover:bg-slate-700 transition-colors">确认取消</button>
-                <button @click="pendingCancelOrder = null" class="border border-slate-200 text-slate-600 px-6 py-2 text-sm font-medium">返回</button>
+                <button @click="doCancelOrder" class="bg-primary text-primary-foreground px-6 py-2 text-sm font-medium hover:opacity-85 transition-colors">确认取消</button>
+                <button @click="pendingCancelOrder = null" class="border border-border text-muted-foreground px-6 py-2 text-sm font-medium">返回</button>
               </div>
             </section>
 
@@ -1155,57 +1155,57 @@
     </main>
 
     <!-- 成功通知模态框 -->
-    <div v-if="isCheckoutSuccess" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-white/80 backdrop-blur-sm">
-      <div class="w-full max-w-xs bg-white border border-slate-200 p-8 space-y-6 text-center">
+    <div v-if="isCheckoutSuccess" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+      <div class="w-full max-w-xs bg-card border border-border p-8 space-y-6 text-center">
         <!-- 成功文字标识 -->
         <div class="flex justify-center">
-          <div class="text-2xl font-black tracking-tighter text-slate-900 border-4 border-slate-900 px-2 py-1">下单成功</div>
+          <div class="text-2xl font-black tracking-tighter text-foreground border-4 border-primary px-2 py-1">下单成功</div>
         </div>
 
         <!-- 文字信息 -->
         <div class="space-y-2">
-          <h2 class="text-lg font-bold text-slate-900">订单提交成功</h2>
-          <p class="text-sm text-slate-500">感谢您的购买，我们将尽快为您发货。</p>
+          <h2 class="text-lg font-bold text-foreground">订单提交成功</h2>
+          <p class="text-sm text-muted-foreground">感谢您的购买，我们将尽快为您发货。</p>
         </div>
 
         <!-- 订单号 -->
-        <div class="py-2 px-3 bg-slate-50 border border-slate-200 border-dashed space-y-2">
+        <div class="py-2 px-3 bg-muted border border-border border-dashed space-y-2">
           <div class="flex justify-between items-center">
-            <p class="text-[10px] text-slate-400 uppercase tracking-wider">订单编号</p>
-            <p class="text-sm font-mono font-bold text-slate-900">#{{ lastOrderId }}</p>
+            <p class="text-[10px] text-muted-foreground uppercase tracking-wider">订单编号</p>
+            <p class="text-sm font-mono font-bold text-foreground">#{{ lastOrderId }}</p>
           </div>
           <div class="flex justify-between items-center">
-            <p class="text-[10px] text-slate-400 uppercase tracking-wider">订单状态</p>
-            <p class="text-sm font-bold text-slate-900">{{ orderStatusLabel(lastOrderStatus) }}</p>
+            <p class="text-[10px] text-muted-foreground uppercase tracking-wider">订单状态</p>
+            <p class="text-sm font-bold text-foreground">{{ orderStatusLabel(lastOrderStatus) }}</p>
           </div>
           <div class="flex justify-between items-center">
-            <p class="text-[10px] text-slate-400 uppercase tracking-wider">实付金额</p>
-            <p class="text-sm font-mono font-bold text-slate-900">¥{{ (lastOrderPaidCents / 100).toFixed(2) }}</p>
+            <p class="text-[10px] text-muted-foreground uppercase tracking-wider">实付金额</p>
+            <p class="text-sm font-mono font-bold text-foreground">¥{{ (lastOrderPaidCents / 100).toFixed(2) }}</p>
           </div>
         </div>
 
         <!-- 模拟支付区域 -->
         <div v-if="lastOrderStatus === 'PENDING_PAYMENT'" class="space-y-2">
-          <p class="text-xs text-slate-500">订单已创建，库存将在支付成功后扣减。</p>
+          <p class="text-xs text-muted-foreground">订单已创建，库存将在支付成功后扣减。</p>
           <button @click="payLastOrder" :disabled="payingOrder"
-                  class="w-full py-2 px-4 bg-slate-900 text-white text-sm font-bold uppercase tracking-widest hover:bg-slate-800 transition-colors disabled:opacity-50">
+                  class="w-full py-2 px-4 bg-primary text-primary-foreground text-sm font-bold uppercase tracking-widest hover:opacity-85 transition-colors disabled:opacity-50">
             {{ payingOrder ? '支付中...' : '模拟支付' }}
           </button>
-          <p v-if="payOrderError" class="text-xs text-slate-900 border border-slate-200 bg-slate-50 px-2 py-1">{{ payOrderError }}</p>
+          <p v-if="payOrderError" class="text-xs text-foreground border border-border bg-muted px-2 py-1">{{ payOrderError }}</p>
         </div>
-        <div v-else-if="lastOrderStatus === 'PAID'" class="border border-slate-200 bg-slate-50 px-4 py-3 text-sm">
+        <div v-else-if="lastOrderStatus === 'PAID'" class="border border-border bg-muted px-4 py-3 text-sm">
           已支付成功，库存已扣减，等待商家发货。
         </div>
 
         <button v-if="lastOrderStatus === 'PAID'" @click="goToMyOrders"
-                class="w-full py-2 px-4 border border-slate-900 text-slate-900 font-semibold hover:bg-slate-50 transition-colors uppercase text-xs tracking-widest">
+                class="w-full py-2 px-4 border border-primary text-foreground font-semibold hover:bg-muted transition-colors uppercase text-xs tracking-widest">
           查看订单
         </button>
 
         <!-- 操作按钮 -->
         <button 
           @click="resetCheckoutState"
-          class="w-full py-2 px-4 border border-slate-900 text-slate-900 font-semibold hover:bg-slate-50 transition-colors uppercase text-xs tracking-widest"
+          class="w-full py-2 px-4 border border-primary text-foreground font-semibold hover:bg-muted transition-colors uppercase text-xs tracking-widest"
         >
           继续购物
         </button>
