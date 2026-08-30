@@ -47,10 +47,18 @@
             background: white;
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
             margin: 40px auto;
-            padding: 40px 60px;
+            padding: 20px 40px;
             display: flex;
             flex-direction: column;
             border-radius: 12px;
+        }
+        .mermaid small {
+            font-size: 18px !important;
+            display: block;
+            margin-top: 6px;
+            line-height: 1.5;
+            color: #475569;
+            font-weight: 500;
         }
         .mermaid {
             flex-grow: 1;
@@ -58,6 +66,20 @@
             justify-content: center;
             align-items: center;
             background: transparent !important;
+            width: 100%;
+            height: 100%;
+            min-height: 0;
+        }
+        .summary-card {
+            font-size: 0.7rem;
+            line-height: 1.2;
+        }
+        .summary-card h3 {
+            font-size: 0.75rem;
+            margin-bottom: 2px;
+        }
+        .summary-card p {
+            font-size: 0.65rem;
         }
         .aidd-green { color: #00b96b; }
         .aidd-bg-green { background-color: #00b96b; }
@@ -91,31 +113,42 @@
                 <h2 class="text-3xl font-serif font-black text-slate-900">极简交付 (Minimalist Delivery)</h2>
             </div>
             <div class="text-right">
-                <p class="text-slate-400 font-mono text-sm italic">单 Change 闭环 / 快速响应管线</p>
+                <p class="text-slate-400 font-mono text-sm italic">单 Change 交付管线</p>
             </div>
         </div>
         
         <div class="mermaid">
 graph LR
-    A[探索 Explore<br/><small>/opsx:explore</small>] --> B[提案 Propose<br/><small>/opsx:propose</small>]
-    B --> C[实施 Apply<br/><small>/opsx:apply</small>]
-    C --> D[同步 Sync<br/><small>/opsx:sync</small>]
-    D --> E[归档 Archive<br/><small>/opsx:archive</small>]
+    subgraph LeadAgent [Lead Agent]
+        direction TB
+        E[归档 Archive<br/><small>Command: /opsx:archive<br/>Skill: archive-change</small>]
+    end
 
-    style A fill:#fff,stroke:#00b96b,stroke-width:2px,color:#1e293b
-    style B fill:#fff,stroke:#00b96b,stroke-width:2px,color:#1e293b
-    style C fill:#fff,stroke:#00b96b,stroke-width:2px,color:#1e293b
-    style D fill:#fff,stroke:#00b96b,stroke-width:2px,color:#1e293b
-    style E fill:#f8fafc,stroke:#94a3b8,stroke-width:2px,color:#64748b
+    subgraph EngineerAgent [Engineer Agent]
+        direction LR
+        A[探索 Explore<br/><small>Command: /opsx:explore<br/>Skill: explore</small>] ==> B[提案 Propose<br/><small>Command: /opsx:propose<br/>Skill: propose</small>]
+        B ==> C[实施 Apply<br/><small>Command: /opsx:apply<br/>Skill: apply-change</small>]
+        C ==> D[同步 Sync<br/><small>Command: /opsx:sync<br/>Skill: sync-specs</small>]
+    end
+
+    D ==> E
+
+    style A fill:#fff,stroke:#00b96b,stroke-width:6px,color:#1e293b
+    style B fill:#fff,stroke:#00b96b,stroke-width:6px,color:#1e293b
+    style C fill:#fff,stroke:#00b96b,stroke-width:6px,color:#1e293b
+    style D fill:#fff,stroke:#00b96b,stroke-width:6px,color:#1e293b
+    style E fill:#f8fafc,stroke:#94a3b8,stroke-width:6px,color:#64748b
+    style LeadAgent fill:transparent,stroke:#94a3b8,stroke-dasharray: 5 5,color:#64748b
+    style EngineerAgent fill:transparent,stroke:#00b96b,stroke-dasharray: 5 5,color:#00b96b
         </div>
 
-        <div class="mt-4 grid grid-cols-2 gap-6 text-sm">
-            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <h3 class="font-black text-aidd-green mb-1">核心价值</h3>
+        <div class="mt-2 grid grid-cols-2 gap-4 summary-card">
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <h3 class="font-black text-aidd-green uppercase">核心价值</h3>
                 <p class="text-slate-600">确立“意图 -> 规格 -> 代码”的线性转换管线，极致追求交付响应速度。</p>
             </div>
-            <div class="p-4 bg-slate-50 rounded-xl border border-slate-100">
-                <h3 class="font-black text-aidd-green mb-1">适用场景</h3>
+            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <h3 class="font-black text-aidd-green uppercase">适用场景</h3>
                 <p class="text-slate-600">单兵作战，低复杂度变更，快速验证想法。</p>
             </div>
         </div>
@@ -135,48 +168,66 @@ graph LR
         
         <div class="mermaid">
 flowchart LR
-    A([规划基线 Planning]) --> B([业务基线 Business])
-    B --> C[需求探索 Explore]
-    C --> D[方案提案 Propose]
-    
+    subgraph PMAgent [PM Agent]
+        direction TB
+        A([规划基线 Planning<br/><small>Command: /opsx:planning:*<br/>Skill: product-planning</small>])
+        C[需求探索 Explore<br/><small>Command: /req:explore<br/>Skill: explore</small>]
+        K[周期回顾 Review<br/><small>Command: /opsx:planning:product-planning<br/>Skill: product-planning</small>]
+    end
+
+    subgraph LeadAgent2 [Lead Agent]
+        direction TB
+        B([业务基线 Business<br/><small>Command: /opsx:baseline/sync<br/>Skill: blueprint</small>])
+        I[同步 Sync<br/><small>Command: /opsx:sync<br/>Skill: sync-specs</small>]
+        J([变更归档 Archive<br/><small>Command: /opsx:archive<br/>Skill: archive-change</small>])
+    end
+
+    subgraph EngineerAgent2 [Engineer Agent]
+        direction TB
+        D[方案提案 Propose<br/><small>Command: /opsx:propose<br/>Skill: propose</small>]
+    end
+
     subgraph MultiStoryLoop [Multi-Story 执行循环]
         direction TB
         E{涉及 UI?}
-        F[原型设计 Prototype]
-        G[业务故事 Story]
-        H[实施与验证]
+        F[原型设计 Prototype<br/><small>Command: /req:prototype<br/>Skill: prototype</small>]
+        G[业务故事 Story<br/><small>Command: /req:story<br/>Skill: story</small>]
+        H[实施与验证<br/><small>Command: /opsx:apply<br/>Skill: apply-change</small>]
     end
-    
-    D --> E
-    E -- 是 --> F --> G
+
+    A ==> B ==> C ==> D ==> E
+    E -- 是 --> F ==> G
     E -- 否 --> G
-    G --> H
+    G ==> H
     H -- 下一个 Story --> E
     
-    H --> I[同步 Sync]
-    I --> J([变更归档 Archive])
-    J --> K[周期回顾 Review]
+    H ==> I ==> J ==> K
     K -.-> A
 
-    style A fill:#fff,stroke:#1677ff,stroke-width:2px,color:#1e293b
-    style B fill:#fff,stroke:#1677ff,stroke-width:2px,color:#1e293b
+    style PMAgent fill:transparent,stroke:#00b96b,stroke-dasharray: 5 5
+    style LeadAgent2 fill:transparent,stroke:#94a3b8,stroke-dasharray: 5 5
+    style EngineerAgent2 fill:transparent,stroke:#1677ff,stroke-dasharray: 5 5
     style MultiStoryLoop fill:#f0f7ff,stroke:#dbeafe,stroke-dasharray: 5 5,color:#1e293b
-    style E fill:#fff,stroke:#1677ff,stroke-width:2px,color:#1e293b
-    style F fill:#fff,stroke:#1677ff,stroke-width:2px,color:#1e293b
-    style G fill:#fff,stroke:#1677ff,stroke-width:2px,color:#1e293b
-    style H fill:#fff,stroke:#1677ff,stroke-width:2px,color:#1e293b
-    style I fill:#fff,stroke:#1677ff,stroke-width:2px,color:#1e293b
-    style J fill:#f8fafc,stroke:#94a3b8,stroke-width:2px,color:#64748b
-    style K fill:#fff,stroke:#1677ff,stroke-width:2px,color:#1e293b
+    style A fill:#fff,stroke:#1677ff,stroke-width:6px,color:#1e293b
+    style B fill:#fff,stroke:#1677ff,stroke-width:6px,color:#1e293b
+    style C fill:#fff,stroke:#1677ff,stroke-width:6px,color:#1e293b
+    style D fill:#fff,stroke:#1677ff,stroke-width:6px,color:#1e293b
+    style E fill:#fff,stroke:#1677ff,stroke-width:6px,color:#1e293b
+    style F fill:#fff,stroke:#1677ff,stroke-width:6px,color:#1e293b
+    style G fill:#fff,stroke:#1677ff,stroke-width:6px,color:#1e293b
+    style H fill:#fff,stroke:#1677ff,stroke-width:6px,color:#1e293b
+    style I fill:#fff,stroke:#1677ff,stroke-width:6px,color:#1e293b
+    style J fill:#f8fafc,stroke:#94a3b8,stroke-width:6px,color:#64748b
+    style K fill:#fff,stroke:#1677ff,stroke-width:6px,color:#1e293b
         </div>
 
-        <div class="mt-4 grid grid-cols-2 gap-6 text-sm">
-            <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
-                <h3 class="font-black text-aidd-blue mb-1">基线意识</h3>
+        <div class="mt-2 grid grid-cols-2 gap-4 summary-card">
+            <div class="p-3 bg-blue-50 rounded-xl border border-blue-100">
+                <h3 class="font-black text-aidd-blue uppercase">基线意识</h3>
                 <p class="text-slate-600">引入 Planning 与 Business 基线，确保研发方向不偏离核心业务价值。</p>
             </div>
-            <div class="p-4 bg-blue-50 rounded-xl border border-blue-100">
-                <h3 class="font-black text-aidd-blue mb-1">解构交付</h3>
+            <div class="p-3 bg-blue-50 rounded-xl border border-blue-100">
+                <h3 class="font-black text-aidd-blue uppercase">解构交付</h3>
                 <p class="text-slate-600">支持将复杂变更拆分为多个 Story 循环交付，降低系统性风险。</p>
             </div>
         </div>
@@ -194,70 +245,85 @@ flowchart LR
         
         <div class="mermaid">
 flowchart LR
-    A([规划基线 Planning]) ==> B([业务基线 Business])
-    B ==> R{任务类型?}
-
-    subgraph ReqSide [需求侧 PM 主导]
+    subgraph PMAgent3 [PM Agent]
         direction TB
-        P1[需求调研 Research] --> P2[需求探索 Explore]
-        P2 --> P4{涉及 UI?}
-        P4 -- 是 --> P5[原型设计 Prototype]
-        P4 -- 否 --> P3[需求拆分 Storymap]
-        P5 --> P3
-        P3 ==> P6[业务故事 Story]
+        A([规划基线 Planning<br/><small>Command: /opsx:planning:*<br/>Skill: product-planning</small>])
+        subgraph ReqSide [需求侧 PM 主导]
+            direction TB
+            P1[需求调研 Research<br/><small>Command: /req:research<br/>Skill: research</small>] ==> P2[需求探索 Explore<br/><small>Command: /req:explore<br/>Skill: explore</small>]
+            P2 ==> P4{涉及 UI?}
+            P4 -- 是 --> P5[原型设计 Prototype<br/><small>Command: /req:prototype<br/>Skill: prototype</small>]
+            P4 -- 否 --> P3[需求拆分 Storymap<br/><small>Command: /req:storymap<br/>Skill: storymap</small>]
+            P5 ==> P3
+            P3 ==> P6[业务故事 Story<br/><small>Command: /req:story<br/>Skill: story</small>]
+        end
+        M[周期回顾 Review<br/><small>Command: /opsx:planning:product-planning<br/>Skill: product-planning</small>]
     end
 
-    subgraph HandoffZone [交接]
-        H1[handoff]
-    end
-
-    subgraph DevSide [交付侧 工程师主导]
+    subgraph LeadAgent3 [Lead Agent]
         direction TB
-        D1[提案 Proposal] --> D2[行为规格 Specs]
-        D2 --> D3[技术设计 Design]
-        D3 --> D4[实施验证 Apply/Verify]
+        B([业务基线 Business<br/><small>Command: /opsx:baseline/sync<br/>Skill: blueprint</small>])
+        R{任务类型?}
+        subgraph HandoffZone [交接]
+            H1[handoff<br/><small>Command: /req:handoff<br/>Skill: handoff</small>]
+        end
+        K1[规格同步 Spec Sync<br/><small>Command: /opsx:sync<br/>Skill: sync-specs</small>]
+        L([变更归档 Archive<br/><small>Command: /opsx:archive<br/>Skill: archive-change</small>])
+        K2[基线同步 Baseline Sync<br/><small>Command: /opsx:baseline/sync<br/>Skill: blueprint</small>]
     end
 
+    subgraph EngineerAgent3 [Engineer Agent]
+        direction TB
+        subgraph DevSide [交付侧 工程师主导]
+            direction TB
+            D1[提案 Proposal<br/><small>Command: /opsx:propose<br/>Skill: propose</small>] ==> D2[行为规格 Specs<br/><small>Command: /opsx:spec-design<br/>Skill: spec-design</small>]
+            D2 ==> D3[技术设计 Design<br/><small>Command: /opsx:spec-design<br/>Skill: spec-design</small>]
+            D3 ==> D4[实施验证 Apply/Verify<br/><small>Command: /opsx:apply & /opsx:verify<br/>Skill: apply-change & verify</small>]
+        end
+    end
+
+    A ==> B ==> R
     R -- 大块 Epic --> P1
     R -- 简单功能/修复 --> D1
 
     P6 ==> H1 ==> D1
 
-    D4 ==> K1[规格同步 Spec Sync]
-    K1 ==> L([变更归档 Archive])
+    D4 ==> K1 ==> L
 
     L -- 下一个 Story --> P6
-    L -- Epic 完成 --> K2[基线同步 Baseline Sync]
+    L -- Epic 完成 --> K2
     K2 -.-> B
-    K2 ==> M[周期回顾 Review]
-    M -.-> A
+    K2 ==> M ==> A
 
-    style A fill:#fff,stroke:#00b96b,stroke-width:2px
-    style B fill:#fff,stroke:#00b96b,stroke-width:2px
+    style PMAgent3 fill:transparent,stroke:#00b96b,stroke-dasharray: 5 5
+    style LeadAgent3 fill:transparent,stroke:#94a3b8,stroke-dasharray: 5 5
+    style EngineerAgent3 fill:transparent,stroke:#1677ff,stroke-dasharray: 5 5
+    style A fill:#fff,stroke:#00b96b,stroke-width:6px
+    style B fill:#fff,stroke:#00b96b,stroke-width:6px
     style ReqSide fill:#f6ffed,stroke:#b7eb8f,stroke-dasharray: 5 5
     style DevSide fill:#f0f7ff,stroke:#adc6ff,stroke-dasharray: 5 5
-    style HandoffZone fill:#fff,stroke:#1677ff,stroke-width:2px
-    style K1 fill:#fff,stroke:#00b96b,stroke-width:2px
-    style L fill:#f8fafc,stroke:#94a3b8,stroke-width:2px
-    style K2 fill:#fff,stroke:#00b96b,stroke-width:2px
-    style M fill:#fff,stroke:#00b96b,stroke-width:2px
+    style HandoffZone fill:#fff,stroke:#1677ff,stroke-width:6px
+    style K1 fill:#fff,stroke:#00b96b,stroke-width:6px
+    style L fill:#f8fafc,stroke:#94a3b8,stroke-width:6px
+    style K2 fill:#fff,stroke:#00b96b,stroke-width:6px
+    style M fill:#fff,stroke:#00b96b,stroke-width:6px
         </div>
 
-        <div class="mt-4 grid grid-cols-4 gap-4 text-xs">
-            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                <h3 class="font-black text-slate-900 mb-1 uppercase">01 解耦协作</h3>
+        <div class="mt-2 grid grid-cols-4 gap-4 summary-card">
+            <div class="p-2 bg-slate-50 rounded-xl border border-slate-100">
+                <h3 class="font-black text-slate-900 uppercase">01 解耦协作</h3>
                 <p class="text-slate-500">业务语义与技术实现彻底解耦。</p>
             </div>
-            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                <h3 class="font-black text-slate-900 mb-1 uppercase">02 确定性</h3>
+            <div class="p-2 bg-slate-50 rounded-xl border border-slate-100">
+                <h3 class="font-black text-slate-900 uppercase">02 确定性</h3>
                 <p class="text-slate-500">标准化工序消除需求模糊性。</p>
             </div>
-            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                <h3 class="font-black text-slate-900 mb-1 uppercase">03 资产化</h3>
+            <div class="p-2 bg-slate-50 rounded-xl border border-slate-100">
+                <h3 class="font-black text-slate-900 uppercase">03 资产化</h3>
                 <p class="text-slate-500">将研发认知持续沉淀为资产。</p>
             </div>
-            <div class="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                <h3 class="font-black text-slate-900 mb-1 uppercase">04 治理护栏</h3>
+            <div class="p-2 bg-slate-50 rounded-xl border border-slate-100">
+                <h3 class="font-black text-slate-900 uppercase">04 治理护栏</h3>
                 <p class="text-slate-500">变更受控于基线护栏。</p>
             </div>
         </div>
@@ -271,14 +337,22 @@ flowchart LR
                 primaryColor: '#ffffff',
                 primaryTextColor: '#1e293b',
                 primaryBorderColor: '#00b96b',
-                lineColor: '#cbd5e1',
+                lineColor: '#94a3b8',
                 secondaryColor: '#f8fafc',
                 tertiaryColor: '#ffffff',
-                fontFamily: 'system-ui, -apple-system, sans-serif'
+                fontFamily: 'system-ui, -apple-system, sans-serif',
+                fontSize: '32px',
+                labelFontSize: '28px',
+                subgraphFontSize: '36px',
+                clusterFontSize: '36px'
             },
             flowchart: {
                 htmlLabels: true,
-                curve: 'basis'
+                curve: 'basis',
+                useMaxWidth: true,
+                padding: 0,
+                nodeSpacing: 80,
+                rankSpacing: 120
             }
         });
     </script>

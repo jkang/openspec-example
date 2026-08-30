@@ -48,16 +48,25 @@
 
 ```mermaid
 graph LR
-    A[探索 Explore<br/><small>/opsx:explore</small>] --> B[提案 Propose<br/><small>/opsx:propose</small>]
-    B --> C[实施 Apply<br/><small>/opsx:apply</small>]
-    C --> D[同步 Sync<br/><small>/opsx:sync</small>]
-    D --> E[归档 Archive<br/><small>/opsx:archive</small>]
+    subgraph LeadAgent [Lead Agent]
+        direction LR
+        E[归档 Archive<br/><small>Command: /opsx:archive<br/>Skill: archive-change</small>]
+    end
 
-    style A fill:#fff,stroke:#00b96b,stroke-width:2px
-    style B fill:#fff,stroke:#00b96b,stroke-width:2px
-    style C fill:#fff,stroke:#00b96b,stroke-width:2px
-    style D fill:#fff,stroke:#00b96b,stroke-width:2px
-    style E fill:#f8fafc,stroke:#94a3b8,stroke-width:2px
+    subgraph EngineerAgent [Engineer Agent]
+        direction LR
+        A[探索 Explore<br/><small>Command: /opsx:explore<br/>Skill: explore</small>] ==> B[提案 Propose<br/><small>Command: /opsx:propose<br/>Skill: propose</small>]
+        B ==> C[实施 Apply<br/><small>Command: /opsx:apply<br/>Skill: apply-change</small>]
+        C ==> D[同步 Sync<br/><small>Command: /opsx:sync<br/>Skill: sync-specs</small>]
+    end
+
+    D ==> E
+
+    style A fill:#fff,stroke:#00b96b,stroke-width:4px
+    style B fill:#fff,stroke:#00b96b,stroke-width:4px
+    style C fill:#fff,stroke:#00b96b,stroke-width:4px
+    style D fill:#fff,stroke:#00b96b,stroke-width:4px
+    style E fill:#f8fafc,stroke:#94a3b8,stroke-width:4px
 ```
 
 ### 形态二：轻量产品 (Lightweight Product)
@@ -65,39 +74,54 @@ graph LR
 
 ```mermaid
 flowchart LR
-    A([规划基线 Planning]) --> B([业务基线 Business])
-    B --> C[需求探索 Explore]
-    C --> D[方案提案 Propose]
-    
+    subgraph PMAgent [PM Agent]
+        direction TB
+        A([规划基线 Planning<br/><small>Command: /opsx:planning:*<br/>Skill: product-planning</small>])
+        C[需求探索 Explore<br/><small>Command: /req:explore<br/>Skill: explore</small>]
+        K[周期回顾 Review<br/><small>Command: /opsx:planning:product-planning<br/>Skill: product-planning</small>]
+    end
+
+    subgraph LeadAgent2 [Lead Agent]
+        direction TB
+        B([业务基线 Business<br/><small>Command: /opsx:baseline/sync<br/>Skill: blueprint</small>])
+        I[同步 Sync<br/><small>Command: /opsx:sync<br/>Skill: sync-specs</small>]
+        J([变更归档 Archive<br/><small>Command: /opsx:archive<br/>Skill: archive-change</small>])
+    end
+
+    subgraph EngineerAgent2 [Engineer Agent]
+        direction TB
+        D[方案提案 Propose<br/><small>Command: /opsx:propose<br/>Skill: propose</small>]
+    end
+
     subgraph MultiStoryLoop [Multi-Story 执行循环]
         direction TB
         E{涉及 UI?}
-        F[原型设计 Prototype]
-        G[业务故事 Story]
-        H[实施与验证]
+        F[原型设计 Prototype<br/><small>Command: /req:prototype<br/>Skill: prototype</small>]
+        G[业务故事 Story<br/><small>Command: /req:story<br/>Skill: story</small>]
+        H[实施与验证<br/><small>Command: /opsx:apply<br/>Skill: apply-change</small>]
     end
-    
-    D --> E
-    E -- 是 --> F --> G
+
+    A ==> B ==> C ==> D ==> E
+    E -- 是 --> F ==> G
     E -- 否 --> G
-    G --> H
+    G ==> H
     H -- 下一个 Story --> E
     
-    H --> I[同步 Sync]
-    I --> J([变更归档 Archive])
-    J --> K[周期回顾 Review]
+    H ==> I ==> J ==> K
     K -.-> A
 
-    style A fill:#fff,stroke:#1677ff,stroke-width:2px
-    style B fill:#fff,stroke:#1677ff,stroke-width:2px
+    style A fill:#fff,stroke:#1677ff,stroke-width:4px
+    style B fill:#fff,stroke:#1677ff,stroke-width:4px
+    style C fill:#fff,stroke:#1677ff,stroke-width:4px
+    style D fill:#fff,stroke:#1677ff,stroke-width:4px
     style MultiStoryLoop fill:#f0f7ff,stroke:#dbeafe,stroke-dasharray: 5 5
-    style E fill:#fff,stroke:#1677ff,stroke-width:2px
-    style F fill:#fff,stroke:#1677ff,stroke-width:2px
-    style G fill:#fff,stroke:#1677ff,stroke-width:2px
-    style H fill:#fff,stroke:#1677ff,stroke-width:2px
-    style I fill:#fff,stroke:#1677ff,stroke-width:2px
-    style J fill:#f8fafc,stroke:#94a3b8,stroke-width:2px
-    style K fill:#fff,stroke:#1677ff,stroke-width:2px
+    style E fill:#fff,stroke:#1677ff,stroke-width:4px
+    style F fill:#fff,stroke:#1677ff,stroke-width:4px
+    style G fill:#fff,stroke:#1677ff,stroke-width:4px
+    style H fill:#fff,stroke:#1677ff,stroke-width:4px
+    style I fill:#fff,stroke:#1677ff,stroke-width:4px
+    style J fill:#f8fafc,stroke:#94a3b8,stroke-width:4px
+    style K fill:#fff,stroke:#1677ff,stroke-width:4px
 ```
 
 ### 形态三：业务产品 (Business Product)
@@ -105,53 +129,65 @@ flowchart LR
 
 ```mermaid
 flowchart LR
-    A([规划基线 Planning]) ==> B([业务基线 Business])
-    B ==> R{任务类型?}
-
-    subgraph ReqSide [需求侧 PM 主导]
+    subgraph PMAgent3 [PM Agent]
         direction TB
-        P1[需求调研 Research] --> P2[需求探索 Explore]
-        P2 --> P4{涉及 UI?}
-        P4 -- 是 --> P5[原型设计 Prototype]
-        P4 -- 否 --> P3[需求拆分 Storymap]
-        P5 --> P3
-        P3 ==> P6[业务故事 Story]
+        A([规划基线 Planning<br/><small>Command: /opsx:planning:*<br/>Skill: product-planning</small>])
+        subgraph ReqSide [需求侧 PM 主导]
+            direction TB
+            P1[需求调研 Research<br/><small>Command: /req:research<br/>Skill: research</small>] ==> P2[需求探索 Explore<br/><small>Command: /req:explore<br/>Skill: explore</small>]
+            P2 ==> P4{涉及 UI?}
+            P4 -- 是 --> P5[原型设计 Prototype<br/><small>Command: /req:prototype<br/>Skill: prototype</small>]
+            P4 -- 否 --> P3[需求拆分 Storymap<br/><small>Command: /req:storymap<br/>Skill: storymap</small>]
+            P5 ==> P3
+            P3 ==> P6[业务故事 Story<br/><small>Command: /req:story<br/>Skill: story</small>]
+        end
+        M[周期回顾 Review<br/><small>Command: /opsx:planning:product-planning<br/>Skill: product-planning</small>]
     end
 
-    subgraph HandoffZone [交接]
-        H1[handoff]
-    end
-
-    subgraph DevSide [交付侧 工程师主导]
+    subgraph LeadAgent3 [Lead Agent]
         direction TB
-        D1[提案 Proposal] --> D2[行为规格 Specs]
-        D2 --> D3[技术设计 Design]
-        D3 --> D4[实施验证 Apply/Verify]
+        B([业务基线 Business<br/><small>Command: /opsx:baseline/sync<br/>Skill: blueprint</small>])
+        R{任务类型?}
+        subgraph HandoffZone [交接]
+            H1[handoff<br/><small>Command: /req:handoff<br/>Skill: handoff</small>]
+        end
+        K1[规格同步 Spec Sync<br/><small>Command: /opsx:sync<br/>Skill: sync-specs</small>]
+        L([变更归档 Archive<br/><small>Command: /opsx:archive<br/>Skill: archive-change</small>])
+        K2[基线同步 Baseline Sync<br/><small>Command: /opsx:baseline/sync<br/>Skill: blueprint</small>]
     end
 
+    subgraph EngineerAgent3 [Engineer Agent]
+        direction TB
+        subgraph DevSide [交付侧 工程师主导]
+            direction TB
+            D1[提案 Proposal<br/><small>Command: /opsx:propose<br/>Skill: propose</small>] ==> D2[行为规格 Specs<br/><small>Command: /opsx:spec-design<br/>Skill: spec-design</small>]
+            D2 ==> D3[技术设计 Design<br/><small>Command: /opsx:spec-design<br/>Skill: spec-design</small>]
+            D3 ==> D4[实施验证 Apply/Verify<br/><small>Command: /opsx:apply & /opsx:verify<br/>Skill: apply-change & verify</small>]
+        end
+    end
+
+    A ==> B ==> R
     R -- 大块 Epic --> P1
     R -- 简单功能/修复 --> D1
 
     P6 ==> H1 ==> D1
 
-    D4 ==> K1[规格同步 Spec Sync]
-    K1 ==> L([变更归档 Archive])
+    D4 ==> K1 ==> L
 
     L -- 下一个 Story --> P6
-    L -- Epic 完成 --> K2[基线同步 Baseline Sync]
+    L -- Epic 完成 --> K2
     K2 -.-> B
-    K2 ==> M[周期回顾 Review]
-    M -.-> A
+    K2 ==> M ==> A
 
-    style A fill:#fff,stroke:#00b96b,stroke-width:2px
-    style B fill:#fff,stroke:#00b96b,stroke-width:2px
+    style A fill:#fff,stroke:#00b96b,stroke-width:4px
+    style B fill:#fff,stroke:#00b96b,stroke-width:4px
     style ReqSide fill:#f6ffed,stroke:#b7eb8f,stroke-dasharray: 5 5
     style DevSide fill:#f0f7ff,stroke:#adc6ff,stroke-dasharray: 5 5
-    style HandoffZone fill:#fff,stroke:#1677ff,stroke-width:2px
-    style K1 fill:#fff,stroke:#00b96b,stroke-width:2px
-    style L fill:#f8fafc,stroke:#94a3b8,stroke-width:2px
-    style K2 fill:#fff,stroke:#00b96b,stroke-width:2px
-    style M fill:#fff,stroke:#00b96b,stroke-width:2px
+    style HandoffZone fill:#fff,stroke:#1677ff,stroke-width:4px
+    style K1 fill:#fff,stroke:#00b96b,stroke-width:4px
+    style L fill:#f8fafc,stroke:#94a3b8,stroke-width:4px
+    style K2 fill:#fff,stroke:#00b96b,stroke-width:4px
+    style M fill:#fff,stroke:#00b96b,stroke-width:4px
 ```
 
 ---
