@@ -7,7 +7,7 @@ Feature: B 端销售总览看板（story-sales-dashboard-overview）
 
   @e2e
   Scenario: 近7日销售总览指标与订单一致
-    Given 系统存在混合销售订单数据（已支付/待支付/已取消）
+    Given 系统存在混合销售订单数据（已支付、待支付与已取消）
     And 运营陈晓芸已登录销售看板（近7日）
     When 运营请求近7日销售总览
     Then 返回状态码 200 且销售额等于已支付订单实付之和

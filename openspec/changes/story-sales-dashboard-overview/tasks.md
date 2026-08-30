@@ -25,19 +25,19 @@
 
 ## 2. 前端：销售看板视图
 
-- [ ] 2.1 App.vue 新增「销售看板」视图（导航入口仅 运营/老板 角色可见；客服/客户不显示）
-- [ ] 2.2 视图实现（对齐原型 `sales-dashboard.html`）：4 指标卡 + 时间切换（今日/近7日/近30日）+ SVG 趋势图 + 优惠券效果区；slate 极简（无圆角/无阴影/无第三方图表库）
-- [ ] 2.3 时间切换联动：`dimension` 变化 → 重新请求 API → 刷新指标卡/趋势/优惠券区；默认近7日
-- [ ] 2.4 前端极简约束验证：浏览器检查 0 圆角 / 0 阴影 / 真实中文数据 / 无占位符
+- [x] 2.1 App.vue 新增「销售看板」视图（导航入口仅 运营/老板 角色可见；客服/客户不显示）
+- [x] 2.2 视图实现（对齐原型 `sales-dashboard.html`）：4 指标卡 + 时间切换（今日/近7日/近30日）+ SVG 趋势图 + 优惠券效果区；slate 极简（无圆角/无阴影/无第三方图表库）
+- [x] 2.3 时间切换联动：`dimension` 变化 → 重新请求 API → 刷新指标卡/趋势/优惠券区；默认近7日
+- [x] 2.4 前端极简约束验证：浏览器检查 0 圆角 / 0 阴影 / 真实中文数据 / 无占位符
 
 ## 3. E2E 覆盖（新增 + 回归）
 
-- [ ] 3.1 新增 `e2e-tests/features/sales_dashboard.feature`：
+- [x] 3.1 新增 `e2e-tests/features/sales_dashboard.feature`：
   - @e2e 近7日销售总览指标与订单一致（动态构造订单数据 → 断言指标与明细一致）
   - @e2e 切换今日维度刷新指标（今日销售额 = 今日实付之和）
   - @e2e 客服角色访问看板被拒绝（403，无数据返回）
-- [ ] 3.2 新增 `e2e-tests/steps/sales_dashboard.js`（步骤命名空间化：`dashboard_` 前缀防 ambiguous）
-- [ ] 3.3 回归验证：既有 `user-admin` E2E（客服 403 用户管理）与 `smoke.feature` 主链路保持通过（requireAdmin 改造无回归）
+- [x] 3.2 新增 `e2e-tests/steps/sales_dashboard.js`（步骤命名空间化：`dashboard_` 前缀防 ambiguous）
+- [x] 3.3 回归验证：既有 `user-admin` E2E（客服 403 用户管理）与 `smoke.feature` 主链路保持通过（requireAdmin 改造无回归）
 
 ## 4. 验证与同步
 

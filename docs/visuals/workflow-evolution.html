@@ -3,264 +3,244 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OpenSpec 工作流演进 - 从极简到全治理</title>
+    <title>OpenSpec 工作流演进全景图</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script type="module">
-        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-        mermaid.initialize({ 
-            startOnLoad: true,
-            theme: 'base',
-            themeVariables: {
-                primaryColor: '#f1f5f9',
-                primaryTextColor: '#1e293b',
-                primaryBorderColor: '#cbd5e1',
-                lineColor: '#64748b',
-                secondaryColor: '#e2e8f0',
-                tertiaryColor: '#f8fafc',
-                fontSize: '14px',
-                fontFamily: 'ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif'
-            },
-            flowchart: {
-                curve: 'basis',
-                padding: 20
+    <!-- Mermaid.js -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Noto Serif SC"', 'serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    colors: {
+                        slate: {
+                            950: '#020617',
+                        }
+                    }
+                }
             }
-        });
+        }
     </script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@700&family=JetBrains+Mono:wght@400;500&display=swap');
-        
         body {
-            background-color: #f8fafc;
-            color: #334155;
-            font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
+            background-color: #020617;
+            color: #f8fafc;
         }
-        
-        h1, h2 {
-            font-family: 'Noto Serif SC', serif;
+        .mermaid {
+            background: transparent !important;
+            display: flex;
+            justify-content: center;
         }
-
-        .mermaid-card {
-            background: white;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-            transition: all 0.3s ease;
+        .card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(8px);
         }
-
-        .mermaid-card:hover {
-            box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-            border-color: #94a3b8;
+        .step-title {
+            writing-mode: vertical-rl;
+            text-orientation: mixed;
         }
-
-        .step-badge {
-            background: #f1f5f9;
-            color: #475569;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: 600;
-            border: 1px solid #e2e8f0;
+        @keyframes breathe {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.02); }
         }
-
-        .intro-gradient {
-            background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+        .breathe {
+            animation: breathe 4s ease-in-out infinite;
         }
     </style>
 </head>
-<body class="p-8 md:p-16">
-    <div class="max-w-6xl mx-auto">
-        <!-- Header -->
-        <header class="mb-16 text-center">
-            <div class="inline-block px-4 py-1 mb-4 text-xs font-bold tracking-widest uppercase bg-indigo-100 text-indigo-700 rounded-full">
-                Knowledge Asset
-            </div>
-            <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-6">OpenSpec 工作流演进全景</h1>
-            <p class="text-lg text-slate-600 max-w-2xl mx-auto">
-                从“指令驱动”到“治理驱动”，见证 AI 辅助软件工程如何通过结构化契约与分层治理，彻底解决需求漂移。
-            </p>
-        </header>
+<body class="bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 min-h-screen font-mono antialiased">
 
-        <!-- Section 1: v1.5 Minimal -->
-        <section class="mb-24">
-            <div class="flex items-center gap-4 mb-8">
-                <div class="intro-gradient text-white w-12 h-12 flex items-center justify-center rounded-lg font-bold text-xl shadow-lg">1</div>
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-800">v1.5 极简版：线性单路闭环</h2>
-                    <p class="text-slate-500">最原始的 SDD 范式，确立了“意图 -> 规格 -> 代码”的流水线。</p>
-                </div>
-            </div>
-            <div class="mermaid-card p-8 flex justify-center">
-                <div class="mermaid w-full">
-graph LR
-    E[Explore 探索] --> P[Propose 提案] --> A[Apply 实施] --> S[Sync 同步] --> Ar[Archive 归档]
+    <!-- Header -->
+    <header class="py-20 px-6 text-center relative overflow-hidden">
+        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none"></div>
+        <h1 class="text-5xl md:text-7xl font-serif font-black tracking-tight text-slate-50 mb-4">
+            OpenSpec 工作流演进全景图
+        </h1>
+        <p class="text-xl md:text-2xl text-slate-400 font-light tracking-widest uppercase">
+            从线性敏捷到解耦工程化的演进历程
+        </p>
+        <div class="mt-8 w-24 h-1 bg-slate-700 mx-auto"></div>
+    </header>
 
-    style E fill:#fff,stroke:#64748b,stroke-width:2px
-    style P fill:#fff,stroke:#64748b,stroke-width:2px
-    style A fill:#fff,stroke:#64748b,stroke-width:2px
-    style S fill:#fff,stroke:#64748b,stroke-width:2px
-    style Ar fill:#f1f5f9,stroke:#64748b,stroke-width:2px
-                </div>
-            </div>
-            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-slate-600">
-                <div class="p-4 bg-white border border-slate-100 rounded-lg">
-                    <span class="font-bold text-slate-800">核心特征</span>：单向线性流，无复杂任务分支。
-                </div>
-                <div class="p-4 bg-white border border-slate-100 rounded-lg">
-                    <span class="font-bold text-slate-800">适用场景</span>：小型项目，单人开发，需求极度明确。
-                </div>
-                <div class="p-4 bg-white border border-slate-100 rounded-lg">
-                    <span class="font-bold text-slate-800">局限性</span>：缺乏上游治理，难以处理复杂的 UI 交互与业务规则。
-                </div>
-            </div>
-        </section>
+    <main class="max-w-6xl mx-auto px-6 pb-32 space-y-32">
 
-        <!-- Section 2: Lightweight SDD -->
-        <section class="mb-24">
-            <div class="flex items-center gap-4 mb-8">
-                <div class="intro-gradient text-white w-12 h-12 flex items-center justify-center rounded-lg font-bold text-xl shadow-lg">2</div>
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-800">轻量版 SDD：多 Story 执行循环</h2>
-                    <p class="text-slate-500">引入基线概念，支持一个 Change 内包含多个 Story 的迭代。</p>
+        <!-- Section 1: v1.5 极简版 -->
+        <section class="relative">
+            <div class="flex flex-col md:flex-row gap-12 items-center">
+                <div class="flex-1 space-y-8">
+                    <div class="inline-block px-4 py-1 border border-slate-700 text-slate-500 text-sm uppercase tracking-tighter">Phase 01</div>
+                    <h2 class="text-4xl font-serif text-slate-100">v1.5 极简版：线性敏捷</h2>
+                    <div class="card border border-slate-800 p-8 rounded-none transition-all duration-500 hover:border-slate-600 hover:-translate-y-2 group">
+                        <div class="mermaid">
+                            graph LR
+                                A[Explore] --> B[Propose]
+                                B --> C[Apply]
+                                C --> D[Sync]
+                                D --> E[Archive]
+                                
+                                style A fill:#1e293b,stroke:#475569,color:#f8fafc
+                                style B fill:#1e293b,stroke:#475569,color:#f8fafc
+                                style C fill:#1e293b,stroke:#475569,color:#f8fafc
+                                style D fill:#1e293b,stroke:#475569,color:#f8fafc
+                                style E fill:#1e293b,stroke:#475569,color:#f8fafc
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="mermaid-card p-8 flex justify-center">
-                <div class="mermaid w-full">
-flowchart TD
-    A([规划基线<br/>产品定位 / 路线图])
-    B([业务基线<br/>领域模型 / 流程])
-    C[需求探索<br/>/opsx:explore]
-    D[方案提案<br/>/opsx:propose]
-    
-    subgraph MultiStoryLoop [Multi-Story 执行循环]
-        direction TB
-        E{涉及 UI 变更?}
-        F[原型设计<br/>/opsx:prototype + HITL 确认]
-        G[业务故事<br/>/opsx:story + HITL 确认]
-        H[开发实现<br/>规格设计 -> 实施 -> 验证]
-    end
-    
-    K[基线同步<br/>/opsx:sync 回流]
-    L([变更归档<br/>/opsx:archive])
-    M[周期回顾<br/>更新 Roadmap]
-
-    A ==> B
-    B ==> C
-    C ==> D
-    D ==> E
-    
-    E -- 是 --> F
-    E -- 否 --> G
-    F --> G
-    G --> H
-    
-    H -- 下一个 Story --> E
-    H ==> K
-    K -.-> B
-    K ==> L
-    L ==> M
-    M -.-> A
-
-    style A fill:#eff6ff,stroke:#2563eb,stroke-width:2px
-    style B fill:#eff6ff,stroke:#2563eb,stroke-width:2px
-    style MultiStoryLoop fill:#f8fafc,stroke:#94a3b8,stroke-dasharray: 5 5
-    style F fill:#f0fdf4,stroke:#16a34a,stroke-width:2px
-    style G fill:#f0fdf4,stroke:#16a34a,stroke-width:2px
-    style L fill:#f1f5f9,stroke:#64748b,stroke-width:2px
-                </div>
-            </div>
-            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-slate-600">
-                <div class="p-4 bg-white border border-slate-100 rounded-lg">
-                    <span class="font-bold text-slate-800">核心特征</span>：引入基线 (Baseline)，支持 Multi-Story 循环。
-                </div>
-                <div class="p-4 bg-white border border-slate-100 rounded-lg">
-                    <span class="font-bold text-slate-800">适用场景</span>：中型业务，需要频繁迭代 UI 与业务规则。
-                </div>
-                <div class="p-4 bg-white border border-slate-100 rounded-lg">
-                    <span class="font-bold text-slate-800">价值点</span>：通过 HITL (人机协同) 确保原型与业务规则的确定性。
+                <div class="w-full md:w-80 space-y-4">
+                    <div class="card p-6 border-l-4 border-slate-700">
+                        <h3 class="text-slate-100 font-bold mb-2">线性效率</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">去中心化的快速迭代，适合单兵作战或小规模尝试。</p>
+                    </div>
+                    <div class="card p-6 border-l-4 border-slate-700">
+                        <h3 class="text-slate-100 font-bold mb-2">低沟通成本</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">极简的步骤，最小化的文档负担，专注于“做”。</p>
+                    </div>
+                    <div class="card p-6 border-l-4 border-slate-700">
+                        <h3 class="text-slate-100 font-bold mb-2">快速闭环</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">从探索到归档一气呵成，变更历史清晰可追溯。</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Section 3: Full SDD -->
-        <section class="mb-24">
-            <div class="flex items-center gap-4 mb-8">
-                <div class="intro-gradient text-white w-12 h-12 flex items-center justify-center rounded-lg font-bold text-xl shadow-lg">3</div>
-                <div>
-                    <h2 class="text-2xl font-bold text-slate-800">完整版 SDD：端到端治理闭环 (v2.0)</h2>
-                    <p class="text-slate-500">需求侧与交付侧深度解耦，全链路资产化管理，支持规模化协作。</p>
+        <!-- Section 2: 轻量版 -->
+        <section class="relative">
+            <div class="flex flex-col md:flex-row-reverse gap-12 items-center">
+                <div class="flex-1 space-y-8 text-right md:text-left">
+                    <div class="inline-block px-4 py-1 border border-slate-700 text-slate-500 text-sm uppercase tracking-tighter">Phase 02</div>
+                    <h2 class="text-4xl font-serif text-slate-100">轻量版：基线与循环</h2>
+                    <div class="card border border-slate-800 p-8 rounded-none transition-all duration-500 hover:border-slate-600 hover:-translate-y-2">
+                        <div class="mermaid">
+                            flowchart TD
+                                A[Baseline] --> B[Explore]
+                                B --> C[Propose]
+                                C --> D{Multi-Story?}
+                                D -- Yes --> B
+                                D -- No --> E[Sync]
+                                E --> F[Archive]
+
+                                style A fill:#1e293b,stroke:#475569,color:#f8fafc
+                                style B fill:#1e293b,stroke:#475569,color:#f8fafc
+                                style C fill:#1e293b,stroke:#475569,color:#f8fafc
+                                style D fill:#334155,stroke:#64748b,color:#f8fafc
+                                style E fill:#1e293b,stroke:#475569,color:#f8fafc
+                                style F fill:#1e293b,stroke:#475569,color:#f8fafc
+                        </div>
+                    </div>
                 </div>
-            </div>
-            <div class="mermaid-card p-8 flex justify-center">
-                <div class="mermaid w-full">
-flowchart TD
-    A([规划基线<br/>/opsx:planning:*])
-    B([业务基线<br/>/opsx:baseline/sync])
-    R{任务路由?}
-
-    subgraph ReqSide [需求侧 · PM 主导]
-        direction TB
-        P1[需求调研]
-        P2[探索]
-        P4{UI?}
-        P5[原型设计]
-        P3[需求拆分]
-        P6[Story 交付物]
-    end
-
-    subgraph Handoff [交接边界]
-        H1[handoff<br/>合成提案]
-    end
-
-    subgraph DevSide [交付侧 · Engineer 主导]
-        direction TB
-        D1[提案]
-        D2[行为规格]
-        D3[设计]
-        D4[实施与验证]
-    end
-
-    K1[Spec Sync]
-    L([归档])
-    K2[Baseline Sync]
-    M[周期回顾]
-
-    A ==> B
-    B ==> R
-    R -- 大块 Epic --> P1
-    R -- 简单任务 --> D1
-    P1 ==> P2 ==> P4
-    P4 -- 是 --> P5 --> P3
-    P4 -- 否 --> P3
-    P3 ==> P6 ==> H1 ==> D1
-    D1 ==> D2 ==> D3 ==> D4 ==> K1 ==> L
-    L -- 循环 --> P6
-    L -- 结束 --> K2 -.-> B
-    K2 ==> M -.-> A
-
-    style ReqSide fill:#f0fdf4,stroke:#16a34a,stroke-dasharray: 5 5
-    style DevSide fill:#f5f3ff,stroke:#7c3aed,stroke-dasharray: 5 5
-    style Handoff fill:#fffbeb,stroke:#d97706,stroke-dasharray: 5 5
-    style A fill:#eff6ff,stroke:#2563eb,stroke-width:2px
-    style B fill:#eff6ff,stroke:#2563eb,stroke-width:2px
-                </div>
-            </div>
-            <div class="mt-4 grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-slate-600">
-                <div class="p-4 bg-white border border-slate-100 rounded-lg">
-                    <span class="font-bold text-slate-800">核心特征</span>：两侧解耦（Req/Dev），全漏斗覆盖，分层同步。
-                </div>
-                <div class="p-4 bg-white border border-slate-100 rounded-lg">
-                    <span class="font-bold text-slate-800">适用场景</span>：复杂企业级业务，多 Epic 并行，高成熟度团队。
-                </div>
-                <div class="p-4 bg-white border border-slate-100 rounded-lg">
-                    <span class="font-bold text-slate-800">终极价值</span>：需求资产随开发自然沉淀，基线稳固演进，彻底解决 Blocker。
+                <div class="w-full md:w-80 space-y-4">
+                    <div class="card p-6 border-r-4 md:border-r-0 md:border-l-4 border-slate-600">
+                        <h3 class="text-slate-100 font-bold mb-2">基线意识</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">引入业务蓝图与领域模型，确保开发方向不偏离核心价值。</p>
+                    </div>
+                    <div class="card p-6 border-r-4 md:border-r-0 md:border-l-4 border-slate-600">
+                        <h3 class="text-slate-100 font-bold mb-2">循环迭代</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">通过 Multi-Story 循环，处理复杂的业务逻辑分解。</p>
+                    </div>
+                    <div class="card p-6 border-r-4 md:border-r-0 md:border-l-4 border-slate-600">
+                        <h3 class="text-slate-100 font-bold mb-2">多故事管理</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">在同一个 Epic 下进行多个 Story 的编排与交付。</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <!-- Footer -->
-        <footer class="mt-32 pt-8 border-t border-slate-200 text-center text-slate-400 text-xs">
-            <p>© 2026 OpenSpec Practice - 规格驱动开发实战</p>
-        </footer>
-    </div>
+        <!-- Section 3: v2.0 完整版 -->
+        <section class="relative">
+            <div class="space-y-12">
+                <div class="text-center space-y-4">
+                    <div class="inline-block px-4 py-1 border border-slate-700 text-slate-500 text-sm uppercase tracking-tighter">Final Evolution</div>
+                    <h2 class="text-5xl font-serif text-slate-100">v2.0 完整版：解耦与规格驱动</h2>
+                </div>
+                
+                <div class="card border border-slate-800 p-12 rounded-none transition-all duration-700 hover:border-slate-500">
+                    <div class="mermaid">
+                        flowchart TD
+                            subgraph Req[需求侧 / Requirement Funnel]
+                                R1[Research] --> R2[Explore]
+                                R2 --> R3[Prototype]
+                                R3 --> R4[Storymap]
+                                R4 --> R5[Story]
+                            end
+
+                            R5 --> H[Handoff / 交接点]
+
+                            H --> D1[Proposal]
+
+                            subgraph Del[交付侧 / Delivery Execution]
+                                D1 --> D2[Design]
+                                D2 --> D3[Tasks]
+                                D3 --> D4[Apply]
+                            end
+
+                            D4 --> S1{Sync}
+                            S1 -- Spec Sync --> D1
+                            S1 -- Baseline Sync --> A[Archive]
+
+                            style Req fill:transparent,stroke:#334155,stroke-dasharray: 5 5,color:#94a3b8
+                            style Del fill:transparent,stroke:#334155,stroke-dasharray: 5 5,color:#94a3b8
+                            style H fill:#475569,stroke:#94a3b8,color:#f8fafc
+                            style S1 fill:#334155,stroke:#64748b,color:#f8fafc
+                            style A fill:#0f172a,stroke:#475569,color:#64748b
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="card p-8 border-t-2 border-slate-500">
+                        <div class="text-slate-500 text-xs mb-4">01</div>
+                        <h3 class="text-slate-100 font-black text-xl mb-4 font-serif">需求/交付解耦</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed italic">将业务探索与技术实现完全分离，实现 PM 与工程师的高并发并行协作。</p>
+                    </div>
+                    <div class="card p-8 border-t-2 border-slate-500">
+                        <div class="text-slate-500 text-xs mb-4">02</div>
+                        <h3 class="text-slate-100 font-black text-xl mb-4 font-serif">规格驱动 (SDD)</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed italic">所有的代码变更必须基于明确的 Specs 规格，确保代码即规范，规范即文档。</p>
+                    </div>
+                    <div class="card p-8 border-t-2 border-slate-500">
+                        <div class="text-slate-500 text-xs mb-4">03</div>
+                        <h3 class="text-slate-100 font-black text-xl mb-4 font-serif">分层 Sync 机制</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed italic">区分 Change 级的 Spec Sync 和 Epic 级的 Baseline Sync，保持认知的持续对齐。</p>
+                    </div>
+                    <div class="card p-8 border-t-2 border-slate-500">
+                        <div class="text-slate-500 text-xs mb-4">04</div>
+                        <h3 class="text-slate-100 font-black text-xl mb-4 font-serif">Handoff 契约</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed italic">明确的交接节点，将业务愿景转化为可执行的工程提案，杜绝模糊需求进入开发阶段。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-20 border-t border-slate-900 text-center">
+        <p class="text-slate-600 text-sm tracking-widest">
+            POWERED BY OPEN SPECIFICATION FRAMEWORK V2.0 &copy; 2026
+        </p>
+    </footer>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#1e293b',
+                primaryTextColor: '#f8fafc',
+                primaryBorderColor: '#475569',
+                lineColor: '#94a3b8',
+                secondaryColor: '#334155',
+                tertiaryColor: '#0f172a',
+                fontFamily: 'JetBrains Mono'
+            }
+        });
+    </script>
 </body>
 </html>

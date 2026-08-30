@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C端 / B端 入口导航信息架构 - 极简电商</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <style>
+        * { border-radius: 0 !important; box-shadow: none !important; }
+        body { background-color: #f8fafc; color: #0f172a; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        .border-slate-200 { border-color: #e2e8f0; }
+        input:focus, select:focus { outline: none; border-color: #0f172a; }
+    </style>
+</head>
+<body class="min-h-screen">
+    <div id="app" class="min-h-screen flex flex-col">
+        <!-- 视图切换（原型演示用） -->
+        <div class="border-b border-slate-200 bg-white px-8 py-2 flex items-center gap-3">
+            <span class="text-xs text-slate-500">原型演示：</span>
+            <button @click="view = 'store'" :class="['px-3 py-1 text-xs font-bold border', view === 'store' ? 'bg-slate-900 text-white border-slate-900' : 'border-slate-200 text-slate-600']">C 端店铺视图</button>
+            <button @click="view = 'admin'" :class="['px-3 py-1 text-xs font-bold border', view === 'admin' ? 'bg-slate-900 text-white border-slate-900' : 'border-slate-200 text-slate-600']">B 端运营后台视图</button>
+            <select v-model="demoRole" class="text-xs border border-slate-200 px-2 py-1 bg-white">
+                <option value="operator">运营角色 (陈晓芸)</option>
+                <option value="customer">顾客角色 (持久化测试)</option>
+                <option value="guest">未登录</option>
+            </select>
+        </div>
+
+        <!-- ============ C 端店铺视图 ============ -->
+        <div v-if="view === 'store'">
+            <!-- C 端 header：仅顾客操作 + 独立"运营后台"入口 -->
+            <header class="h-16 border-b border-slate-200 flex items-center justify-between px-8 bg-white z-10">
+                <div class="flex items-center gap-2">
+                    <div class="w-8 h-8 bg-slate-900 flex items-center justify-center text-white text-xs font-bold">M</div>
+                    <h1 class="text-lg font-semibold tracking-tight uppercase">Minimal Store</h1>
+                </div>
+
+                <div class="flex-1 max-w-md mx-8 relative">
+                    <input v-model="searchQuery" type="text" placeholder="搜索商品..." class="w-full px-4 py-2 bg-slate-50 border border-slate-200 text-sm focus:outline-none focus:border-slate-400">
+                </div>
+
+                <div class="flex items-center gap-3 text-sm font-medium">
+                    <button @click="isCartOpen = !isCartOpen" class="relative py-1 px-2 border border-slate-200 hover:bg-slate-50">
+                        购物车
+                        <span v-if="cartTotal > 0" class="absolute -top-1 -right-1 w-4 h-4 bg-slate-900 text-white text-[10px] flex items-center justify-center">{{ cartTotal }}</span>
+                    </button>
+                    <button @click="view = 'orders'" class="py-1 px-2 border border-slate-200 hover:bg-slate-50">我的订单</button>
+
+                    <!-- 未登录：注册/登录 -->
+                    <template v-if="!currentUser">
+                        <button @click="view = 'login'" class="py-1 px-2 border border-slate-900 bg-slate-900 text-white hover:bg-slate-700">登录 / 注册</button>
+                    </template>
+                    <!-- 已登录：昵称 + 退出 -->
+                    <template v-else>
+                        <span class="text-sm text-slate-600">{{ currentUser.nickname }}</span>
+                        <button @click="currentUser = null" class="py-1 px-2 border border-slate-900 bg-slate-900 text-white hover:bg-slate-700">退出登录</button>
+                    </template>
+
+                    <!-- 独立的"运营后台"入口按钮（不再是店铺|运营后台分段切换） -->
+                    <button @click="view = 'admin'" class="py-1 px-2 border border-slate-200 text-slate-600 hover:bg-slate-50">运营后台</button>
+                </div>
+            </header>
+
+            <!-- C 端主内容 -->
+            <main class="p-8 bg-slate-50 min-h-[calc(100vh-6rem)]">
+                <div class="text-sm text-slate-500 mb-4">当前路径: <span class="text-slate-900 font-medium">C 端店铺</span></div>
+                <div class="bg-white border border-slate-200 p-8">
+                    <h2 class="text-lg font-bold mb-2">商品列表</h2>
+                    <p class="text-sm text-slate-600">C 端 header 现仅承载顾客操作（搜索 / 购物车 / 我的订单 / 登录态），「运营后台」为独立入口按钮，不再与店铺做分段切换，作用域清晰。</p>
+                </div>
+            </main>
+        </div>
+
+        <!-- ============ B 端运营后台视图 ============ -->
+        <div v-else class="flex min-h-screen">
+            <!-- B 端侧边栏 -->
+            <aside class="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0">
+                <div class="h-16 flex items-center px-6 border-b border-slate-200">
+                    <h1 class="text-xl font-bold tracking-tight">极简电商 ADMIN</h1>
+                </div>
+                <nav class="flex-1 py-4">
+                    <div class="px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">交易管理</div>
+                    <a :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer', adminTab === 'order' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']" @click="adminTab='order'">订单列表</a>
+                    <a :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer', adminTab === 'product' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']" @click="adminTab='product'">商品管理</a>
+                    <a :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer', adminTab === 'category' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']" @click="adminTab='category'">分类管理</a>
+                    <div class="mt-8 px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">营销中心</div>
+                    <a :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer', adminTab === 'coupon' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']" @click="adminTab='coupon'">优惠券管理</a>
+                    <!-- 账户中心（Change A 负责其可见性；此处保留占位） -->
+                    <div class="mt-8 px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">账户中心</div>
+                    <a v-if="isOperator" :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer', adminTab === 'user' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']" @click="adminTab='user'">用户管理</a>
+                </nav>
+            </aside>
+
+            <!-- B 端主内容 -->
+            <main class="flex-1 flex flex-col overflow-hidden">
+                <!-- B 端 header：独立运营作用域（面包屑 + 返回店铺 + 运营专员标签） -->
+                <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8 shrink-0">
+                    <div class="text-slate-600">
+                        运营后台 / <span class="text-slate-900 font-medium">{{ pathMap[adminTab] }}</span>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <span class="text-sm text-slate-500">运营专员: <span class="font-medium">{{ (isOperator && currentUser?.nickname) || '—' }}</span></span>
+                        <button @click="view = 'store'" class="py-1 px-2 border border-slate-200 text-slate-600 hover:bg-slate-50">返回店铺</button>
+                    </div>
+                </header>
+
+                <div class="flex-1 overflow-y-auto p-8 bg-slate-50">
+                    <div class="max-w-5xl mx-auto">
+                        <div v-if="adminTab === 'coupon'" class="bg-white border border-slate-200 p-8">
+                            <h2 class="text-lg font-bold mb-2">新建优惠券规则</h2>
+                            <p class="text-sm text-slate-600">B 端 header 现为独立「运营后台」作用域：面包屑显示服务层级（运营后台 / 营销中心 / 优惠券管理），右侧提供「返回店铺」出口，与顾客操作完全隔离。</p>
+                        </div>
+                        <div v-else class="bg-white border border-slate-200 p-8">
+                            <h2 class="text-lg font-bold">{{ ['订单列表','商品管理','分类管理','优惠券管理','账户中心 / 用户管理'][{order:0,product:1,category:2,coupon:3,user:4}[adminTab]] }}</h2>
+                            <p class="text-sm text-slate-600">面包屑：运营后台 / {{ pathMap[adminTab] }}</p>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, computed } = Vue;
+
+        createApp({
+            setup() {
+                const view = ref('store'); // store | admin
+                const adminTab = ref('coupon'); // order | product | category | coupon | user
+                const searchQuery = ref('');
+                const isCartOpen = ref(false);
+                const cartTotal = ref(2);
+
+                const REAL_OPERATOR = { id: 'user_1001', nickname: '陈晓芸', role: '运营' };
+                const REAL_CUSTOMER = { id: 'user_1002', nickname: '持久化测试', role: '客户' };
+
+                const demoRole = ref('operator');
+                const currentUser = computed(() =>
+                    demoRole.value === 'operator' ? REAL_OPERATOR :
+                    demoRole.value === 'customer' ? REAL_CUSTOMER : null
+                );
+                const isOperator = computed(() => currentUser.value?.role === '运营');
+
+                const pathMap = { order: '交易管理 / 订单列表', product: '交易管理 / 商品管理', category: '交易管理 / 分类管理', coupon: '营销中心 / 优惠券管理', user: '账户中心 / 用户管理' };
+
+                return { view, adminTab, searchQuery, isCartOpen, cartTotal, demoRole, currentUser, isOperator, pathMap };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

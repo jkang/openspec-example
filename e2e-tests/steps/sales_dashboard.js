@@ -67,7 +67,7 @@ async function dashboardWriteSession(page, token, user) {
 
 // ==================== 前置：数据与角色会话 ====================
 
-Given('系统存在混合销售订单数据（已支付/待支付/已取消）', async function () {
+Given('系统存在混合销售订单数据（已支付、待支付与已取消）', async function () {
   const paid1 = await dashboardCreateOrder('13800000031', '看板买家甲', '1', true);
   const paid2 = await dashboardCreateOrder('13800000032', '看板买家乙', '2', true);
   const pending = await dashboardCreateOrder('13800000033', '看板买家丙', '4', false);
@@ -163,7 +163,11 @@ When('运营在销售看板切换到「今日」', async function () {
 Then('趋势标题与日期标签按今日区间刷新', async function () {
   const trendTitle = await this.page.locator('h3:has-text("销售趋势")').textContent();
   expect(trendTitle).to.contain('今日');
-  // 今日仅 1 个日期标签
+  // 等数据刷新完成：今日仅 1 个日期标签（避免旧近7日数据未刷新的竞态）
+  await this.page.waitForFunction(
+    () => [...document.querySelectorAll('svg + div span')].length === 1,
+    { timeout: 10000 }
+  );
   const labelCount = await this.page.locator('svg + div span').count();
   expect(labelCount).to.equal(1);
 });
