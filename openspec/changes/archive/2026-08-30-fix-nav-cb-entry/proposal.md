@@ -32,21 +32,21 @@
 
 ## Impacted Bounded Contexts
 
-- **Frontend / Commerce Context（修改·仅前端导航契约）**：`frontend-ui` capability 覆盖 C/B 双端 UI 布局与导航；本次仅调整 header 信息架构（作用域分离、面包屑、入口表达），不改变任何后端能力。该 capability 在 `docs/baseline/domain_model.html` 已收录（前端 UI），本次属**契约细化**，非新增 taxonomy。
+- **Shared / Cross（修改·仅前端导航契约）**：`frontend-ui` capability（`bc-shared → cap-ui`，Cross-Context「全局极简 UI 组件库与视觉规范」）覆盖 C/B 双端 UI 布局与导航；本次仅调整 header 信息架构（作用域分离、面包屑、入口表达），不改变任何后端能力。该 capability 在 `docs/baseline/domain_model.html` 已收录（前端 UI），本次属**契约细化**，非新增 taxonomy。
 
 ## Process Alignment (流程对齐)
 
 | 流程节点 | 关联说明 |
 | --- | --- |
-| `L1-01 商品发现` | C 端 header 入口（店铺 / 搜索 / 我的订单 / 购物车）作用域重组，影响顾客首次进入路径的表达 |
+| `L1-01 触达与发现` | C 端 header 入口（店铺 / 搜索 / 我的订单 / 购物车）作用域重组，影响顾客首次进入路径的表达 |
 | `L1-06 履约与完成` | B 端（运营后台）入口与返回店铺动作的作用域分离，属于履约后的后台导航 |
 
 ## Service Blueprint Alignment (服务蓝图对齐)
 
 | 蓝图节点 | 动作类型 | 说明 |
 | --- | --- | --- |
-| `SB-STAGE-01 商品发现` | 修改（前端入口层） | 顾客侧 header 入口（店铺/搜索/购物车/我的订单）的作用域化表达；不改变 CUSTOMER 泳道行为序列 |
-| `SB-OPS-05` | 修改（前端入口层） | 运营后台与返回店铺入口的 header 作用域分离；capability 分布与状态不变，属**前端呈现重组**，不触发 blueprint 回流 |
+| `SB-STAGE-01 触达与发现` | 修改（前端入口层） | 顾客侧 header 入口（店铺/搜索/购物车/我的订单）的作用域化表达；不改变 CUSTOMER 泳道行为序列 |
+| `SB-OPS-06` | 修改（前端入口层） | 电商运营层·运营后台与返回店铺入口的 header 作用域分离；capability 分布与状态不变，属**前端呈现重组**，不触发 blueprint 回流 |
 
 ## Impact (影响面)
 

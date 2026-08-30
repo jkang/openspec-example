@@ -60,8 +60,8 @@
 
 ## Governance Mapping
 
-- **Bounded Context**: Frontend / Commerce Context（`docs/baseline/domain_model.html`：`BC -> Capability` 映射，`frontend-ui` 已收录）
+- **Bounded Context**: Shared / Cross（`docs/baseline/domain_model.html`：`bc-shared` → `cap-ui`（frontend-ui），Cross-Context「全局极简 UI 组件库与视觉规范」；该能力已收录）
 - **Capability Taxonomy**: `frontend-ui`（修改·C/B 顶部导航作用域契约细化；taxonomy 无新增/移除）
-- **Process Nodes**: `L1-01 商品发现`（C 端 header 入口作用域化）、`L1-06 履约与完成`（B 端后台入口与返回店铺作用域分离）
-- **Service Blueprint**: `SB-STAGE-01 商品发现`（C 端 header 入口层呈现重组）、`SB-OPS-05`（运营后台与返回店铺 header 作用域分离；capability 分布与状态不变）
+- **Process Nodes**: `L1-01 触达与发现`（C 端 header 入口作用域化）、`L1-06 履约与完成`（B 端后台入口与返回店铺作用域分离）
+- **Service Blueprint**: `SB-STAGE-01 触达与发现`（C 端 header 入口层呈现重组）、`SB-OPS-06`（电商运营层·运营后台与返回店铺 header 作用域分离；capability 分布与状态不变）
 - **测试标签**: `@e2e`（C/B header 作用域、面包屑、B 端 role 标签与不混排顾客操作）

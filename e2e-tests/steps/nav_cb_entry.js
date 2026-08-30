@@ -81,7 +81,7 @@ Then('C 端 header 不存在「店铺 | 运营后台」分段切换控件', asyn
 
 // ==================== 场景二/三/四：B 端 header 作用域 ====================
 
-When(/^查看 B 端后台顶部 (header|路径)$/, async function (_) {
+When(/^查看 B 端后台顶部\s*(header|路径)$/, async function (_) {
   this._cbHeader = this.page.locator('header.h-16');
   await this._cbHeader.waitFor({ state: 'visible' });
 });

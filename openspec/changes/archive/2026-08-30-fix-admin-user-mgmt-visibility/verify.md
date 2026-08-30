@@ -4,6 +4,14 @@
 >
 > 验证日期：2026-08-30。以下硬门禁（Hard Gates）均已实际执行并采集证据，无伪造。
 
+## Gates
+
+- Schema validate: PASS
+- Node test: PASS（190 项全通过）
+- Python test: PASS（12 项通过）
+- Frontend build: PASS（vite 12 modules）
+- E2E cucumber: PASS（32 scenarios / 188 steps）
+
 ## 任务逐项证据
 
 ### 1. 前端 — 账户中心分组角色感知（@unit/@e2e）

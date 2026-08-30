@@ -57,12 +57,12 @@
 ## Service Blueprint Sync Assessment
 
 **Needs Sync: No（显式 No-op）**
-- 理由：本次仅重组 `SB-STAGE-01 商品发现`（C 端 header 入口层）与 `SB-OPS-05`（运营后台与返回店铺入口）的**前端 header 呈现**，capability 分布（`catalog`/`frontend-ui`）与状态均不变；未新增/移除幕后活动节点，未改变 `SB-STAGE-*` / `SB-<LANE>-*` 结构。据此 `docs/baseline/service_blueprint.html` **无需回流**。
+- 理由：本次仅重组 `SB-STAGE-01 触达与发现`（C 端 header 入口层）与 `SB-OPS-06`（电商运营层·运营后台与返回店铺入口）的**前端 header 呈现**，capability 分布（`catalog`/`frontend-ui`/`user-admin`/`order-management`）与状态均不变；未新增/移除幕后活动节点，未改变 `SB-STAGE-*` / `SB-<LANE>-*` 结构。据此 `docs/baseline/service_blueprint.html` **无需回流**。
 
 ## Domain Model Sync Assessment
 
 **Needs Sync: No（显式 No-op）**
-- 理由：`frontend-ui` capability 在 `docs/baseline/domain_model.html` 已收录且状态"已落地"。本次仅细化 **C/B 顶部导航作用域契约**，属 `BC -> Capability` 既有映射的契约细化，**未新增/移除/改名 taxonomy，未改 BC 边界、Domain Event/Command/Policy、Aggregate/状态机**。据此 `docs/baseline/domain_model.html` **无需回流**。
+- 理由：`frontend-ui` capability 在 `docs/baseline/domain_model.html` 已收录（`bc-shared → cap-ui`，Cross-Context）且状态"已落地"。本次仅细化 **C/B 顶部导航作用域契约**，属 `BC -> Capability` 既有映射的契约细化，**未新增/移除/改名 taxonomy，未改 BC 边界、Domain Event/Command/Policy、Aggregate/状态机**。据此 `docs/baseline/domain_model.html` **无需回流**。
 
 ## Open Questions
 
