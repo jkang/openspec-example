@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenSpec 蓝图级分层治理体系全景图</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Noto Serif SC"', 'serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                        sans: ['system-ui', '-apple-system', 'sans-serif'],
+                    },
+                    colors: {
+                        aidd: {
+                            green: '#00b96b',
+                            blue: '#1677ff',
+                            slate: '#1e293b',
+                            gray: '#94a3b8',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .slide {
+            width: 100%;
+            max-width: 1440px;
+            aspect-ratio: 16 / 9;
+            background: white;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
+            margin: 40px auto;
+            padding: 30px 40px;
+            display: flex;
+            flex-direction: column;
+            border-radius: 16px;
+            overflow: hidden;
+            position: relative;
+        }
+        .blueprint-grid {
+            display: grid;
+            grid-template-rows: 40px 140px 80px 80px 1fr;
+            height: 100%;
+            border: 1px solid #e2e8f0;
+        }
+        .lane-header {
+            background: #f1f5f9;
+            border-right: 2px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 900;
+            font-size: 0.75rem;
+            color: #64748b;
+            text-transform: uppercase;
+            writing-mode: vertical-lr;
+            transform: rotate(180deg);
+            padding: 10px 0;
+            width: 40px;
+        }
+        .lane {
+            display: flex;
+            border-bottom: 1px solid #e2e8f0;
+            position: relative;
+        }
+        .lane:last-child { border-bottom: none; }
+        
+        .lane-content {
+            flex-grow: 1;
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            position: relative;
+        }
+
+        .activity-card {
+            background: white;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 12px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+            z-index: 10;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .activity-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        .lane-agent { height: 40px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; }
+        .agent-pm { background: #f0fdf4; border-bottom: 3px solid #00b96b; color: #166534; }
+        .agent-eng { background: #eff6ff; border-bottom: 3px solid #1677ff; color: #1e40af; }
+        .agent-lead { background: #f1f5f9; border-bottom: 3px solid #64748b; color: #334155; }
+
+        .svg-connector {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .lane-label {
+            font-family: 'JetBrains Mono';
+            font-size: 0.75rem;
+            color: #94a3b8;
+            padding: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-right: 1px solid #f1f5f9;
+        }
+
+        .deliverable-item {
+            font-size: 0.7rem;
+            line-height: 1.3;
+            color: #475569;
+            padding: 8px;
+            border-left: 2px solid #e2e8f0;
+            margin: 4px;
+            background: #fafafa;
+        }
+
+        .deliverable-title {
+            font-weight: 900;
+            color: #1e293b;
+            margin-bottom: 2px;
+            display: block;
+        }
+
+        .loop-line {
+            stroke-dasharray: 5,5;
+            fill: none;
+            stroke: #94a3b8;
+            stroke-width: 2;
+        }
+
+        .main-line {
+            fill: none;
+            stroke: #cbd5e1;
+            stroke-width: 3;
+        }
+    </style>
+</head>
+<body class="py-10">
+
+    <header class="max-w-6xl mx-auto mb-10 text-center">
+        <div class="flex items-center justify-center gap-3 mb-4">
+            <span class="px-4 py-1 bg-aidd-green text-white font-black rounded-full text-sm tracking-tighter">AIDD CITY LAB</span>
+            <span class="text-slate-400 font-serif italic text-lg">成都站 · 2026.09.19</span>
+        </div>
+        <h1 class="text-5xl font-serif font-black text-slate-900 mb-2">OpenSpec 蓝图级分层治理全景图</h1>
+        <p class="text-slate-500 font-medium tracking-widest uppercase">From PRD to Specs: Rebuilding Requirements Engineering</p>
+    </header>
+
+    <!-- Slide 1: Layer 01 -->
+    <section class="slide border-l-8 border-aidd-green">
+        <div class="p-4 flex justify-between items-center border-bottom border-slate-100">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-aidd-green font-black text-2xl border border-green-100 shadow-sm">01</div>
+                <div>
+                    <h2 class="text-2xl font-serif font-black text-slate-900 leading-none">极简交付 (Minimalist Delivery)</h2>
+                    <p class="text-slate-400 text-sm mt-1">单 Change 闭环 / 快速响应管线</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="blueprint-grid">
+            <!-- Lane 1: Agent -->
+            <div class="lane">
+                <div class="lane-header">Agent</div>
+                <div class="lane-content">
+                    <div class="col-span-12 agent-eng flex items-center justify-center font-black tracking-widest">ENGINEER AGENT</div>
+                </div>
+            </div>
+
+            <!-- Lane 2: Activity -->
+            <div class="lane h-[140px]">
+                <div class="lane-header">Flow</div>
+                <div class="lane-content px-10 items-center">
+                    <svg class="svg-connector">
+                        <path d="M 120 70 L 1050 70" class="main-line" />
+                        <path d="M 1050 70 L 1040 65 M 1050 70 L 1040 75" fill="none" stroke="#cbd5e1" stroke-width="3" />
+                    </svg>
+                    <div class="col-span-2 px-2"><div class="activity-card border-aidd-green text-aidd-green">探索 Explore</div></div>
+                    <div class="col-span-1"></div>
+                    <div class="col-span-2 px-2"><div class="activity-card border-aidd-green text-aidd-green">提案 Propose</div></div>
+                    <div class="col-span-2 px-2"><div class="activity-card border-aidd-green text-aidd-green">实施 Apply</div></div>
+                    <div class="col-span-2 px-2"><div class="activity-card border-aidd-green text-aidd-green">同步 Sync</div></div>
+                    <div class="col-span-1"></div>
+                    <div class="col-span-2 px-2"><div class="activity-card border-slate-400 text-slate-400 bg-slate-50">归档 Archive</div></div>
+                </div>
+            </div>
+
+            <!-- Lane 3: Skill -->
+            <div class="lane h-[80px]">
+                <div class="lane-header">Skill</div>
+                <div class="lane-content font-mono text-[10px]">
+                    <div class="col-span-2 flex items-center justify-center text-slate-500 italic">explore</div>
+                    <div class="col-span-1"></div>
+                    <div class="col-span-2 flex items-center justify-center text-slate-500 italic">propose</div>
+                    <div class="col-span-2 flex items-center justify-center text-slate-500 italic">apply-change</div>
+                    <div class="col-span-2 flex items-center justify-center text-slate-500 italic">sync-specs</div>
+                    <div class="col-span-1"></div>
+                    <div class="col-span-2 flex items-center justify-center text-slate-400 italic">archive-change</div>
+                </div>
+            </div>
+
+            <!-- Lane 4: Command -->
+            <div class="lane h-[80px]">
+                <div class="lane-header">Cmd</div>
+                <div class="lane-content font-mono text-[11px] font-bold">
+                    <div class="col-span-2 flex items-center justify-center text-aidd-green">/opsx:explore</div>
+                    <div class="col-span-1"></div>
+                    <div class="col-span-2 flex items-center justify-center text-aidd-green">/opsx:propose</div>
+                    <div class="col-span-2 flex items-center justify-center text-aidd-green">/opsx:apply</div>
+                    <div class="col-span-2 flex items-center justify-center text-aidd-green">/opsx:sync</div>
+                    <div class="col-span-1"></div>
+                    <div class="col-span-2 flex items-center justify-center text-slate-400">/opsx:archive</div>
+                </div>
+            </div>
+
+            <!-- Lane 5: Deliverables -->
+            <div class="lane flex-grow">
+                <div class="lane-header">Outputs</div>
+                <div class="lane-content p-4">
+                    <div class="col-span-2">
+                        <div class="deliverable-item">
+                            <span class="deliverable-title">idea.md</span>
+                            记录业务初探设计，明确 In-Scope 范围。
+                        </div>
+                    </div>
+                    <div class="col-span-1"></div>
+                    <div class="col-span-2">
+                        <div class="deliverable-item">
+                            <span class="deliverable-title">proposal.md</span>
+                            包含初步原型，确立实现方案基调。
+                        </div>
+                    </div>
+                    <div class="col-span-2">
+                        <div class="deliverable-item">
+                            <span class="deliverable-title">Code + verify.md</span>
+                            原子化变更实施，附带自动化验证证据。
+                        </div>
+                    </div>
+                    <div class="col-span-2">
+                        <div class="deliverable-item">
+                            <span class="deliverable-title">Delta Specs</span>
+                            变更回流至 specs/ 基线，消灭认知偏差。
+                        </div>
+                    </div>
+                    <div class="col-span-1"></div>
+                    <div class="col-span-2">
+                        <div class="deliverable-item">
+                            <span class="deliverable-title">Archive Folder</span>
+                            Change 完整归档，形成历史审计链路。
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 2: Layer 02 -->
+    <section class="slide border-l-8 border-aidd-blue">
+        <div class="p-4 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-aidd-blue font-black text-2xl border border-blue-100 shadow-sm">02</div>
+                <div>
+                    <h2 class="text-2xl font-serif font-black text-slate-900 leading-none">轻量产品 (Lightweight Product)</h2>
+                    <p class="text-slate-400 text-sm mt-1">基线护栏 / 多 Story 执行循环</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="blueprint-grid">
+            <div class="lane">
+                <div class="lane-header">Agent</div>
+                <div class="lane-content">
+                    <div class="col-span-2 agent-lead flex items-center justify-center text-[10px] font-black tracking-widest">LEAD</div>
+                    <div class="col-span-8 agent-eng flex items-center justify-center text-[10px] font-black tracking-widest">ENGINEER AGENT (LOOP)</div>
+                    <div class="col-span-2 agent-pm flex items-center justify-center text-[10px] font-black tracking-widest">PM</div>
+                </div>
+            </div>
+
+            <div class="lane h-[140px]">
+                <div class="lane-header">Flow</div>
+                <div class="lane-content px-6 items-center">
+                    <svg class="svg-connector">
+                        <path d="M 50 70 L 1150 70" class="main-line" />
+                        <!-- Loop line -->
+                        <path d="M 850 70 Q 650 150 450 70" class="loop-line" stroke="#1677ff" />
+                        <path d="M 450 70 L 460 75 M 450 70 L 460 65" fill="none" stroke="#1677ff" stroke-width="2" />
+                    </svg>
+                    <div class="col-span-1 px-1"><div class="activity-card border-slate-400 text-slate-500 scale-90">规划<br/>Planning</div></div>
+                    <div class="col-span-1 px-1"><div class="activity-card border-slate-400 text-slate-500 scale-90">基线<br/>Baseline</div></div>
+                    <div class="col-span-2 px-2"><div class="activity-card border-aidd-blue text-aidd-blue">需求探索<br/>Explore</div></div>
+                    <div class="col-span-2 px-2"><div class="activity-card border-aidd-blue text-aidd-blue">方案提案<br/>Propose</div></div>
+                    <div class="col-span-2 px-2 bg-blue-50/50 border-dashed border-aidd-blue/30 rounded-2xl py-2 flex flex-col gap-1">
+                        <div class="text-[8px] font-black text-aidd-blue uppercase">Multi-Story Loop</div>
+                        <div class="activity-card border-aidd-blue text-aidd-blue text-[10px] py-1">原型/故事</div>
+                        <div class="activity-card border-aidd-blue text-aidd-blue text-[10px] py-1">实施验证</div>
+                    </div>
+                    <div class="col-span-2 px-2"><div class="activity-card border-aidd-blue text-aidd-blue">规格同步<br/>Sync</div></div>
+                    <div class="col-span-1 px-1"><div class="activity-card border-slate-400 text-slate-400 bg-slate-50 scale-90">归档<br/>Archive</div></div>
+                    <div class="col-span-1 px-1"><div class="activity-card border-slate-400 text-slate-400 bg-slate-50 scale-90">回顾<br/>Review</div></div>
+                </div>
+            </div>
+
+            <div class="lane h-[80px]">
+                <div class="lane-header">Skill</div>
+                <div class="lane-content font-mono text-[9px] text-slate-500">
+                    <div class="col-span-1 flex items-center justify-center italic text-center">product-<br/>planning</div>
+                    <div class="col-span-1 flex items-center justify-center italic">blueprint</div>
+                    <div class="col-span-2 flex items-center justify-center italic">explore</div>
+                    <div class="col-span-2 flex items-center justify-center italic">propose</div>
+                    <div class="col-span-2 flex items-center justify-center italic">prototype & story<br/>apply-change</div>
+                    <div class="col-span-2 flex items-center justify-center italic">sync-specs</div>
+                    <div class="col-span-1 flex items-center justify-center italic">archive</div>
+                    <div class="col-span-1 flex items-center justify-center italic text-center">product-<br/>planning</div>
+                </div>
+            </div>
+
+            <div class="lane h-[80px]">
+                <div class="lane-header">Cmd</div>
+                <div class="lane-content font-mono text-[10px] font-bold text-aidd-blue">
+                    <div class="col-span-1 flex items-center justify-center">/opsx:planning</div>
+                    <div class="col-span-1 flex items-center justify-center">/opsx:baseline</div>
+                    <div class="col-span-2 flex items-center justify-center">/opsx:explore</div>
+                    <div class="col-span-2 flex items-center justify-center">/opsx:propose</div>
+                    <div class="col-span-2 flex items-center justify-center">/opsx:prototype<br/>/opsx:apply</div>
+                    <div class="col-span-2 flex items-center justify-center">/opsx:sync</div>
+                    <div class="col-span-1 flex items-center justify-center text-slate-400">/opsx:archive</div>
+                    <div class="col-span-1 flex items-center justify-center text-slate-400">/opsx:review</div>
+                </div>
+            </div>
+
+            <div class="lane flex-grow">
+                <div class="lane-header">Outputs</div>
+                <div class="lane-content p-4">
+                    <div class="col-span-2 flex flex-col gap-2">
+                        <div class="deliverable-item"><span class="deliverable-title">ROADMAP.md</span>对齐产品愿景与阶段目标。</div>
+                    </div>
+                    <div class="col-span-2">
+                        <div class="deliverable-item"><span class="deliverable-title">idea.md</span>多 Story 协同的业务设计。</div>
+                    </div>
+                    <div class="col-span-2">
+                        <div class="deliverable-item"><span class="deliverable-title">proposal.md</span>解构后的工程执行计划。</div>
+                    </div>
+                    <div class="col-span-2">
+                        <div class="deliverable-item"><span class="deliverable-title">Loop Artifacts</span>精细化的 Prototype 与 Story。</div>
+                    </div>
+                    <div class="col-span-2">
+                        <div class="deliverable-item"><span class="deliverable-title">Spec Sync</span>保证多 Story 认知的持续对齐。</div>
+                    </div>
+                    <div class="col-span-2 flex flex-col gap-2">
+                        <div class="deliverable-item"><span class="deliverable-title">Review</span>基于交付事实更新路线图。</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Slide 3: Layer 03 -->
+    <section class="slide border-l-8 border-slate-900">
+        <div class="p-4 flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-lg">03</div>
+                <div>
+                    <h2 class="text-2xl font-serif font-black text-slate-900 leading-none">业务产品 (Business Product)</h2>
+                    <p class="text-slate-400 text-sm mt-1">解耦协作 / 确定性漏斗 / 双层回流循环</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="blueprint-grid">
+            <div class="lane">
+                <div class="lane-header">Agent</div>
+                <div class="lane-content">
+                    <div class="col-span-4 agent-pm flex items-center justify-center text-[10px] font-black tracking-widest">PM AGENT (REQUIREMENT FUNNEL)</div>
+                    <div class="col-span-1 agent-lead flex items-center justify-center text-[10px] font-black tracking-widest">LEAD</div>
+                    <div class="col-span-4 agent-eng flex items-center justify-center text-[10px] font-black tracking-widest">ENGINEER AGENT (EXECUTION)</div>
+                    <div class="col-span-3 agent-lead flex items-center justify-center text-[10px] font-black tracking-widest">LEAD / GOVERNANCE</div>
+                </div>
+            </div>
+
+            <div class="lane h-[140px]">
+                <div class="lane-header">Flow</div>
+                <div class="lane-content px-4 items-center">
+                    <svg class="svg-connector">
+                        <path d="M 40 70 L 1300 70" class="main-line" />
+                        <!-- Story Loop -->
+                        <path d="M 1000 70 Q 750 160 400 70" class="loop-line" stroke="#1677ff" />
+                        <!-- Baseline Loop -->
+                        <path d="M 1250 70 Q 650 200 150 70" class="loop-line" stroke="#00b96b" />
+                    </svg>
+                    <div class="col-span-1 px-1"><div class="activity-card border-slate-300 text-slate-400 scale-75">规划<br/>Planning</div></div>
+                    <div class="col-span-1 px-1"><div class="activity-card border-slate-300 text-slate-400 scale-75">基线<br/>Baseline</div></div>
+                    
+                    <div class="col-span-2 px-1 bg-green-50/50 border-dashed border-aidd-green/20 rounded-xl py-1 flex flex-col gap-1">
+                        <div class="text-[7px] font-black text-aidd-green uppercase">Req Funnel</div>
+                        <div class="activity-card border-aidd-green text-aidd-green text-[10px] py-1">调研/探索</div>
+                        <div class="activity-card border-aidd-green text-aidd-green text-[10px] py-1">原型/Story</div>
+                    </div>
+
+                    <div class="col-span-1 px-1"><div class="activity-card bg-slate-900 text-white border-none shadow-lg text-[10px]">HANDOFF<br/>交接</div></div>
+
+                    <div class="col-span-2 px-1 bg-blue-50/50 border-dashed border-aidd-blue/20 rounded-xl py-1 flex flex-col gap-1">
+                        <div class="text-[7px] font-black text-aidd-blue uppercase">Dev Execution</div>
+                        <div class="activity-card border-aidd-blue text-aidd-blue text-[10px] py-1">提案/规格</div>
+                        <div class="activity-card border-aidd-blue text-aidd-blue text-[10px] py-1">实施验证</div>
+                    </div>
+
+                    <div class="col-span-1 px-1"><div class="activity-card border-slate-400 text-slate-600 text-[10px]">规格同步<br/>Spec Sync</div></div>
+                    <div class="col-span-1 px-1"><div class="activity-card border-slate-400 text-slate-600 text-[10px] scale-90">归档<br/>Archive</div></div>
+                    <div class="col-span-1 px-1"><div class="activity-card border-aidd-green text-aidd-green text-[10px]">基线同步<br/>Baseline</div></div>
+                    <div class="col-span-1 px-1"><div class="activity-card border-slate-400 text-slate-400 bg-slate-50 scale-75">回顾<br/>Review</div></div>
+                </div>
+            </div>
+
+            <div class="lane h-[80px]">
+                <div class="lane-header">Skill</div>
+                <div class="lane-content font-mono text-[8px] text-slate-500">
+                    <div class="col-span-1 flex items-center justify-center">planning</div>
+                    <div class="col-span-1 flex items-center justify-center">blueprint</div>
+                    <div class="col-span-2 flex items-center justify-center text-center">research / explore<br/>prototype / story</div>
+                    <div class="col-span-1 flex items-center justify-center font-bold text-slate-900">handoff</div>
+                    <div class="col-span-2 flex items-center justify-center text-center">propose / spec-design<br/>apply-change / verify</div>
+                    <div class="col-span-1 flex items-center justify-center italic">sync-specs</div>
+                    <div class="col-span-1 flex items-center justify-center italic">archive</div>
+                    <div class="col-span-1 flex items-center justify-center italic text-aidd-green">baseline/*</div>
+                    <div class="col-span-1 flex items-center justify-center italic">planning</div>
+                </div>
+            </div>
+
+            <div class="lane h-[80px]">
+                <div class="lane-header">Cmd</div>
+                <div class="lane-content font-mono text-[9px] font-bold">
+                    <div class="col-span-1 flex items-center justify-center text-slate-400">/opsx:planning</div>
+                    <div class="col-span-1 flex items-center justify-center text-slate-400">/opsx:baseline</div>
+                    <div class="col-span-2 flex items-center justify-center text-aidd-green">/req:* (Full)</div>
+                    <div class="col-span-1 flex items-center justify-center text-slate-900">/req:handoff</div>
+                    <div class="col-span-2 flex items-center justify-center text-aidd-blue">/opsx:* (Full)</div>
+                    <div class="col-span-1 flex items-center justify-center text-slate-600">/opsx:sync</div>
+                    <div class="col-span-1 flex items-center justify-center text-slate-400">/opsx:archive</div>
+                    <div class="col-span-1 flex items-center justify-center text-aidd-green">/opsx:baseline/sync</div>
+                    <div class="col-span-1 flex items-center justify-center text-slate-400">/opsx:planning</div>
+                </div>
+            </div>
+
+            <div class="lane flex-grow">
+                <div class="lane-header">Outputs</div>
+                <div class="lane-content p-2">
+                    <div class="col-span-2">
+                        <div class="deliverable-item"><span class="deliverable-title">Baseline Assets</span>稳定业务边界与领域模型。</div>
+                    </div>
+                    <div class="col-span-2">
+                        <div class="deliverable-item"><span class="deliverable-title">Story (Freeze)</span>业务面冻结，含 E2E 验收断言。</div>
+                    </div>
+                    <div class="col-span-1">
+                        <div class="deliverable-item border-slate-900 bg-slate-50"><span class="deliverable-title">Proposal</span>强契约合成，驱动交付。</div>
+                    </div>
+                    <div class="col-span-2">
+                        <div class="deliverable-item"><span class="deliverable-title">Specs (SDD)</span>行为规格驱动的自动化产线。</div>
+                    </div>
+                    <div class="col-span-2">
+                        <div class="deliverable-item"><span class="deliverable-title">Story Loop</span>支持高并发多 Story 循环交付。</div>
+                    </div>
+                    <div class="col-span-2">
+                        <div class="deliverable-item border-aidd-green bg-green-50"><span class="deliverable-title">Knowledge Asset</span>认知持续沉淀回业务基线。</div>
+                    </div>
+                    <div class="col-span-1"></div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="py-12 text-center">
+        <p class="text-slate-400 font-mono text-sm tracking-widest">
+            POWERED BY OPEN SPECIFICATION FRAMEWORK V2.0 &copy; 2026
+        </p>
+    </footer>
+
+</body>
+</html>
