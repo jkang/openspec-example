@@ -3,7 +3,7 @@
 ## Purpose
 销售报表看板（Sales Dashboard）：为老板与运营提供**只读经营分析视图**——销售总览（销售额/订单量/客单价/优惠让利 4 指标 + 时间维度切换 + 销售趋势）与商品/分类排行（TOP10）。数据实时聚合自订单明细（`actualPaidCents` 口径），属于新增 `data-insights` Bounded Context。治理归属：data-insights（新增 taxonomy）。
 
-## Requirements
+## ADDED Requirements
 
 ### Requirement: 看板权限门禁
 
