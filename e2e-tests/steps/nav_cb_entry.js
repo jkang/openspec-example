@@ -75,7 +75,7 @@ Then('C 端 header 不存在「店铺 | 运营后台」分段切换控件', asyn
   // 分段切换控件（店铺 | 运营后台）已移除：header 中不应存在「店铺」独立切换按钮
   expect(await header.locator('button:has-text("店铺")').count()).to.equal(0);
   // 分段容器（含「店铺」按钮且并列「运营后台」按钮）不应存在
-  const segment = header.locator('div.flex.items-center.border.border-slate-200.text-xs.font-bold');
+  const segment = header.locator('div.flex.items-center.border.border-border.text-xs.font-bold');
   expect(await segment.count()).to.equal(0);
 });
 

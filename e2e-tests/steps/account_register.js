@@ -74,7 +74,8 @@ Then('页面提示"该手机号已注册，请直接登录"', async function () 
 });
 
 Then('页面提供跳转登录入口', async function () {
-  const banner = this.page.locator('div.bg-red-50').first();
+  // 行为断言：错误横幅提示「去登录」入口存在（ZAPP 语义令牌 bg-accent/10 + text-accent，不再依赖旧视觉类名）
+  const banner = this.page.locator('div.text-accent').first();
   const text = await banner.textContent();
   expect(text).to.contain('去登录');
 });
