@@ -22,7 +22,7 @@
         当前路径: <span class="text-slate-900 font-medium">{{ viewMode === 'register' ? '账户 / 注册' : '账户 / 登录' }}</span>
       </div>
       <div v-else class="flex-1 mx-8 text-sm text-slate-500">
-        当前路径: <span class="text-slate-900 font-medium">{{ { order: '交易管理 / 订单列表', product: '交易管理 / 商品管理', category: '交易管理 / 分类管理', coupon: '营销中心 / 优惠券管理', user: '账户中心 / 用户管理' }[adminTab] }}</span>
+        当前路径: <span class="text-slate-900 font-medium">{{ { dashboard: '经营分析 / 销售看板', order: '交易管理 / 订单列表', product: '交易管理 / 商品管理', category: '交易管理 / 分类管理', coupon: '营销中心 / 优惠券管理', user: '账户中心 / 用户管理' }[adminTab] }}</span>
       </div>
 
       <div class="flex items-center gap-6 text-sm font-medium">
@@ -56,7 +56,7 @@
             {{ cartTotalItems }}
           </span>
         </button>
-        <span v-if="viewMode === 'admin'" class="text-sm text-slate-500 font-normal">运营专员: {{ (isOperator && currentUser?.nickname) || '王琳' }}</span>
+        <span v-if="viewMode === 'admin'" class="text-sm text-slate-500 font-normal">{{ currentUser?.role === '老板' ? '老板' : '运营专员' }}: {{ currentUser?.nickname || '王琳' }}</span>
       </div>
     </header>
 
@@ -405,7 +405,10 @@
       <!-- 左侧导航 -->
       <aside class="w-64 bg-white border-r border-slate-200 flex flex-col shrink-0">
         <nav class="flex-1 py-4">
-          <div class="px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">交易管理</div>
+          <div v-if="isDashboardRole" class="px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">经营分析</div>
+          <a v-if="isDashboardRole" @click="adminTab = 'dashboard'"
+             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'dashboard' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']">销售看板</a>
+          <div class="mt-8 px-6 py-2 text-sm font-medium text-slate-500 uppercase tracking-wider">交易管理</div>
           <a @click="adminTab = 'order'"
              :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'order' ? 'border-slate-900 bg-slate-50 text-slate-900 font-medium' : 'border-transparent text-slate-600 hover:bg-slate-50']">订单列表</a>
           <a @click="adminTab = 'product'"
@@ -424,6 +427,92 @@
       <!-- 右侧内容区 -->
       <div class="flex-1 overflow-y-auto p-8 bg-slate-50">
         <div class="max-w-5xl mx-auto space-y-8">
+
+          <!-- ===== 销售看板 tab（sales-dashboard / data-insights BC，运营/老板角色，R-DASH-006） ===== -->
+          <div v-if="adminTab === 'dashboard'">
+
+            <!-- 无权限兜底：非运营/老板越权进入 -->
+            <section v-if="!isDashboardRole" class="bg-white border border-slate-200 p-8">
+              <h2 class="text-lg font-bold mb-4 border-b border-slate-200 pb-4">销售看板</h2>
+              <p class="text-sm text-slate-700">无权限访问销售看板：本入口仅「运营」与「老板」角色可见。销售数据属经营敏感信息。</p>
+            </section>
+
+            <template v-else>
+              <!-- 标题 + 时间切换（今日/近7日/近30日，默认近7日 R-DASH-008） -->
+              <section class="bg-white border border-slate-200 p-8">
+                <div class="flex items-center justify-between mb-6">
+                  <div>
+                    <h2 class="text-lg font-bold">销售看板</h2>
+                    <p class="text-sm text-slate-500 mt-1">销售额为实付金额（actualPaidCents），优惠让利单列，不含已取消订单</p>
+                  </div>
+                  <div class="flex border border-slate-200 text-sm">
+                    <button v-for="r in dashboardRanges" :key="r.key" @click="switchDashboardRange(r.key)"
+                            :class="['px-4 py-2 transition-colors', dashboardRange === r.key ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100']">
+                      {{ r.label }}
+                    </button>
+                  </div>
+                </div>
+
+                <div v-if="dashboardError" class="border border-slate-900 bg-slate-50 px-4 py-3 text-sm text-slate-900 mb-6">{{ dashboardError }}</div>
+
+                <!-- 4 指标卡（R-DASH-001~004） -->
+                <div class="grid grid-cols-4 gap-4">
+                  <div class="bg-white border border-slate-200 p-5">
+                    <div class="text-sm text-slate-500">销售额</div>
+                    <div class="text-2xl font-semibold mt-2">{{ formatMoney(dashboardMetrics.sales) }}</div>
+                  </div>
+                  <div class="bg-white border border-slate-200 p-5">
+                    <div class="text-sm text-slate-500">订单量</div>
+                    <div class="text-2xl font-semibold mt-2">{{ dashboardMetrics.orders }} 单</div>
+                  </div>
+                  <div class="bg-white border border-slate-200 p-5">
+                    <div class="text-sm text-slate-500">客单价</div>
+                    <div class="text-2xl font-semibold mt-2">{{ formatMoney(dashboardMetrics.avgOrder) }}</div>
+                  </div>
+                  <div class="bg-white border border-slate-200 p-5">
+                    <div class="text-sm text-slate-500">优惠让利</div>
+                    <div class="text-2xl font-semibold mt-2">{{ formatMoney(dashboardMetrics.discount) }}</div>
+                  </div>
+                </div>
+              </section>
+
+              <!-- 销售趋势（CSS/SVG 手写折线，零第三方图表库） -->
+              <section class="bg-white border border-slate-200 p-8">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="font-medium">销售趋势（{{ currentRangeLabel }}）</h3>
+                  <span class="text-xs text-slate-500">区间合计 {{ formatMoney(trendSum) }}</span>
+                </div>
+                <svg viewBox="0 0 560 160" class="w-full">
+                  <line v-for="i in 4" :key="'g'+i" x1="0" :y1="i*32" x2="560" :y2="i*32" stroke="#e2e8f0" stroke-width="1"/>
+                  <polyline :points="trendPointsStr" fill="none" stroke="#0f172a" stroke-width="2"/>
+                  <circle v-for="(p, i) in trendPointsArray" :key="'c'+i" :cx="p.x" :cy="p.y" r="3" fill="#0f172a"/>
+                </svg>
+                <div class="flex justify-between text-xs text-slate-500 mt-2">
+                  <span v-for="(d, i) in trendLabels" :key="i">{{ d }}</span>
+                </div>
+              </section>
+
+              <!-- 优惠券效果（R-DASH-002 / sales-dashboard coupon 口径） -->
+              <section class="bg-white border border-slate-200 p-8">
+                <h3 class="font-medium mb-4">优惠券效果（{{ currentRangeLabel }}）</h3>
+                <div class="grid grid-cols-3 gap-4 text-sm">
+                  <div class="border border-slate-200 p-4">
+                    <div class="text-slate-500">优惠让利总额</div>
+                    <div class="text-xl font-semibold mt-1">{{ formatMoney(dashboardCoupon.discountCents) }}</div>
+                  </div>
+                  <div class="border border-slate-200 p-4">
+                    <div class="text-slate-500">使用优惠券订单数</div>
+                    <div class="text-xl font-semibold mt-1">{{ dashboardCoupon.couponOrders }} 单</div>
+                  </div>
+                  <div class="border border-slate-200 p-4">
+                    <div class="text-slate-500">用券订单占比</div>
+                    <div class="text-xl font-semibold mt-1">{{ dashboardCoupon.ratio }}%</div>
+                  </div>
+                </div>
+              </section>
+            </template>
+
+          </div><!-- /销售看板 tab -->
 
           <!-- ===== 优惠券管理 tab ===== -->
           <div v-if="adminTab === 'coupon'">
@@ -1553,7 +1642,79 @@ const payLastOrder = async () => {
 }
 
 // ==================== B 端运营后台 ====================
-const adminTab = ref('coupon') // 'coupon' | 'product'
+const adminTab = ref('coupon') // 'dashboard' | 'coupon' | 'product' | 'category' | 'order' | 'user'
+
+// 销售看板角色判定（R-DASH-006）：运营/老板可见入口；客服/客户不可见
+const isDashboardRole = computed(() => currentUser.value && ['运营', '老板'].includes(currentUser.value.role))
+
+// 销售看板状态（sales-dashboard / data-insights BC）
+const dashboardRanges = [
+  { key: 'today', label: '今日' },
+  { key: 'week', label: '近7日' },
+  { key: 'month', label: '近30日' }
+]
+const dashboardRange = ref('week') // 默认近7日（R-DASH-008）
+const dashboardData = ref(null)
+const dashboardError = ref('')
+const dashboardLoading = ref(false)
+
+const currentRangeLabel = computed(() => dashboardRanges.find(r => r.key === dashboardRange.value)?.label || '近7日')
+const dashboardMetrics = computed(() => dashboardData.value?.metrics || { sales: 0, orders: 0, avgOrder: 0, discount: 0 })
+const dashboardCoupon = computed(() => dashboardData.value?.coupon || { discountCents: 0, couponOrders: 0, ratio: 0 })
+
+// 金额展示：cents 整数 → 元（两位小数 + 千分位）
+const formatMoney = (cents) => `¥${((cents || 0) / 100).toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+
+// 趋势序列（SVG 折线，零第三方图表库；design.md 决策 5）
+const dashboardTrend = computed(() => dashboardData.value?.trend || [])
+const trendSum = computed(() => dashboardTrend.value.reduce((n, t) => n + (t.salesCents || 0), 0))
+const trendPointsArray = computed(() => {
+  const trend = dashboardTrend.value
+  if (trend.length === 0) return []
+  const W = 560
+  const H = 160
+  const PAD = 8
+  const max = Math.max(...trend.map(t => t.salesCents || 0), 1)
+  return trend.map((t, i) => {
+    const x = trend.length === 1 ? W / 2 : PAD + (i * (W - 2 * PAD)) / (trend.length - 1)
+    const y = H - PAD - ((t.salesCents || 0) / max) * (H - 2 * PAD)
+    return { x: Math.round(x * 100) / 100, y: Math.round(y * 100) / 100 }
+  })
+})
+const trendPointsStr = computed(() => trendPointsArray.value.map(p => `${p.x},${p.y}`).join(' '))
+const trendLabels = computed(() => dashboardTrend.value.map(t => String(t.date).slice(5))) // MM-DD
+
+// 拉取销售看板数据（dimension 变化 → 重新请求 → 刷新指标卡/趋势/优惠券区）
+const fetchSalesDashboard = async () => {
+  if (!sessionToken.value) return
+  dashboardError.value = ''
+  dashboardLoading.value = true
+  try {
+    const response = await fetch(`${API_BASE}/api/admin/dashboard/sales?dimension=${dashboardRange.value}`, authHeaders())
+    if (response.status === 403) {
+      dashboardError.value = '无权限访问销售看板'
+      dashboardData.value = null
+      return
+    }
+    if (response.ok) {
+      dashboardData.value = await response.json()
+    } else {
+      const err = await response.json()
+      dashboardError.value = err.message || '获取销售数据失败'
+    }
+  } catch (e) {
+    console.error('获取销售看板失败:', e)
+    dashboardError.value = '网络异常，请稍后重试'
+  } finally {
+    dashboardLoading.value = false
+  }
+}
+
+const switchDashboardRange = (key) => {
+  if (dashboardRange.value === key) return
+  dashboardRange.value = key
+  fetchSalesDashboard()
+}
 const adminCoupons = ref([])
 const issueLog = ref([])
 const couponForm = ref({ name: '', type: 'FLAT', value: '', minSpend: '', expiryDate: '' })
@@ -1578,6 +1739,7 @@ const switchViewMode = (mode) => {
     fetchMyOrders()
   }
   if (mode === 'admin') {
+    fetchSalesDashboard()
     fetchAdminCoupons()
     fetchIssuances()
     fetchAdminProducts()

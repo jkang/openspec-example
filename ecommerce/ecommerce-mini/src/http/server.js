@@ -3,7 +3,7 @@ import { ProductRepo, CartRepo, OrderRepo, CouponRepo, IssuanceRepo, CategoryRep
 import { FileRepoAdapter, UserFileRepo, SessionFileRepo, resolveDataDir } from '../repo/fileRepo.js'
 import { CatalogService } from '../services/catalog.js'
 import { CartService } from '../services/cart.js'
-import { OrderService } from '../services/order.js'
+import { OrderService, SALES_STATUSES } from '../services/order.js'
 import { CouponService } from '../services/coupon.js'
 import { AdminCouponService } from '../services/adminCoupon.js'
 import { CategoryService } from '../services/category.js'
@@ -142,27 +142,63 @@ function optionalSession(req, authService) {
 }
 
 /**
- * B 端运营角色门禁（R-ADM-001）：解析 Bearer 会话 → 归属用户须 role=运营
- * 复用 getSessionUser（含禁用门禁：运营被禁用保留 USER_DISABLED 专属提示）
- * 缺失/无效会话统一按 FORBIDDEN 403 处理：admin 端点不区分未登录与越权（防探测，对齐 R-ADM-001 拒绝访问语义）
- * @param {import('http').IncomingMessage} req
- * @param {import('../services/auth.js').AuthService} authService
- * @returns {Omit<import('../domain/types.js').User, 'passwordHash'>} 运营用户 DTO
+ * B 端角色门禁（R-ADM-001 / R-DASH-006）：白名单参数化——解析 Bearer 会话 → 归属用户 role 须在
+ * `allowedRoles` 白名单内，否则 403。复用 getSessionUser（含禁用门禁：被禁用保留 USER_DISABLED 专属提示）
+ * 缺失/无效会话统一按 FORBIDDEN 403 处理：admin 端点不区分未登录与越权（防探测，对齐 R-ADM-001 拒绝访问语义）。
+ * 用法：`requireRole('运营')(req, authService)`（用户管理，老板不可访问）或
+ * `requireRole('运营', '老板')(req, authService)`（销售看板，老板只读）。
+ * @param {...string} allowedRoles 允许访问的角色白名单
+ * @returns {(req: import('http').IncomingMessage, authService: import('../services/auth.js').AuthService) => Omit<import('../domain/types.js').User, 'passwordHash'>}
  */
-function requireAdminRole(req, authService) {
-  const authHeader = req.headers['authorization'] || ''
-  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null
-  let user
-  try {
-    user = authService.getSessionUser(token)
-  } catch (e) {
-    if (e.message === 'UNAUTHORIZED') throw new Error('FORBIDDEN')
-    throw e // USER_DISABLED：运营被禁用，保留专属提示
+function requireRole(...allowedRoles) {
+  return (req, authService) => {
+    const authHeader = req.headers['authorization'] || ''
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null
+    let user
+    try {
+      user = authService.getSessionUser(token)
+    } catch (e) {
+      if (e.message === 'UNAUTHORIZED') throw new Error('FORBIDDEN')
+      throw e // USER_DISABLED：被禁用，保留专属提示
+    }
+    if (!user || !allowedRoles.includes(user.role)) {
+      throw new Error('FORBIDDEN')
+    }
+    return user
   }
-  if (!user || user.role !== '运营') {
-    throw new Error('FORBIDDEN')
+}
+
+/**
+ * 销售看板时间维度换算（design.md 决策 4）：
+ * - today = 今日本地 00:00 ~ now；week = 近 7 个自然日 ~ now（默认）；month = 近 30 个自然日 ~ now
+ * - 显式 from/to 查询参数优先（E2E 断言可直接指定区间）
+ * @param {string} dimension today|week|month
+ * @param {URL} url 请求 URL（解析显式 from/to）
+ * @returns {{ dimension: string, from: string, to: string }} ISO 8601 边界（[from, to)）
+ */
+function resolveDashboardRange(dimension, url) {
+  const fromParam = url.searchParams.get('from')
+  const toParam = url.searchParams.get('to')
+  if (fromParam && toParam) {
+    return {
+      dimension: dimension || 'custom',
+      from: new Date(fromParam).toISOString(),
+      to: new Date(toParam).toISOString()
+    }
   }
-  return user
+  const DAY_MS = 24 * 60 * 60 * 1000
+  const now = Date.now()
+  const startOfDay = (ms) => {
+    const d = new Date(ms)
+    d.setHours(0, 0, 0, 0)
+    return d.getTime()
+  }
+  const dim = dimension === 'today' ? 'today' : dimension === 'month' ? 'month' : 'week'
+  let fromMs
+  if (dim === 'today') fromMs = startOfDay(now)
+  else if (dim === 'month') fromMs = startOfDay(now - 29 * DAY_MS)
+  else fromMs = startOfDay(now - 6 * DAY_MS)
+  return { dimension: dim, from: new Date(fromMs).toISOString(), to: new Date(now).toISOString() }
 }
 
 /**
@@ -308,7 +344,7 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
         return sendJson(res, 200, { ok: true, status: user.status })
       }
 
-      // 测试后门：设置用户角色（运营/客服/客户），仅 NODE_ENV=test 启用，供 B 端用户管理 E2E 创建运营/客服账号
+      // 测试后门：设置用户角色（运营/客服/客户/老板），仅 NODE_ENV=test 启用，供 B 端用户管理/销售看板 E2E 构造角色会话
       if (pathname === '/api/__test/user-role' && req.method === 'POST') {
         if (!testMode)
           return sendError(res, 'NOT_FOUND', 'Endpoint not found', 404)
@@ -316,7 +352,7 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
         const user = userRepo.findByPhone(String(body.phone ?? '').trim())
         if (!user) return sendError(res, 'USER_NOT_FOUND', '用户不存在', 404)
         const role = body.role
-        if (role !== '运营' && role !== '客服' && role !== '客户')
+        if (role !== '运营' && role !== '客服' && role !== '客户' && role !== '老板')
           return sendError(res, 'INVALID_ROLE', '角色不合法', 400)
         user.role = role
         return sendJson(res, 200, { ok: true, role: user.role })
@@ -434,15 +470,15 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
         return sendJson(res, 200, order)
       }
 
-      // ===== B 端用户管理（user-admin capability，运营角色门禁 R-ADM-001） =====
+      // ===== B 端用户管理（user-admin capability，仅运营角色门禁 R-ADM-001；老板为只读看板角色，无管理权限） =====
       if (pathname === '/api/admin/users' && req.method === 'GET') {
-        requireAdminRole(req, authService)
+        requireRole('运营')(req, authService)
         const keyword = url.searchParams.get('keyword')
         return sendJson(res, 200, adminUserService.list({ keyword }))
       }
 
       if (pathname.startsWith('/api/admin/users/') && pathname.endsWith('/status') && req.method === 'PATCH') {
-        requireAdminRole(req, authService)
+        requireRole('运营')(req, authService)
         const id = pathname.split('/')[4]
         const body = await readJson(req)
         const result = adminUserService.setStatus(id, body.status)
@@ -450,10 +486,35 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
       }
 
       if (pathname.startsWith('/api/admin/users/') && req.method === 'GET') {
-        requireAdminRole(req, authService)
+        requireRole('运营')(req, authService)
         const id = pathname.split('/').pop()
         const detail = adminUserService.getDetail(id)
         return sendJson(res, 200, detail)
+      }
+
+      // ===== B 端销售看板（sales-dashboard capability / data-insights BC，运营/老板白名单 R-DASH-006；纯只读聚合） =====
+      if (pathname === '/api/admin/dashboard/sales' && req.method === 'GET') {
+        requireRole('运营', '老板')(req, authService)
+        const dimension = url.searchParams.get('dimension') || 'week'
+        const { from, to } = resolveDashboardRange(dimension, url)
+        const agg = orderService.aggregateSales({ from, to, statuses: SALES_STATUSES, granularity: 'day' })
+        const avgOrderCents = agg.orderCount > 0 ? Math.round(agg.salesCents / agg.orderCount) : 0
+        const couponRatio = agg.orderCount > 0 ? Math.round((agg.couponOrderCount / agg.orderCount) * 1000) / 10 : 0
+        return sendJson(res, 200, {
+          metrics: {
+            sales: agg.salesCents,
+            orders: agg.orderCount,
+            avgOrder: avgOrderCents,
+            discount: agg.discountCents
+          },
+          coupon: {
+            discountCents: agg.discountCents,
+            couponOrders: agg.couponOrderCount,
+            ratio: couponRatio
+          },
+          trend: agg.trend,
+          range: { dimension, from, to }
+        })
       }
 
       if (pathname === '/api/coupons' && req.method === 'GET') {
@@ -590,7 +651,7 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
       if (e.message === 'USER_DISABLED')
         return sendError(res, 'USER_DISABLED', '该账户已被禁用，如有疑问请联系平台客服', 403)
       if (e.message === 'FORBIDDEN')
-        return sendError(res, 'FORBIDDEN', '无权限，仅运营角色可访问用户管理', 403)
+        return sendError(res, 'FORBIDDEN', '无权限访问该资源', 403)
       if (e.message === 'USER_NOT_FOUND')
         return sendError(res, 'USER_NOT_FOUND', '用户不存在', 404)
       if (e.message === 'INVALID_STATUS')

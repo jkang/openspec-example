@@ -48,6 +48,8 @@
  * @property {string} [couponId]
  * @property {OrderItem[]} items
  * @property {string} userId
+ * @property {string} [createdAt] 下单时间（ISO 8601）
+ * @property {string} [paidAt] 支付时间（ISO 8601，支付成功时写入；销售看板时间归属基准，R-DASH-005）
  */
 
 /**
@@ -80,7 +82,7 @@
  * @property {string} passwordHash 密码哈希（scrypt:<salt>:<hash>），不存明文
  * @property {string} nickname 昵称（≤20 字；未填时默认 "<尾号>用户"）
  * @property {"正常" | "禁用"} status 用户状态（注册默认"正常"；B 端启停动作迁移）
- * @property {"客户" | "运营" | "客服"} [role] 用户角色（注册默认"客户"；运营角色可访问 B 端用户管理，R-ADM-001）
+ * @property {"客户" | "运营" | "客服" | "老板"} [role] 用户角色（注册默认"客户"；运营可访问 B 端用户管理 R-ADM-001；老板为只读看板角色，可访问 GET /api/admin/dashboard/*，无管理写权限，R-DASH-006）
  * @property {string} createdAt 创建时间 (YYYY-MM-DD HH:mm)
  */
 

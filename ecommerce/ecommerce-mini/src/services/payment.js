@@ -43,8 +43,9 @@ export class PaymentService {
       this.couponService.redeem(order.couponId)
     }
 
-    // 推进状态
+    // 推进状态：写入支付时间（paidAt）作为销售看板时间归属基准（R-DASH-005）
     order.status = 'PAID'
+    order.paidAt = new Date().toISOString()
     this.orderRepo.save(order)
     return order
   }

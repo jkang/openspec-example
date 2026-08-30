@@ -13,15 +13,15 @@
 
 ## 1. 后端：只读聚合与看板 API
 
-- [ ] 1.1 `order-management` service 新增只读聚合方法 `aggregateSales({ from, to, statuses, granularity })`：
+- [x] 1.1 `order-management` service 新增只读聚合方法 `aggregateSales({ from, to, statuses, granularity })`：
   - 过滤 `status ∈ {PAID, SHIPPED, COMPLETED}` 且 `paidAt ∈ [from, to)`
   - 返回 `{ salesCents, orderCount, discountCents, couponOrderCount, trend: [{date, salesCents}] }`（trend 按日分桶）
   - 复用 `orderRepo.findAll()`（memory/file 双实现），不新增写路径
-- [ ] 1.2 `user-admin` 角色模型：`User.role` 合法值增加 `老板`；测试辅助 `POST /api/__test/user-role` 接受 `role=老板`
-- [ ] 1.3 `requireAdmin` 门禁改造为白名单参数化：`requireRole(...allowedRoles)`；用户管理接口用 `requireRole('运营')`（老板 403），看板接口用 `requireRole('运营','老板')`
-- [ ] 1.4 新增路由 `GET /api/admin/dashboard/sales`（requireRole 运营/老板）：解析 `dimension`（today/week/month，默认 week）→ 换算 from/to → 调 `aggregateSales` → 组装 `{ metrics: {sales, orders, avgOrder, discount}, coupon: {discountCents, couponOrders, ratio}, trend, range }`
-- [ ] 1.5 新增单元测试：聚合口径（CANCELLED/PENDING 不计入）、时间区间边界、维度换算、空区间零指标、coupon 占比计算
-- [ ] 1.6 新增 API 测试：老板 200 且用户管理 403、客服 403、未登录 403、运营 200
+- [x] 1.2 `user-admin` 角色模型：`User.role` 合法值增加 `老板`；测试辅助 `POST /api/__test/user-role` 接受 `role=老板`
+- [x] 1.3 `requireAdmin` 门禁改造为白名单参数化：`requireRole(...allowedRoles)`；用户管理接口用 `requireRole('运营')`（老板 403），看板接口用 `requireRole('运营','老板')`
+- [x] 1.4 新增路由 `GET /api/admin/dashboard/sales`（requireRole 运营/老板）：解析 `dimension`（today/week/month，默认 week）→ 换算 from/to → 调 `aggregateSales` → 组装 `{ metrics: {sales, orders, avgOrder, discount}, coupon: {discountCents, couponOrders, ratio}, trend, range }`
+- [x] 1.5 新增单元测试：聚合口径（CANCELLED/PENDING 不计入）、时间区间边界、维度换算、空区间零指标、coupon 占比计算
+- [x] 1.6 新增 API 测试：老板 200 且用户管理 403、客服 403、未登录 403、运营 200
 
 ## 2. 前端：销售看板视图
 

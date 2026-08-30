@@ -1,5 +1,8 @@
 import { calculateDiscount, assertOrderTransition } from '../domain/logic.js'
 
+/** 销售统计有效状态集合（R-DASH-001/002/003）：CANCELLED / PENDING_PAYMENT 不计入任何指标 */
+export const SALES_STATUSES = ['PAID', 'SHIPPED', 'COMPLETED']
+
 export class OrderService {
   constructor(cartRepo, orderRepo, productRepo, couponService) {
     this.cartRepo = cartRepo
@@ -136,5 +139,82 @@ export class OrderService {
         return b.index - a.index // createdAt 相同（同毫秒）时，后保存的在前
       })
       .map(x => x.order)
+  }
+
+  /**
+   * 销售只读聚合查询（sales-dashboard / data-insights BC 消费，R-DASH-001~005，order-management delta spec）：
+   * 过滤 `status ∈ 状态集合`（默认 PAID/SHIPPED/COMPLETED）且 `paidAt ∈ [from, to)` 的订单，
+   * 返回销售指标（实付汇总/订单计数/优惠让利汇总/用券订单计数）与按日分桶的趋势序列。
+   * 纯只读：不改变订单写入语义、不触发任何写操作。
+   * @param {{ from: string|number|Date, to: string|number|Date, statuses?: string[], granularity?: 'day' }} [input]
+   * @returns {{ salesCents: number, orderCount: number, discountCents: number, couponOrderCount: number, trend: Array<{ date: string, salesCents: number }> }}
+   */
+  aggregateSales({ from, to, statuses = SALES_STATUSES, granularity = 'day' } = {}) {
+    const fromMs = new Date(from).getTime()
+    const toMs = new Date(to).getTime()
+
+    const matched = this.orderRepo
+      .findAll()
+      .filter(o => o.paidAt) // 仅已支付订单具备时间归属（R-DASH-005）
+      .filter(o => statuses.includes(o.status))
+      .filter(o => {
+        const t = new Date(o.paidAt).getTime()
+        return t >= fromMs && t < toMs
+      })
+
+    let salesCents = 0
+    let discountCents = 0
+    let couponOrderCount = 0
+    for (const o of matched) {
+      salesCents += o.actualPaidCents || 0
+      discountCents += o.discountCents || 0
+      if (o.couponId) couponOrderCount += 1
+    }
+    const orderCount = matched.length
+
+    let trend = []
+    if (granularity === 'day') {
+      trend = this.buildDailyTrend(fromMs, toMs, matched)
+    }
+
+    return { salesCents, orderCount, discountCents, couponOrderCount, trend }
+  }
+
+  /**
+   * 按日分桶趋势序列：从 from 所在本地日 00:00 起逐日推进至 to，
+   * 每日桶 = [当日 00:00, 次日 00:00) ∩ [from, to)，累计该桶内订单实付金额。
+   * 日期标签为本地时区 YYYY-MM-DD；序列合计 = 区间销售额总额。
+   * @param {number} fromMs
+   * @param {number} toMs
+   * @param {Array<import('../domain/types.js').Order>} orders
+   * @returns {Array<{ date: string, salesCents: number }>}
+   */
+  buildDailyTrend(fromMs, toMs, orders) {
+    const DAY_MS = 24 * 60 * 60 * 1000
+    const buckets = []
+    const startOfDay = (ms) => {
+      const d = new Date(ms)
+      d.setHours(0, 0, 0, 0)
+      return d.getTime()
+    }
+    const formatDay = (ms) => {
+      const d = new Date(ms)
+      const mm = String(d.getMonth() + 1).padStart(2, '0')
+      const dd = String(d.getDate()).padStart(2, '0')
+      return `${d.getFullYear()}-${mm}-${dd}`
+    }
+
+    let cursor = startOfDay(fromMs)
+    while (cursor < toMs) {
+      const bucketEnd = Math.min(cursor + DAY_MS, toMs)
+      let sales = 0
+      for (const o of orders) {
+        const t = new Date(o.paidAt).getTime()
+        if (t >= cursor && t < bucketEnd) sales += o.actualPaidCents || 0
+      }
+      buckets.push({ date: formatDay(cursor), salesCents: sales })
+      cursor += DAY_MS
+    }
+    return buckets
   }
 }
