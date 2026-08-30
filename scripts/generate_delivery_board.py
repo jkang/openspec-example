@@ -67,7 +67,8 @@ def scan_roadmap():
     scope_match = re.search(r"### 📥 In Scope(.*?)### 🚫", text, re.S)
     if scope_match:
         for m in re.finditer(r"\*\*Epic\s+[\d.]+[^\n]*`([a-z0-9-]+)`\s*—\s*([^\n]+)", scope_match.group(1)):
-            planned.append({"key": m.group(1), "title": m.group(2).strip()})
+            title = re.sub(r"[*:：\s]+$", "", m.group(2)).strip()
+            planned.append({"key": m.group(1), "title": title})
     return {"current": {"no": current_no, "name": current_name}, "phases": phases, "planned": planned}
 
 
@@ -167,18 +168,21 @@ def scan_verify(change_dir):
         key = {"schema": "schema", "node": "node", "python": "python", "frontend": "frontend", "e2e": "e2e"}[label]
         gates[key] = m.group(2) + (f"（{m.group(3)}）" if m.group(3) else "")
     # 2) 表格格式（旧版：验证矩阵 "| 任务 | 命令 | ✅ PASS | 证据 |"）
+    key_map = (
+        ("schema", ("schema", "validate", "制品校验", "规格合规", "规划校验", "openspec")),
+        ("node", ("node", "全量测试", "后端")),
+        ("python", ("python", "冒烟", "全站")),
+        ("frontend", ("frontend", "前端", "构建")),
+        ("e2e", ("e2e", "全链路", "回归")),
+    )
     for m in re.finditer(r"\|\s*([^|]+?)\s*\|\s*[^|]*?\s*\|\s*✅?\s*(PASS|FAIL)", text):
         task, result = m.group(1).lower(), m.group(2)
-        if any(k in task for k in ("schema", "validate", "制品校验")) and gates["schema"] == "未执行":
-            gates["schema"] = result
-        elif any(k in task for k in ("node", "全量测试", "后端")) and gates["node"] == "未执行":
-            gates["node"] = result
-        elif "python" in task and gates["python"] == "未执行":
-            gates["python"] = result
-        elif any(k in task for k in ("frontend", "前端", "构建")) and gates["frontend"] == "未执行":
-            gates["frontend"] = result
-        elif "e2e" in task and gates["e2e"] == "未执行":
-            gates["e2e"] = result
+        for gate, keywords in key_map:
+            if gates[gate] != "未执行":
+                continue
+            if any(k in task for k in keywords):
+                gates[gate] = result
+                break
     # 3) E2E 场景数提取（"17 scenarios / 91 steps"）
     m = re.search(r"(\d+)\s*scenarios?\s*/\s*(\d+)\s*steps?", text)
     if m and "PASS" in gates["e2e"]:
@@ -242,18 +246,21 @@ def scan_baseline():
             updated = mtime.isoformat()
         detail = ""
         if "service_blueprint" in fname:
-            stages = len(set(re.findall(r'class="stage-name">([^<]+)', text)))
+            stages = len(re.findall(r'class="stage-name">([^<]+)', text))
             lanes = len(set(re.findall(r'class="row-title">([^<]+)', text)))
             cross = len(set(re.findall(r'class="cross-card-title">([^<]+)', text)))
             detail = f"{stages} 个旅程阶段 · {lanes} 条泳道 · {cross} 项跨阶段支撑"
         elif "business_process" in fname:
             nodes = len(set(re.findall(r"L[123]-[0-9]{2}", text)))
-            sections = len(re.findall(r'class="section-title">([^<]+)', text))
+            sections = len(set(re.findall(r'class="section-title">([^<]+)', text)))
             detail = f"{sections} 个分层章节 · {nodes} 个流程节点引用"
         elif "domain_model" in fname:
-            bcs = len(set(re.findall(r"Bounded Context", text)))
-            caps = len(set(re.findall(r"capabilit(y|ies)", text, re.I)))
-            detail = f"{bcs} 个 Bounded Context · {caps} 处能力引用"
+            bc_ids = sorted(set(re.findall(r"id: 'bc-([a-z0-9-]+)'", text)))
+            caps = len(re.findall(r"[Cc]apabilit(y|ies)", text))
+            names = " / ".join(bc_ids[:6])
+            detail = f"{len(bc_ids)} 个 Bounded Context · {caps} 处能力引用"
+            if names:
+                detail += f"（{names}）"
         result.append({"file": fname, "title": title, "desc": desc, "updated": updated, "detail": detail})
     return result
 
@@ -293,9 +300,10 @@ def render_html(data, refreshed):
     phase_pct = round(done_count / total_phases * 100)
 
     # 指标卡
-    planning_n = len(r["planned"])
+    active_epics = [e for e in data["epics"] if e["status"] != "done"]
+    planning_n = len([p for p in r["planned"] if p["key"] not in {e["key"] for e in data["epics"]}])
     explore_n = sum(1 for c in data["active"] if c["phase"] == "explore")
-    exploring_n = len(data["epics"]) + (1 if data["ideas"] else 0) + explore_n
+    exploring_n = len(active_epics) + (1 if data["ideas"] else 0) + explore_n
     design_n = sum(1 for c in data["active"] if c["phase"] == "design")
     coding_n = sum(1 for c in data["active"] if c["phase"] == "coding")
     archived_n = len(data["recent"])
@@ -372,7 +380,10 @@ def render_html(data, refreshed):
         )
 
     planning_cards = ""
+    planned_keys = {e["key"] for e in data["epics"]}
     for p in r["planned"]:
+        if p["key"] in planned_keys:
+            continue  # 已进入需求侧/交付侧，不再属于"规划中"
         planning_cards += (
             f'<a href="../../docs/ROADMAP.md" class="block bg-white border border-slate-200 p-4 card group">'
             f'{badge_html("路线图规划", "bg-slate-200 text-slate-700")}'
@@ -598,10 +609,16 @@ def main():
         f.write(html)
 
     # CI 友好的摘要输出
+    active_epics = [e for e in data["epics"] if e["status"] != "done"]
+    planned_keys = {e["key"] for e in data["epics"]}
+    planning_n = len([p for p in data["roadmap"]["planned"] if p["key"] not in planned_keys])
+    exploring_n = len(active_epics) + (1 if data["ideas"] else 0) + sum(1 for c in data["active"] if c["phase"] == "explore")
+    design_n = sum(1 for c in data["active"] if c["phase"] == "design")
+    coding_n = sum(1 for c in data["active"] if c["phase"] == "coding")
     print(f"交付看板已生成: {out}")
     print(f"  当前阶段: 阶段 {data['roadmap']['current']['no']} {data['roadmap']['current']['name']}")
     print(f"  阶段进度: {done_count_of(data['roadmap'])}/7 完成")
-    print(f"  规划中: {len(data['roadmap']['planned'])} · 需求探索: {len(data['epics'])} · 活跃变更: {len(data['active'])}")
+    print(f"  规划中: {planning_n} · 需求探索: {exploring_n} · 设计中: {design_n} · 开发中: {coding_n}")
     print(f"  已归档(近{args.days}天): {len(data['recent'])} · 历史: {len(data['history'])}")
     verified = [r for r in data["recent"] if r.get("verify")]
     failed = [r for r in verified if not r["verify"]["all_pass"]]

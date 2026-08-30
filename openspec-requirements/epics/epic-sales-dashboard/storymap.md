@@ -23,8 +23,8 @@
 
 | Story ID | 标题 | 角色 (Role) | 价值 (Value) | 目标 (Goal) | 依赖 | 优先级 | 状态(注1) |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| story-sales-dashboard-overview | 销售总览（指标卡 + 时间切换 + 趋势） | 老板/运营 | 首屏即得经营全貌与趋势，无需手动统计 | 近7日默认总览：销售额/订单量/客单价/优惠让利 4 指标 + 今日/近7日/近30日切换 + 趋势图，数据与订单一致 | 无 | P0 | ready |
-| story-sales-dashboard-ranking | 商品/分类销售排行 | 运营/老板 | 定位爆款与疲软商品/分类，支撑选品与补货决策 | 商品 TOP10（销量/销售额）+ 分类 TOP10（销售额/占比/订单数），口径与订单一致 | story-sales-dashboard-overview（看板框架与权限） | P1 | ready |
+| story-sales-dashboard-overview | 销售总览（指标卡 + 时间切换 + 趋势） | 老板/运营 | 首屏即得经营全貌与趋势，无需手动统计 | 近7日默认总览：销售额/订单量/客单价/优惠让利 4 指标 + 今日/近7日/近30日切换 + 趋势图，数据与订单一致 | 无 | P0 | handoff（change: story-sales-dashboard-overview） |
+| story-sales-dashboard-ranking | 商品/分类销售排行 | 运营/老板 | 定位爆款与疲软商品/分类，支撑选品与补货决策 | 商品 TOP10（销量/销售额）+ 分类 TOP10（销售额/占比/订单数），口径与订单一致 | story-sales-dashboard-overview（看板框架与权限） | P1 | handoff（change: story-sales-dashboard-ranking） |
 
 ## 覆盖对账 (Coverage Reconciliation)
 
