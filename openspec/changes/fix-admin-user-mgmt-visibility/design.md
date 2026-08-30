@@ -41,7 +41,7 @@
 
 ### Decision 3: 复用既有 user-admin tab 的无权限兜底面板
 
-- **选择**：非运营会话下即使强行进入 `adminTab === 'user'`，复用既有 `v-if="!isOperator"` 面板（第 783 行）展示"无权限/仅运营"文案，与侧边栏引导一致。
+- **选择**：非运营会话下即使强行进入 `adminTab === 'user'`，复用既有 `v-if="!isOperator"` 面板（`App.vue` 该面板已实现于用户管理 tab 内）展示"无权限/仅运营"文案，与侧边栏引导一致。
 - **理由**：避免重复实现权限面板，保持用户管理视图的单一数据源。
 
 ## Risks / Trade-offs
@@ -57,7 +57,7 @@
 ## Service Blueprint Sync Assessment
 
 **Needs Sync: No（显式 No-op）**
-- 理由：本次仅修正 `SB-OPS-05`（运营后台支撑泳道·用户管理活动）的**前端入口呈现**（角色标签、分组可见性、权限引导），capability 分布（`user-admin`）与状态（已落地）**均无变化**；未新增/移除后台活动节点，未改变 `SB-STAGE-*` / `SB-<LANE>-*` 结构。据此 `docs/baseline/service_blueprint.html` **无需回流**。
+- 理由：本次仅修正 `SB-OPS-06`（电商运营层支撑泳道·用户管理活动，`user-admin` capability）的**前端入口呈现**（角色标签、分组可见性、权限引导），capability 分布（`user-admin`）与状态（已落地）**均无变化**；未新增/移除后台活动节点，未改变 `SB-STAGE-*` / `SB-<LANE>-*` 结构。据此 `docs/baseline/service_blueprint.html` **无需回流**。
 
 ## Domain Model Sync Assessment
 

@@ -2,62 +2,69 @@
   <div class="h-screen flex flex-col overflow-hidden bg-white text-slate-900 font-sans">
     <!-- 顶部导航 -->
     <header class="h-16 flex-shrink-0 border-b border-slate-200 flex items-center justify-between px-8 bg-white z-10">
+      <!-- 左侧品牌（C/B 共用） -->
       <div class="flex items-center gap-2">
         <div class="w-8 h-8 bg-slate-900 flex items-center justify-center text-white text-xs font-bold">M</div>
         <h1 class="text-lg font-semibold tracking-tight uppercase">Minimal Store</h1>
       </div>
-      
-      <div v-if="viewMode === 'store'" class="flex-1 max-w-md mx-8 relative">
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="搜索商品..."
-          class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-none focus:outline-none focus:border-slate-400 transition-colors text-sm"
-        >
-      </div>
-      <div v-else-if="viewMode === 'orders'" class="flex-1 mx-8 text-sm text-slate-500">
-        当前路径: <span class="text-slate-900 font-medium">我的订单</span>
-      </div>
-      <div v-else-if="viewMode === 'register' || viewMode === 'login'" class="flex-1 mx-8 text-sm text-slate-500">
-        当前路径: <span class="text-slate-900 font-medium">{{ viewMode === 'register' ? '账户 / 注册' : '账户 / 登录' }}</span>
-      </div>
-      <div v-else class="flex-1 mx-8 text-sm text-slate-500">
-        当前路径: <span class="text-slate-900 font-medium">{{ { dashboard: '经营分析 / 销售看板', order: '交易管理 / 订单列表', product: '交易管理 / 商品管理', category: '交易管理 / 分类管理', coupon: '营销中心 / 优惠券管理', user: '账户中心 / 用户管理' }[adminTab] }}</span>
-      </div>
 
-      <div class="flex items-center gap-6 text-sm font-medium">
-        <!-- 视图模式切换 -->
-        <div class="flex items-center border border-slate-200 text-xs font-bold">
-          <button
-            @click="switchViewMode('store')"
-            :class="['px-3 py-1 transition-colors', viewMode === 'store' ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 hover:bg-slate-50']"
-          >店铺</button>
-          <button
-            @click="switchViewMode('admin')"
-            :class="['px-3 py-1 border-l border-slate-200 transition-colors', viewMode === 'admin' ? 'bg-slate-900 text-white' : 'bg-white text-slate-600 hover:bg-slate-50']"
-          >运营后台</button>
+      <!-- ============ C 端 header：仅顾客操作 + 独立「运营后台」入口 ============ -->
+      <template v-if="viewMode !== 'admin'">
+        <div v-if="viewMode === 'store'" class="flex-1 max-w-md mx-8 relative">
+          <input
+            v-model="searchQuery"
+            type="text"
+            placeholder="搜索商品..."
+            class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-none focus:outline-none focus:border-slate-400 transition-colors text-sm"
+          >
         </div>
-        <button v-if="viewMode === 'store' || viewMode === 'orders' || (viewMode === 'login' && sessionToken && loginSuccess)" @click="goToOrders"
-                :class="['py-1 px-2 border transition-colors', viewMode === 'orders' ? 'border-slate-900 text-slate-900' : 'border-slate-200 hover:bg-slate-50']">
-          我的订单
-        </button>
-        <button v-if="viewMode === 'store' && !sessionToken" @click="switchToRegister" class="py-1 px-2 border border-slate-200 hover:bg-slate-50">
-          注册 / 登录
-        </button>
-        <span v-if="sessionToken && currentUser && viewMode !== 'admin'" class="text-sm text-slate-600">
-          {{ currentUser.nickname }}
-        </span>
-        <button v-if="sessionToken && currentUser && viewMode !== 'admin'" @click="logoutSession" class="py-1 px-2 border border-slate-900 bg-slate-900 text-white hover:bg-slate-700">
-          退出登录
-        </button>
-        <button v-if="viewMode === 'store'" @click="isCartOpen = !isCartOpen" class="relative py-1 px-2 border border-slate-200 hover:bg-slate-50">
-          购物车
-          <span v-if="cartTotalItems > 0" class="absolute -top-1 -right-1 w-4 h-4 bg-slate-900 text-white text-[10px] flex items-center justify-center">
-            {{ cartTotalItems }}
+        <div v-else-if="viewMode === 'orders'" class="flex-1 mx-8 text-sm text-slate-500">
+          当前路径: <span class="text-slate-900 font-medium">我的订单</span>
+        </div>
+        <div v-else-if="viewMode === 'register' || viewMode === 'login'" class="flex-1 mx-8 text-sm text-slate-500">
+          当前路径: <span class="text-slate-900 font-medium">{{ viewMode === 'register' ? '账户 / 注册' : '账户 / 登录' }}</span>
+        </div>
+
+        <div class="flex items-center gap-6 text-sm font-medium">
+          <button v-if="viewMode === 'store' || viewMode === 'orders' || (viewMode === 'login' && sessionToken && loginSuccess)"
+                  :class="['py-1 px-2 border transition-colors', viewMode === 'orders' ? 'border-slate-900 text-slate-900' : 'border-slate-200 hover:bg-slate-50']"
+                  @click="goToOrders">
+            我的订单
+          </button>
+          <button v-if="viewMode === 'store' && !sessionToken" @click="switchToRegister" class="py-1 px-2 border border-slate-200 hover:bg-slate-50">
+            注册 / 登录
+          </button>
+          <span v-if="sessionToken && currentUser" class="text-sm text-slate-600">
+            {{ currentUser.nickname }}
           </span>
-        </button>
-        <span v-if="viewMode === 'admin'" class="text-sm text-slate-500 font-normal">{{ currentUser?.role === '老板' ? '老板' : '运营专员' }}: {{ currentUser?.role === '老板' ? (currentUser?.nickname || '—') : ((isOperator && currentUser?.nickname) || '—') }}</span>
-      </div>
+          <button v-if="sessionToken && currentUser" @click="logoutSession" class="py-1 px-2 border border-slate-900 bg-slate-900 text-white hover:bg-slate-700">
+            退出登录
+          </button>
+          <button v-if="viewMode === 'store'" @click="isCartOpen = !isCartOpen" class="relative py-1 px-2 border border-slate-200 hover:bg-slate-50">
+            购物车
+            <span v-if="cartTotalItems > 0" class="absolute -top-1 -right-1 w-4 h-4 bg-slate-900 text-white text-[10px] flex items-center justify-center">
+              {{ cartTotalItems }}
+            </span>
+          </button>
+          <!-- 独立「运营后台」入口按钮（非「店铺 | 运营后台」分段切换控件） -->
+          <button @click="switchViewMode('admin')" class="py-1 px-2 border border-slate-200 text-slate-600 hover:bg-slate-50">
+            运营后台
+          </button>
+        </div>
+      </template>
+
+      <!-- ============ B 端 header：独立运营作用域（面包屑 + 角色标签 + 返回店铺） ============ -->
+      <template v-else>
+        <div class="flex-1 mx-8 text-sm text-slate-500">
+          运营后台 / <span class="text-slate-900 font-medium">{{ pathMap[adminTab] }}</span>
+        </div>
+        <div class="flex items-center gap-6 text-sm font-medium">
+          <span class="text-sm text-slate-500 font-normal">{{ currentUser?.role === '老板' ? '老板' : '运营专员' }}: {{ currentUser?.role === '老板' ? (currentUser?.nickname || '—') : ((isOperator && currentUser?.nickname) || '—') }}</span>
+          <button @click="switchViewMode('store')" class="py-1 px-2 border border-slate-200 text-slate-600 hover:bg-slate-50">
+            返回店铺
+          </button>
+        </div>
+      </template>
     </header>
 
     <!-- 主内容区 (C 端店铺) -->
@@ -1709,6 +1716,16 @@ const payLastOrder = async () => {
 
 // ==================== B 端运营后台 ====================
 const adminTab = ref('coupon') // 'dashboard' | 'coupon' | 'product' | 'category' | 'order' | 'user'
+
+// 顶部路径分层面包屑映射（与侧边栏分组标题对齐：经营分析/交易管理/营销中心/账户中心）
+const pathMap = {
+  dashboard: '经营分析 / 销售看板',
+  order: '交易管理 / 订单列表',
+  product: '交易管理 / 商品管理',
+  category: '交易管理 / 分类管理',
+  coupon: '营销中心 / 优惠券管理',
+  user: '账户中心 / 用户管理'
+}
 
 // 销售看板角色判定（R-DASH-006）：运营/老板可见入口；客服/客户不可见
 const isDashboardRole = computed(() => currentUser.value && ['运营', '老板'].includes(currentUser.value.role))

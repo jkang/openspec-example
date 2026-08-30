@@ -78,4 +78,13 @@
 - **行程记录**：所有 Hard Gates（5.1-5.6）在本地实际执行并通过，无强行伪造。
 - **`老板` 角色标签**：顶部标签保留既有 `老板` 分支前缀（`currentUser?.role === '老板' ? '老板' : '运营专员'`），仅将昵称兜底改为按角色/`isOperator` 门控 + `—`。delta spec 的非运营集合（顾客/客服/未登录）行为符合 `—`，老板为既有独立 capability，未受影响。
 - **遗留服务**：验证期间临时起停的 Vite dev server 已在验证后关闭，端口 3000/5173/8000 无遗留监听。
+
+## Lead 质量复核（QA 对抗审查 + 锚点修正）
+
+- **QA 独立复核结论（对抗审查）**：代码实现正确、测试齐全、无 ambiguous step、无越界改动；硬门禁全部真实通过（openspec validate ✅ / vue:build ✅ / node 190 pass ✅ / python 12 pass ✅ / e2e 32 scenarios / 188 steps ✅）。
+- **治理锚点修正（Lead 定案，QA 发现）**：
+  - `SB-OPS-05`（实际为「支付确认推进到已支付」）→ **更正为 `SB-OPS-06`**（电商运营层·「用户管理（运营角色）」活动，`user-admin` capability）。
+  - 移除 `L3-06`（实际为「记录与追溯」，非用户管理）断言，仅保留 `L1-06 履约与完成`。
+  - 泳道名对齐「电商运营层」（SB-LANE-OPS）；同步修正 proposal / specs / design 三处 + design 无权限面板行号偏移。
+- **复核后**：`openspec validate fix-admin-user-mgmt-visibility` 仍 PASS（delta `## MODIFIED Requirements` 完整、schema 合规）。
 - **未做项**：未改动 `fix-nav-cb-entry` 相关代码（C/B 入口信息架构），属独立 change。

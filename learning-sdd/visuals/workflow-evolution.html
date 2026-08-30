@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenSpec 分层治理体系全景图</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Mermaid.js -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Noto Serif SC"', 'serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                        sans: ['system-ui', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', '"Helvetica Neue"', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        aidd: {
+                            green: '#00b96b',
+                            blue: '#1677ff',
+                            slate: '#1e293b',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #f8fafc;
+            color: #1e293b;
+        }
+        .mermaid {
+            background: transparent !important;
+            display: flex;
+            justify-content: center;
+        }
+        .card {
+            background: #ffffff;
+            box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.05);
+        }
+        .aidd-green {
+            color: #00b96b;
+        }
+        .aidd-bg-green {
+            background-color: #00b96b;
+        }
+        .aidd-blue {
+            color: #1677ff;
+        }
+        .aidd-border-green {
+            border-color: #00b96b;
+        }
+        @keyframes subtle-float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        .float {
+            animation: subtle-float 6s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-[#f8fafc] min-h-screen font-sans antialiased text-slate-900">
+
+    <!-- Header -->
+    <header class="py-24 px-6 text-center relative bg-white border-b border-slate-100">
+        <div class="absolute top-0 left-0 w-full h-1 aidd-bg-green"></div>
+        <div class="max-w-4xl mx-auto">
+            <div class="flex items-center justify-center gap-4 mb-6">
+                <span class="text-2xl font-black tracking-tighter text-slate-800">AIDD <span class="aidd-green font-normal text-lg">City Lab | 成都站</span></span>
+            </div>
+            <h1 class="text-4xl md:text-6xl font-serif font-black tracking-tight text-slate-900 mb-6 leading-tight">
+                从 PRD 到 Specs: <span class="aidd-blue">AI 重塑需求工程</span>
+            </h1>
+            <p class="text-lg md:text-xl text-slate-500 font-medium tracking-wide">
+                OpenSpec 分层治理体系全景图
+            </p>
+        </div>
+    </header>
+
+    <main class="max-w-6xl mx-auto px-6 py-20 space-y-32">
+
+        <!-- Layer 1: 极简交付 -->
+        <section class="relative">
+            <div class="flex flex-col md:flex-row gap-12 items-center">
+                <div class="flex-1 space-y-6">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-green-50 text-[#00b96b] text-xs font-bold uppercase tracking-wider rounded-full border border-green-100">
+                        <span class="w-2 h-2 rounded-full aidd-bg-green"></span>
+                        Layer 01
+                    </div>
+                    <h2 class="text-3xl font-serif font-black text-slate-900">极简交付 (Minimalist Delivery)</h2>
+                    <div class="card border border-slate-100 p-10 rounded-2xl transition-all duration-500 hover:shadow-xl group">
+                        <div class="mermaid">
+graph LR
+    A[探索 Explore<br/>/opsx:explore] --> B[提案 Propose<br/>/opsx:propose]
+    B --> C[实施 Apply<br/>/opsx:apply]
+    C --> D[同步 Sync<br/>/opsx:sync]
+    D --> E[归档 Archive<br/>/opsx:archive]
+
+    style A fill:#fff,stroke:#00b96b,stroke-width:2px,color:#1e293b
+    style B fill:#fff,stroke:#00b96b,stroke-width:2px,color:#1e293b
+    style C fill:#fff,stroke:#00b96b,stroke-width:2px,color:#1e293b
+    style D fill:#fff,stroke:#00b96b,stroke-width:2px,color:#1e293b
+    style E fill:#fff,stroke:#00b96b,stroke-width:2px,color:#1e293b
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full md:w-80 space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border-l-4 aidd-border-green shadow-sm hover:shadow-md transition-shadow">
+                        <h3 class="text-slate-900 font-black mb-2 text-lg">线性管线</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">最纯粹的 SDD 闭环，确立“意图 -> 规格 -> 代码”的线性转换能力。</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border-l-4 aidd-border-green shadow-sm hover:shadow-md transition-shadow">
+                        <h3 class="text-slate-100 font-bold mb-2 text-lg">单兵作战</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">适合低复杂度的 Bug Fix 或 Tech Debt，追求极致的交付响应速度。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Layer 2: 轻量产品 -->
+        <section class="relative">
+            <div class="flex flex-col md:flex-row-reverse gap-12 items-center">
+                <div class="flex-1 space-y-6 text-right md:text-left">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-[#1677ff] text-xs font-bold uppercase tracking-wider rounded-full border border-blue-100">
+                        <span class="w-2 h-2 rounded-full bg-[#1677ff]"></span>
+                        Layer 02
+                    </div>
+                    <h2 class="text-4xl font-serif font-black text-slate-900">轻量产品 (Lightweight Product)</h2>
+                    <div class="card border border-slate-100 p-10 rounded-2xl transition-all duration-500 hover:shadow-xl">
+                        <div class="mermaid">
+flowchart TD
+    A([规划基线<br/>定位 / 路线图])
+    B([业务基线<br/>领域模型 / 流程])
+    C[需求探索<br/>/opsx:explore]
+    D[方案提案<br/>/opsx:propose]
+    
+    subgraph MultiStoryLoop [Multi-Story 执行循环]
+        direction TB
+        E{涉及 UI 变更?}
+        F[原型设计 Prototype<br/>/opsx:prototype + HITL]
+        G[业务故事 Story<br/>/opsx:story + HITL]
+        H[开发实现<br/>规格 -> 实施 -> 验证]
+    end
+    
+    K[基线同步 Sync<br/>/opsx:sync 回流]
+    L([变更归档 Archive<br/>/opsx:archive])
+    M[周期回顾<br/>更新 Roadmap]
+
+    A ==> B ==> C ==> D ==> E
+    
+    E -- 是 --> F --> G
+    E -- 否 --> G
+    G --> H
+    
+    H -- 下一个 Story --> E
+    H ==> K -.-> B
+    K ==> L ==> M -.-> A
+
+    style A fill:#fff,stroke:#1677ff,stroke-width:2px,color:#1e293b
+    style B fill:#fff,stroke:#1677ff,stroke-width:2px,color:#1e293b
+    style C fill:#fff,stroke:#1677ff,stroke-width:2px,color:#1e293b
+    style D fill:#fff,stroke:#1677ff,stroke-width:2px,color:#1e293b
+    style MultiStoryLoop fill:#f0f7ff,stroke:#dbeafe,stroke-dasharray: 5 5,color:#1e293b
+    style E fill:#fff,stroke:#1677ff,stroke-width:2px,color:#1e293b
+    style F fill:#fff,stroke:#1677ff,stroke-width:2px,color:#1e293b
+    style G fill:#fff,stroke:#1677ff,stroke-width:2px,color:#1e293b
+    style H fill:#fff,stroke:#1677ff,stroke-width:2px,color:#1e293b
+    style K fill:#fff,stroke:#1677ff,stroke-width:2px,color:#1e293b
+    style L fill:#fff,stroke:#1677ff,stroke-width:2px,color:#1e293b
+    style M fill:#fff,stroke:#1677ff,stroke-width:2px,color:#1e293b
+                        </div>
+                    </div>
+                </div>
+                <div class="w-full md:w-80 space-y-6">
+                    <div class="bg-white p-6 rounded-2xl border-r-4 md:border-r-0 md:border-l-4 border-[#1677ff] shadow-sm hover:shadow-md transition-shadow">
+                        <h3 class="text-slate-900 font-black mb-2 text-lg">基线意识</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed">引入 Planning 与 Business 基线，解决“为了做而做”的问题，确保需求与价值对齐。</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border-r-4 md:border-r-0 md:border-l-4 border-[#1677ff] shadow-sm hover:shadow-md transition-shadow">
+                        <h3 class="text-slate-900 font-black mb-2 text-lg">分而治之</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed">支持将复杂变更拆分为多个 Story 进行循环交付，降低交付爆炸半径。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Layer 3: 业务产品 -->
+        <section class="relative">
+            <div class="space-y-12">
+                <div class="text-center space-y-4">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 bg-slate-100 text-slate-600 text-xs font-bold uppercase tracking-wider rounded-full border border-slate-200">
+                        <span class="w-2 h-2 rounded-full bg-slate-600"></span>
+                        Layer 03
+                    </div>
+                    <h2 class="text-4xl md:text-5xl font-serif font-black text-slate-900">业务产品 (Business Product)</h2>
+                </div>
+                
+                <div class="card border border-slate-100 p-12 rounded-3xl transition-all duration-700 hover:shadow-2xl">
+                    <div class="mermaid">
+flowchart TD
+    A([规划基线<br/>/opsx:planning])
+    B([业务基线<br/>docs/baseline])
+    R{路由判断<br/>任务类型?}
+
+    subgraph ReqSide [需求侧 · PM 主导]
+        direction TB
+        P1[需求调研<br/>/req:research]
+        P2[需求探索<br/>/req:explore]
+        P4{涉及 UI?}
+        P5[原型设计<br/>/req:prototype]
+        P3[需求拆分<br/>/req:storymap]
+        P6[业务故事 Story<br/>/req:story]
+    end
+
+    subgraph Handoff [交接边界]
+        H1[交接 Handoff<br/>/req:handoff]
+    end
+
+    subgraph DevSide [交付侧 · 工程师主导]
+        direction TB
+        D1[提案 Proposal<br/>/opsx:propose]
+        D2[行为规格 Specs<br/>/opsx:spec-design]
+        D3[技术设计 Design<br/>/opsx:spec-design]
+        D4[实施验证 Apply<br/>/opsx:apply + verify]
+    end
+
+    K1[规格同步<br/>/opsx:sync]
+    L([变更归档<br/>/opsx:archive])
+    K2[基线同步<br/>/opsx:baseline/sync]
+    M[周期回顾<br/>Roadmap]
+
+    A ==> B ==> R
+    R -- 大块 Epic --> P1
+    R -- 简单变更 / BugFix --> D1
+
+    P1 ==> P2 ==> P4
+    P4 -- 是 --> P5 --> P3
+    P4 -- 否 --> P3
+    P3 ==> P6 ==> H1 ==> D1
+
+    D1 ==> D2 ==> D3 ==> D4 ==> K1 ==> L
+
+    L -- Epic 未完成 --> P6
+    L -- Epic 已完成 --> K2
+    K2 -.-> B
+    K2 ==> M -.-> A
+
+    style A fill:#fff,stroke:#00b96b,stroke-width:2px,color:#1e293b
+    style B fill:#fff,stroke:#00b96b,stroke-width:2px,color:#1e293b
+    style ReqSide fill:#f6ffed,stroke:#b7eb8f,stroke-dasharray: 5 5,color:#1e293b
+    style DevSide fill:#f0f7ff,stroke:#adc6ff,stroke-dasharray: 5 5,color:#1e293b
+    style Handoff fill:#fff,stroke:#1677ff,stroke-width:2px,color:#1e293b
+    style K1 fill:#fff,stroke:#00b96b,stroke-width:2px,color:#1e293b
+    style L fill:#fff,stroke:#00b96b,stroke-width:2px,color:#1e293b
+    style K2 fill:#fff,stroke:#00b96b,stroke-width:2px,color:#1e293b
+    style M fill:#fff,stroke:#00b96b,stroke-width:2px,color:#1e293b
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all">
+                        <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center mb-6">
+                            <span class="aidd-green font-black">01</span>
+                        </div>
+                        <h3 class="text-slate-900 font-black text-xl mb-4 font-serif">需求/交付深度解耦</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed">PM 主导业务语义与验收标准冻结，工程师主导技术规格实施，通过 Handoff 建立强契约交接。</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center mb-6">
+                            <span class="aidd-blue font-black">02</span>
+                        </div>
+                        <h3 class="text-slate-900 font-black text-xl mb-4 font-serif">分层同步与回流</h3>
+                        <p class="text-slate-500 text-sm leading-relaxed">区分指令级的 Spec Sync 与业务级的 Baseline Sync，解决大组织中“文档与代码长期割裂”的顽疾。</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all">
+                        <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center mb-6">
+                            <span class="aidd-green font-black">03</span>
+                        </div>
+                        <h3 class="text-slate-100 font-black text-xl mb-4 font-serif">确定性研发管线</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">通过标准化的调研、探索、原型、拆分工序，将不可控的个人经验转化为可预测的组织能力。</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm hover:shadow-xl transition-all">
+                        <div class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center mb-6">
+                            <span class="text-slate-600 font-black">04</span>
+                        </div>
+                        <h3 class="text-slate-900 font-black text-xl mb-4 font-serif">治理护栏</h3>
+                        <p class="text-slate-400 text-sm leading-relaxed">所有的变更必须长在规划层与业务基线的护栏内，确保持续演进而不偏离产品定位。</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="py-24 bg-white border-t border-slate-100 text-center">
+        <div class="max-w-4xl mx-auto px-6">
+            <p class="text-slate-400 text-sm tracking-widest font-medium">
+                POWERED BY OPEN SPECIFICATION FRAMEWORK V2.0 &copy; 2026
+            </p>
+        </div>
+    </footer>
+
+    <script>
+        mermaid.initialize({
+            startOnLoad: true,
+            theme: 'base',
+            themeVariables: {
+                primaryColor: '#ffffff',
+                primaryTextColor: '#1e293b',
+                primaryBorderColor: '#00b96b',
+                lineColor: '#cbd5e1',
+                secondaryColor: '#f8fafc',
+                tertiaryColor: '#ffffff',
+                fontFamily: 'system-ui, -apple-system, sans-serif'
+            }
+        });
+    </script>
+</body>
+</html>

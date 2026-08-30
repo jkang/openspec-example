@@ -65,6 +65,6 @@ B 端**用户管理入口与账户中心分组**的前端可见性 SHALL 由当�
 
 - **Bounded Context**: User Context（`docs/baseline/domain_model.html`：`BC -> Capability` 映射，`user-admin` 已收录）
 - **Capability Taxonomy**: `user-admin`（修改·前端入口可见性契约细化；taxonomy 无新增/移除）
-- **Process Nodes**: `L1-06 履约与完成`（后台支撑活动）、`L3-06`（后台运营动作·用户管理入口仅运营角色）
-- **Service Blueprint**: `SB-OPS-05`（运营后台支撑泳道·用户管理活动，前端入口呈现修正，能力分布与状态不变）
+- **Process Nodes**: `L1-06 履约与完成`（后台支撑活动；用户管理为 B 端支撑活动，非 L3 交易节点）
+- **Service Blueprint**: `SB-OPS-06`（电商运营层支撑泳道·用户管理活动，`user-admin` capability；前端入口呈现修正，能力分布与状态不变）
 - **测试标签**: `@api`（权限门禁 API）/ `@unit`（门禁逻辑）/ `@e2e`（前端入口可见性与角色标签）

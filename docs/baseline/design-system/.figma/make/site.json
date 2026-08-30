@@ -1,0 +1,10 @@
+{
+  "description": "This e-commerce platform offers unique and playful digital electronics designed for young consumers seeking personalized tech experiences.",
+  "robots": {
+    "index": false
+  },
+  "accessibility": {
+    "addBypassLinks": false,
+    "ignoreReducedMotion": false
+  }
+}
