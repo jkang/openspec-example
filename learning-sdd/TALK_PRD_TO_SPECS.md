@@ -48,45 +48,110 @@
 
 ```mermaid
 graph LR
-    A[探索 Explore<br/>/opsx:explore] --> B[提案 Propose<br/>/opsx:propose]
-    B --> C[实施 Apply<br/>/opsx:apply]
-    C --> D[同步 Sync<br/>/opsx:sync]
-    D --> E[归档 Archive<br/>/opsx:archive]
+    A[探索 Explore<br/><small>/opsx:explore</small>] --> B[提案 Propose<br/><small>/opsx:propose</small>]
+    B --> C[实施 Apply<br/><small>/opsx:apply</small>]
+    C --> D[同步 Sync<br/><small>/opsx:sync</small>]
+    D --> E[归档 Archive<br/><small>/opsx:archive</small>]
+
+    style A fill:#fff,stroke:#00b96b,stroke-width:2px
+    style B fill:#fff,stroke:#00b96b,stroke-width:2px
+    style C fill:#fff,stroke:#00b96b,stroke-width:2px
+    style D fill:#fff,stroke:#00b96b,stroke-width:2px
+    style E fill:#f8fafc,stroke:#94a3b8,stroke-width:2px
 ```
 
 ### 形态二：轻量产品 (Lightweight Product)
 引入了“规划与业务基线”，支持 Multi-Story 循环迭代，解决了复杂业务逻辑的拆解与价值对齐问题。
 
 ```mermaid
-flowchart TD
-    A([规划基线]) --> B([业务基线])
+flowchart LR
+    A([规划基线 Planning]) --> B([业务基线 Business])
     B --> C[需求探索 Explore]
     C --> D[方案提案 Propose]
-    subgraph Loop [业务交付循环]
-        E{UI 变更?} --> F[原型 Prototype] --> G[故事 Story] --> H[实施验证]
-        E -- 否 --> G
-        H -- Next --> E
+    
+    subgraph MultiStoryLoop [Multi-Story 执行循环]
+        direction TB
+        E{涉及 UI?}
+        F[原型设计 Prototype]
+        G[业务故事 Story]
+        H[实施与验证]
     end
+    
     D --> E
-    H --> I[同步归档]
+    E -- 是 --> F --> G
+    E -- 否 --> G
+    G --> H
+    H -- 下一个 Story --> E
+    
+    H --> I[同步 Sync]
+    I --> J([变更归档 Archive])
+    J --> K[周期回顾 Review]
+    K -.-> A
+
+    style A fill:#fff,stroke:#1677ff,stroke-width:2px
+    style B fill:#fff,stroke:#1677ff,stroke-width:2px
+    style MultiStoryLoop fill:#f0f7ff,stroke:#dbeafe,stroke-dasharray: 5 5
+    style E fill:#fff,stroke:#1677ff,stroke-width:2px
+    style F fill:#fff,stroke:#1677ff,stroke-width:2px
+    style G fill:#fff,stroke:#1677ff,stroke-width:2px
+    style H fill:#fff,stroke:#1677ff,stroke-width:2px
+    style I fill:#fff,stroke:#1677ff,stroke-width:2px
+    style J fill:#f8fafc,stroke:#94a3b8,stroke-width:2px
+    style K fill:#fff,stroke:#1677ff,stroke-width:2px
 ```
 
 ### 形态三：业务产品 (Business Product)
 实现了需求侧与交付侧的深度解耦，通过标准化漏斗、交接契约与分层同步，支持规模化协作与持续架构演进。
 
 ```mermaid
-flowchart TD
-    subgraph Req[需求侧：PM 主导]
-        R1[调研] --> R2[探索] --> R3{UI?} --> R4[原型] --> R5[拆分] --> R6[Story]
-        R3 -- 否 --> R5
+flowchart LR
+    A([规划基线 Planning]) ==> B([业务基线 Business])
+    B ==> R{任务类型?}
+
+    subgraph ReqSide [需求侧 PM 主导]
+        direction TB
+        P1[需求调研 Research] --> P2[需求探索 Explore]
+        P2 --> P4{涉及 UI?}
+        P4 -- 是 --> P5[原型设计 Prototype]
+        P4 -- 否 --> P3[需求拆分 Storymap]
+        P5 --> P3
+        P3 ==> P6[业务故事 Story]
     end
-    R6 --> H[交接 Handoff]
-    H --> D1[提案]
-    subgraph Del[交付侧：工程师主导]
-        D1 --> D2[规格设计] --> D3[实施验证]
+
+    subgraph HandoffZone [交接]
+        H1[handoff]
     end
-    D3 --> S[分层同步] --> Ar[归档]
-    Ar -- Loop --> R6
+
+    subgraph DevSide [交付侧 工程师主导]
+        direction TB
+        D1[提案 Proposal] --> D2[行为规格 Specs]
+        D2 --> D3[技术设计 Design]
+        D3 --> D4[实施验证 Apply/Verify]
+    end
+
+    R -- 大块 Epic --> P1
+    R -- 简单功能/修复 --> D1
+
+    P6 ==> H1 ==> D1
+
+    D4 ==> K1[规格同步 Spec Sync]
+    K1 ==> L([变更归档 Archive])
+
+    L -- 下一个 Story --> P6
+    L -- Epic 完成 --> K2[基线同步 Baseline Sync]
+    K2 -.-> B
+    K2 ==> M[周期回顾 Review]
+    M -.-> A
+
+    style A fill:#fff,stroke:#00b96b,stroke-width:2px
+    style B fill:#fff,stroke:#00b96b,stroke-width:2px
+    style ReqSide fill:#f6ffed,stroke:#b7eb8f,stroke-dasharray: 5 5
+    style DevSide fill:#f0f7ff,stroke:#adc6ff,stroke-dasharray: 5 5
+    style HandoffZone fill:#fff,stroke:#1677ff,stroke-width:2px
+    style K1 fill:#fff,stroke:#00b96b,stroke-width:2px
+    style L fill:#f8fafc,stroke:#94a3b8,stroke-width:2px
+    style K2 fill:#fff,stroke:#00b96b,stroke-width:2px
+    style M fill:#fff,stroke:#00b96b,stroke-width:2px
 ```
 
 ---
