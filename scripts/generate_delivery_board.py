@@ -56,10 +56,18 @@ def scan_roadmap():
     current_no = int(re.search(r"Phase\s*(\d+)", current.group(1)).group(1)) if current else 5
     current_name = current.group(2).strip() if current else "数据洞察与经营决策"
 
+    # 从 ROADMAP.md 动态解析阶段标题（当前 + 未来），覆盖 PHASE_NAMES 硬编码默认值
+    phase_names = dict(PHASE_NAMES)
+    max_no = current_no
+    for m in re.finditer(r"#{2,4}\s+[^\n]*—\s*Phase\s*(\d+)\s*:\s*([^\n]+)", text):
+        no = int(m.group(1))
+        phase_names[no] = m.group(2).strip()
+        max_no = max(max_no, no)
+
     phases = []
-    for no in range(1, 8):
+    for no in range(1, max_no + 1):
         status = "done" if no < current_no else ("current" if no == current_no else "future")
-        name = PHASE_NAMES.get(no, f"Phase {no}")
+        name = phase_names.get(no, f"Phase {no}")
         phases.append({"no": no, "name": name, "status": status})
 
     # 当前阶段 In Scope 中的 Epic（规划中/待启动）
@@ -113,8 +121,11 @@ def scan_epics():
 
 
 def scan_ideas():
-    """想法池：读取 idea.md 标题。"""
-    text = read(os.path.join(ROOT, "openspec", "changes", "ideas", "idea.md"))
+    """想法池：读取 idea.md 标题。目录/文件不存在时返回空（无想法池）。"""
+    path = os.path.join(ROOT, "openspec", "changes", "ideas", "idea.md")
+    if not os.path.exists(path):
+        return ""
+    text = read(path)
     m = re.search(r"^#\s+(.+)$", text, re.M)
     return m.group(1).strip() if m else "全局想法池"
 
@@ -617,7 +628,7 @@ def main():
     coding_n = sum(1 for c in data["active"] if c["phase"] == "coding")
     print(f"交付看板已生成: {out}")
     print(f"  当前阶段: 阶段 {data['roadmap']['current']['no']} {data['roadmap']['current']['name']}")
-    print(f"  阶段进度: {done_count_of(data['roadmap'])}/7 完成")
+    print(f"  阶段进度: {done_count_of(data['roadmap'])}/{len(data['roadmap']['phases'])} 完成")
     print(f"  规划中: {planning_n} · 需求探索: {exploring_n} · 设计中: {design_n} · 开发中: {coding_n}")
     print(f"  已归档(近{args.days}天): {len(data['recent'])} · 历史: {len(data['history'])}")
     verified = [r for r in data["recent"] if r.get("verify")]

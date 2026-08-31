@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>库存预警 · 库存洞察 Epic 原型（ZAPP 暗黑）</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script>
+    /* ZAPP 暗黑设计令牌 —— 唯一事实来源：docs/baseline/design-system/ */
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            background: '#08080E',
+            card: '#0F0F1C',
+            foreground: '#EFEFFA',
+            muted: '#15152A',
+            'muted-foreground': '#6E6E9A',
+            secondary: '#1A1A2E',
+            primary: '#C8FF00',
+            'primary-foreground': '#08080E',
+            accent: '#FF2D6B',
+            'accent-foreground': '#FFFFFF',
+            electric: '#3B6DFF',
+            warning: '#FF9A00',
+            'warning-foreground': '#08080E',
+            success: '#00E5A0',
+            'success-foreground': '#08080E',
+            border: '#222238',
+            ring: '#C8FF00',
+          },
+          fontFamily: {
+            display: ['"Exo 2"', 'sans-serif'],
+            sans: ['"DM Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@700;800;900&family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+    /* ZAPP 规范：零圆角 / 零阴影 / 零渐变 */
+    * { border-radius: 0 !important; box-shadow: none !important; }
+    html, body { background-color: #08080E; }
+    [v-cloak] { display: none; }
+    /* number input 内箭头保留原生；聚焦高亮 */
+    input:focus, select:focus { outline: none; border-color: #C8FF00 !important; }
+  </style>
+</head>
+<body class="bg-background text-foreground font-sans antialiased" v-cloak>
+<div id="app" class="min-h-screen bg-background text-foreground font-sans">
+
+  <!-- ═══ 头部：品牌标识 + 角色标识 ═══ -->
+  <header class="h-16 bg-card border-b border-border flex items-center justify-between px-6 sticky top-0 z-50">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-primary flex items-center justify-center">
+        <span class="font-display font-black text-primary-foreground text-sm">Z</span>
+      </div>
+      <span class="font-display font-black text-lg uppercase tracking-tight text-foreground">ZAPP</span>
+      <span class="font-mono text-[10px] uppercase tracking-widest text-muted-foreground border border-border px-2 py-0.5 hidden sm:inline">极简商城 · 管理后台</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <span class="font-mono text-[10px] uppercase tracking-widest text-muted-foreground hidden sm:inline">角色切换</span>
+      <div class="flex border border-border">
+        <button
+          @click="role = '运营'"
+          :class="role === '运营' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'"
+          class="px-4 py-2 font-mono text-xs uppercase tracking-wider transition-colors">
+          运营 · 王运营
+        </button>
+        <button
+          @click="role = '老板'"
+          :class="role === '老板' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'"
+          class="px-4 py-2 font-mono text-xs uppercase tracking-wider transition-colors">
+          老板 · 李老板
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex">
+
+    <!-- ═══ 左侧导航 ═══ -->
+    <aside class="w-56 bg-card border-r border-border shrink-0 min-h-[calc(100vh-4rem)]">
+      <nav class="py-4 px-3">
+        <div class="px-3 pb-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">经营分析</div>
+        <a href="#" @click.prevent class="block px-3 py-2 font-display font-bold text-sm uppercase tracking-wide text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">销售看板</a>
+        <a href="#" @click.prevent class="block px-3 py-2 font-display font-bold text-sm uppercase tracking-wide bg-primary text-primary-foreground">库存预警</a>
+        <div class="px-3 pt-5 pb-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">商品运营</div>
+        <a href="#" @click.prevent class="block px-3 py-2 font-display font-bold text-sm uppercase tracking-wide text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">商品管理</a>
+        <a href="#" @click.prevent class="block px-3 py-2 font-display font-bold text-sm uppercase tracking-wide text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">分类管理</a>
+        <a href="#" @click.prevent class="block px-3 py-2 font-display font-bold text-sm uppercase tracking-wide text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">优惠券</a>
+        <div class="px-3 pt-5 pb-2 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">交易与用户</div>
+        <a href="#" @click.prevent class="block px-3 py-2 font-display font-bold text-sm uppercase tracking-wide text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">订单管理</a>
+        <a href="#" @click.prevent class="block px-3 py-2 font-display font-bold text-sm uppercase tracking-wide text-muted-foreground hover:text-foreground hover:bg-muted transition-colors">用户管理</a>
+      </nav>
+    </aside>
+
+    <!-- ═══ 主内容区 ═══ -->
+    <main class="flex-1 p-8">
+      <div class="max-w-screen-xl mx-auto">
+
+        <!-- 标题 + 口径说明 -->
+        <div class="mb-6">
+          <span class="font-mono text-xs uppercase tracking-widest text-muted-foreground">经营分析 / 库存洞察</span>
+          <div class="flex items-end justify-between gap-4 mt-1">
+            <h1 class="font-display font-black text-4xl uppercase tracking-tight text-foreground">库存预警</h1>
+            <span v-if="role === '老板'" class="font-mono text-xs uppercase tracking-widest text-muted-foreground border border-border px-2 py-1">纯只读 · 无配置入口</span>
+          </div>
+          <p class="text-sm text-muted-foreground mt-2 leading-relaxed">
+            口径：日均销量 = 近7日销量 ÷ 7 · 建议补货量按 7 天到货周期估算 · 库存 ≤ 阈值 即入列预警
+          </p>
+        </div>
+
+        <!-- ── 运营：阈值配置区（仅运营可见） ── -->
+        <section v-if="role === '运营'" class="bg-card border border-border p-6 mb-6">
+          <div class="flex items-center justify-between gap-6 flex-wrap">
+            <div class="flex items-end gap-5">
+              <div>
+                <span class="block font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1.5">全局默认阈值</span>
+                <div class="flex items-center gap-2">
+                  <input
+                    type="number" min="0" v-model.number="globalThreshold" aria-label="全局默认阈值" name="global-threshold"
+                    class="w-28 bg-muted border border-border px-4 py-2.5 font-mono text-sm font-bold text-foreground placeholder:text-muted-foreground">
+                  <span class="font-mono text-xs text-muted-foreground">件</span>
+                </div>
+                <p class="font-mono text-[10px] text-muted-foreground mt-1.5 opacity-70">未设置覆盖的商品以此为准 · 修改后列表即时刷新</p>
+              </div>
+              <button
+                @click="saveConfig"
+                class="bg-primary text-primary-foreground font-display font-bold uppercase tracking-wide px-6 py-2.5 text-sm hover:opacity-85 active:scale-[0.98] transition-all">
+                保存配置
+              </button>
+            </div>
+            <div class="text-right">
+              <p class="font-mono text-[10px] uppercase tracking-widest text-warning mb-1">仅运营可配置 · 即时生效</p>
+              <p class="font-mono text-[10px] text-muted-foreground">商品级覆盖：按单品单独设置 · 长期有效</p>
+              <p v-if="savedFlag" class="font-mono text-[10px] font-bold text-success mt-1.5">✓ 已保存 · 阈值已即时生效</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── 老板：全局库存健康度总览（只读） ── -->
+        <section v-else class="bg-card border border-border p-6 mb-6">
+          <div class="flex items-center justify-between mb-5">
+            <span class="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">全局库存健康度总览 · 只读</span>
+            <span class="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">到货周期 7 天 · 数据来自近7日销量</span>
+          </div>
+          <div class="grid grid-cols-3 gap-4">
+            <div class="border border-border bg-background p-5">
+              <div class="font-display font-black text-4xl text-primary">{{ statWarning }}</div>
+              <div class="font-mono text-xs uppercase tracking-widest text-muted-foreground mt-1.5">预警商品数</div>
+              <p class="text-xs text-muted-foreground mt-2 leading-relaxed">库存 ≤ 阈值 已入列监控</p>
+            </div>
+            <div class="border border-border bg-background p-5">
+              <div class="font-display font-black text-4xl text-accent">{{ statSoldOut }}</div>
+              <div class="font-mono text-xs uppercase tracking-widest text-muted-foreground mt-1.5">已售罄数</div>
+              <p class="text-xs text-muted-foreground mt-2 leading-relaxed">库存为 0 · 最需关注</p>
+            </div>
+            <div class="border border-border bg-background p-5">
+              <div class="font-display font-black text-4xl text-warning">{{ statRisk }}</div>
+              <div class="font-mono text-xs uppercase tracking-widest text-muted-foreground mt-1.5">超卖风险数</div>
+              <p class="text-xs text-muted-foreground mt-2 leading-relaxed">售罄天数不足 7 天到货周期</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── 预警列表 ── -->
+        <section class="bg-card border border-border">
+          <div class="flex items-center justify-between px-6 pt-5 pb-4 border-b border-border flex-wrap gap-3">
+            <div>
+              <h2 class="font-display font-black text-xl uppercase tracking-tight text-foreground">预警列表</h2>
+              <p class="text-xs text-muted-foreground mt-1">超卖风险 = 预计售罄天数 &lt; 7 天 · 建议补货量 = max(0, ⌈日均销量×7⌉ − 当前库存)</p>
+            </div>
+            <div class="flex border border-border">
+              <button
+                @click="activeTab = 'warning'"
+                :class="activeTab === 'warning' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'"
+                class="px-5 py-2 font-display font-bold text-xs uppercase tracking-wide transition-colors">
+                预警中 · {{ warningList.length }}
+              </button>
+              <button
+                @click="activeTab = 'healthy'"
+                :class="activeTab === 'healthy' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'"
+                class="px-5 py-2 font-display font-bold text-xs uppercase tracking-wide transition-colors">
+                健康水位 · {{ healthyList.length }}
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[1020px] text-sm">
+              <thead>
+                <tr class="border-b border-border text-left">
+                  <th class="py-3 px-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-normal">商品名</th>
+                  <th class="py-3 px-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-normal text-right">当前库存</th>
+                  <th class="py-3 px-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-normal text-right">预警阈值</th>
+                  <th class="py-3 px-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-normal text-right">近7日日均销量</th>
+                  <th class="py-3 px-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-normal text-right">预计售罄天数</th>
+                  <th class="py-3 px-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-normal text-center">超卖风险标识</th>
+                  <th class="py-3 px-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-normal text-right">建议补货量</th>
+                  <th class="py-3 px-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-normal text-center">状态</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="p in shownList"
+                  :key="p.id"
+                  :class="p.stock === 0 ? 'bg-muted/50' : 'hover:bg-muted/30'"
+                  class="border-b border-border transition-colors">
+                  <!-- 商品名 -->
+                  <td class="py-3.5 px-4">
+                    <div class="font-display font-bold text-sm text-foreground">{{ p.name }}</div>
+                    <div class="font-mono text-[10px] text-muted-foreground mt-0.5">{{ p.category }}</div>
+                  </td>
+                  <!-- 当前库存 -->
+                  <td class="py-3.5 px-4 text-right">
+                    <span class="font-mono font-bold" :class="stockColor(p)">{{ p.stock }} 件</span>
+                  </td>
+                  <!-- 预警阈值 -->
+                  <td class="py-3.5 px-4 text-right">
+                    <template v-if="p.override != null">
+                      <span v-if="role === '运营'" class="inline-flex items-center gap-1.5">
+                        <input
+                          type="number" min="0" v-model.number="p.override" aria-label="商品级覆盖阈值" name="override-threshold"
+                          class="w-16 bg-muted border border-border px-2 py-1 font-mono text-sm font-bold text-foreground text-center">
+                        <span class="font-mono text-[10px] uppercase tracking-widest text-warning">覆盖</span>
+                      </span>
+                      <span v-else class="font-mono font-bold text-warning">{{ p.override }}<span class="ml-1 font-mono text-[10px] uppercase tracking-widest text-warning">覆盖</span></span>
+                    </template>
+                    <template v-else>
+                      <span class="font-mono font-bold text-foreground">{{ globalThreshold }}</span>
+                      <span class="ml-1 font-mono text-[10px] text-muted-foreground">全局</span>
+                    </template>
+                  </td>
+                  <!-- 近7日日均销量 -->
+                  <td class="py-3.5 px-4 text-right">
+                    <template v-if="p.dailyAvg > 0">
+                      <div class="font-mono font-bold text-foreground">{{ fmtAvg(p.dailyAvg) }} 件/日</div>
+                      <div class="font-mono text-[10px] text-muted-foreground mt-0.5">近7日 {{ p.sales7d }} 件</div>
+                    </template>
+                    <span v-else class="font-mono text-xs text-muted-foreground">暂无销量</span>
+                  </td>
+                  <!-- 预计售罄天数 -->
+                  <td class="py-3.5 px-4 text-right">
+                    <span v-if="p.dailyAvg > 0" class="font-mono font-bold" :class="daysColor(p)">{{ fmtDay(p.daysToSellout) }}</span>
+                    <span v-else class="font-mono text-xs text-muted-foreground">—</span>
+                  </td>
+                  <!-- 超卖风险标识 -->
+                  <td class="py-3.5 px-4 text-center">
+                    <span v-if="p.risk" class="inline-flex items-center px-2 py-0.5 font-mono text-[10px] font-bold tracking-widest uppercase bg-warning text-warning-foreground">超卖风险</span>
+                    <span v-else class="font-mono text-xs text-muted-foreground">—</span>
+                  </td>
+                  <!-- 建议补货量 -->
+                  <td class="py-3.5 px-4 text-right">
+                    <template v-if="p.stock === 0">
+                      <span class="font-mono font-bold text-accent">{{ p.replenish }} 件</span>
+                    </template>
+                    <template v-else-if="p.replenish > 0">
+                      <span class="font-mono font-bold text-primary">{{ p.replenish }} 件</span>
+                    </template>
+                    <span v-else class="font-mono text-xs text-muted-foreground">无需补货</span>
+                  </td>
+                  <!-- 状态 -->
+                  <td class="py-3.5 px-4 text-center">
+                    <span v-if="p.stock === 0" class="inline-flex items-center px-2 py-0.5 font-mono text-[10px] font-bold tracking-widest uppercase bg-accent text-accent-foreground">已售罄</span>
+                    <span v-else-if="p.risk" class="inline-flex items-center px-2 py-0.5 font-mono text-[10px] font-bold tracking-widest uppercase bg-warning text-warning-foreground">低库存</span>
+                    <span v-else-if="p.listed" class="inline-flex items-center px-2 py-0.5 font-mono text-[10px] font-bold tracking-widest uppercase border border-border text-foreground">低库存</span>
+                    <span v-else class="inline-flex items-center px-2 py-0.5 font-mono text-[10px] font-bold tracking-widest uppercase bg-success text-success-foreground">库存充足</span>
+                  </td>
+                </tr>
+
+                <tr v-if="shownList.length === 0">
+                  <td colspan="8" class="py-12 text-center">
+                    <div class="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                      <template v-if="activeTab === 'warning'">当前无预警商品 · 全部商品处于健康水位</template>
+                      <template v-else>当前无健康水位商品 · 全部商品已入列预警</template>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- 排序与口径脚注 -->
+          <div class="px-6 py-3 flex items-center justify-between flex-wrap gap-2">
+            <p class="font-mono text-[10px] text-muted-foreground">排序：已售罄置顶 · 其余按预计售罄天数升序（最紧迫在前）</p>
+            <p class="font-mono text-[10px] text-muted-foreground">到货周期固定 7 天（MVP）· 无销量商品不计算售罄天数</p>
+          </div>
+        </section>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+  const { createApp } = Vue;
+
+  createApp({
+    data() {
+      return {
+        role: '运营',            // 运营 王运营 / 老板 李老板
+        globalThreshold: 10,    // 全局默认阈值（件）
+        activeTab: 'warning',   // warning | healthy
+        savedFlag: false,
+        rawProducts: [
+          // 真实业务数据：6 个在售商品，构造有区分度的库存/销量场景
+          { id: 1, name: '极简机械键盘',     category: '键盘外设', stock: 3,  dailyAvg: 1.2, sales7d: 8,  override: null }, // 跑量款：售罄 2.5 天 → 超卖风险
+          { id: 2, name: '无线办公鼠标',     category: '键盘外设', stock: 8,  dailyAvg: 2.0, sales7d: 14, override: null }, // 售罄 4 天 → 超卖风险
+          { id: 3, name: '高清显示器',       category: '影音设备', stock: 5,  dailyAvg: 0.3, sales7d: 2,  override: null }, // 慢销：售罄 16.7 天 → 低库存无风险
+          { id: 4, name: '桌面收纳架',       category: '桌面配件', stock: 0,  dailyAvg: 4.0, sales7d: 28, override: null }, // 已售罄（置顶）
+          { id: 5, name: '铝合金笔记本支架', category: '桌面配件', stock: 15, dailyAvg: 0.1, sales7d: 1,  override: 15   }, // 覆盖阈值 15 → 入列演示
+          { id: 6, name: '桌面拾音氛围灯',   category: '桌面配件', stock: 40, dailyAvg: 0,   sales7d: 0,  override: null }, // 无销量 · 健康水位不入列
+        ],
+      };
+    },
+    computed: {
+      /* 逐商品计算：有效阈值 / 入列 / 售罄天数 / 超卖风险 / 建议补货量（idea.md 口径） */
+      products() {
+        return this.rawProducts.map(p => {
+          const eff = p.override != null ? Number(p.override) : this.globalThreshold;
+          const listed = p.stock === 0 || p.stock <= eff;
+          const daysToSellout = p.dailyAvg > 0 ? (p.stock === 0 ? 0 : p.stock / p.dailyAvg) : null;
+          const risk = p.dailyAvg > 0 && p.stock > 0 && daysToSellout < 7;
+          const replenish = p.dailyAvg > 0 ? Math.max(0, Math.ceil(p.dailyAvg * 7) - p.stock) : 0;
+          return { ...p, effThreshold: eff, listed, daysToSellout, risk, replenish };
+        });
+      },
+      warningList() {
+        const list = this.products.filter(p => p.listed);
+        list.sort((a, b) => {
+          if (a.stock === 0 && b.stock !== 0) return -1;   // 已售罄置顶
+          if (b.stock === 0 && a.stock !== 0) return 1;
+          if (a.stock === 0 && b.stock === 0) return 0;
+          return (a.daysToSellout ?? Infinity) - (b.daysToSellout ?? Infinity); // 售罄天数升序
+        });
+        return list;
+      },
+      healthyList() {
+        return this.products.filter(p => !p.listed);
+      },
+      shownList() {
+        return this.activeTab === 'warning' ? this.warningList : this.healthyList;
+      },
+      /* 老板健康度总览 */
+      statWarning() { return this.warningList.length; },
+      statSoldOut() { return this.warningList.filter(p => p.stock === 0).length; },
+      statRisk()    { return this.warningList.filter(p => p.risk).length; },
+    },
+    methods: {
+      fmtAvg(v) { return v.toFixed(1); },
+      fmtDay(v) {
+        if (v === null) return '—';
+        const s = Number.isInteger(v) ? String(v) : v.toFixed(1);
+        return s + ' 天';
+      },
+      stockColor(p) {
+        if (p.stock === 0) return 'text-accent';
+        if (p.stock <= p.effThreshold) return 'text-warning';
+        return 'text-foreground';
+      },
+      daysColor(p) {
+        if (p.stock === 0) return 'text-accent';
+        if (p.risk) return 'text-warning';
+        return 'text-foreground';
+      },
+      saveConfig() {
+        this.savedFlag = true;
+        setTimeout(() => { this.savedFlag = false; }, 3000);
+      },
+    },
+  }).mount('#app');
+</script>
+</body>
+</html>

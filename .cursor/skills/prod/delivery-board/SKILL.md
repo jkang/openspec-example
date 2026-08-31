@@ -22,7 +22,7 @@ metadata:
 
 | 看板区块 | 数据来源 |
 | :--- | :--- |
-| 路线图阶段进度（阶段 1~7 状态） | `docs/ROADMAP.md`（当前阶段 / 未来阶段） |
+| 路线图阶段进度（阶段 1~N 状态，随 ROADMAP 动态） | `docs/ROADMAP.md`（当前阶段 / 未来阶段） |
 | 规划中（待启动 Epic） | `docs/ROADMAP.md` 当前阶段 In Scope 中**尚未进入需求侧/交付侧**的 Epic |
 | 需求漏斗（需求侧 Epic 阶段状态） | `openspec-requirements/epics/*/STATUS.md` + 各阶段制品存在性（research.md / idea.md / prototypes/ / storymap.md / stories/） |
 | 探索中（想法池 + 需求侧活跃 Epic + 交付侧骨架） | `openspec/changes/ideas/idea.md` · 需求侧活跃 Epic · `openspec/changes/` 无 proposal 的变更 |
@@ -81,7 +81,7 @@ jobs:
 ## 看板信息架构
 
 - **头部**：看板标题 + 项目名 + 当前阶段徽章 + 最后刷新时间。
-- **路线图阶段进度**：阶段 1~7 状态条（已完成 / 当前 / 未来）+ 完成百分比。
+- **路线图阶段进度**：阶段 1~N 状态条（已完成 / 当前 / 未来，随 ROADMAP 动态）+ 完成百分比。
 - **指标行**：规划中 / 需求探索中 / 设计中 / 开发中 / 已归档（近 N 天）/ 质量信号。
 - **业务基线**：三张内容摘要卡片（阶段数 / 节点数 / Bounded Context 数 + 更新时间 + 查看链接），不只是文件名。
 - **需求漏斗**：需求侧 Epic 各阶段状态灯（调研 · 探索 · 原型 · 拆分 · 故事）+ 完成状态。

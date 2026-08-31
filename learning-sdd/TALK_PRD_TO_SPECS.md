@@ -41,7 +41,7 @@
 
 ## 01.5 分层治理可视化：OpenSpec 的三种形态
 
-> **提示**：为了获得最佳视觉体验，请查看 [OpenSpec 分层治理体系全景图 (High-Fidelity)](file:///Users/superkkk/MyCoding/OpenSpec-practice/docs/visuals/workflow-evolution.html)。
+> **提示**：为了获得最佳视觉体验，请查看 [OpenSpec 蓝图级分层治理体系全景图 (Blueprint)](file:///Users/superkkk/MyCoding/OpenSpec-practice/learning-sdd/visuals/workflow-blueprint.html)。
 
 ### 形态一：极简交付 (Minimalist Delivery)
 专注于单 Change 的快速闭环，确立了“意图 -> 规格 -> 代码”的原始管线。
@@ -50,77 +50,59 @@
 graph LR
     subgraph LeadAgent [Lead Agent]
         direction TB
-        E[归档 Archive<br/><small>Command: /opsx:archive<br/>Skill: archive-change</small>]
+        E[归档 Archive<br/><small>Cmd: /opsx:archive<br/>Skill: archive-change</small>]
     end
 
     subgraph EngineerAgent [Engineer Agent]
-        direction LR
-        A[探索 Explore<br/><small>业务设计 (idea.md)<br/>Command: /opsx:explore<br/>Skill: explore</small>] ==> B[提案 Propose<br/><small>工程提案 + 原型设计<br/>Command: /opsx:propose<br/>Skill: propose</small>]
-        B ==> C[实施 Apply<br/><small>代码实施与验证<br/>Command: /opsx:apply<br/>Skill: apply-change</small>]
-        C ==> D[同步 Sync<br/><small>规格同步 Spec Sync<br/>Command: /opsx:sync<br/>Skill: sync-specs</small>]
+        direction TB
+        A[探索 Explore<br/><small>idea.md<br/>Cmd: /opsx:explore<br/>Skill: explore</small>]
+        B[提案 Propose<br/><small>proposal.md<br/>Cmd: /opsx:propose<br/>Skill: propose</small>]
+        C[实施 Apply<br/><small>Code + verify.md<br/>Cmd: /opsx:apply<br/>Skill: apply-change</small>]
+        D[同步 Sync<br/><small>Delta Specs<br/>Cmd: /opsx:sync<br/>Skill: sync-specs</small>]
     end
 
-    D ==> E
+    A --> B --> C --> D --> E
 
-    style A fill:#fff,stroke:#00b96b,stroke-width:6px
-    style B fill:#fff,stroke:#00b96b,stroke-width:6px
-    style C fill:#fff,stroke:#00b96b,stroke-width:6px
-    style D fill:#fff,stroke:#00b96b,stroke-width:6px
-    style E fill:#f8fafc,stroke:#94a3b8,stroke-width:6px
+    style A fill:#fff,stroke:#1677ff,stroke-width:4px
+    style B fill:#fff,stroke:#1677ff,stroke-width:4px
+    style C fill:#fff,stroke:#1677ff,stroke-width:4px
+    style D fill:#fff,stroke:#1677ff,stroke-width:4px
+    style E fill:#f8fafc,stroke:#94a3b8,stroke-width:4px
 ```
 
 ### 形态二：轻量产品 (Lightweight Product)
 引入了“规划与业务基线”，支持 Multi-Story 循环迭代，解决了复杂业务逻辑的拆解与价值对齐问题。
 
 ```mermaid
-flowchart LR
-    subgraph PMAgent [PM Agent]
+graph LR
+    subgraph LeadPM [Lead / PM]
         direction TB
-        A([规划基线 Planning<br/><small>Command: /opsx:planning:*<br/>Skill: product-planning</small>])
-        C[需求探索 Explore<br/><small>Command: /req:explore<br/>Skill: explore</small>]
-        K[周期回顾 Review<br/><small>Command: /opsx:planning:product-planning<br/>Skill: product-planning</small>]
+        A([规划 Plan<br/><small>ROADMAP.md</small>])
+        B([基线 Base<br/><small>Blueprint</small>])
+        K[回顾 Review<br/><small>Roadmap Update</small>]
     end
 
-    subgraph LeadAgent2 [Lead Agent]
+    subgraph Execution [Engineer Agent / Story Loop]
         direction TB
-        B([业务基线 Business<br/><small>Command: /opsx:baseline/sync<br/>Skill: blueprint</small>])
-        I[同步 Sync<br/><small>Command: /opsx:sync<br/>Skill: sync-specs</small>]
-        J([变更归档 Archive<br/><small>Command: /opsx:archive<br/>Skill: archive-change</small>])
+        C[探索 Explore<br/><small>idea.md</small>]
+        D[提案 Propose<br/><small>proposal.md</small>]
+        subgraph Loop [Multi-Story Loop]
+            direction TB
+            E[原型 Prototype]
+            F[实施 Apply]
+        end
+        G[同步 Sync<br/><small>Spec Sync</small>]
+        H[归档 Archive]
     end
 
-    subgraph EngineerAgent2 [Engineer Agent]
-        direction TB
-        D[方案提案 Propose<br/><small>Command: /opsx:propose<br/>Skill: propose</small>]
-    end
-
-    subgraph MultiStoryLoop [Multi-Story 执行循环]
-        direction TB
-        E{涉及 UI?}
-        F[原型设计 Prototype<br/><small>Command: /req:prototype<br/>Skill: prototype</small>]
-        G[业务故事 Story<br/><small>Command: /req:story<br/>Skill: story</small>]
-        H[实施与验证<br/><small>Command: /opsx:apply<br/>Skill: apply-change</small>]
-    end
-
-    A ==> B ==> C ==> D ==> E
-    E -- 是 --> F ==> G
-    E -- 否 --> G
-    G ==> H
-    H -- 下一个 Story --> E
-    
-    H ==> I ==> J ==> K
+    A --> B --> C --> D --> E --> F
+    F -- Next Story --> E
+    F --> G --> H --> K
     K -.-> A
 
-    style A fill:#fff,stroke:#1677ff,stroke-width:6px
-    style B fill:#fff,stroke:#1677ff,stroke-width:6px
-    style C fill:#fff,stroke:#1677ff,stroke-width:4px
-    style D fill:#fff,stroke:#1677ff,stroke-width:4px
-    style MultiStoryLoop fill:#f0f7ff,stroke:#dbeafe,stroke-dasharray: 5 5
-    style E fill:#fff,stroke:#1677ff,stroke-width:4px
-    style F fill:#fff,stroke:#1677ff,stroke-width:4px
-    style G fill:#fff,stroke:#1677ff,stroke-width:4px
-    style H fill:#fff,stroke:#1677ff,stroke-width:4px
-    style I fill:#fff,stroke:#1677ff,stroke-width:4px
-    style J fill:#f8fafc,stroke:#94a3b8,stroke-width:4px
+    style A fill:#fff,stroke:#1677ff,stroke-width:4px
+    style B fill:#fff,stroke:#1677ff,stroke-width:4px
+    style Loop fill:#eff6ff,stroke:#dbeafe,stroke-dasharray: 5 5
     style K fill:#fff,stroke:#1677ff,stroke-width:4px
 ```
 
@@ -128,67 +110,41 @@ flowchart LR
 实现了需求侧与交付侧的深度解耦，通过标准化漏斗、交接契约与分层同步，支持规模化协作与持续架构演进。
 
 ```mermaid
-flowchart LR
-    subgraph PMAgent3 [PM Agent]
+graph LR
+    subgraph Funnel [PM / Requirement Funnel]
         direction TB
-        A([规划基线 Planning<br/><small>Command: /opsx:planning:*<br/>Skill: product-planning</small>])
-        subgraph ReqSide [需求侧 PM 主导]
-            direction TB
-            P1[需求调研 Research<br/><small>Command: /req:research<br/>Skill: research</small>] ==> P2[需求探索 Explore<br/><small>Command: /req:explore<br/>Skill: explore</small>]
-            P2 ==> P4{涉及 UI?}
-            P4 -- 是 --> P5[原型设计 Prototype<br/><small>Command: /req:prototype<br/>Skill: prototype</small>]
-            P4 -- 否 --> P3[需求拆分 Storymap<br/><small>Command: /req:storymap<br/>Skill: storymap</small>]
-            P5 ==> P3
-            P3 ==> P6[业务故事 Story<br/><small>Command: /req:story<br/>Skill: story</small>]
-        end
-        M[周期回顾 Review<br/><small>Command: /opsx:planning:product-planning<br/>Skill: product-planning</small>]
+        P1[调研 Research]
+        P2[探索 Explore]
+        P3[故事 Story]
     end
 
-    subgraph LeadAgent3 [Lead Agent]
-        direction TB
-        B([业务基线 Business<br/><small>Command: /opsx:baseline/sync<br/>Skill: blueprint</small>])
-        R{任务类型?}
-        subgraph HandoffZone [交接]
-            H1[handoff<br/><small>Command: /req:handoff<br/>Skill: handoff</small>]
-        end
-        K1[规格同步 Spec Sync<br/><small>Command: /opsx:sync<br/>Skill: sync-specs</small>]
-        L([变更归档 Archive<br/><small>Command: /opsx:archive<br/>Skill: archive-change</small>])
-        K2[基线同步 Baseline Sync<br/><small>Command: /opsx:baseline/sync<br/>Skill: blueprint</small>]
+    subgraph Bridge [Lead]
+        H1[交接 Handoff<br/><small>Synthesized Proposal</small>]
     end
 
-    subgraph EngineerAgent3 [Engineer Agent]
+    subgraph Pipeline [Engineer / Execution Pipeline]
         direction TB
-        subgraph DevSide [交付侧 工程师主导]
-            direction TB
-            D1[提案 Proposal<br/><small>Command: /opsx:propose<br/>Skill: propose</small>] ==> D2[行为规格 Specs<br/><small>Command: /opsx:spec-design<br/>Skill: spec-design</small>]
-            D2 ==> D3[技术设计 Design<br/><small>Command: /opsx:spec-design<br/>Skill: spec-design</small>]
-            D3 ==> D4[实施验证 Apply/Verify<br/><small>Command: /opsx:apply & /opsx:verify<br/>Skill: apply-change & verify</small>]
-        end
+        D1[规格 Spec]
+        D2[实施 Apply]
+        D3[同步 Sync]
     end
 
-    A ==> B ==> R
-    R -- 大块 Epic --> P1
-    R -- 简单功能/修复 --> D1
+    subgraph Governance [Lead / Governance]
+        direction TB
+        G1[归档 Archive]
+        G2[基线同步 Baseline Sync]
+    end
 
-    P6 ==> H1 ==> D1
+    P1 --> P2 --> P3 --> H1 --> D1 --> D2 --> D3 --> G1 --> G2
+    G1 -- Next Story --> P3
+    G2 -- Next Epic --> P1
 
-    D4 ==> K1 ==> L
-
-    L -- 下一个 Story --> P6
-    L -- Epic 完成 --> K2
-    K2 -.-> B
-    K2 ==> M ==> A
-
-    style A fill:#fff,stroke:#00b96b,stroke-width:6px
-    style B fill:#fff,stroke:#00b96b,stroke-width:6px
-    style ReqSide fill:#f6ffed,stroke:#b7eb8f,stroke-dasharray: 5 5
-    style DevSide fill:#f0f7ff,stroke:#adc6ff,stroke-dasharray: 5 5
-    style HandoffZone fill:#fff,stroke:#1677ff,stroke-width:6px
-    style K1 fill:#fff,stroke:#00b96b,stroke-width:6px
-    style L fill:#f8fafc,stroke:#94a3b8,stroke-width:6px
-    style K2 fill:#fff,stroke:#00b96b,stroke-width:6px
-    style M fill:#fff,stroke:#00b96b,stroke-width:6px
+    style Funnel fill:#f6ffed,stroke:#00b96b,stroke-width:2px
+    style Pipeline fill:#eff6ff,stroke:#1677ff,stroke-width:2px
+    style Bridge fill:#1e293b,color:#fff
+    style G2 fill:#fff,stroke:#00b96b,stroke-width:4px
 ```
+
 
 ---
 

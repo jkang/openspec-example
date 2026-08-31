@@ -493,14 +493,14 @@
                 <div class="section-body">
                     <div class="viz-shell">
                         <div class="viz-canvas">
-                            <div id="mapping-canvas" class="viz-canvas-inner" style="width: 1180px; height: 1440px;"></div>
+                            <div id="mapping-canvas" class="viz-canvas-inner" style="width: 1180px; height: 1560px;"></div>
                         </div>
                         <table class="viz-table" id="mapping-table"></table>
                     </div>
                 </div>
             </section>
 
-            <div class="footer-note">Last Updated: 2026-08-30</div>
+            <div class="footer-note">Last Updated: 2026-08-31</div>
         </div>
     </div>
 
@@ -867,14 +867,17 @@
                 ['User', '防枚举登录', '账号不存在与密码错误统一提示「手机号或密码不正确」，不泄露账号存在性。'],
                 ['User', 'B 端权限门禁', '用户管理接口仅 role=运营 会话可访问；客服/未登录 403，不返回手机号等敏感信息。'],
                 ['DataInsights', '看板权限门禁', '销售看板接口（dashboard/sales、dashboard/ranking）仅 role=运营 或 role=老板 会话可访问；客服/未登录 403。老板为只读看板角色，无管理写权限。'],
-                ['DataInsights', '销售口径约束', '销售额=SUM(actualPaidCents)，仅计 PAID/SHIPPED/COMPLETED，按 paidAt 时间归属；优惠让利=SUM(discountCents) 单列；CANCELLED/PENDING 不计入。']
+                ['DataInsights', '销售口径约束', '销售额=SUM(actualPaidCents)，仅计 PAID/SHIPPED/COMPLETED，按 paidAt 时间归属；优惠让利=SUM(discountCents) 单列；CANCELLED/PENDING 不计入。'],
+                ['DataInsights', '库存预警判定', 'stock ≤ 有效阈值（商品级覆盖优先，否则全局默认 10 件）入列；stock=0 已售罄置顶；超卖风险 = 预计售罄天数 < 7 天。'],
+                ['DataInsights', '库存预警门禁', '预警接口（dashboard/stock）仅 role=运营 或 role=老板 可访问；配置写（stock-config）仅运营；客服/客户 403、未登录 401。'],
+                ['DataInsights', '补货建议口径', '日均销量=近7日成交 Σ(items.quantity)÷7（向上取整 0.1）；建议补货量=max(0,⌈日均×7⌉−stock)，到货周期固定 7 天；无销量不计算天数。']
             ],
             readModels: [
                 ['Catalog', '商品搜索结果', '供买家浏览与筛选。'],
                 ['Cart', '购物车快照', '供结算页与最优券算法消费。'],
                 ['Coupon', '可用券集合', '包含门槛、类型、有效期与归属。'],
                 ['Order', '订单成功页', '展示已锁定的订单与支付信息。'],
-                ['Operator', '库存看板', '运营查看销量与补货状态。'],
+                ['Operator', '库存看板', '运营/老板查看低库存预警（阈值可配置）与补货建议（日均销量→售罄天数→建议量）；老板只读健康度总览。'],
                 ['Operator', '销售看板', '老板/运营查看销售总览（4 指标/时间维度/趋势/优惠券效果）与商品/分类排行，只读聚合自订单明细（data-insights BC）。'],
                 ['Operator', '用户列表', 'B 端用户管理：ID/昵称/手机号/订单数/注册日期/状态。'],
                 ['Operator', '用户详情', '基础信息 + 该用户订单聚合（一人多单）。'],
@@ -923,12 +926,12 @@
                 root: 'User (id, phone, passwordHash, nickname, status, role, createdAt)',
                 entities: 'Session (token, userId, createdAt) 作为跨聚合凭证对象由 User Context 管理。',
                 values: 'PhoneNumber, PasswordHash, UserRole, AccountStatus',
-                invariant: '手机号全局唯一；密码仅存 scrypt 哈希不落明文；status ∈ {正常, 禁用}（注册默认正常）；role ∈ {客户, 运营, 客服}（注册默认客户）；禁用后登录与既有会话访问均被拒绝，启用后恢复。'
+                invariant: '手机号全局唯一；密码仅存 scrypt 哈希不落明文；status ∈ {正常, 禁用}（注册默认正常）；role ∈ {客户, 运营, 客服, 老板}（注册默认客户）；禁用后登录与既有会话访问均被拒绝，启用后恢复。'
             }
         ];
 
         const mappingGraph = {
-            canvas: { width: 1180, height: 1320, nodeWidth: 240, nodeHeight: 120 },
+            canvas: { width: 1180, height: 1560, nodeWidth: 240, nodeHeight: 120 },
             nodes: [
                 { id: 'bc-catalog', title: 'Catalog Context', subtitle: 'Bounded Context', meta: ['Governance'], x: 100, y: 40 },
                 { id: 'bc-cart', title: 'Cart Context', subtitle: 'Bounded Context', meta: ['Governance'], x: 100, y: 180 },
@@ -951,7 +954,8 @@
                 { id: 'cap-account', title: 'account-management', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1020 },
                 { id: 'cap-session', title: 'user-session', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1120 },
                 { id: 'cap-admin', title: 'user-admin', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1220 },
-                { id: 'cap-sales-dashboard', title: 'sales-dashboard', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1320 }
+                { id: 'cap-sales-dashboard', title: 'sales-dashboard', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1320 },
+                { id: 'cap-stock-insight', title: 'stock-insight', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1440 }
             ],
             edges: [
                 { from: 'bc-catalog', to: 'cap-catalog', label: 'Governs', rule: 'Catalog 边界负责商品元数据与库存管理' },
@@ -967,7 +971,8 @@
                 { from: 'bc-user', to: 'cap-account', label: 'Governs', rule: 'User 边界负责账户注册/登录认证与生命周期状态' },
                 { from: 'bc-user', to: 'cap-session', label: 'Governs', rule: 'User 边界负责会话创建/校验/销毁' },
                 { from: 'bc-user', to: 'cap-admin', label: 'Governs', rule: 'User 边界负责 B 端用户管理（列表/检索/详情/启停 + 权限门禁 + role=老板 只读扩展）' },
-                { from: 'bc-data-insights', to: 'cap-sales-dashboard', label: 'Governs', rule: 'Data Insights 边界负责销售报表看板（指标聚合/时间维度/趋势/排行，只读消费 Order 数据）' }
+                { from: 'bc-data-insights', to: 'cap-sales-dashboard', label: 'Governs', rule: 'Data Insights 边界负责销售报表看板（指标聚合/时间维度/趋势/排行，只读消费 Order 数据）' },
+                { from: 'bc-data-insights', to: 'cap-stock-insight', label: 'Governs', rule: 'Data Insights 边界负责库存洞察（低库存预警/阈值配置/补货建议，只读消费 Catalog stock 与 Order 销量）' }
             ]
         };
 

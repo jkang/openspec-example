@@ -165,6 +165,31 @@ export class UserRepo {
   }
 }
 
+export class StockConfigRepo {
+  constructor() {
+    // 缺省配置：全局默认阈值 10 件 + 空覆盖表（R-STOCK-004）
+    this.config = { globalThreshold: 10, overrides: {} }
+  }
+
+  getConfig() {
+    return this.config
+  }
+
+  setGlobalThreshold(threshold) {
+    this.config.globalThreshold = threshold
+    return this.config
+  }
+
+  setOverride(productId, threshold) {
+    this.config.overrides[String(productId)] = threshold
+    return this.config
+  }
+
+  clear() {
+    this.config = { globalThreshold: 10, overrides: {} }
+  }
+}
+
 export class SessionRepo {
   constructor() {
     this.sessions = new Map()

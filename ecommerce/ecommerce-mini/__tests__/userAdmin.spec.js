@@ -1,9 +1,37 @@
 import { describe, it, beforeEach } from 'node:test'
 import assert from 'node:assert'
+import fs from 'node:fs'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { UserRepo, OrderRepo, SessionRepo } from '../src/repo/memoryRepo.js'
 import { AuthService } from '../src/services/auth.js'
 import { AdminUserService } from '../src/services/userAdmin.js'
 import { assertUserStatusValue, assertUserEnabled } from '../src/domain/logic.js'
+import { initialUsers } from '../src/http/server.js'
+
+describe('老板角色种子演示账号 user_1003（@unit，user-admin delta spec）', () => {
+  it('代码种子包含 user_1003（role=老板 昵称 李老板 状态 正常），与 user_1001（运营）并存', () => {
+    const boss = initialUsers.find(u => u.id === 'user_1003')
+    assert.ok(boss, '代码种子应包含 user_1003')
+    assert.strictEqual(boss.role, '老板')
+    assert.strictEqual(boss.nickname, '李老板')
+    assert.strictEqual(boss.status, '正常')
+    assert.ok(initialUsers.some(u => u.id === 'user_1001' && u.role === '运营'), 'user_1001（运营）应并存')
+  })
+
+  it('运行时数据层三者并存：data/users.json 含 user_1001（运营）/ user_1002（客户）/ user_1003（老板）', () => {
+    // user_1002（客户·林晓明）为既有运行时账户（file 模式首次启动后注册/补录），
+    // 与代码种子 user_1001/user_1003 在运行态数据层三者并存（user-admin delta spec）
+    const dataDir = fileURLToPath(new URL('../data', import.meta.url))
+    const usersPath = path.join(dataDir, 'users.json')
+    if (!fs.existsSync(usersPath)) return // 干净环境无运行时数据文件：跳过（种子口径由代码种子保证）
+    const users = JSON.parse(fs.readFileSync(usersPath, 'utf-8'))
+    const byId = Object.fromEntries(users.map(u => [u.id, u]))
+    assert.strictEqual(byId['user_1001']?.role, '运营')
+    assert.strictEqual(byId['user_1002']?.role, '客户')
+    assert.strictEqual(byId['user_1003']?.role, '老板')
+  })
+})
 
 describe('B 端用户管理 - 领域规则（@unit）', () => {
   it('状态值校验：正常/禁用通过', () => {

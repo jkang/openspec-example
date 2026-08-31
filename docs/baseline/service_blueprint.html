@@ -472,7 +472,7 @@
                     所有能力命名优先对齐 `domain_model.html` 中的 Capability taxonomy。
                 </p>
             </div>
-            <div class="meta">Baseline / Last Updated: 2026-08-30</div>
+            <div class="meta">Baseline / Last Updated: 2026-08-31</div>
         </div>
 
         <div class="intro-grid">
@@ -554,7 +554,7 @@
                     <div class="stage-cell" id="SB-STAGE-06" data-blueprint-stage="SB-STAGE-06">
                         <span class="stage-index">Stage 06</span>
                         <h2 class="stage-name">成功回流</h2>
-                        <p class="stage-note">展示成功页与订单详情，并把用户带回下一轮浏览；「我的订单」按登录用户归属查询，B 端可按用户聚合回查。</p>
+                        <p class="stage-note">展示成功页与订单详情，并把用户带回下一轮浏览；「我的订单」按登录用户归属查询，B 端可按用户聚合回查（销售看板 + 库存预警与补货建议，只读库存洞察回查）。</p>
                     </div>
                 </div>
 
@@ -858,6 +858,7 @@
                                 <li>发货（PAID→SHIPPED）与取消（仅待支付→CANCELLED）</li>
                                 <li>以订单数据复盘营销效果</li>
                                 <li>用户管理（运营角色）：按手机号/昵称检索用户、查看详情与订单聚合、禁用/启用（R-ADM-001~007）</li>
+                                <li>关注库存预警与补货建议（阈值配置仅运营可写，老板只读）</li>
                             </ul>
                         </div>
                         <div class="cell-block">
@@ -1030,6 +1031,7 @@
                                 <li>读取订单详情并渲染成功反馈</li>
                                 <li>保留下一轮浏览的入口，不阻塞用户继续购物</li>
                                 <li>销售数据聚合（看板）：按时间维度聚合订单指标与商品/分类排行（只读，B 端运营/老板视角）</li>
+                                <li>库存数据聚合（预警与补货建议）：按 Product.stock + 近7日销量聚合低库存预警、阈值配置、补货建议（只读，B 端运营/老板视角）</li>
                             </ul>
                         </div>
                         <div class="cell-block">
@@ -1046,6 +1048,10 @@
                                 <div class="capability support" data-capability="sales-dashboard">
                                     <span class="capability-name">sales-dashboard</span>
                                     <span class="capability-desc">销售看板：指标聚合 / 时间维度 / 趋势 / 商品分类排行（只读，data-insights BC）</span>
+                                </div>
+                                <div class="capability support" data-capability="stock-insight">
+                                    <span class="capability-name">stock-insight</span>
+                                    <span class="capability-desc">库存洞察：低库存预警 / 阈值两级配置 / 补货建议 / 老板健康度总览（只读，data-insights BC）</span>
                                 </div>
                             </div>
                         </div>
@@ -1192,6 +1198,12 @@
                         <td>User Context</td>
                         <td>已落地</td>
                         <td>承载 B 端用户管理：列表/检索/详情（订单聚合）/禁用启用；仅运营角色（敏感信息保护）。</td>
+                    </tr>
+                    <tr>
+                        <td><strong>stock-insight</strong></td>
+                        <td>Data Insights</td>
+                        <td>已落地</td>
+                        <td>承载库存洞察：低库存预警（stock ≤ 有效阈值入列 / 已售罄置顶 / 超卖风险）、阈值两级配置（全局默认 + 商品级覆盖，仅运营可写）、补货建议与老板健康度总览（只读，data-insights BC）。</td>
                     </tr>
                 </tbody>
             </table>

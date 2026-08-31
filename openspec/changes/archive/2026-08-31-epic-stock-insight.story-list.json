@@ -1,0 +1,24 @@
+{
+  "epicKey": "stock-insight",
+  "title": "库存预警与补货建议",
+  "description": "让老板与运营通过真实库存与销量数据主动经营：低库存预警列表（阈值可配置，全局默认 10 件 + 商品级覆盖，含超卖风险标识与已售罄状态）+ 基于销量速度的补货建议（近7日日均销量 → 预计售罄天数 → 建议补货量，到货周期固定 7 天）；B 端阈值配置仅运营可写、即时生效、落盘 stock-config.json（Phase 5 Epic 5.2）。",
+  "stories": [
+    {
+      "id": "story-stock-warning-list",
+      "title": "低库存预警列表 + 阈值配置",
+      "description": "B 端库存预警：stock ≤ 阈值商品入列（含 stock=0 已售罄状态 + 超卖风险标识）；阈值两级配置（全局默认 10 件 + 商品级覆盖，仅运营可写，落盘 data/stock-config.json 即时生效）；仅运营/老板可访问（客户/客服 403）",
+      "status": "done",
+      "changeName": "story-stock-warning-list",
+      "priority": "P0"
+    },
+    {
+      "id": "story-stock-replenish-suggestion",
+      "title": "补货建议（售罄天数 + 建议补货量）",
+      "description": "库存洞察补货建议：近7日日均销量（复用销量聚合底座）→ 预计售罄天数 = stock ÷ 日均销量 → 建议补货量 = max(0, ⌈日均销量×7⌉ − stock)；无销量商品展示「暂无销量」；老板只读全局库存健康度总览",
+      "status": "done",
+      "changeName": "story-stock-replenish-suggestion",
+      "priority": "P1"
+    }
+  ],
+  "updatedAt": "2026-08-31T09:00:00Z"
+}

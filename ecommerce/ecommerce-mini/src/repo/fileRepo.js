@@ -1,4 +1,5 @@
 import path from 'path'
+import fs from 'fs'
 import crypto from 'crypto'
 import { fileURLToPath } from 'url'
 import { FileStore } from '../persist/fileStore.js'
@@ -111,7 +112,79 @@ export class UserFileRepo extends FileRepoAdapter {
 
   clear() {
     this.store.clear()
-    this.sequence = 1000
+  }
+}
+
+/**
+ * 库存阈值配置仓储（stock-config.json 持久化，R-STOCK-007）：
+ * 单对象文件 `{ globalThreshold: 10, overrides: { "<productId>": <threshold> } }`，
+ * 接口与 memory `StockConfigRepo` 一致（getConfig / setGlobalThreshold / setOverride / clear）。
+ * 原子写（tmp + rename），损坏/缺失自愈为默认配置，不抛异常。
+ */
+export class StockConfigFileRepo {
+  /**
+   * @param {{ dataDir?: string }} [options]
+   */
+  constructor({ dataDir } = { dataDir: undefined }) {
+    this.filePath = resolveDataFile('stock-config.json', dataDir)
+    /** @type {{ globalThreshold: number, overrides: Record<string, number> }} */
+    this.config = { globalThreshold: 10, overrides: {} }
+    this.load()
+  }
+
+  /** 加载配置；文件缺失 → 自动创建默认配置；解析失败 → 备份损坏文件后以默认配置启动（不崩溃） */
+  load() {
+    if (!fs.existsSync(this.filePath)) {
+      this.saveAll()
+      return
+    }
+    try {
+      const json = JSON.parse(fs.readFileSync(this.filePath, 'utf-8'))
+      this.config = {
+        globalThreshold:
+          typeof json.globalThreshold === 'number' && json.globalThreshold >= 0
+            ? json.globalThreshold
+            : 10,
+        overrides: json.overrides && typeof json.overrides === 'object' ? json.overrides : {}
+      }
+    } catch (e) {
+      const backupPath = `${this.filePath}.corrupt-${Date.now()}`
+      try {
+        fs.renameSync(this.filePath, backupPath)
+        console.error(`[StockConfigFileRepo] 配置文件解析失败，已备份为 ${backupPath} 并以默认配置启动: ${e.message}`)
+      } catch (backupErr) {
+        console.error(`[StockConfigFileRepo] 配置文件解析失败且备份失败（${backupErr.message}），仅以默认配置启动: ${e.message}`)
+      }
+      this.config = { globalThreshold: 10, overrides: {} }
+    }
+  }
+
+  /** 原子落盘当前配置（tmp + rename，避免崩溃窗口留下截断文件） */
+  saveAll() {
+    const tmpPath = `${this.filePath}.tmp`
+    fs.writeFileSync(tmpPath, JSON.stringify(this.config, null, 2))
+    fs.renameSync(tmpPath, this.filePath)
+  }
+
+  getConfig() {
+    return this.config
+  }
+
+  setGlobalThreshold(threshold) {
+    this.config.globalThreshold = threshold
+    this.saveAll()
+    return this.config
+  }
+
+  setOverride(productId, threshold) {
+    this.config.overrides[String(productId)] = threshold
+    this.saveAll()
+    return this.config
+  }
+
+  clear() {
+    this.config = { globalThreshold: 10, overrides: {} }
+    this.saveAll()
   }
 }
 

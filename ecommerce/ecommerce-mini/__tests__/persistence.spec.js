@@ -49,9 +49,10 @@ describe('fileStore/fileRepo 单元测试（@unit）', () => {
     for (const f of DATA_FILES) {
       assert.ok(fs.existsSync(path.join(fresh, f)), `首次启动应自动创建 ${f}`)
     }
-    // 种子对齐：users 注入演示用户 user_1001；carts/orders/issuances/sessions 空数据集
+    // 种子对齐：users 注入演示用户 user_1001 与 user_1003（老板）；carts/orders/issuances/sessions 空数据集
     const users = readJson(fresh, 'users.json')
     assert.ok(users.some(u => u.id === 'user_1001'), 'users.json 应含演示用户 user_1001')
+    assert.ok(users.some(u => u.id === 'user_1003' && u.role === '老板'), 'users.json 应含老板种子 user_1003')
     assert.deepStrictEqual(readJson(fresh, 'sessions.json'), [])
     assert.deepStrictEqual(readJson(fresh, 'issuances.json'), [])
     assert.deepStrictEqual(readJson(fresh, 'carts.json'), [])

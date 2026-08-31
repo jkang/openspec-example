@@ -7,7 +7,7 @@
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet">
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -25,6 +25,7 @@
                             blue: '#1677ff',
                             slate: '#1e293b',
                             gray: '#94a3b8',
+                            light: '#f8fafc',
                         }
                     }
                 }
@@ -33,475 +34,425 @@
     </script>
     <style>
         body {
-            background-color: #f8fafc;
+            background-color: #eef2f7;
             color: #1e293b;
+            font-family: 'system-ui', sans-serif;
+        }
+        .slide-container {
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 40px 24px;
         }
         .slide {
             width: 100%;
-            max-width: 1440px;
             aspect-ratio: 16 / 9;
             background: white;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.05);
-            margin: 40px auto;
-            padding: 30px 40px;
+            box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.18);
+            margin-bottom: 56px;
             display: flex;
             flex-direction: column;
-            border-radius: 16px;
+            border-radius: 22px;
             overflow: hidden;
             position: relative;
+            border: 1px solid rgba(0, 0, 0, 0.05);
         }
-        .blueprint-grid {
-            display: grid;
-            grid-template-rows: 40px 140px 80px 80px 1fr;
-            height: 100%;
-            border: 1px solid #e2e8f0;
-        }
-        .lane-header {
-            background: #f1f5f9;
-            border-right: 2px solid #cbd5e1;
+        .slide-header {
+            padding: 20px 34px;
+            border-bottom: 1px solid #f1f5f9;
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            justify-content: center;
-            font-weight: 900;
-            font-size: 0.75rem;
-            color: #64748b;
-            text-transform: uppercase;
-            writing-mode: vertical-lr;
-            transform: rotate(180deg);
-            padding: 10px 0;
-            width: 40px;
+            flex-shrink: 0;
         }
-        .lane {
-            display: flex;
-            border-bottom: 1px solid #e2e8f0;
-            position: relative;
+        .bp-body {
+            flex: 1;
+            min-height: 0;
+            padding: 14px 24px;
         }
-        .lane:last-child { border-bottom: none; }
-        
-        .lane-content {
-            flex-grow: 1;
-            display: grid;
-            grid-template-columns: repeat(12, 1fr);
-            position: relative;
-        }
-
-        .activity-card {
-            background: white;
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 12px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            font-size: 0.9rem;
-            font-weight: 700;
-            z-index: 10;
-            transition: all 0.3s;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-
-        .activity-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-        }
-
-        .lane-agent { height: 40px; background: #f8fafc; border-bottom: 2px solid #e2e8f0; }
-        .agent-pm { background: #f0fdf4; border-bottom: 3px solid #00b96b; color: #166534; }
-        .agent-eng { background: #eff6ff; border-bottom: 3px solid #1677ff; color: #1e40af; }
-        .agent-lead { background: #f1f5f9; border-bottom: 3px solid #64748b; color: #334155; }
-
-        .svg-connector {
-            position: absolute;
-            top: 0;
-            left: 0;
+        .bp-svg {
             width: 100%;
             height: 100%;
-            pointer-events: none;
-            z-index: 5;
-        }
-
-        .lane-label {
-            font-family: 'JetBrains Mono';
-            font-size: 0.75rem;
-            color: #94a3b8;
-            padding: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-right: 1px solid #f1f5f9;
-        }
-
-        .deliverable-item {
-            font-size: 0.7rem;
-            line-height: 1.3;
-            color: #475569;
-            padding: 8px;
-            border-left: 2px solid #e2e8f0;
-            margin: 4px;
-            background: #fafafa;
-        }
-
-        .deliverable-title {
-            font-weight: 900;
-            color: #1e293b;
-            margin-bottom: 2px;
             display: block;
         }
-
-        .loop-line {
-            stroke-dasharray: 5,5;
-            fill: none;
-            stroke: #94a3b8;
-            stroke-width: 2;
+        .bp-svg text {
+            font-family: 'system-ui', -apple-system, sans-serif;
         }
-
-        .main-line {
-            fill: none;
-            stroke: #cbd5e1;
-            stroke-width: 3;
-        }
+        .bp-svg .mono { font-family: 'JetBrains Mono', monospace; }
+        .bp-svg .serif { font-family: '"Noto Serif SC"', serif; }
     </style>
 </head>
-<body class="py-10">
+<body>
 
-    <header class="max-w-6xl mx-auto mb-10 text-center">
-        <div class="flex items-center justify-center gap-3 mb-4">
-            <span class="px-4 py-1 bg-aidd-green text-white font-black rounded-full text-sm tracking-tighter">AIDD CITY LAB</span>
-            <span class="text-slate-400 font-serif italic text-lg">成都站 · 2026.09.19</span>
-        </div>
-        <h1 class="text-5xl font-serif font-black text-slate-900 mb-2">OpenSpec 蓝图级分层治理全景图</h1>
-        <p class="text-slate-500 font-medium tracking-widest uppercase">From PRD to Specs: Rebuilding Requirements Engineering</p>
-    </header>
+    <div class="slide-container" id="slides"></div>
 
-    <!-- Slide 1: Layer 01 -->
-    <section class="slide border-l-8 border-aidd-green">
-        <div class="p-4 flex justify-between items-center border-bottom border-slate-100">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center text-aidd-green font-black text-2xl border border-green-100 shadow-sm">01</div>
-                <div>
-                    <h2 class="text-2xl font-serif font-black text-slate-900 leading-none">极简交付 (Minimalist Delivery)</h2>
-                    <p class="text-slate-400 text-sm mt-1">单 Change 闭环 / 快速响应管线</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="blueprint-grid">
-            <!-- Lane 1: Agent -->
-            <div class="lane">
-                <div class="lane-header">Agent</div>
-                <div class="lane-content">
-                    <div class="col-span-12 agent-eng flex items-center justify-center font-black tracking-widest">ENGINEER AGENT</div>
-                </div>
-            </div>
-
-            <!-- Lane 2: Activity -->
-            <div class="lane h-[140px]">
-                <div class="lane-header">Flow</div>
-                <div class="lane-content px-10 items-center">
-                    <svg class="svg-connector">
-                        <path d="M 120 70 L 1050 70" class="main-line" />
-                        <path d="M 1050 70 L 1040 65 M 1050 70 L 1040 75" fill="none" stroke="#cbd5e1" stroke-width="3" />
-                    </svg>
-                    <div class="col-span-2 px-2"><div class="activity-card border-aidd-green text-aidd-green">探索 Explore</div></div>
-                    <div class="col-span-1"></div>
-                    <div class="col-span-2 px-2"><div class="activity-card border-aidd-green text-aidd-green">提案 Propose</div></div>
-                    <div class="col-span-2 px-2"><div class="activity-card border-aidd-green text-aidd-green">实施 Apply</div></div>
-                    <div class="col-span-2 px-2"><div class="activity-card border-aidd-green text-aidd-green">同步 Sync</div></div>
-                    <div class="col-span-1"></div>
-                    <div class="col-span-2 px-2"><div class="activity-card border-slate-400 text-slate-400 bg-slate-50">归档 Archive</div></div>
-                </div>
-            </div>
-
-            <!-- Lane 3: Skill -->
-            <div class="lane h-[80px]">
-                <div class="lane-header">Skill</div>
-                <div class="lane-content font-mono text-[10px]">
-                    <div class="col-span-2 flex items-center justify-center text-slate-500 italic">explore</div>
-                    <div class="col-span-1"></div>
-                    <div class="col-span-2 flex items-center justify-center text-slate-500 italic">propose</div>
-                    <div class="col-span-2 flex items-center justify-center text-slate-500 italic">apply-change</div>
-                    <div class="col-span-2 flex items-center justify-center text-slate-500 italic">sync-specs</div>
-                    <div class="col-span-1"></div>
-                    <div class="col-span-2 flex items-center justify-center text-slate-400 italic">archive-change</div>
-                </div>
-            </div>
-
-            <!-- Lane 4: Command -->
-            <div class="lane h-[80px]">
-                <div class="lane-header">Cmd</div>
-                <div class="lane-content font-mono text-[11px] font-bold">
-                    <div class="col-span-2 flex items-center justify-center text-aidd-green">/opsx:explore</div>
-                    <div class="col-span-1"></div>
-                    <div class="col-span-2 flex items-center justify-center text-aidd-green">/opsx:propose</div>
-                    <div class="col-span-2 flex items-center justify-center text-aidd-green">/opsx:apply</div>
-                    <div class="col-span-2 flex items-center justify-center text-aidd-green">/opsx:sync</div>
-                    <div class="col-span-1"></div>
-                    <div class="col-span-2 flex items-center justify-center text-slate-400">/opsx:archive</div>
-                </div>
-            </div>
-
-            <!-- Lane 5: Deliverables -->
-            <div class="lane flex-grow">
-                <div class="lane-header">Outputs</div>
-                <div class="lane-content p-4">
-                    <div class="col-span-2">
-                        <div class="deliverable-item">
-                            <span class="deliverable-title">idea.md</span>
-                            记录业务初探设计，明确 In-Scope 范围。
-                        </div>
-                    </div>
-                    <div class="col-span-1"></div>
-                    <div class="col-span-2">
-                        <div class="deliverable-item">
-                            <span class="deliverable-title">proposal.md</span>
-                            包含初步原型，确立实现方案基调。
-                        </div>
-                    </div>
-                    <div class="col-span-2">
-                        <div class="deliverable-item">
-                            <span class="deliverable-title">Code + verify.md</span>
-                            原子化变更实施，附带自动化验证证据。
-                        </div>
-                    </div>
-                    <div class="col-span-2">
-                        <div class="deliverable-item">
-                            <span class="deliverable-title">Delta Specs</span>
-                            变更回流至 specs/ 基线，消灭认知偏差。
-                        </div>
-                    </div>
-                    <div class="col-span-1"></div>
-                    <div class="col-span-2">
-                        <div class="deliverable-item">
-                            <span class="deliverable-title">Archive Folder</span>
-                            Change 完整归档，形成历史审计链路。
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Slide 2: Layer 02 -->
-    <section class="slide border-l-8 border-aidd-blue">
-        <div class="p-4 flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center text-aidd-blue font-black text-2xl border border-blue-100 shadow-sm">02</div>
-                <div>
-                    <h2 class="text-2xl font-serif font-black text-slate-900 leading-none">轻量产品 (Lightweight Product)</h2>
-                    <p class="text-slate-400 text-sm mt-1">基线护栏 / 多 Story 执行循环</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="blueprint-grid">
-            <div class="lane">
-                <div class="lane-header">Agent</div>
-                <div class="lane-content">
-                    <div class="col-span-2 agent-lead flex items-center justify-center text-[10px] font-black tracking-widest">LEAD</div>
-                    <div class="col-span-8 agent-eng flex items-center justify-center text-[10px] font-black tracking-widest">ENGINEER AGENT (LOOP)</div>
-                    <div class="col-span-2 agent-pm flex items-center justify-center text-[10px] font-black tracking-widest">PM</div>
-                </div>
-            </div>
-
-            <div class="lane h-[140px]">
-                <div class="lane-header">Flow</div>
-                <div class="lane-content px-6 items-center">
-                    <svg class="svg-connector">
-                        <path d="M 50 70 L 1150 70" class="main-line" />
-                        <!-- Loop line -->
-                        <path d="M 850 70 Q 650 150 450 70" class="loop-line" stroke="#1677ff" />
-                        <path d="M 450 70 L 460 75 M 450 70 L 460 65" fill="none" stroke="#1677ff" stroke-width="2" />
-                    </svg>
-                    <div class="col-span-1 px-1"><div class="activity-card border-slate-400 text-slate-500 scale-90">规划<br/>Planning</div></div>
-                    <div class="col-span-1 px-1"><div class="activity-card border-slate-400 text-slate-500 scale-90">基线<br/>Baseline</div></div>
-                    <div class="col-span-2 px-2"><div class="activity-card border-aidd-blue text-aidd-blue">需求探索<br/>Explore</div></div>
-                    <div class="col-span-2 px-2"><div class="activity-card border-aidd-blue text-aidd-blue">方案提案<br/>Propose</div></div>
-                    <div class="col-span-2 px-2 bg-blue-50/50 border-dashed border-aidd-blue/30 rounded-2xl py-2 flex flex-col gap-1">
-                        <div class="text-[8px] font-black text-aidd-blue uppercase">Multi-Story Loop</div>
-                        <div class="activity-card border-aidd-blue text-aidd-blue text-[10px] py-1">原型/故事</div>
-                        <div class="activity-card border-aidd-blue text-aidd-blue text-[10px] py-1">实施验证</div>
-                    </div>
-                    <div class="col-span-2 px-2"><div class="activity-card border-aidd-blue text-aidd-blue">规格同步<br/>Sync</div></div>
-                    <div class="col-span-1 px-1"><div class="activity-card border-slate-400 text-slate-400 bg-slate-50 scale-90">归档<br/>Archive</div></div>
-                    <div class="col-span-1 px-1"><div class="activity-card border-slate-400 text-slate-400 bg-slate-50 scale-90">回顾<br/>Review</div></div>
-                </div>
-            </div>
-
-            <div class="lane h-[80px]">
-                <div class="lane-header">Skill</div>
-                <div class="lane-content font-mono text-[9px] text-slate-500">
-                    <div class="col-span-1 flex items-center justify-center italic text-center">product-<br/>planning</div>
-                    <div class="col-span-1 flex items-center justify-center italic">blueprint</div>
-                    <div class="col-span-2 flex items-center justify-center italic">explore</div>
-                    <div class="col-span-2 flex items-center justify-center italic">propose</div>
-                    <div class="col-span-2 flex items-center justify-center italic">prototype & story<br/>apply-change</div>
-                    <div class="col-span-2 flex items-center justify-center italic">sync-specs</div>
-                    <div class="col-span-1 flex items-center justify-center italic">archive</div>
-                    <div class="col-span-1 flex items-center justify-center italic text-center">product-<br/>planning</div>
-                </div>
-            </div>
-
-            <div class="lane h-[80px]">
-                <div class="lane-header">Cmd</div>
-                <div class="lane-content font-mono text-[10px] font-bold text-aidd-blue">
-                    <div class="col-span-1 flex items-center justify-center">/opsx:planning</div>
-                    <div class="col-span-1 flex items-center justify-center">/opsx:baseline</div>
-                    <div class="col-span-2 flex items-center justify-center">/opsx:explore</div>
-                    <div class="col-span-2 flex items-center justify-center">/opsx:propose</div>
-                    <div class="col-span-2 flex items-center justify-center">/opsx:prototype<br/>/opsx:apply</div>
-                    <div class="col-span-2 flex items-center justify-center">/opsx:sync</div>
-                    <div class="col-span-1 flex items-center justify-center text-slate-400">/opsx:archive</div>
-                    <div class="col-span-1 flex items-center justify-center text-slate-400">/opsx:review</div>
-                </div>
-            </div>
-
-            <div class="lane flex-grow">
-                <div class="lane-header">Outputs</div>
-                <div class="lane-content p-4">
-                    <div class="col-span-2 flex flex-col gap-2">
-                        <div class="deliverable-item"><span class="deliverable-title">ROADMAP.md</span>对齐产品愿景与阶段目标。</div>
-                    </div>
-                    <div class="col-span-2">
-                        <div class="deliverable-item"><span class="deliverable-title">idea.md</span>多 Story 协同的业务设计。</div>
-                    </div>
-                    <div class="col-span-2">
-                        <div class="deliverable-item"><span class="deliverable-title">proposal.md</span>解构后的工程执行计划。</div>
-                    </div>
-                    <div class="col-span-2">
-                        <div class="deliverable-item"><span class="deliverable-title">Loop Artifacts</span>精细化的 Prototype 与 Story。</div>
-                    </div>
-                    <div class="col-span-2">
-                        <div class="deliverable-item"><span class="deliverable-title">Spec Sync</span>保证多 Story 认知的持续对齐。</div>
-                    </div>
-                    <div class="col-span-2 flex flex-col gap-2">
-                        <div class="deliverable-item"><span class="deliverable-title">Review</span>基于交付事实更新路线图。</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Slide 3: Layer 03 -->
-    <section class="slide border-l-8 border-slate-900">
-        <div class="p-4 flex justify-between items-center">
-            <div class="flex items-center gap-4">
-                <div class="w-12 h-12 bg-slate-900 rounded-xl flex items-center justify-center text-white font-black text-2xl shadow-lg">03</div>
-                <div>
-                    <h2 class="text-2xl font-serif font-black text-slate-900 leading-none">业务产品 (Business Product)</h2>
-                    <p class="text-slate-400 text-sm mt-1">解耦协作 / 确定性漏斗 / 双层回流循环</p>
-                </div>
-            </div>
-        </div>
-
-        <div class="blueprint-grid">
-            <div class="lane">
-                <div class="lane-header">Agent</div>
-                <div class="lane-content">
-                    <div class="col-span-4 agent-pm flex items-center justify-center text-[10px] font-black tracking-widest">PM AGENT (REQUIREMENT FUNNEL)</div>
-                    <div class="col-span-1 agent-lead flex items-center justify-center text-[10px] font-black tracking-widest">LEAD</div>
-                    <div class="col-span-4 agent-eng flex items-center justify-center text-[10px] font-black tracking-widest">ENGINEER AGENT (EXECUTION)</div>
-                    <div class="col-span-3 agent-lead flex items-center justify-center text-[10px] font-black tracking-widest">LEAD / GOVERNANCE</div>
-                </div>
-            </div>
-
-            <div class="lane h-[140px]">
-                <div class="lane-header">Flow</div>
-                <div class="lane-content px-4 items-center">
-                    <svg class="svg-connector">
-                        <path d="M 40 70 L 1300 70" class="main-line" />
-                        <!-- Story Loop -->
-                        <path d="M 1000 70 Q 750 160 400 70" class="loop-line" stroke="#1677ff" />
-                        <!-- Baseline Loop -->
-                        <path d="M 1250 70 Q 650 200 150 70" class="loop-line" stroke="#00b96b" />
-                    </svg>
-                    <div class="col-span-1 px-1"><div class="activity-card border-slate-300 text-slate-400 scale-75">规划<br/>Planning</div></div>
-                    <div class="col-span-1 px-1"><div class="activity-card border-slate-300 text-slate-400 scale-75">基线<br/>Baseline</div></div>
-                    
-                    <div class="col-span-2 px-1 bg-green-50/50 border-dashed border-aidd-green/20 rounded-xl py-1 flex flex-col gap-1">
-                        <div class="text-[7px] font-black text-aidd-green uppercase">Req Funnel</div>
-                        <div class="activity-card border-aidd-green text-aidd-green text-[10px] py-1">调研/探索</div>
-                        <div class="activity-card border-aidd-green text-aidd-green text-[10px] py-1">原型/Story</div>
-                    </div>
-
-                    <div class="col-span-1 px-1"><div class="activity-card bg-slate-900 text-white border-none shadow-lg text-[10px]">HANDOFF<br/>交接</div></div>
-
-                    <div class="col-span-2 px-1 bg-blue-50/50 border-dashed border-aidd-blue/20 rounded-xl py-1 flex flex-col gap-1">
-                        <div class="text-[7px] font-black text-aidd-blue uppercase">Dev Execution</div>
-                        <div class="activity-card border-aidd-blue text-aidd-blue text-[10px] py-1">提案/规格</div>
-                        <div class="activity-card border-aidd-blue text-aidd-blue text-[10px] py-1">实施验证</div>
-                    </div>
-
-                    <div class="col-span-1 px-1"><div class="activity-card border-slate-400 text-slate-600 text-[10px]">规格同步<br/>Spec Sync</div></div>
-                    <div class="col-span-1 px-1"><div class="activity-card border-slate-400 text-slate-600 text-[10px] scale-90">归档<br/>Archive</div></div>
-                    <div class="col-span-1 px-1"><div class="activity-card border-aidd-green text-aidd-green text-[10px]">基线同步<br/>Baseline</div></div>
-                    <div class="col-span-1 px-1"><div class="activity-card border-slate-400 text-slate-400 bg-slate-50 scale-75">回顾<br/>Review</div></div>
-                </div>
-            </div>
-
-            <div class="lane h-[80px]">
-                <div class="lane-header">Skill</div>
-                <div class="lane-content font-mono text-[8px] text-slate-500">
-                    <div class="col-span-1 flex items-center justify-center">planning</div>
-                    <div class="col-span-1 flex items-center justify-center">blueprint</div>
-                    <div class="col-span-2 flex items-center justify-center text-center">research / explore<br/>prototype / story</div>
-                    <div class="col-span-1 flex items-center justify-center font-bold text-slate-900">handoff</div>
-                    <div class="col-span-2 flex items-center justify-center text-center">propose / spec-design<br/>apply-change / verify</div>
-                    <div class="col-span-1 flex items-center justify-center italic">sync-specs</div>
-                    <div class="col-span-1 flex items-center justify-center italic">archive</div>
-                    <div class="col-span-1 flex items-center justify-center italic text-aidd-green">baseline/*</div>
-                    <div class="col-span-1 flex items-center justify-center italic">planning</div>
-                </div>
-            </div>
-
-            <div class="lane h-[80px]">
-                <div class="lane-header">Cmd</div>
-                <div class="lane-content font-mono text-[9px] font-bold">
-                    <div class="col-span-1 flex items-center justify-center text-slate-400">/opsx:planning</div>
-                    <div class="col-span-1 flex items-center justify-center text-slate-400">/opsx:baseline</div>
-                    <div class="col-span-2 flex items-center justify-center text-aidd-green">/req:* (Full)</div>
-                    <div class="col-span-1 flex items-center justify-center text-slate-900">/req:handoff</div>
-                    <div class="col-span-2 flex items-center justify-center text-aidd-blue">/opsx:* (Full)</div>
-                    <div class="col-span-1 flex items-center justify-center text-slate-600">/opsx:sync</div>
-                    <div class="col-span-1 flex items-center justify-center text-slate-400">/opsx:archive</div>
-                    <div class="col-span-1 flex items-center justify-center text-aidd-green">/opsx:baseline/sync</div>
-                    <div class="col-span-1 flex items-center justify-center text-slate-400">/opsx:planning</div>
-                </div>
-            </div>
-
-            <div class="lane flex-grow">
-                <div class="lane-header">Outputs</div>
-                <div class="lane-content p-2">
-                    <div class="col-span-2">
-                        <div class="deliverable-item"><span class="deliverable-title">Baseline Assets</span>稳定业务边界与领域模型。</div>
-                    </div>
-                    <div class="col-span-2">
-                        <div class="deliverable-item"><span class="deliverable-title">Story (Freeze)</span>业务面冻结，含 E2E 验收断言。</div>
-                    </div>
-                    <div class="col-span-1">
-                        <div class="deliverable-item border-slate-900 bg-slate-50"><span class="deliverable-title">Proposal</span>强契约合成，驱动交付。</div>
-                    </div>
-                    <div class="col-span-2">
-                        <div class="deliverable-item"><span class="deliverable-title">Specs (SDD)</span>行为规格驱动的自动化产线。</div>
-                    </div>
-                    <div class="col-span-2">
-                        <div class="deliverable-item"><span class="deliverable-title">Story Loop</span>支持高并发多 Story 循环交付。</div>
-                    </div>
-                    <div class="col-span-2">
-                        <div class="deliverable-item border-aidd-green bg-green-50"><span class="deliverable-title">Knowledge Asset</span>认知持续沉淀回业务基线。</div>
-                    </div>
-                    <div class="col-span-1"></div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer class="py-12 text-center">
-        <p class="text-slate-400 font-mono text-sm tracking-widest">
-            POWERED BY OPEN SPECIFICATION FRAMEWORK V2.0 &copy; 2026
+    <footer class="py-16 text-center">
+        <p class="text-slate-400 font-mono text-xs tracking-[0.3em] uppercase">
+            Spec-Driven Development · Governance Framework V2.0 · AIDD City Lab
         </p>
     </footer>
 
+    <script>
+    // ==========================================================================
+    //  5-Lane Blueprint SVG generator — single viewBox ⇒ guaranteed alignment.
+    // ==========================================================================
+
+    const C = {
+        green: '#00b96b',
+        blue:  '#1677ff',
+        slate: '#1e293b',
+        gray:  '#94a3b8',
+    };
+
+    // Vertical bands (viewBox units) — flow lane is tall so loops stay INSIDE it
+    const LANE = {
+        agent:   { top: 8,   h: 50 },
+        flow:    { top: 66,  h: 252 },
+        skill:   { top: 328, h: 54 },
+        command: { top: 390, h: 54 },
+        deliv:   { top: 454, h: 148 },
+    };
+    const VB_H = 454 + 148 + 6;               // 608
+    const CARD_TOP = LANE.flow.top + 22;      // 88
+    const CARD_BOT = LANE.flow.top + 150;     // 216
+    const FLOW_CY  = (CARD_TOP + CARD_BOT) / 2; // 152
+    const LOOP_Y   = CARD_BOT + 10;           // 226
+
+    // Horizontal content range + left gutter
+    const X_LEFT   = 84;
+    const X_RIGHT  = 1252;
+    const GUTTER   = 8;
+    const GUTTER_W = 70;
+
+    // --------------------------------------------------------------------------
+    const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+    function evenCenters(n, xL = X_LEFT, xR = X_RIGHT) {
+        const cw = (xR - xL) / n;
+        return Array.from({ length: n }, (_, i) => xL + cw * (i + 0.5));
+    }
+
+    function card(x0, x1, y0, y1, opts = {}) {
+        const rx = opts.rx ?? 18;
+        const w = x1 - x0, h = y1 - y0;
+        const fill = opts.fill ?? '#ffffff';
+        const stroke = opts.stroke ?? '#cbd5e1';
+        const sw = opts.sw ?? 1.8;
+        const dash = opts.dash ? ` stroke-dasharray="${opts.dash}"` : '';
+        const shadow = opts.shadow === false ? '' : ' filter="url(#shadow)"';
+        return `<rect x="${x0}" y="${y0}" width="${w}" height="${h}" rx="${rx}" ry="${rx}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"${dash}${shadow}/>`;
+    }
+
+    function text(cx, cy, lines, opts = {}) {
+        const size = opts.size ?? 13;
+        const color = opts.color ?? '#0f172a';
+        const weight = opts.weight ?? 700;
+        const family = opts.family ?? 'system-ui';
+        const lh = opts.lh ?? (size * 1.28);
+        const totalH = lines.length * lh;
+        let y = cy - totalH / 2 + lh * 0.82;
+        let out = '';
+        for (const ln of lines) {
+            out += `<text x="${cx}" y="${y}" text-anchor="middle" font-size="${size}" font-weight="${weight}" fill="${color}" class="${family}">${esc(ln)}</text>`;
+            y += lh;
+        }
+        return out;
+    }
+
+    function hArrow(x1, x2, y, stroke, opts = {}) {
+        const sw = opts.sw ?? 3.2;
+        const dash = opts.dash ? ` stroke-dasharray="${opts.dash}"` : '';
+        const head = 13;
+        const dir = x2 > x1 ? 1 : -1;
+        const hx = x2 - dir * head;
+        let s = '';
+        if (Math.abs(x2 - x1) > 6) {
+            s += `<path d="M ${x1} ${y} L ${hx} ${y}" fill="none" stroke="${stroke}" stroke-width="${sw}"${dash} stroke-linecap="round"/>`;
+        }
+        s += `<path d="M ${x2} ${y} L ${x2 - dir * head} ${y - head * 0.55} L ${x2 - dir * head} ${y + head * 0.55} Z" fill="${stroke}"/>`;
+        return s;
+    }
+
+    // Feedback loop (dashed) starting at source bottom, dipping down, back to target bottom.
+    function loopArc(srcX, tgtX, stroke, labelStr, opts = {}) {
+        const drop = opts.drop ?? 96;
+        const sw = opts.sw ?? 2.4;
+        const y = LOOP_Y;
+        const dir = tgtX >= srcX ? 1 : -1;
+        const d = `M ${srcX} ${y} C ${srcX} ${y + drop}, ${tgtX} ${y + drop}, ${tgtX} ${y}`;
+        const head = 11;
+        let s = `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${sw}" stroke-dasharray="9 8" stroke-linecap="round"/>`;
+        s += `<path d="M ${tgtX} ${y} L ${tgtX - head * 0.42} ${y + head} L ${tgtX + head * 0.42} ${y + head} Z" fill="${stroke}"/>`;
+        if (labelStr) {
+            s += `<text x="${(srcX + tgtX) / 2}" y="${y + drop * 0.5}" text-anchor="middle" font-size="10" font-weight="800" fill="${stroke}" class="mono" letter-spacing="1">${esc(labelStr)}</text>`;
+        }
+        return s;
+    }
+
+    function laneLabel(cy, str) {
+        return `<text x="${GUTTER + 24}" y="${cy}" text-anchor="middle" transform="rotate(-90 ${GUTTER + 24} ${cy})" font-size="11" font-weight="900" fill="#94a3b8" class="mono" letter-spacing="2">${esc(str)}</text>`;
+    }
+
+    function laneBg(y0, y1) {
+        return `<rect x="${GUTTER_W}" y="${y0}" width="${X_RIGHT - GUTTER_W}" height="${y1 - y0}" fill="#fbfcfd"/>`;
+    }
+
+    // Agent band across columns [i0..i1] — ranges must be disjoint
+    function agentBand(cols, i0, i1, color, labelStr, opts = {}) {
+        const x0 = cols[i0].x0, x1 = cols[i1].x1;
+        const y0 = LANE.agent.top + 9, y1 = LANE.agent.top + LANE.agent.h - 5;
+        const solid = opts.solid === true;
+        const fill = solid ? color : (opts.fill ?? color + '1f');
+        let s = card(x0, x1, y0, y1, { rx: 12, fill, stroke: color, sw: solid ? 0 : 1.8, shadow: false });
+        s += text((x0 + x1) / 2, (y0 + y1) / 2, [labelStr], { size: 12, weight: 900, color: solid ? '#ffffff' : color, family: 'mono', lh: 15 });
+        return s;
+    }
+
+    // Block card containing sub-pills (big rounded rounded container)
+    function blockCard(c, f) {
+        const y0 = CARD_TOP - 10, y1 = CARD_BOT + 6;
+        const xx0 = c.x0, xx1 = c.x1;
+        let colStroke = '#cbd5e1', colColor = '#0f172a';
+        if (f.kind === 'green') { colStroke = C.green; colColor = C.green; }
+        if (f.kind === 'blue')  { colStroke = C.blue;  colColor = C.blue; }
+        if (f.kind === 'dark')  { colStroke = C.slate; colColor = '#ffffff'; }
+
+        let s = card(xx0, xx1, y0, y1, { rx: 20, fill: '#f8fafc', stroke: colStroke, sw: 2, dash: '5 5' });
+        // stage label
+        s += text((xx0 + xx1) / 2, y0 + 16, [f.stage], { size: 11, weight: 900, color: colColor, family: 'mono', lh: 13 });
+        // pills
+        const pillTop = y0 + 30, pillBot = y1 - 8;
+        const pillH = pillBot - pillTop;
+        const n = f.subpills.length;
+        const innerL = xx0 + 10, innerR = xx1 - 10;
+        const gap = 8;
+        const pw = (innerR - innerL - gap * (n - 1)) / n;
+        for (let i = 0; i < n; i++) {
+            const px0 = innerL + i * (pw + gap), px1 = px0 + pw;
+            const cxm = (px0 + px1) / 2;
+            const pyl = (pillTop + pillBot) / 2;
+            const lines = f.subpills[i];
+            s += card(px0, px1, pillTop, pillBot, { rx: 12, fill: '#ffffff', stroke: colStroke, sw: 1.6 });
+            if (lines.length === 1) {
+                s += `<text x="${cxm}" y="${pyl + 4}" text-anchor="middle" font-size="13" font-weight="800" fill="${colColor}">${esc(lines[0])}</text>`;
+            } else {
+                s += `<text x="${cxm}" y="${pyl - 2}" text-anchor="middle" font-size="12.5" font-weight="800" fill="${colColor}">${esc(lines[0])}</text>`;
+                s += `<text x="${cxm}" y="${pyl + 14}" text-anchor="middle" font-size="8.5" font-weight="600" fill="${colColor}99" class="mono">${esc(lines[1])}</text>`;
+            }
+        }
+        return s;
+    }
+
+    // --------------------------------------------------------------------------
+    function renderLayer(lay, cfg = {}) {
+        const cx = lay.columns.map(c => ({ cx: c.cx, w: c.w, x0: c.cx - c.w / 2, x1: c.cx + c.w / 2 }));
+        const cols = lay.columns.map((c, i) => Object.assign({}, c, cx[i])); // each col carries x0/x1
+        let s = `<svg class="bp-svg" viewBox="0 0 1312 ${VB_H}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">`;
+
+        s += `<defs><filter id="shadow" x="-20%" y="-20%" width="140%" height="170%">
+            <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.10"/>
+        </filter></defs>`;
+
+        // lane backgrounds + labels
+        s += laneBg(LANE.agent.top, LANE.agent.top + LANE.agent.h);
+        s += laneBg(LANE.flow.top, LANE.flow.top + LANE.flow.h);
+        s += laneBg(LANE.skill.top, LANE.skill.top + LANE.skill.h);
+        s += laneBg(LANE.command.top, LANE.command.top + LANE.command.h);
+        s += laneBg(LANE.deliv.top, LANE.deliv.top + LANE.deliv.h);
+        s += laneLabel(LANE.agent.top + LANE.agent.h / 2, 'AGENT');
+        s += laneLabel(LANE.flow.top + LANE.flow.h / 2, 'FLOW');
+        s += laneLabel(LANE.skill.top + LANE.skill.h / 2, 'SKILL');
+        s += laneLabel(LANE.command.top + LANE.command.h / 2, 'COMMAND');
+        s += laneLabel(LANE.deliv.top + LANE.deliv.h / 2, 'OUTPUT');
+
+        // vertical dividers between lane rows
+        s += `<line x1="${GUTTER_W}" x2="${X_RIGHT}" y1="${LANE.agent.top + LANE.agent.h}" y2="${LANE.agent.top + LANE.agent.h}" stroke="#eef2f7" stroke-width="2"/>`;
+        s += `<line x1="${GUTTER_W}" x2="${X_RIGHT}" y1="${LANE.skill.top}" y2="${LANE.skill.top}" stroke="#eef2f7" stroke-width="2"/>`;
+        s += `<line x1="${GUTTER_W}" x2="${X_RIGHT}" y1="${LANE.command.top}" y2="${LANE.command.top}" stroke="#eef2f7" stroke-width="2"/>`;
+        s += `<line x1="${GUTTER_W}" x2="${X_RIGHT}" y1="${LANE.deliv.top}" y2="${LANE.deliv.top}" stroke="#eef2f7" stroke-width="2"/>`;
+
+        // ----- Lane 1: Agent bands -----
+        for (const ag of lay.agents) s += agentBand(cx, ag.from, ag.to, ag.color, ag.label, ag);
+
+        // ----- Lane 2: main solid arrows (behind cards) -----
+        for (const a of lay.arrows) {
+            const src = cx[a.from], tgt = cx[a.to];
+            const x1 = src.x1 + 4, x2 = tgt.x0 - 4;
+            if (x2 > x1) s += hArrow(x1, x2, FLOW_CY, '#94a3b8', { sw: 3.2 });
+        }
+
+        // ----- Lane 2: flow cards / blocks -----
+        for (const c of cols) {
+            const f = c.flow;
+            if (f.block) { s += blockCard(c, f); continue; }
+            const y0 = CARD_TOP, y1 = CARD_BOT;
+            const xx0 = c.x0, xx1 = c.x1;
+            let colStroke = '#cbd5e1', colFill = '#ffffff', colColor = '#0f172a', sw = 2;
+            if (f.kind === 'green') { colStroke = C.green; colColor = C.green; }
+            if (f.kind === 'blue')  { colStroke = C.blue;  colColor = C.blue; }
+            if (f.kind === 'dark')  { colStroke = C.slate; colFill = C.slate; colColor = '#ffffff'; sw = 0; }
+            s += card(xx0, xx1, y0, y1, { rx: 20, fill: colFill, stroke: colStroke, sw });
+            const cxm = (xx0 + xx1) / 2;
+            s += `<text x="${cxm}" y="${FLOW_CY - 3}" text-anchor="middle" font-size="14.5" font-weight="900" fill="${colColor}">${esc(f.title)}</text>`;
+            s += `<text x="${cxm}" y="${FLOW_CY + 16}" text-anchor="middle" font-size="10" font-weight="700" fill="${f.kind === 'dark' ? '#cbd5e1' : '#94a3b8'}">${esc(f.sub)}</text>`;
+        }
+
+        // ----- Lane 2: feedback loops (dashed, inside flow lane) -----
+        for (const lp of lay.loops) {
+            const srcC = cx[lp.fromCol], tgtC = cx[lp.toCol];
+            const srcX = lp.fromEdge === 'left' ? srcC.x0 : srcC.x1;
+            const tgtX = lp.toEdge === 'left' ? tgtC.x0 : tgtC.x1;
+            s += loopArc(srcX, tgtX, lp.color, lp.label, { drop: lp.drop ?? 96 });
+        }
+
+        // drop-wires from cards to Skill/Command/Output lanes
+        for (const c of cols) {
+            s += `<line x1="${c.cx}" y1="${CARD_BOT + 2}" x2="${c.cx}" y2="${LANE.skill.top}" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="3 4"/>`;
+        }
+
+        // ----- Lane 3: Skill -----
+        for (const c of cols) {
+            const y0 = LANE.skill.top, y1 = LANE.skill.top + LANE.skill.h;
+            s += text(c.cx, (y0 + y1) / 2, c.skills, { size: 11.5, weight: 700, color: '#64748b', family: 'mono', lh: 15 });
+        }
+
+        // ----- Lane 4: Command -----
+        for (const c of cols) {
+            const y0 = LANE.command.top, y1 = LANE.command.top + LANE.command.h;
+            s += text(c.cx, (y0 + y1) / 2, c.cmds, { size: 11.5, weight: 800, color: '#1e293b', family: 'mono', lh: 15 });
+        }
+
+        // ----- Lane 5: Deliverables -----
+        for (const c of cols) {
+            const d = c.deliv;
+            const y0 = LANE.deliv.top + 8, y1 = LANE.deliv.top + LANE.deliv.h - 6;
+            const xx0 = c.x0 + 2, xx1 = c.x1 - 2;
+            const dark = d.dark;
+            s += card(xx0, xx1, y0, y1, { rx: 12, fill: dark ? C.slate : '#ffffff', stroke: dark ? C.slate : '#e2e8f0', sw: dark ? 0 : 1.6 });
+            const titleColor = dark ? '#ffffff' : '#0f172a';
+            const descColor = dark ? '#cbd5e1' : '#64748b';
+            const cxm = (xx0 + xx1) / 2;
+            s += `<text x="${cxm}" y="${y0 + 22}" text-anchor="middle" font-size="11.5" font-weight="800" fill="${titleColor}" class="mono">${esc(d.title)}</text>`;
+            s += `<line x1="${xx0 + 10}" x2="${xx1 - 10}" y1="${y0 + 33}" y2="${y0 + 33}" stroke="${dark ? '#334155' : '#e8edf3'}" stroke-width="1.4"/>`;
+            s += text(cxm, y0 + 48, d.desc, { size: 10.5, weight: 500, color: descColor, lh: 14 });
+        }
+
+        s += `</svg>`;
+        return s;
+    }
+
+    // ==========================================================================
+    //  LAYER 01 — 极简交付 (Single Change Pipeline)
+    // ==========================================================================
+    const L1 = evenCenters(5);
+    const layer1 = {
+        agents: [
+            { label: 'ENGINEER AGENT (PRIMARY)', color: C.blue, from: 0, to: 3, fill: '#eaf2ff' },
+            { label: 'LEAD (GOVERNANCE)', color: C.slate, from: 4, to: 4, solid: true },
+        ],
+        columns: [
+            { cx: L1[0], w: 214, flow: { title: '探索 Explore', sub: '业务初探 · idea.md', kind: 'blue' }, skills: ['explore'], cmds: ['/opsx:explore'], deliv: { title: 'idea.md', desc: ['记录业务初探设计', '明确意图与价值'] } },
+            { cx: L1[1], w: 214, flow: { title: '提案 Propose', sub: '工程提案 + 原型', kind: 'blue' }, skills: ['propose'], cmds: ['/opsx:propose'], deliv: { title: 'proposal.md', desc: ['确立工程实施方案', '对齐交付路径'] } },
+            { cx: L1[2], w: 214, flow: { title: '实施 Apply', sub: '代码实施与验证', kind: 'blue' }, skills: ['apply-change'], cmds: ['/opsx:apply'], deliv: { title: 'code + verify.md', desc: ['原子化变更', '验证门禁证据'] } },
+            { cx: L1[3], w: 214, flow: { title: '同步 Sync', sub: 'delta 规格回写', kind: 'blue' }, skills: ['sync-specs'], cmds: ['/opsx:sync'], deliv: { title: 'delta specs', desc: ['认知回流规格基线', '更新 specs/*.md'] } },
+            { cx: L1[4], w: 214, flow: { title: '归档 Archive', sub: '审计追踪', kind: 'dark' }, skills: ['archive-change'], cmds: ['/opsx:archive'], deliv: { title: 'archive/', desc: ['完整变更审计追踪', '回填业务基线'] } },
+        ],
+        arrows: [ { from: 0, to: 1 }, { from: 1, to: 2 }, { from: 2, to: 3 }, { from: 3, to: 4 } ],
+        loops: [],
+    };
+
+    // ==========================================================================
+    //  LAYER 02 — 轻量产品 (Baseline Guardrail + Multi-Story Loop)
+    // ==========================================================================
+    const L2 = [
+        { cx: 159, w: 150 }, { cx: 317, w: 150 }, { cx: 475, w: 150 }, { cx: 633, w: 150 },
+        { cx: 836, w: 240 }, { cx: 1039, w: 150 }, { cx: 1187, w: 130 },
+    ];
+    const layer2 = {
+        agents: [
+            { label: 'LEAD / PM (GUARDRAIL)', color: C.green, from: 0, to: 1, fill: '#e9f8f0' },
+            { label: 'ENGINEER AGENT (STORY LOOP)', color: C.blue, from: 2, to: 4, fill: '#eaf2ff' },
+            { label: 'LEAD (SYNC · ARCHIVE)', color: C.slate, from: 5, to: 6, solid: true },
+        ],
+        columns: [
+            { cx: L2[0].cx, w: L2[0].w, flow: { title: '规划 Plan', sub: '基线护栏', kind: 'green' }, skills: ['product-planning'], cmds: ['/opsx:planning:*'], deliv: { title: 'ROADMAP.md', desc: ['对齐产品愿景', '规划基线'] } },
+            { cx: L2[1].cx, w: L2[1].w, flow: { title: '业务基线', sub: 'Business', kind: 'green' }, skills: ['blueprint'], cmds: ['/opsx:baseline/sync'], deliv: { title: 'baseline/', desc: ['稳定业务边界', '蓝图层治理'] } },
+            { cx: L2[2].cx, w: L2[2].w, flow: { title: '探索 Explore', sub: '需求侧', kind: 'blue' }, skills: ['explore'], cmds: ['/req:explore'], deliv: { title: 'idea.md', desc: ['多 Story 协同设计'] } },
+            { cx: L2[3].cx, w: L2[3].w, flow: { title: '提案 Propose', sub: '工程侧', kind: 'blue' }, skills: ['propose'], cmds: ['/opsx:propose'], deliv: { title: 'proposal.md', desc: ['解构工程执行计划'] } },
+            { cx: L2[4].cx, w: L2[4].w, flow: { kind: 'blue', block: true, stage: 'MULTI-STORY EXECUTION', subpills: [['原型', 'Proto'], ['故事', 'Story'], ['实施', 'Apply']] }, skills: ['prototype', 'story', 'apply-change'], cmds: ['/req:prototype', '/req:story', '/opsx:apply'], deliv: { title: 'Story Artifacts', desc: ['精细化规格与验证', '多 Story 循环交付'] } },
+            { cx: L2[5].cx, w: L2[5].w, flow: { title: '同步 Sync', sub: 'Spec Sync', kind: 'dark' }, skills: ['sync-specs'], cmds: ['/opsx:sync'], deliv: { title: 'Spec Sync', desc: ['认知持续对齐'] } },
+            { cx: L2[6].cx, w: L2[6].w, flow: { title: '归档 Archive', sub: '基线回流', kind: 'dark' }, skills: ['archive-change'], cmds: ['/opsx:archive'], deliv: { title: 'Baseline Update', desc: ['更新路线图基线'] } },
+        ],
+        arrows: [ { from: 0, to: 1 }, { from: 1, to: 2 }, { from: 2, to: 3 }, { from: 3, to: 4 }, { from: 4, to: 5 }, { from: 5, to: 6 } ],
+        loops: [
+            { fromCol: 6, toCol: 4, label: 'NEXT STORY', color: C.blue, drop: 56, fromEdge: 'left', toEdge: 'right' },
+            { fromCol: 6, toCol: 0, label: 'REVIEW → PLANNING (BASELINE)', color: C.green, drop: 92, fromEdge: 'left', toEdge: 'right' },
+        ],
+    };
+
+    // ==========================================================================
+    //  LAYER 03 — 业务产品 (Requirement Funnel + Double-Loop Governance)
+    // ==========================================================================
+    const L3arr = [
+        { cx: 123, w: 78 }, { cx: 209, w: 78 }, { cx: 295, w: 78 }, { cx: 497, w: 310 },
+        { cx: 704, w: 88 }, { cx: 911, w: 310 }, { cx: 1116, w: 84 }, { cx: 1205, w: 78 },
+    ];
+    const layer3 = {
+        agents: [
+            { label: 'LEAD', color: C.slate, from: 0, to: 2, fill: '#eef2f7' },
+            { label: 'PM AGENT (REQ FUNNEL)', color: C.green, from: 3, to: 3, solid: true },
+            { label: 'BRIDGE', color: C.slate, from: 4, to: 4, solid: true },
+            { label: 'ENGINEER AGENT (EXECUTION)', color: C.blue, from: 5, to: 5, solid: true },
+            { label: 'LEAD / GOVERNANCE', color: C.slate, from: 6, to: 7, solid: true },
+        ],
+        columns: [
+            { cx: L3arr[0].cx, w: L3arr[0].w, flow: { title: '规划', sub: 'Plan', kind: 'green' }, skills: ['product-planning'], cmds: ['/opsx:planning:*'], deliv: { title: 'ROADMAP.md', desc: ['对齐产品愿景'] } },
+            { cx: L3arr[1].cx, w: L3arr[1].w, flow: { title: '业务基线', sub: 'Business', kind: 'green' }, skills: ['blueprint'], cmds: ['/opsx:baseline/sync'], deliv: { title: 'baseline/', desc: ['稳定业务边界'] } },
+            { cx: L3arr[2].cx, w: L3arr[2].w, flow: { title: '任务类型?', sub: 'Epic / Fix', kind: 'dark' }, skills: ['router'], cmds: ['/req:handoff'], deliv: { title: '类型路由', desc: ['Epic→漏斗', 'Fix→交付'] } },
+            { cx: L3arr[3].cx, w: L3arr[3].w, flow: { kind: 'green', block: true, stage: 'REQUIREMENT FUNNEL', subpills: [['调研', 'Scan'], ['探索', 'Explore'], ['原型', 'Proto'], ['故事', 'Story']] }, skills: ['research', 'explore', 'prototype', 'storymap/story'], cmds: ['/req:research', '/req:explore', '/req:prototype', '/req:story'], deliv: { title: 'Story (Freeze)', desc: ['业务面冻结 / E2E 断言'] } },
+            { cx: L3arr[4].cx, w: L3arr[4].w, flow: { title: '交接', sub: 'Handoff', kind: 'dark' }, skills: ['handoff'], cmds: ['/req:handoff'], deliv: { title: 'Synthesized', desc: ['交接契约驱动交付'], dark: true } },
+            { cx: L3arr[5].cx, w: L3arr[5].w, flow: { kind: 'blue', block: true, stage: 'EXECUTION PIPELINE', subpills: [['提案', 'Propose'], ['规格', 'Specs'], ['设计', 'Design'], ['实施', 'Apply']] }, skills: ['propose', 'spec-design', 'apply-change', 'verify'], cmds: ['/opsx:propose', '/opsx:spec-design', '/opsx:apply'], deliv: { title: 'Specs (SDD)', desc: ['行为规格驱动的产线'] } },
+            { cx: L3arr[6].cx, w: L3arr[6].w, flow: { title: '规格同步', sub: 'Spec Sync', kind: 'dark' }, skills: ['sync-specs'], cmds: ['/opsx:sync'], deliv: { title: 'delta specs', desc: ['认知回流规格', '保持规格基线'] } },
+            { cx: L3arr[7].cx, w: L3arr[7].w, flow: { title: '归档', sub: 'Archive', kind: 'dark' }, skills: ['archive-change'], cmds: ['/opsx:archive'], deliv: { title: 'archive/', desc: ['完整审计追踪'] } },
+        ],
+        arrows: [
+            { from: 0, to: 1 }, { from: 1, to: 2 }, { from: 2, to: 3 }, { from: 3, to: 4 },
+            { from: 4, to: 5 }, { from: 5, to: 6 }, { from: 6, to: 7 },
+        ],
+        loops: [
+            { fromCol: 7, toCol: 3, label: 'NEXT STORY', color: C.blue, drop: 56, fromEdge: 'left', toEdge: 'right' },
+            { fromCol: 7, toCol: 0, label: 'BASELINE LOOP (NEXT EPIC · REVIEW)', color: C.green, drop: 92, fromEdge: 'left', toEdge: 'right' },
+        ],
+    };
+
+    // ==========================================================================
+    function slideHTML(num, theme, title, subtitle, tag, tagClass, svg) {
+        const numBg = theme === 'green' ? 'bg-aidd-green' : theme === 'blue' ? 'bg-aidd-blue' : 'bg-slate-900';
+        const numShadow = theme === 'green' ? 'shadow-green-200' : theme === 'blue' ? 'shadow-blue-200' : 'shadow-slate-400';
+        return `<section class="slide">
+            <div class="slide-header">
+                <div class="flex items-center gap-6">
+                    <div class="${numBg} text-white flex items-center justify-center text-3xl font-black rounded-2xl shadow-lg ${numShadow} w-16 h-16">${num}</div>
+                    <div>
+                        <h2 class="text-3xl font-serif font-black text-slate-900">${title}</h2>
+                        <p class="text-slate-400 font-medium uppercase tracking-widest text-sm mt-1">${subtitle}</p>
+                    </div>
+                </div>
+                <span class="px-4 py-1 rounded-full text-xs font-bold tracking-tighter ${tagClass}">${tag}</span>
+            </div>
+            <div class="bp-body">${svg}</div>
+        </section>`;
+    }
+
+    const slidesHtml = [
+        slideHTML('01', 'green', '极简交付 · Layer 01', 'Minimalist Delivery / Single Change Pipeline',
+            'SPEC-DRIVEN DEVELOPMENT', 'bg-slate-100 text-slate-500', renderLayer(layer1)),
+        slideHTML('02', 'blue', '轻量产品 · Layer 02', 'Lightweight Product / Baseline Guardrail / Multi-Story Loop',
+            'COLLABORATIVE SDD', 'bg-slate-100 text-slate-500', renderLayer(layer2)),
+        slideHTML('03', 'dark', '业务产品 · Layer 03', 'Business Product / Requirement Funnel / Double-Loop Governance',
+            'ENTERPRISE SDD FRAMEWORK', 'bg-aidd-green text-white', renderLayer(layer3)),
+    ];
+
+    document.getElementById('slides').innerHTML = slidesHtml.join('');
+    </script>
 </body>
 </html>

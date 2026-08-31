@@ -415,6 +415,8 @@
           <div v-if="isDashboardRole" class="px-6 py-2 text-sm font-medium text-muted-foreground uppercase tracking-wider">经营分析</div>
           <a v-if="isDashboardRole" @click="adminTab = 'dashboard'"
              :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'dashboard' ? 'border-primary bg-primary/5 text-primary font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">销售看板</a>
+          <a v-if="isDashboardRole" @click="adminTab = 'stock'"
+             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'stock' ? 'border-primary bg-primary/5 text-primary font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">库存预警</a>
           <div class="mt-8 px-6 py-2 text-sm font-medium text-muted-foreground uppercase tracking-wider">交易管理</div>
           <a @click="adminTab = 'order'"
              :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'order' ? 'border-primary bg-primary/5 text-primary font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">订单列表</a>
@@ -585,6 +587,192 @@
             </template>
 
           </div><!-- /销售看板 tab -->
+
+          <!-- ===== 库存预警 tab（stock-insight / data-insights BC，运营/老板角色，R-STOCK-001~010） ===== -->
+          <div v-else-if="adminTab === 'stock'">
+
+            <!-- 无权限兜底：非运营/老板越权进入 -->
+            <section v-if="!isDashboardRole" class="bg-card border border-border p-8">
+              <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold mb-4 border-b border-border pb-4">库存预警</h2>
+              <p class="text-sm text-foreground">无权限访问库存预警：本入口仅「运营」与「老板」角色可见。库存数据属经营敏感信息。</p>
+            </section>
+
+            <template v-else>
+              <!-- 标题 + 口径说明 -->
+              <div class="mb-6">
+                <span class="font-mono text-xs uppercase tracking-widest text-muted-foreground">经营分析 / 库存洞察</span>
+                <div class="flex items-end justify-between gap-4 mt-1">
+                  <h2 class="font-display font-black uppercase tracking-tight text-xl font-bold">库存预警</h2>
+                  <span v-if="isBoss" class="font-mono text-xs uppercase tracking-widest text-muted-foreground border border-border px-2 py-1">纯只读 · 无配置入口</span>
+                </div>
+                <p class="text-sm text-muted-foreground mt-2 leading-relaxed">口径：日均销量 = 近7日销量 ÷ 7 · 库存 ≤ 有效阈值 即入列预警 · 超卖风险 = 预计售罄天数 &lt; 7 天到货周期</p>
+              </div>
+
+              <div v-if="stockError" class="border border-accent/40 bg-accent/10 px-4 py-3 text-sm text-accent mb-6">{{ stockError }}</div>
+
+              <!-- 运营：阈值配置区（仅运营渲染，R-STOCK-006 前端最小权限） -->
+              <section v-if="isOperator" class="bg-card border border-border p-6 mb-6">
+                <div class="flex items-center justify-between gap-6 flex-wrap">
+                  <div class="flex items-end gap-5">
+                    <div>
+                      <span class="block font-mono text-[10px] uppercase tracking-widest text-muted-foreground mb-1.5">全局默认阈值</span>
+                      <div class="flex items-center gap-2">
+                        <input type="number" min="0" v-model.number="globalThresholdInput" aria-label="全局默认阈值" name="global-threshold"
+                          class="w-28 bg-muted border border-border px-4 py-2.5 font-mono text-sm font-bold text-foreground">
+                        <span class="font-mono text-xs text-muted-foreground">件</span>
+                      </div>
+                      <p class="font-mono text-[10px] text-muted-foreground mt-1.5 opacity-70">未设置覆盖的商品以此为准 · 修改后列表即时刷新</p>
+                    </div>
+                    <button @click="saveGlobalConfig" class="bg-primary text-primary-foreground font-display font-bold uppercase tracking-wide px-6 py-2.5 text-sm hover:opacity-85 transition-opacity">保存配置</button>
+                  </div>
+                  <div class="text-right">
+                    <p class="font-mono text-[10px] uppercase tracking-widest text-warning mb-1">仅运营可配置 · 即时生效</p>
+                    <p class="font-mono text-[10px] text-muted-foreground">商品级覆盖：按单品单独设置 · 长期有效</p>
+                    <p v-if="stockSavedFlag" class="font-mono text-[10px] font-bold text-success mt-1.5">✓ 已保存 · 阈值已即时生效</p>
+                  </div>
+                </div>
+              </section>
+
+              <!-- 老板：全局库存健康度总览（只读） -->
+              <section v-else-if="isBoss" class="bg-card border border-border p-6 mb-6">
+                <div class="flex items-center justify-between mb-5">
+                  <span class="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">全局库存健康度总览 · 只读</span>
+                  <span class="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">到货周期 7 天 · 数据来自近7日销量</span>
+                </div>
+                <div class="grid grid-cols-3 gap-4">
+                  <div class="border border-border bg-background p-5">
+                    <div class="font-display font-black text-4xl text-primary">{{ statWarning }}</div>
+                    <div class="font-mono text-xs uppercase tracking-widest text-muted-foreground mt-1.5">预警商品数</div>
+                    <p class="text-xs text-muted-foreground mt-2 leading-relaxed">库存 ≤ 阈值 已入列监控</p>
+                  </div>
+                  <div class="border border-border bg-background p-5">
+                    <div class="font-display font-black text-4xl text-accent">{{ statSoldOut }}</div>
+                    <div class="font-mono text-xs uppercase tracking-widest text-muted-foreground mt-1.5">已售罄数</div>
+                    <p class="text-xs text-muted-foreground mt-2 leading-relaxed">库存为 0 · 最需关注</p>
+                  </div>
+                  <div class="border border-border bg-background p-5">
+                    <div class="font-display font-black text-4xl text-warning">{{ statRisk }}</div>
+                    <div class="font-mono text-xs uppercase tracking-widest text-muted-foreground mt-1.5">超卖风险数</div>
+                    <p class="text-xs text-muted-foreground mt-2 leading-relaxed">售罄天数不足 7 天到货周期</p>
+                  </div>
+                </div>
+              </section>
+
+              <!-- 预警列表：Tabs + 8 列表头 -->
+              <section class="bg-card border border-border">
+                <div class="flex items-center justify-between px-6 pt-5 pb-4 border-b border-border flex-wrap gap-3">
+                  <div>
+                    <h2 class="font-display font-black text-xl uppercase tracking-tight text-foreground">预警列表</h2>
+                    <p class="text-xs text-muted-foreground mt-1">超卖风险 = 预计售罄天数 &lt; 7 天 · 建议补货量 = max(0, ⌈日均销量×7⌉ − 当前库存)</p>
+                  </div>
+                  <div class="flex border border-border">
+                    <button @click="stockTab = 'warning'" :class="stockTab === 'warning' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'"
+                      class="px-5 py-2 font-display font-bold text-xs uppercase tracking-wide transition-colors">预警中 · {{ stockWarningList.length }}</button>
+                    <button @click="stockTab = 'healthy'" :class="stockTab === 'healthy' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'"
+                      class="px-5 py-2 font-display font-bold text-xs uppercase tracking-wide transition-colors">健康水位 · {{ stockHealthyList.length }}</button>
+                  </div>
+                </div>
+
+                <div class="overflow-x-auto">
+                  <table class="w-full min-w-[1020px] text-sm">
+                    <thead>
+                      <tr class="border-b border-border text-left">
+                        <th class="py-3 px-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-normal">商品名</th>
+                        <th class="py-3 px-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-normal text-right">当前库存</th>
+                        <th class="py-3 px-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-normal text-right">预警阈值</th>
+                        <th class="py-3 px-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-normal text-right">近7日日均销量</th>
+                        <th class="py-3 px-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-normal text-right">预计售罄天数</th>
+                        <th class="py-3 px-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-normal text-center">超卖风险标识</th>
+                        <th class="py-3 px-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-normal text-right">建议补货量</th>
+                        <th class="py-3 px-4 font-mono text-[10px] uppercase tracking-widest text-muted-foreground font-normal text-center">状态</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="p in stockShownList" :key="p.productId"
+                          :class="p.stock === 0 ? 'bg-muted/50' : 'hover:bg-muted/30'"
+                          class="border-b border-border transition-colors">
+                        <!-- 商品名 -->
+                        <td class="py-3.5 px-4">
+                          <div class="font-display font-bold text-sm text-foreground">{{ p.name }}</div>
+                        </td>
+                        <!-- 当前库存 -->
+                        <td class="py-3.5 px-4 text-right">
+                          <span class="font-mono font-bold" :class="stockColor(p)">{{ p.stock }} 件</span>
+                        </td>
+                        <!-- 预警阈值（覆盖 --warning / 全局 muted；运营行内可编辑） -->
+                        <td class="py-3.5 px-4 text-right">
+                          <template v-if="isOperator">
+                            <span class="inline-flex items-center gap-1.5 justify-end">
+                              <input type="number" min="0" v-model.number="p.override" aria-label="商品级覆盖阈值" name="override-threshold"
+                                class="w-16 bg-muted border border-border px-2 py-1 font-mono text-sm font-bold text-foreground text-center">
+                              <button @click="saveProductOverride(p)" class="border border-border px-1.5 py-0.5 font-mono text-[10px] font-bold text-muted-foreground hover:text-foreground hover:bg-muted">保存</button>
+                              <span v-if="p.thresholdSource === 'override'" class="font-mono text-[10px] uppercase tracking-widest text-warning">覆盖</span>
+                              <span v-else class="font-mono text-[10px] text-muted-foreground">全局</span>
+                            </span>
+                          </template>
+                          <template v-else>
+                            <span :class="['font-mono font-bold', p.thresholdSource === 'override' ? 'text-warning' : 'text-foreground']">{{ p.effectiveThreshold }}</span>
+                            <span :class="['ml-1 font-mono text-[10px] uppercase tracking-widest', p.thresholdSource === 'override' ? 'text-warning' : 'text-muted-foreground']">{{ p.thresholdSource === 'override' ? '覆盖' : '全局' }}</span>
+                          </template>
+                        </td>
+                        <!-- 近7日日均销量 -->
+                        <td class="py-3.5 px-4 text-right">
+                          <template v-if="p.dailyAvg > 0">
+                            <div class="font-mono font-bold text-foreground">{{ formatStockAvg(p.dailyAvg) }} 件/日</div>
+                            <div class="font-mono text-[10px] text-muted-foreground mt-0.5">近7日 {{ p.sales7d }} 件</div>
+                          </template>
+                          <span v-else class="font-mono text-xs text-muted-foreground">暂无销量</span>
+                        </td>
+                        <!-- 预计售罄天数 -->
+                        <td class="py-3.5 px-4 text-right">
+                          <span v-if="p.dailyAvg > 0" class="font-mono font-bold" :class="stockDaysColor(p)">{{ formatStockDay(p.daysToSellout) }}</span>
+                          <span v-else class="font-mono text-xs text-muted-foreground">—</span>
+                        </td>
+                        <!-- 超卖风险标识 -->
+                        <td class="py-3.5 px-4 text-center">
+                          <span v-if="p.risk" class="inline-flex items-center px-2 py-0.5 font-mono text-[10px] font-bold tracking-widest uppercase bg-warning text-warning-foreground">超卖风险</span>
+                          <span v-else class="font-mono text-xs text-muted-foreground">—</span>
+                        </td>
+                        <!-- 建议补货量：R-STOCK-106 口径铁律三分支（stock=0 → accent 建议量 / replenish>0 → primary 数量 / replenish=0 → 无需补货） -->
+                        <td class="py-3.5 px-4 text-right">
+                          <template v-if="p.stock === 0">
+                            <span class="font-mono font-bold text-accent">{{ p.replenish }} 件</span>
+                          </template>
+                          <template v-else-if="p.replenish > 0">
+                            <span class="font-mono font-bold text-primary">{{ p.replenish }} 件</span>
+                          </template>
+                          <span v-else class="font-mono text-xs text-muted-foreground">无需补货</span>
+                        </td>
+                        <!-- 状态 -->
+                        <td class="py-3.5 px-4 text-center">
+                          <span v-if="p.stock === 0" class="inline-flex items-center px-2 py-0.5 font-mono text-[10px] font-bold tracking-widest uppercase bg-accent text-accent-foreground">已售罄</span>
+                          <span v-else-if="p.risk" class="inline-flex items-center px-2 py-0.5 font-mono text-[10px] font-bold tracking-widest uppercase bg-warning text-warning-foreground">低库存</span>
+                          <span v-else-if="p.listed" class="inline-flex items-center px-2 py-0.5 font-mono text-[10px] font-bold tracking-widest uppercase border border-border text-foreground">低库存</span>
+                          <span v-else class="inline-flex items-center px-2 py-0.5 font-mono text-[10px] font-bold tracking-widest uppercase bg-success text-success-foreground">库存充足</span>
+                        </td>
+                      </tr>
+
+                      <tr v-if="stockShownList.length === 0">
+                        <td colspan="8" class="py-12 text-center">
+                          <div class="font-mono text-xs uppercase tracking-widest text-muted-foreground">
+                            <template v-if="stockTab === 'warning'">当前无预警商品 · 全部商品处于健康水位</template>
+                            <template v-else>当前无健康水位商品 · 全部商品已入列预警</template>
+                          </div>
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+
+                <!-- 排序与口径脚注 -->
+                <div class="px-6 py-3 flex items-center justify-between flex-wrap gap-2">
+                  <p class="font-mono text-[10px] text-muted-foreground">排序：已售罄置顶 · 其余按预计售罄天数升序（最紧迫在前）</p>
+                  <p class="font-mono text-[10px] text-muted-foreground">到货周期固定 7 天（MVP）· 无销量商品不计算售罄天数</p>
+                </div>
+              </section>
+            </template>
+
+          </div><!-- /库存预警 tab -->
 
           <!-- ===== 优惠券管理 tab ===== -->
           <div v-if="adminTab === 'coupon'">
@@ -1058,7 +1246,7 @@
           </div><!-- /用户管理 tab -->
 
           <!-- ===== 订单列表 tab ===== -->
-          <div v-else>
+          <div v-else-if="adminTab === 'order'">
 
             <!-- 章节一: 订单列表 -->
             <section class="bg-card border border-border p-8">
@@ -1720,6 +1908,7 @@ const adminTab = ref('coupon') // 'dashboard' | 'coupon' | 'product' | 'category
 // 顶部路径分层面包屑映射（与侧边栏分组标题对齐：经营分析/交易管理/营销中心/账户中心）
 const pathMap = {
   dashboard: '经营分析 / 销售看板',
+  stock: '经营分析 / 库存预警',
   order: '交易管理 / 订单列表',
   product: '交易管理 / 商品管理',
   category: '交易管理 / 分类管理',
@@ -1729,6 +1918,138 @@ const pathMap = {
 
 // 销售看板角色判定（R-DASH-006）：运营/老板可见入口；客服/客户不可见
 const isDashboardRole = computed(() => currentUser.value && ['运营', '老板'].includes(currentUser.value.role))
+// 老板角色判定：只读视角（库存预警无配置区 + 健康度卡片）
+const isBoss = computed(() => currentUser.value?.role === '老板')
+
+// ==================== 库存预警（stock-insight / data-insights BC，R-STOCK-001~010） ====================
+const stockInsightData = ref(null)
+const stockError = ref('')
+const stockLoading = ref(false)
+const stockTab = ref('warning') // 'warning' | 'healthy'
+const globalThresholdInput = ref(10)
+const stockSavedFlag = ref(false)
+let stockSavedTimer = null
+
+const stockWarningList = computed(() => (stockInsightData.value?.items || []).filter(i => i.listed))
+const stockHealthyList = computed(() => (stockInsightData.value?.items || []).filter(i => !i.listed))
+const stockShownList = computed(() => stockTab.value === 'warning' ? stockWarningList.value : stockHealthyList.value)
+
+// 老板健康度总览 3 指标（R-STOCK-107：后端权威聚合，前端只读消费 healthOverview；杜绝前后端统计漂移）
+const healthOverview = computed(() => stockInsightData.value?.healthOverview || { warningCount: 0, soldOutCount: 0, riskCount: 0 })
+const statWarning = computed(() => healthOverview.value.warningCount)
+const statSoldOut = computed(() => healthOverview.value.soldOutCount)
+const statRisk = computed(() => healthOverview.value.riskCount)
+
+// 库存预警只读聚合（R-STOCK-009：401 未登录 / 403 越权区分）
+const fetchStockInsight = async () => {
+  if (!sessionToken.value) return
+  stockError.value = ''
+  stockLoading.value = true
+  try {
+    const response = await fetch(`${API_BASE}/api/admin/dashboard/stock`, { headers: authHeaders() })
+    if (response.status === 401) {
+      clearSession()
+      loginRedirect.value = 'admin'
+      switchToLogin()
+      loginServerError.value = (await response.json()).message || '请先登录'
+      return
+    }
+    if (response.status === 403) {
+      stockError.value = '无权限访问库存预警'
+      stockInsightData.value = null
+      return
+    }
+    if (response.ok) {
+      stockInsightData.value = await response.json()
+      globalThresholdInput.value = stockInsightData.value.globalThreshold
+    } else {
+      const err = await response.json()
+      stockError.value = err.message || '获取预警数据失败'
+    }
+  } catch (e) {
+    console.error('获取库存预警失败:', e)
+    stockError.value = '网络异常，请稍后重试'
+  } finally {
+    stockLoading.value = false
+  }
+}
+
+/** 运营保存全局默认阈值（R-STOCK-006/007）：落盘 + 即时生效 + 3 秒保存反馈 */
+const saveGlobalConfig = async () => {
+  stockError.value = ''
+  const threshold = Number(globalThresholdInput.value)
+  if (!Number.isInteger(threshold) || threshold < 0) {
+    stockError.value = '阈值必须为大于等于 0 的整数'
+    return
+  }
+  try {
+    const response = await fetch(`${API_BASE}/api/admin/stock-config`, {
+      method: 'PUT',
+      headers: authHeaders(),
+      body: JSON.stringify({ threshold })
+    })
+    if (response.ok) {
+      flashStockSaved()
+      await fetchStockInsight()
+    } else {
+      const err = await response.json()
+      stockError.value = err.message || '保存失败'
+    }
+  } catch (e) {
+    stockError.value = `网络错误: ${e.message}`
+  }
+}
+
+/** 运营保存商品级覆盖阈值（R-STOCK-005/006/007）：写入后重新请求 API 即时刷新列表 */
+const saveProductOverride = async (p) => {
+  stockError.value = ''
+  const threshold = Number(p.override)
+  if (!Number.isInteger(threshold) || threshold < 0) {
+    stockError.value = '阈值必须为大于等于 0 的整数'
+    return
+  }
+  try {
+    const response = await fetch(`${API_BASE}/api/admin/products/${p.productId}/stock-config`, {
+      method: 'PUT',
+      headers: authHeaders(),
+      body: JSON.stringify({ threshold })
+    })
+    if (response.ok) {
+      flashStockSaved()
+      await fetchStockInsight()
+    } else {
+      const err = await response.json()
+      stockError.value = err.message || '保存失败'
+    }
+  } catch (e) {
+    stockError.value = `网络错误: ${e.message}`
+  }
+}
+
+/** 保存成功反馈：「✓ 已保存 · 阈值已即时生效」（text-success，3 秒后消失） */
+const flashStockSaved = () => {
+  stockSavedFlag.value = true
+  if (stockSavedTimer) clearTimeout(stockSavedTimer)
+  stockSavedTimer = setTimeout(() => { stockSavedFlag.value = false }, 3000)
+}
+
+// 预警列表展示格式（数据全部来自 API，前端不做 mock 计算）
+const formatStockAvg = (v) => Number(v || 0).toFixed(1)
+const formatStockDay = (v) => {
+  if (v === null || v === undefined) return '—'
+  const s = Number.isInteger(v) ? String(v) : Number(v).toFixed(1)
+  return `${s} 天`
+}
+const stockColor = (p) => {
+  if (p.stock === 0) return 'text-accent'
+  if (p.stock <= p.effectiveThreshold) return 'text-warning'
+  return 'text-foreground'
+}
+const stockDaysColor = (p) => {
+  if (p.stock === 0) return 'text-accent'
+  if (p.risk) return 'text-warning'
+  return 'text-foreground'
+}
 
 // 销售看板状态（sales-dashboard / data-insights BC）
 const dashboardRanges = [
@@ -1842,6 +2163,7 @@ const switchViewMode = (mode) => {
   if (mode === 'admin') {
     fetchSalesDashboard()
     fetchSalesRanking()
+    fetchStockInsight()
     fetchAdminCoupons()
     fetchIssuances()
     fetchAdminProducts()

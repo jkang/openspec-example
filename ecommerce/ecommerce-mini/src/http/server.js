@@ -1,6 +1,6 @@
 import http from 'http'
-import { ProductRepo, CartRepo, OrderRepo, CouponRepo, IssuanceRepo, CategoryRepo, UserRepo, SessionRepo } from '../repo/memoryRepo.js'
-import { FileRepoAdapter, UserFileRepo, SessionFileRepo, resolveDataDir } from '../repo/fileRepo.js'
+import { ProductRepo, CartRepo, OrderRepo, CouponRepo, IssuanceRepo, CategoryRepo, UserRepo, SessionRepo, StockConfigRepo } from '../repo/memoryRepo.js'
+import { FileRepoAdapter, UserFileRepo, SessionFileRepo, StockConfigFileRepo, resolveDataDir } from '../repo/fileRepo.js'
 import { CatalogService } from '../services/catalog.js'
 import { CartService } from '../services/cart.js'
 import { OrderService, SALES_STATUSES } from '../services/order.js'
@@ -10,6 +10,7 @@ import { CategoryService } from '../services/category.js'
 import { PaymentService } from '../services/payment.js'
 import { AuthService } from '../services/auth.js'
 import { AdminUserService } from '../services/userAdmin.js'
+import { StockInsightService } from '../services/stockInsight.js'
 
 // 注入初始商品数据
 const initialProducts = [
@@ -53,12 +54,17 @@ const initialCoupons = [
   { id: 'PERCENT9', name: '9 折数码券', type: 'PERCENTAGE', value: 9, minSpendCents: 10000, status: 'UNUSED', expiryDate: '2026-12-31', userId: null }
 ]
 
-// 注入初始演示用户数据（R-LOG-001 对应前端示例）
-const initialUsers = [
+// 注入初始演示用户数据（R-LOG-001 对应前端示例；user_1003 老板角色种子，供老板只读视角演示/E2E）
+export const initialUsers = [
   { 
     id: 'user_1001', phone: '13912345678', nickname: '陈晓芸', 
     passwordHash: 'scrypt:708139f4b3a834319eacf7c532b1e4c9:d850177ba1e6bf16d801ec85a8720a98be2b7cb42c1bbca37f30831827b4d09f5dcf8b641c8657c8f41ce154d35d4896e4312923c0e58da3baa8bd9594fb8f92', 
     status: '正常', role: '运营', createdAt: '2026-08-29 08:00'
+  },
+  { 
+    id: 'user_1003', phone: '13612345678', nickname: '李老板', 
+    passwordHash: 'scrypt:281962f83abc8e8075c078b2a3798904:14cbe6e49872fdc08c3366eea79f0b3e920c8d3cab47c135a1741c3bbcfee57c7a0706cf6d71ced43b4beab776f79f77aaa4656033599a1e784228e1ac46a2a1', 
+    status: '正常', role: '老板', createdAt: '2026-08-31 09:00'
   }
 ]
 
@@ -169,6 +175,29 @@ function requireRole(...allowedRoles) {
 }
 
 /**
+ * B 端严格角色门禁（stock-insight，R-STOCK-009）：在 requireRole 基础上区分「未登录 401 / 越权 403」——
+ * 先解析会话（无有效会话 → UNAUTHORIZED 401「请先登录」，design.md 决策 3），再校验角色白名单
+ * （角色不在白名单 → FORBIDDEN 403）。仅预警/配置端点使用；既有 requireRole 与 sales-dashboard
+ * 端点保持统一 403 兜底语义零改动（防回归）。
+ * 用法：`requireRoleStrict('运营', '老板')(req, authService)`（只读预警）或
+ * `requireRoleStrict('运营')(req, authService)`（阈值配置写，仅运营）。
+ * @param {...string} allowedRoles 允许访问的角色白名单
+ * @returns {(req: import('http').IncomingMessage, authService: import('../services/auth.js').AuthService) => Omit<import('../domain/types.js').User, 'passwordHash'>}
+ */
+function requireRoleStrict(...allowedRoles) {
+  return (req, authService) => {
+    const authHeader = req.headers['authorization'] || ''
+    const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null
+    // 未登录 / 会话无效：保留 UNAUTHORIZED 语义 → 401「请先登录」（区别于 requireRole 的兜底 403）
+    const user = authService.getSessionUser(token)
+    if (!user || !allowedRoles.includes(user.role)) {
+      throw new Error('FORBIDDEN')
+    }
+    return user
+  }
+}
+
+/**
  * 销售看板时间维度换算（design.md 决策 4）：
  * - today = 今日本地 00:00 ~ now；week = 近 7 个自然日 ~ now（默认）；month = 近 30 个自然日 ~ now
  * - 显式 from/to 查询参数优先（E2E 断言可直接指定区间）
@@ -252,6 +281,8 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
   let userRepo
   /** @type {any} */
   let sessionRepo
+  /** @type {any} */
+  let stockConfigRepo
   
   let testMode = false
 
@@ -265,8 +296,9 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
     categoryRepo = new FileRepoAdapter({ filename: 'categories.json', dataDir: fileDataDir })
     userRepo = new UserFileRepo({ dataDir: fileDataDir })
     sessionRepo = new SessionFileRepo({ dataDir: fileDataDir })
-    // 种子对齐：products/categories/coupons 沿用既有种子；users 注入演示用户 user_1001；
-    // carts/orders/issuances/sessions 由 FileStore 初始化为空数据集
+    stockConfigRepo = new StockConfigFileRepo({ dataDir: fileDataDir })
+    // 种子对齐：products/categories/coupons 沿用既有种子；users 注入演示用户 user_1001/user_1003；
+    // carts/orders/issuances/sessions 由 FileStore 初始化为空数据集；stock-config 由 StockConfigFileRepo 自愈默认
     seedFileRepos({ productRepo, categoryRepo, couponRepo, userRepo })
   } else {
     // 内存存储（NODE_ENV=test 测试隔离）：保留既有行为
@@ -278,6 +310,7 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
     categoryRepo = new CategoryRepo()
     userRepo = new UserRepo()
     sessionRepo = new SessionRepo()
+    stockConfigRepo = new StockConfigRepo()
     // 测试后门仅 NODE_ENV=test + memory 模式生效（file 模式下必须 404）
     testMode = process.env.NODE_ENV === 'test'
 
@@ -297,6 +330,7 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
   const paymentService = new PaymentService(orderRepo, productRepo, couponService)
   const authService = new AuthService(userRepo, sessionRepo)
   const adminUserService = new AdminUserService(userRepo, orderRepo)
+  const stockInsightService = new StockInsightService(orderService, productRepo, stockConfigRepo)
 
   const server = http.createServer(async (req, res) => {
     // Handle CORS preflight
@@ -326,6 +360,7 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
         categoryRepo.clear()
         userRepo.clear()
         sessionRepo.clear()
+        stockConfigRepo.clear()
         initialProducts.forEach(p => productRepo.save({ ...p }))
         initialCoupons.forEach(c => couponRepo.save({ ...c }))
         initialCategories.forEach(c => categoryRepo.save({ ...c }))
@@ -536,6 +571,35 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
         })
       }
 
+      // ===== B 端库存预警（stock-insight capability / data-insights BC，R-STOCK-001~010） =====
+      // 只读预警聚合：requireRoleStrict（未登录 401 / 越权 403，R-STOCK-009）；运营/老板白名单
+      if (pathname === '/api/admin/dashboard/stock' && req.method === 'GET') {
+        requireRoleStrict('运营', '老板')(req, authService)
+        const result = stockInsightService.aggregate()
+        return sendJson(res, 200, result)
+      }
+
+      // 阈值配置（本 Epic 唯一写操作，R-STOCK-006/007）：全局默认阈值，仅运营可写
+      if (pathname === '/api/admin/stock-config' && req.method === 'PUT') {
+        requireRoleStrict('运营')(req, authService)
+        const body = await readJson(req)
+        const config = stockInsightService.setGlobalThreshold(body.threshold)
+        return sendJson(res, 200, config)
+      }
+
+      // 阈值配置：商品级覆盖阈值（覆盖优先于全局默认），仅运营可写；软删除商品返回 404（不写死循环）
+      if (pathname.startsWith('/api/admin/products/') && pathname.endsWith('/stock-config') && req.method === 'PUT') {
+        requireRoleStrict('运营')(req, authService)
+        const id = pathname.split('/')[4]
+        const product = productRepo.findById(id)
+        if (!product || (product.status || 'active') === 'deleted') {
+          return sendError(res, 'PRODUCT_NOT_FOUND', '商品不存在', 404)
+        }
+        const body = await readJson(req)
+        const config = stockInsightService.setProductOverride(id, body.threshold)
+        return sendJson(res, 200, config)
+      }
+
       if (pathname === '/api/coupons' && req.method === 'GET') {
         const userId = url.searchParams.get('userId')
         return sendJson(res, 200, couponService.list(userId))
@@ -675,6 +739,8 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
         return sendError(res, 'USER_NOT_FOUND', '用户不存在', 404)
       if (e.message === 'INVALID_STATUS')
         return sendError(res, 'INVALID_STATUS', '用户状态不合法，仅支持正常/禁用', 400)
+      if (e.message === 'INVALID_THRESHOLD')
+        return sendError(res, 'INVALID_THRESHOLD', '阈值必须为大于等于 0 的整数', 400)
 
       console.error(e)
       sendError(res, 'INTERNAL_ERROR', e.message, 500)
