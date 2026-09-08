@@ -83,6 +83,7 @@
  * @property {string} passwordHash 密码哈希（scrypt:<salt>:<hash>），不存明文
  * @property {string} nickname 昵称（≤20 字；未填时默认 "<尾号>用户"）
  * @property {string} [openid] 微信小程序 openid（微信授权登录因子，Q1 方案 A；可空，单小程序一对一，绑定后存在）
+ * @property {number} [creditDays] 客户账期（0=现结，>0=账期客户如 30/45/60；账期客户订单免现结、履约即转应收，R-AR-001）
  * @property {"正常" | "禁用"} status 用户状态（注册默认"正常"；B 端启停动作迁移）
  * @property {"客户" | "运营" | "客服" | "老板"} [role] 用户角色（注册默认"客户"；运营可访问 B 端用户管理 R-ADM-001；老板为只读看板角色，可访问 GET /api/admin/dashboard/*，无管理写权限，R-DASH-006）
  * @property {string} createdAt 创建时间 (YYYY-MM-DD HH:mm)
@@ -94,4 +95,24 @@
  * @property {string} userId 归属用户
  * @property {"WEB" | "MINIPROGRAM"} [channel] 会话来源渠道（登录创建时写入；网页登录默认 WEB，微信授权登录 MINIPROGRAM——供下单写 Order.channel 消费，Q7）
  * @property {string} createdAt 创建时间 (YYYY-MM-DD HH:mm)
+ */
+
+/**
+ * @typedef {Object} Receivable
+ * @property {string} id 应收 ID（ar_<rand>）
+ * @property {string} userId 归属客户用户 ID
+ * @property {string} orderId 来源订单 ID（一单一应收）
+ * @property {number} amountCents 应收金额（= 订单 actualPaidCents，priceCents 精确制，R-AR-005）
+ * @property {number} receivedCents 已回款金额（回款登记累加，初始 0）
+ * @property {string} dueDate 应收到期日 (YYYY-MM-DD) = 发货日 + 客户 creditDays（R-AR-003）
+ * @property {string} createdAt 创建时间 (ISO 8601)
+ */
+
+/**
+ * @typedef {Object} Receipt
+ * @property {string} id 回款流水 ID（rcpt_<rand>）
+ * @property {string} receivableId 关联应收 ID
+ * @property {number} amountCents 回款金额（分整型，R-AR-106）
+ * @property {string} recordedAt 登记时间 (YYYY-MM-DD HH:mm)
+ * @property {string} operator 登记操作人（用户 ID）
  */

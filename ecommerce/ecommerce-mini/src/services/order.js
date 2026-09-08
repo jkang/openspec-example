@@ -96,12 +96,13 @@ export class OrderService {
     return order
   }
 
-  /** 发货：PAID → SHIPPED */
+  /** 发货：PAID → SHIPPED（写入 shippedAt 供账期应收到期日计算，R-AR-003） */
   markShipped(orderId) {
     const order = this.orderRepo.findById(orderId)
     if (!order) throw new Error('ORDER_NOT_FOUND')
     assertOrderTransition(order.status, 'SHIPPED')
     order.status = 'SHIPPED'
+    order.shippedAt = order.shippedAt || new Date().toISOString()
     this.orderRepo.save(order)
     return order
   }

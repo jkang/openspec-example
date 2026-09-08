@@ -245,3 +245,21 @@ B 端**用户管理入口与账户中心分组**的前端可见性 SHALL 由当�
 - **GIVEN** 老板角色（种子 `user_1003`）已登录 B 端后台并进入「库存预警」视图
 - **THEN** 页面展示「纯只读 · 无配置入口」标识
 - **AND** 页面不渲染「保存配置」按钮与任何阈值输入框
+
+
+### Requirement: 客户账期（creditDays）展示与配置
+
+系统 SHALL 在 B 端用户管理中展示并允许配置客户账期（story-ar-credit-customer / `accounts-receivable` capability）：
+
+- 客户详情展示 `creditDays`（0=现结 / >0=账期天数）。
+- 配置 `creditDays` 仅 `role=运营`（扩展 R-ADM 门禁家族）；客户列表/详情响应包含该字段。
+
+- **Priority**: P0
+- **Rationale**: 账期按客户差异化；配置低频、运营执行（决策 Q2=B / Q3）。
+
+#### Scenario: 运营配置客户账期并生效
+- @e2e
+- **GIVEN** 运营已登录 B 端用户管理，打开客户详情
+- **WHEN** 运营配置该客户 creditDays=45 并保存
+- **THEN** 客户详情显示 creditDays=45（「账期客户 · 45 天」或「现结」）
+- **AND** 后续该客户订单履约自动按 45 天生成应收

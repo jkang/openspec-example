@@ -1,4 +1,5 @@
 import { assertUserStatusValue } from '../domain/logic.js'
+import { assertCreditDays } from './accountsReceivable.js'
 
 /**
  * B 端用户管理服务：用户列表/检索/详情（订单聚合）/禁用启用（HTTP → Service → Domain → Repo 单向依赖）
@@ -40,7 +41,8 @@ export class AdminUserService {
         orderCount: this.orderCount(u.id),
         createdAt: u.createdAt,
         status: u.status,
-        role: u.role
+        role: u.role,
+        creditDays: Number(u.creditDays) || 0
       }))
       .filter(u => !k || u.phone.includes(k) || u.nickname.toLowerCase().includes(k.toLowerCase()))
       .sort((a, b) => (b.createdAt || '').localeCompare(a.createdAt || ''))
@@ -69,8 +71,26 @@ export class AdminUserService {
       createdAt: user.createdAt,
       status: user.status,
       role: user.role,
+      creditDays: Number(user.creditDays) || 0,
       orders
     }
+  }
+
+  /**
+   * 配置客户账期（story-ar-credit-customer，R-AR-001）：0~365 整数
+   * @param {string} id 用户 ID
+   * @param {number} creditDays 账期天数（0=现结）
+   * @returns {{ id: string, nickname: string, creditDays: number }}
+   * @throws {Error} INVALID_CREDIT_DAYS 账期非法
+   * @throws {Error} USER_NOT_FOUND 用户不存在
+   */
+  setCreditDays(id, creditDays) {
+    const days = assertCreditDays(creditDays)
+    const user = this.userRepo.findById(id)
+    if (!user) throw new Error('USER_NOT_FOUND')
+    user.creditDays = days
+    this.userRepo.save(user)
+    return { id: user.id, nickname: user.nickname, creditDays: days }
   }
 
   /**

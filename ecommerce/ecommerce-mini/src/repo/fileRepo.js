@@ -301,3 +301,94 @@ export class ChannelConfigFileRepo {
     this.saveAll()
   }
 }
+
+/**
+ * 应收账款仓储（receivables.json 持久化，story-ar-credit-customer）：
+ * 数组文件 `[{ id, userId, orderId, amountCents, receivedCents, dueDate, createdAt }]`，
+ * 接口与 memory `ReceivableRepo` 一致。原子写 + 自愈（空数组）。
+ */
+export class ReceivableFileRepo {
+  constructor({ dataDir } = { dataDir: undefined }) {
+    this.filePath = resolveDataFile('receivables.json', dataDir)
+    this.data = []
+    this.load()
+  }
+
+  load() {
+    if (!fs.existsSync(this.filePath)) { this.saveAll(); return }
+    try {
+      const json = JSON.parse(fs.readFileSync(this.filePath, 'utf-8'))
+      this.data = Array.isArray(json) ? json : []
+    } catch (e) {
+      try { fs.renameSync(this.filePath, `${this.filePath}.corrupt-${Date.now()}`) } catch (_) { /* ignore */ }
+      console.error(`[ReceivableFileRepo] 解析失败，已重置为空数组: ${e.message}`)
+      this.data = []
+    }
+  }
+
+  saveAll() {
+    const tmp = `${this.filePath}.tmp`
+    fs.writeFileSync(tmp, JSON.stringify(this.data, null, 2))
+    fs.renameSync(tmp, this.filePath)
+  }
+
+  save(r) {
+    const i = this.data.findIndex(x => x.id === r.id)
+    if (i >= 0) this.data[i] = r; else this.data.push(r)
+    this.saveAll()
+    return r
+  }
+
+  findAll() { return this.data }
+
+  findById(id) { return this.data.find(x => x.id === id) }
+
+  findByUserId(userId) { return this.data.filter(x => x.userId === userId) }
+
+  findByOrderId(orderId) { return this.data.find(x => x.orderId === orderId) }
+
+  clear() { this.data = []; this.saveAll() }
+}
+
+/**
+ * 回款流水仓储（receipts.json 持久化，story-ar-receipt-entry）：
+ * 数组文件 `[{ id, receivableId, amountCents, recordedAt, operator }]`，接口与 memory `ReceiptRepo` 一致。
+ */
+export class ReceiptFileRepo {
+  constructor({ dataDir } = { dataDir: undefined }) {
+    this.filePath = resolveDataFile('receipts.json', dataDir)
+    this.data = []
+    this.load()
+  }
+
+  load() {
+    if (!fs.existsSync(this.filePath)) { this.saveAll(); return }
+    try {
+      const json = JSON.parse(fs.readFileSync(this.filePath, 'utf-8'))
+      this.data = Array.isArray(json) ? json : []
+    } catch (e) {
+      try { fs.renameSync(this.filePath, `${this.filePath}.corrupt-${Date.now()}`) } catch (_) { /* ignore */ }
+      console.error(`[ReceiptFileRepo] 解析失败，已重置为空数组: ${e.message}`)
+      this.data = []
+    }
+  }
+
+  saveAll() {
+    const tmp = `${this.filePath}.tmp`
+    fs.writeFileSync(tmp, JSON.stringify(this.data, null, 2))
+    fs.renameSync(tmp, this.filePath)
+  }
+
+  save(r) {
+    const i = this.data.findIndex(x => x.id === r.id)
+    if (i >= 0) this.data[i] = r; else this.data.push(r)
+    this.saveAll()
+    return r
+  }
+
+  findAll() { return this.data }
+
+  findByReceivableId(receivableId) { return this.data.filter(x => x.receivableId === receivableId) }
+
+  clear() { this.data = []; this.saveAll() }
+}

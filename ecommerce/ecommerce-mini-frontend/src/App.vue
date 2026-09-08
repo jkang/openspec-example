@@ -417,6 +417,8 @@
              :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'dashboard' ? 'border-primary bg-primary/5 text-primary font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">销售看板</a>
           <a v-if="isDashboardRole" @click="adminTab = 'stock'"
              :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'stock' ? 'border-primary bg-primary/5 text-primary font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">库存预警</a>
+          <a v-if="isDashboardRole" @click="adminTab = 'receivable'; fetchReceivables()"
+             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'receivable' ? 'border-primary bg-primary/5 text-primary font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">应收账款</a>
           <div class="mt-8 px-6 py-2 text-sm font-medium text-muted-foreground uppercase tracking-wider">渠道管理</div>
           <a v-if="isDashboardRole" @click="adminTab = 'channel'; fetchChannelConfig()"
              :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'channel' ? 'border-primary bg-primary/5 text-primary font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">小程序渠道</a>
@@ -871,6 +873,136 @@
             </template>
           </div><!-- /小程序渠道 tab -->
 
+          <!-- ===== 应收账款 tab（accounts-receivable / Order Context 扩展，运营可登记/老板只读，R-AR-101~106） ===== -->
+          <div v-if="adminTab === 'receivable'">
+            <section v-if="!isDashboardRole" class="bg-card border border-border p-8">
+              <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold mb-4 border-b border-border pb-4">应收账款</h2>
+              <p class="text-sm text-foreground">无权限访问应收账款：本入口仅「运营」与「老板」角色可见（回款登记仅运营，客服无权）。</p>
+            </section>
+
+            <template v-else>
+              <div class="flex items-start justify-between mb-6">
+                <div>
+                  <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold">应收账款</h2>
+                  <p class="font-mono text-xs uppercase tracking-widest text-muted-foreground mt-1">accounts-receivable · 账期客户履约即转应收 · 剩余=应收−已回 · 逾期自动推导</p>
+                </div>
+                <div class="flex border border-border">
+                  <button @click="arView = 'overview'; fetchReceivableSummary()" :class="arView === 'overview' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'"
+                    class="px-4 py-2 font-mono text-xs uppercase tracking-wider">总览</button>
+                  <button @click="arView = 'detail'" :class="arView === 'detail' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'"
+                    class="px-4 py-2 font-mono text-xs uppercase tracking-wider">明细</button>
+                </div>
+              </div>
+
+              <!-- 应收看板（总览，story-ar-dashboard，R-AR-201~205，老板/运营只读） -->
+              <template v-if="arView === 'overview'">
+                <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                  <div v-for="c in arSummaryCards" :key="c.label" class="border border-border bg-card p-5">
+                    <p class="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{{ c.label }}</p>
+                    <p class="text-xl font-mono font-black mt-2" :class="c.color">{{ c.value }}</p>
+                    <p class="text-[10px] text-muted-foreground mt-1">{{ c.sub }}</p>
+                  </div>
+                </section>
+                <section class="border border-border bg-card p-6 mb-6">
+                  <h3 class="font-display font-bold uppercase tracking-tight text-sm mb-4">客户欠款集中度</h3>
+                  <table class="w-full text-sm">
+                    <thead>
+                      <tr class="border-b border-border text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                        <th class="py-2 font-normal">客户</th>
+                        <th class="py-2 font-normal">应收单数</th>
+                        <th class="py-2 font-normal">未回余额</th>
+                        <th class="py-2 font-normal">逾期金额</th>
+                        <th class="py-2 font-normal">账期</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr v-for="c in arSummary?.byCustomer || []" :key="c.userId" class="border-b border-border last:border-b-0">
+                        <td class="py-3">{{ c.nickname }}</td>
+                        <td class="py-3">{{ c.count }} 单</td>
+                        <td class="py-3 font-mono font-bold text-primary">¥{{ (c.balanceCents / 100).toFixed(2) }}</td>
+                        <td class="py-3 font-mono" :class="c.overdueCents > 0 ? 'text-accent' : 'text-muted-foreground'">¥{{ (c.overdueCents / 100).toFixed(2) }}</td>
+                        <td class="py-3 text-xs text-muted-foreground">{{ c.creditDays > 0 ? c.creditDays + ' 天' : '现结' }}</td>
+                      </tr>
+                      <tr v-if="!(arSummary?.byCustomer || []).length"><td colspan="5" class="py-8 text-center text-muted-foreground">暂无应收数据</td></tr>
+                    </tbody>
+                  </table>
+                </section>
+              </template>
+
+              <template v-else>
+              <!-- 状态过滤 -->
+              <div class="flex items-center gap-2 mb-6 flex-wrap">
+                <button v-for="f in arFilters" :key="f.value" @click="arStatusFilter = f.value"
+                  :class="['px-4 py-2 border text-sm font-medium transition-colors', arStatusFilter === f.value ? 'bg-primary text-primary-foreground' : 'bg-card border-border text-muted-foreground hover:bg-muted']">
+                  {{ f.label }}
+                </button>
+              </div>
+
+              <section class="border border-border bg-card">
+                <table class="w-full text-sm">
+                  <thead>
+                    <tr class="border-b border-border text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                      <th class="px-5 py-3 font-normal">客户</th>
+                      <th class="px-5 py-3 font-normal">订单</th>
+                      <th class="px-5 py-3 font-normal">应收</th>
+                      <th class="px-5 py-3 font-normal">已回</th>
+                      <th class="px-5 py-3 font-normal">剩余</th>
+                      <th class="px-5 py-3 font-normal">到期日</th>
+                      <th class="px-5 py-3 font-normal">状态</th>
+                      <th v-if="isOperator" class="px-5 py-3 font-normal text-right">登记回款</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="r in filteredReceivables" :key="r.id" class="border-b border-border last:border-b-0">
+                      <td class="px-5 py-3">{{ r.customer }}</td>
+                      <td class="px-5 py-3 font-mono text-xs text-muted-foreground">{{ r.orderId }}</td>
+                      <td class="px-5 py-3 font-mono font-bold text-primary">¥{{ (r.amountCents / 100).toFixed(2) }}</td>
+                      <td class="px-5 py-3 font-mono text-success">¥{{ (r.receivedCents / 100).toFixed(2) }}</td>
+                      <td class="px-5 py-3 font-mono font-bold">¥{{ (r.balance / 100).toFixed(2) }}</td>
+                      <td class="px-5 py-3 text-xs text-muted-foreground">{{ r.dueDate }}<span v-if="r.overdue" class="ml-1 text-accent font-bold">已逾期</span></td>
+                      <td class="px-5 py-3">
+                        <span class="inline-block border px-2 py-0.5 font-mono text-[10px]"
+                          :class="r.settled ? 'border-success text-success' : r.overdue ? 'border-accent text-accent' : r.receivedCents > 0 ? 'border-warning text-warning' : 'border-border text-muted-foreground'">
+                          {{ r.settled ? '已结清' : r.overdue ? '逾期' : r.receivedCents > 0 ? '部分回款' : '未回款' }}
+                        </span>
+                      </td>
+                      <td class="px-5 py-3 text-right">
+                        <button v-if="isOperator && !r.settled" @click="openReceiptForm(r)"
+                          class="border border-primary text-primary px-3 py-1 text-xs font-mono uppercase tracking-widest whitespace-nowrap hover:bg-secondary">登记回款</button>
+                        <span v-else-if="isOperator && r.settled" class="text-xs text-success">已结清</span>
+                      </td>
+                    </tr>
+                    <tr v-if="filteredReceivables.length === 0">
+                      <td :colspan="isOperator ? 8 : 7" class="py-10 text-center text-muted-foreground">暂无应收单（账期客户订单发货后自动生成）</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </section>
+
+              <!-- 回款登记抽屉 -->
+              <section v-if="receiptTarget" class="border border-border bg-card p-6 mt-6">
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="font-display font-bold uppercase tracking-tight text-sm">登记回款 — {{ receiptTarget.customer }}（#{{ receiptTarget.orderId }}）</h3>
+                  <button @click="receiptTarget = null" class="text-muted-foreground text-sm border border-border px-2 py-1">关闭</button>
+                </div>
+                <div class="flex items-end gap-4">
+                  <div class="flex-1">
+                    <label class="block text-sm mb-1">回款金额（元，剩余 ¥{{ (receiptTarget.balance / 100).toFixed(2) }}）</label>
+                    <input v-model.number="receiptAmountYuan" type="number" min="0.01" step="0.01"
+                      placeholder="输入回款金额，可部分回款" class="w-full border border-border bg-muted px-3 py-2 text-sm font-mono" />
+                  </div>
+                  <button @click="submitReceipt"
+                    :disabled="!receiptAmountYuan || receiptAmountYuan <= 0 || Math.round(receiptAmountYuan * 100) > receiptTarget.balance"
+                    class="bg-primary text-primary-foreground px-6 py-2 text-sm font-bold disabled:opacity-40">确认入账</button>
+                </div>
+                <p v-if="receiptError" class="text-xs text-accent mt-2">{{ receiptError }}</p>
+                <p class="text-xs text-muted-foreground mt-2">金额 ≤ 剩余应收，支持多次部分回款；入账后剩余自动递减、结清即更新状态。</p>
+              </section>
+              </template>
+            </template>
+          </div><!-- /应收账款 tab -->
+
+
           <!-- ===== 优惠券管理 tab ===== -->
           <div v-if="adminTab === 'coupon'">
 
@@ -1313,6 +1445,23 @@
                   <div class="border border-border p-3">
                     <p class="text-muted-foreground mb-1">累计订单</p>
                     <p>{{ selectedAdminUser.orders.length }} 笔</p>
+                  </div>
+                </div>
+                <!-- 账期配置（story-ar-credit-customer，R-AR-001：客户账期，仅运营） -->
+                <div class="border border-border p-4 mb-6 flex items-center justify-between">
+                  <div>
+                    <p class="text-sm mb-1">账期（应收）
+                      <span class="ml-2 inline-block border px-2 py-0.5 font-mono text-[10px]"
+                        :class="(selectedAdminUser.creditDays || 0) > 0 ? 'border-primary text-primary' : 'border-border text-muted-foreground'">
+                        {{ (selectedAdminUser.creditDays || 0) > 0 ? `账期客户 · ${selectedAdminUser.creditDays} 天` : '现结客户' }}
+                      </span>
+                    </p>
+                    <p class="text-xs text-muted-foreground">账期客户订单免现结，发货后自动生成应收；0 = 现结（Phase 7）</p>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <input v-model.number="creditDaysInput" type="number" min="0" max="365" placeholder="如 0 / 30 / 45"
+                      class="w-28 border border-border bg-muted px-3 py-2 text-sm font-mono" />
+                    <button @click="saveCreditDays" class="bg-primary text-primary-foreground px-4 py-2 text-sm font-medium">保存账期</button>
                   </div>
                 </div>
                 <h3 class="font-display font-black uppercase tracking-tight text-sm font-semibold mb-3">该用户的订单</h3>
@@ -2013,6 +2162,7 @@ const adminTab = ref('coupon') // 'dashboard' | 'coupon' | 'product' | 'category
 const pathMap = {
   dashboard: '经营分析 / 销售看板',
   stock: '经营分析 / 库存预警',
+  receivable: '经营分析 / 应收账款',
   channel: '渠道管理 / 小程序渠道',
   order: '交易管理 / 订单列表',
   product: '交易管理 / 商品管理',
@@ -2343,6 +2493,8 @@ const switchViewMode = (mode) => {
     fetchSalesRanking()
     fetchStockInsight()
     fetchChannelConfig()
+    fetchReceivables()
+    fetchReceivableSummary()
     fetchAdminCoupons()
     fetchIssuances()
     fetchAdminProducts()
@@ -2658,10 +2810,90 @@ const doCancelOrder = async () => {
   }
 }
 
+// ==================== 应收账款（accounts-receivable / Order Context 扩展，R-AR-101~106） ====================
+const receivables = ref([])
+const arView = ref('overview')
+const arSummary = ref(null)
+const arStatusFilter = ref('ALL')
+const arFilters = [
+  { label: '全部', value: 'ALL' },
+  { label: '未结清', value: 'OPEN' },
+  { label: '仅逾期', value: 'OVERDUE' },
+  { label: '已结清', value: 'SETTLED' },
+]
+const receiptTarget = ref(null)
+const receiptAmountYuan = ref(null)
+const receiptError = ref('')
+
+const arSummaryCards = computed(() => {
+  const s = arSummary.value || { totalCents: 0, receivedCents: 0, balanceCents: 0, overdueCents: 0 }
+  return [
+    { label: '应收总额', value: `¥${(s.totalCents / 100).toFixed(0)}`, color: 'text-foreground', sub: '账期客户累计应收' },
+    { label: '已回款', value: `¥${(s.receivedCents / 100).toFixed(0)}`, color: 'text-success', sub: '回款流水入账' },
+    { label: '未回余额', value: `¥${(s.balanceCents / 100).toFixed(0)}`, color: 'text-primary', sub: '在外应收' },
+    { label: '逾期金额', value: `¥${(s.overdueCents / 100).toFixed(0)}`, color: 'text-accent', sub: '到期未结清' },
+  ]
+})
+
+const fetchReceivableSummary = async () => {
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/receivables/summary`, { headers: authHeaders() })
+    if (res.ok) arSummary.value = await res.json()
+  } catch (e) {
+    console.error('获取应收汇总失败:', e)
+  }
+}
+
+const filteredReceivables = computed(() => {
+  let list = receivables.value.slice()
+  if (arStatusFilter.value === 'OPEN') list = list.filter(r => !r.settled)
+  if (arStatusFilter.value === 'OVERDUE') list = list.filter(r => r.overdue)
+  if (arStatusFilter.value === 'SETTLED') list = list.filter(r => r.settled)
+  return list
+})
+
+const fetchReceivables = async () => {
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/receivables`, { headers: authHeaders() })
+    if (res.status === 403) return
+    if (res.ok) receivables.value = await res.json()
+  } catch (e) {
+    console.error('获取应收单失败:', e)
+  }
+}
+
+const openReceiptForm = (r) => { receiptTarget.value = r; receiptAmountYuan.value = null; receiptError.value = '' }
+
+const submitReceipt = async () => {
+  receiptError.value = ''
+  const cents = Math.round(receiptAmountYuan.value * 100)
+  if (!cents || cents <= 0 || cents > receiptTarget.value.balance) {
+    receiptError.value = '回款金额必须大于 0 且不超过剩余应收'
+    return
+  }
+  try {
+    const res = await fetch(`${API_BASE}/api/admin/receivables/${receiptTarget.value.id}/receipt`, {
+      method: 'POST',
+      headers: authHeaders(),
+      body: JSON.stringify({ amountCents: cents })
+    })
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}))
+      throw new Error(err.message || '回款登记失败')
+    }
+    receiptTarget.value = null
+    receiptAmountYuan.value = null
+    fetchReceivables()
+  } catch (e) {
+    receiptError.value = e.message || '回款登记失败'
+  }
+}
+
 // ==================== B 端用户管理（user-admin capability，仅运营角色 R-ADM-001） ====================
 const adminUsers = ref([])
 const adminUserKeyword = ref('')
 const selectedAdminUser = ref(null)
+const creditDaysInput = ref(0)
 const adminUserError = ref('')
 
 // 运营角色判定：入口可见性（R-ADM-001）+ 无权限兜底
@@ -2706,6 +2938,7 @@ const openAdminUserDetail = async (u) => {
     }
     if (response.ok) {
       selectedAdminUser.value = await response.json()
+      creditDaysInput.value = selectedAdminUser.value.creditDays || 0
     } else {
       const err = await response.json()
       adminUserError.value = err.message || '获取用户详情失败'
@@ -2713,6 +2946,28 @@ const openAdminUserDetail = async (u) => {
   } catch (e) {
     console.error('获取用户详情失败:', e)
     adminUserError.value = '网络异常，请稍后重试'
+  }
+}
+
+// 保存客户账期（story-ar-credit-customer，R-AR-001）：仅运营入口已由 role 门禁控制
+const saveCreditDays = async () => {
+  adminUserError.value = ''
+  try {
+    const response = await fetch(`${API_BASE}/api/admin/users/${selectedAdminUser.value.id}/credit-days`, {
+      method: 'PUT',
+      headers: authHeaders(),
+      body: JSON.stringify({ creditDays: creditDaysInput.value })
+    })
+    if (!response.ok) {
+      const err = await response.json().catch(() => ({}))
+      throw new Error(err.message || '账期保存失败')
+    }
+    selectedAdminUser.value.creditDays = creditDaysInput.value
+    // 同步列表中的该用户（若在列表中）
+    const idx = adminUsers.value.findIndex(u => u.id === selectedAdminUser.value.id)
+    if (idx >= 0) adminUsers.value[idx].creditDays = creditDaysInput.value
+  } catch (e) {
+    adminUserError.value = e.message || '账期保存失败'
   }
 }
 

@@ -1,6 +1,6 @@
 import http from 'http'
-import { ProductRepo, CartRepo, OrderRepo, CouponRepo, IssuanceRepo, CategoryRepo, UserRepo, SessionRepo, StockConfigRepo, ChannelConfigRepo } from '../repo/memoryRepo.js'
-import { FileRepoAdapter, UserFileRepo, SessionFileRepo, StockConfigFileRepo, ChannelConfigFileRepo, resolveDataDir } from '../repo/fileRepo.js'
+import { ProductRepo, CartRepo, OrderRepo, CouponRepo, IssuanceRepo, CategoryRepo, UserRepo, SessionRepo, StockConfigRepo, ChannelConfigRepo, ReceivableRepo, ReceiptRepo } from '../repo/memoryRepo.js'
+import { FileRepoAdapter, UserFileRepo, SessionFileRepo, StockConfigFileRepo, ChannelConfigFileRepo, ReceivableFileRepo, ReceiptFileRepo, resolveDataDir } from '../repo/fileRepo.js'
 import { toPublicConfig, mergeConfigInput } from '../domain/channel.js'
 import { CatalogService } from '../services/catalog.js'
 import { CartService } from '../services/cart.js'
@@ -13,6 +13,7 @@ import { AuthService } from '../services/auth.js'
 import { WechatAuthService } from '../services/wechatAuth.js'
 import { AdminUserService } from '../services/userAdmin.js'
 import { StockInsightService } from '../services/stockInsight.js'
+import { AccountsReceivableService, assertCreditDays } from '../services/accountsReceivable.js'
 
 // 注入初始商品数据
 const initialProducts = [
@@ -306,6 +307,10 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
   let stockConfigRepo
   /** @type {any} */
   let channelConfigRepo
+  /** @type {any} */
+  let receivableRepo
+  /** @type {any} */
+  let receiptRepo
 
   let testMode = false
 
@@ -321,6 +326,8 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
     sessionRepo = new SessionFileRepo({ dataDir: fileDataDir })
     stockConfigRepo = new StockConfigFileRepo({ dataDir: fileDataDir })
     channelConfigRepo = new ChannelConfigFileRepo({ dataDir: fileDataDir })
+    receivableRepo = new ReceivableFileRepo({ dataDir: fileDataDir })
+    receiptRepo = new ReceiptFileRepo({ dataDir: fileDataDir })
     // 种子对齐：products/categories/coupons 沿用既有种子；users 注入演示用户 user_1001/user_1003；
     // carts/orders/issuances/sessions 由 FileStore 初始化为空数据集；stock-config 由 StockConfigFileRepo 自愈默认
     seedFileRepos({ productRepo, categoryRepo, couponRepo, userRepo })
@@ -336,6 +343,8 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
     sessionRepo = new SessionRepo()
     stockConfigRepo = new StockConfigRepo()
     channelConfigRepo = new ChannelConfigRepo()
+    receivableRepo = new ReceivableRepo()
+    receiptRepo = new ReceiptRepo()
     // 测试后门仅 NODE_ENV=test + memory 模式生效（file 模式下必须 404）
     testMode = process.env.NODE_ENV === 'test'
 
@@ -356,6 +365,7 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
   const authService = new AuthService(userRepo, sessionRepo)
   const wechatAuthService = new WechatAuthService(userRepo, sessionRepo)
   const adminUserService = new AdminUserService(userRepo, orderRepo)
+  const accountsReceivableService = new AccountsReceivableService(receivableRepo, userRepo)
   const stockInsightService = new StockInsightService(orderService, productRepo, stockConfigRepo)
 
   const server = http.createServer(async (req, res) => {
@@ -388,6 +398,8 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
         sessionRepo.clear()
         stockConfigRepo.clear()
         channelConfigRepo.clear()
+        receivableRepo.clear()
+        receiptRepo.clear()
         initialProducts.forEach(p => productRepo.save({ ...p }))
         initialCoupons.forEach(c => couponRepo.save({ ...c }))
         initialCategories.forEach(c => categoryRepo.save({ ...c }))
@@ -500,6 +512,12 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
         // 渠道来源从会话 channel 解析（Q7：服务端判定，不信任客户端 body.channel 防伪造，R-ORDCH-002）
         const session = resolveSession(req, authService, sessionRepo)
         const order = orderService.createOrder(sessionUser.id, body.couponId, session && session.channel)
+        // 账期客户（creditDays>0，R-AR-002）：免客户端模拟支付，服务端账期放行（信用确认 → PAID，可发货）
+        const fullUser = userRepo.findById(sessionUser.id)
+        if (fullUser && Number(fullUser.creditDays) > 0 && order.status === 'PENDING_PAYMENT') {
+          const confirmed = paymentService.pay(order.id)
+          return sendJson(res, 201, confirmed)
+        }
         return sendJson(res, 201, order)
       }
 
@@ -508,6 +526,12 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
         const sessionUser = requireSession(req, authService)
         const session = resolveSession(req, authService, sessionRepo)
         const order = orderService.checkout(sessionUser.id, body.couponId, session && session.channel)
+        // 账期客户（creditDays>0，R-AR-002）：服务端账期放行（信用确认 → PAID，可发货）
+        const fullUser = userRepo.findById(sessionUser.id)
+        if (fullUser && Number(fullUser.creditDays) > 0 && order.status === 'PENDING_PAYMENT') {
+          const confirmed = paymentService.pay(order.id)
+          return sendJson(res, 200, confirmed)
+        }
         return sendJson(res, 200, order)
       }
 
@@ -526,7 +550,9 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
       if (pathname.startsWith('/api/admin/orders/') && pathname.endsWith('/ship') && req.method === 'POST') {
         const id = pathname.split('/')[4]
         const order = orderService.markShipped(id)
-        return sendJson(res, 200, order)
+        // 账期客户订单发货 → 自动生成应收（R-AR-003，accounts-receivable）
+        const receivable = accountsReceivableService.onOrderShipped(order)
+        return sendJson(res, 200, receivable ? { order, receivable } : order)
       }
 
       if (pathname.startsWith('/api/admin/orders/') && pathname.endsWith('/cancel') && req.method === 'POST') {
@@ -547,6 +573,37 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
         const id = pathname.split('/')[4]
         const body = await readJson(req)
         const result = adminUserService.setStatus(id, body.status)
+        return sendJson(res, 200, result)
+      }
+
+      if (pathname.startsWith('/api/admin/users/') && pathname.endsWith('/credit-days') && req.method === 'PUT') {
+        // 客户账期配置（story-ar-credit-customer，R-AR-001）：仅运营
+        requireRole('运营')(req, authService)
+        const id = pathname.split('/')[4]
+        const body = await readJson(req)
+        const result = adminUserService.setCreditDays(id, body.creditDays)
+        return sendJson(res, 200, result)
+      }
+
+      // 应收只读聚合（story-ar-dashboard，R-AR-201~205，运营/老板白名单，纯只读）
+      if (pathname === '/api/admin/receivables/summary' && req.method === 'GET') {
+        requireRole('运营', '老板')(req, authService)
+        return sendJson(res, 200, accountsReceivableService.summary())
+      }
+
+      // 应收单列表（story-ar-receipt-entry，运营/老板只读，R-AR-101/104）
+      if (pathname === '/api/admin/receivables' && req.method === 'GET') {
+        requireRole('运营', '老板')(req, authService)
+        const status = url.searchParams.get('status') || 'ALL'
+        return sendJson(res, 200, accountsReceivableService.listAll(status))
+      }
+
+      // 回款登记（R-AR-102/103，仅运营写）
+      if (pathname.startsWith('/api/admin/receivables/') && pathname.endsWith('/receipt') && req.method === 'POST') {
+        const operator = requireRole('运营')(req, authService)
+        const id = pathname.split('/')[4]
+        const body = await readJson(req)
+        const result = accountsReceivableService.recordReceipt(id, body.amountCents, operator.id)
         return sendJson(res, 200, result)
       }
 
@@ -823,6 +880,14 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
         return sendError(res, 'WECHAT_GATEWAY_NOT_CONFIGURED', '微信网关未接入（资质后置）', 501)
       if (e.message === 'USER_NOT_FOUND')
         return sendError(res, 'USER_NOT_FOUND', '用户不存在', 404)
+      if (e.message === 'RECEIVABLE_NOT_FOUND')
+        return sendError(res, 'RECEIVABLE_NOT_FOUND', '应收单不存在', 404)
+      if (e.message === 'INVALID_RECEIPT_AMOUNT')
+        return sendError(res, 'INVALID_RECEIPT_AMOUNT', '回款金额必须大于 0 且不超过剩余应收', 400)
+      if (e.message === 'RECEIVABLE_SETTLED')
+        return sendError(res, 'RECEIVABLE_SETTLED', '该应收单已结清，不可再登记', 400)
+      if (e.message === 'INVALID_CREDIT_DAYS')
+        return sendError(res, 'INVALID_CREDIT_DAYS', '账期天数必须为 0~365 的整数', 400)
       if (e.message === 'INVALID_STATUS')
         return sendError(res, 'INVALID_STATUS', '用户状态不合法，仅支持正常/禁用', 400)
       if (e.message === 'INVALID_THRESHOLD')

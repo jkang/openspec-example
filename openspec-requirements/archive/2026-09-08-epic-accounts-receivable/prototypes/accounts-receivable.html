@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>应收账款闭环 · Phase 7 原型（ZAPP 暗黑）</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            background: '#08080E', card: '#0F0F1C', foreground: '#EFEFFA',
+            muted: '#15152A', 'muted-foreground': '#6E6E9A', secondary: '#1A1A2E',
+            primary: '#C8FF00', 'primary-foreground': '#08080E',
+            accent: '#FF2D6B', 'accent-foreground': '#FFFFFF',
+            electric: '#3B6DFF', warning: '#FF9A00', success: '#00E5A0',
+            border: '#222238', ring: '#C8FF00',
+          },
+          fontFamily: {
+            display: ['"Exo 2"', 'sans-serif'],
+            sans: ['"DM Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@700;800;900&family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+    * { border-radius: 0 !important; box-shadow: none !important; }
+    html, body { background-color: #08080E; }
+    [v-cloak] { display: none; }
+    input:focus, select:focus { outline: none; border-color: #C8FF00 !important; }
+    button { cursor: pointer; }
+  </style>
+</head>
+<body class="bg-background text-foreground font-sans antialiased">
+<div id="app" v-cloak class="min-h-screen bg-background text-foreground font-sans">
+
+  <header class="h-16 bg-card border-b border-border flex items-center justify-between px-6 sticky top-0 z-50">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-primary flex items-center justify-center">
+        <span class="font-display font-black text-primary-foreground text-sm">M</span>
+      </div>
+      <span class="font-display font-black text-lg uppercase tracking-tight text-foreground">Minimal Store</span>
+      <span class="font-mono text-[10px] uppercase tracking-widest text-muted-foreground border border-border px-2 py-0.5 hidden sm:inline">运营后台 · 应收账款</span>
+    </div>
+    <div class="flex items-center gap-4">
+      <span class="font-mono text-[10px] uppercase tracking-widest text-muted-foreground hidden sm:inline">角色</span>
+      <div class="flex border border-border">
+        <button @click="role = '运营'" :class="role === '运营' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'"
+          class="px-4 py-2 font-mono text-xs uppercase tracking-wider">运营 · 陈晓芸</button>
+        <button @click="role = '老板'" :class="role === '老板' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'"
+          class="px-4 py-2 font-mono text-xs uppercase tracking-wider">老板 · 李老板</button>
+        <button @click="role = '客服'" :class="role === '客服' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground'"
+          class="px-4 py-2 font-mono text-xs uppercase tracking-wider">客服 · 小李</button>
+      </div>
+    </div>
+  </header>
+
+  <div class="flex">
+    <aside class="w-52 border-r border-border bg-card min-h-[calc(100vh-4rem)] p-4 hidden md:block">
+      <nav class="space-y-1">
+        <div class="px-3 py-1 font-mono text-[10px] uppercase tracking-widest text-muted-foreground">经营分析</div>
+        <a v-for="m in nav" :key="m.id" @click.prevent="view = m.id"
+          class="block px-3 py-2 text-sm border border-transparent cursor-pointer"
+          :class="view === m.id ? 'border-primary text-primary' : 'text-muted-foreground hover:text-foreground'">{{ m.label }}</a>
+      </nav>
+    </aside>
+
+    <main class="flex-1 p-6 lg:p-8 max-w-5xl">
+
+      <!-- ═══ 视图 1：应收账款（列表 + 回款登记） ═══ -->
+      <template v-if="view === 'receivable'">
+        <div class="flex items-start justify-between mb-6">
+          <div>
+            <h1 class="font-display font-black uppercase tracking-tight text-2xl">应收账款</h1>
+            <p class="font-mono text-xs uppercase tracking-widest text-muted-foreground mt-1">accounts-receivable · Order Context 扩展 · 账期客户履约即转应收</p>
+          </div>
+          <div v-if="role === '运营'" class="flex gap-2">
+            <select v-model="filterStatus" class="border border-border bg-muted px-3 py-2 text-sm">
+              <option value="ALL">全部状态</option>
+              <option value="OPEN">未结清（未回+部分）</option>
+              <option value="OVERDUE">仅逾期</option>
+              <option value="SETTLED">已结清</option>
+            </select>
+            <button @click="toggleSeed" class="border border-border text-muted-foreground px-4 py-2 text-xs font-mono uppercase tracking-widest hover:text-foreground">生成演示账期订单</button>
+          </div>
+        </div>
+
+        <!-- 角色提示 -->
+        <div v-if="role === '客服'" class="border border-accent text-accent bg-card px-4 py-3 text-sm mb-6">无权限访问应收账款（回款登记仅运营；客服不可见）</div>
+        <div v-else-if="role === '老板'" class="border border-border bg-card px-4 py-3 text-sm mb-6 text-muted-foreground">纯只读视角 · 无登记入口（老板查看应收健康度）</div>
+
+        <section v-if="role !== '客服'" class="border border-border bg-card p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <h2 class="font-display font-bold uppercase tracking-tight text-sm">应收单</h2>
+            <span class="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">剩余 = 应收 − 已回 · 逾期按到期日自动推导</span>
+          </div>
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-border text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                <th class="py-2 font-normal">客户</th>
+                <th class="py-2 font-normal">订单</th>
+                <th class="py-2 font-normal">应收</th>
+                <th class="py-2 font-normal">已回</th>
+                <th class="py-2 font-normal">剩余</th>
+                <th class="py-2 font-normal">到期日</th>
+                <th class="py-2 font-normal">状态</th>
+                <th class="py-2 font-normal text-right" v-if="role === '运营'">登记回款</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="r in filteredReceivables" :key="r.id" class="border-b border-border last:border-b-0">
+                <td class="py-3">{{ r.customer }}</td>
+                <td class="py-3 font-mono text-xs text-muted-foreground">{{ r.orderId }}</td>
+                <td class="py-3 font-mono font-bold text-primary">¥{{ (r.amount / 100).toFixed(2) }}</td>
+                <td class="py-3 font-mono text-success">¥{{ (r.received / 100).toFixed(2) }}</td>
+                <td class="py-3 font-mono font-bold">{{ (r.balance / 100).toFixed(2) }}</td>
+                <td class="py-3 text-xs text-muted-foreground">{{ r.dueDate }} <span v-if="r.overdue" class="ml-1 text-accent font-bold">已逾期</span></td>
+                <td class="py-3">
+                  <span class="inline-block border px-2 py-0.5 font-mono text-[10px]"
+                    :class="r.settled ? 'border-success text-success' : r.overdue ? 'border-accent text-accent' : r.received > 0 ? 'border-warning text-warning' : 'border-border text-muted-foreground'">
+                    {{ r.settled ? '已结清' : r.overdue ? '逾期' : r.received > 0 ? '部分回款' : '未回款' }}
+                  </span>
+                </td>
+                <td class="py-3 text-right">
+                  <button v-if="role === '运营' && !r.settled" @click="openReceipt(r)"
+                    class="border border-primary text-primary px-3 py-1 text-xs font-mono uppercase tracking-widest whitespace-nowrap hover:bg-secondary">登记回款</button>
+                  <span v-else-if="role === '运营'" class="text-xs text-success">已结清</span>
+                </td>
+              </tr>
+              <tr v-if="filteredReceivables.length === 0"><td colspan="8" class="py-10 text-center text-muted-foreground">无应收单（可点「生成演示账期订单」查看）</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 回款登记抽屉 -->
+        <section v-if="receiptTarget" class="border border-border bg-card p-6 mt-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="font-display font-bold uppercase tracking-tight text-sm">登记回款 — {{ receiptTarget.customer }}（#{{ receiptTarget.orderId }}）</h3>
+            <button @click="receiptTarget = null" class="text-muted-foreground text-sm border border-border px-2 py-1">关闭</button>
+          </div>
+          <div class="flex items-end gap-4">
+            <div class="flex-1">
+              <label class="block text-sm mb-1">回款金额（剩余 ¥{{ (receiptTarget.balance / 100).toFixed(2) }}）</label>
+              <input v-model.number="receiptAmount" type="number" min="0.01" :max="(receiptTarget.balance / 100).toFixed(2)"
+                placeholder="输入回款金额（元），可部分回款" class="w-full border border-border bg-muted px-3 py-2 text-sm font-mono" />
+            </div>
+            <button @click="submitReceipt" :disabled="!receiptAmount || receiptAmount <= 0 || receiptAmount * 100 > receiptTarget.balance"
+              class="bg-primary text-primary-foreground px-6 py-2 text-sm font-bold disabled:opacity-40">确认入账</button>
+          </div>
+          <p class="text-xs text-muted-foreground mt-2">金额 ≤ 剩余应收，支持多次部分回款；入账后剩余自动递减、结清即状态更新。</p>
+        </section>
+      </template>
+
+      <!-- ═══ 视图 2：老板应收看板（只读） ═══ -->
+      <template v-if="view === 'dashboard'">
+        <div class="mb-6">
+          <h1 class="font-display font-black uppercase tracking-tight text-2xl">应收看板</h1>
+          <p class="font-mono text-xs uppercase tracking-widest text-muted-foreground mt-1">老板/运营只读 · 数据与登记同源（后端权威聚合）</p>
+        </div>
+        <div v-if="role === '客服'" class="border border-accent text-accent bg-card px-4 py-3 text-sm mb-6">无权限访问应收看板</div>
+        <template v-else>
+          <section class="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+            <div v-for="c in metricCards" :key="c.label" class="border border-border bg-card p-5">
+              <p class="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{{ c.label }}</p>
+              <p class="text-2xl font-mono font-black mt-2" :class="c.color">{{ c.value }}</p>
+              <p class="text-[10px] text-muted-foreground mt-1">{{ c.sub }}</p>
+            </div>
+          </section>
+          <section class="border border-border bg-card p-6">
+            <h2 class="font-display font-bold uppercase tracking-tight text-sm mb-4">客户欠款集中度</h2>
+            <table class="w-full text-sm">
+              <thead>
+                <tr class="border-b border-border text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                  <th class="py-2 font-normal">客户</th>
+                  <th class="py-2 font-normal">应收单数</th>
+                  <th class="py-2 font-normal">未回余额</th>
+                  <th class="py-2 font-normal">逾期金额</th>
+                  <th class="py-2 font-normal">最大账期</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="c in customerAgg" :key="c.name" class="border-b border-border last:border-b-0">
+                  <td class="py-3">{{ c.name }}</td>
+                  <td class="py-3">{{ c.count }} 单</td>
+                  <td class="py-3 font-mono font-bold text-primary">¥{{ (c.balance / 100).toFixed(2) }}</td>
+                  <td class="py-3 font-mono" :class="c.overdue > 0 ? 'text-accent' : 'text-muted-foreground'">¥{{ (c.overdue / 100).toFixed(2) }}</td>
+                  <td class="py-3 text-xs text-muted-foreground">{{ c.maxDays }} 天</td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+        </template>
+      </template>
+
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script>
+    const { createApp, computed } = Vue;
+    const today = () => new Date().toISOString().slice(0, 10);
+    const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x.toISOString().slice(0, 10); };
+    createApp({
+      data() {
+        return {
+          role: '运营',
+          view: 'receivable',
+          nav: [
+            { id: 'receivable', label: '应收账款' },
+            { id: 'dashboard', label: '应收看板' },
+          ],
+          filterStatus: 'ALL',
+          receiptTarget: null,
+          receiptAmount: null,
+          receivables: [],
+          // 客户账期：creditDays（0=现结不产生应收，此处种子只含账期客户）
+          customers: { '林明贸易': 45, '恒达五金': 30, '顺发工贸': 60, '星河科技': 0 },
+        };
+      },
+      computed: {
+        filteredReceivables() {
+          let list = this.receivables.slice();
+          if (this.filterStatus === 'OPEN') list = list.filter(r => !r.settled);
+          if (this.filterStatus === 'OVERDUE') list = list.filter(r => r.overdue);
+          if (this.filterStatus === 'SETTLED') list = list.filter(r => r.settled);
+          return list;
+        },
+        metricCards() {
+          const total = this.receivables.reduce((n, r) => n + r.amount, 0);
+          const received = this.receivables.reduce((n, r) => n + r.received, 0);
+          const balance = this.receivables.reduce((n, r) => n + r.balance, 0);
+          const overdue = this.receivables.reduce((n, r) => (r.overdue ? n + r.balance : n), 0);
+          return [
+            { label: '应收总额', value: `¥${(total / 100).toFixed(0)}`, color: 'text-foreground', sub: '账期客户累计应收' },
+            { label: '已回款', value: `¥${(received / 100).toFixed(0)}`, color: 'text-success', sub: '回款流水入账' },
+            { label: '未回余额', value: `¥${(balance / 100).toFixed(0)}`, color: 'text-primary', sub: '在外应收' },
+            { label: '逾期金额', value: `¥${(overdue / 100).toFixed(0)}`, color: 'text-accent', sub: '到期未结清' },
+          ];
+        },
+        customerAgg() {
+          const map = {};
+          this.receivables.forEach(r => {
+            if (!map[r.customer]) map[r.customer] = { name: r.customer, count: 0, balance: 0, overdue: 0, maxDays: 0 };
+            map[r.customer].count += 1;
+            map[r.customer].balance += r.balance;
+            if (r.overdue) map[r.customer].overdue += r.balance;
+            map[r.customer].maxDays = Math.max(map[r.customer].maxDays, this.customers[r.customer] || 0);
+          });
+          return Object.values(map);
+        },
+      },
+      methods: {
+        toggleSeed() {
+          if (this.receivables.length) { this.receivables = []; return; }
+          // 生成演示账期应收（真实口径：发货日 + 客户 creditDays = 到期日）
+          this.receivables = [
+            { id: 'AR-1001', customer: '林明贸易', orderId: 'ORD-0901-01', amount: 128000, received: 0, dueDate: addDays(today(), -6), creditDays: 45, shippedAt: addDays(today(), -51) },
+            { id: 'AR-1002', customer: '恒达五金', orderId: 'ORD-0901-05', amount: 35600, received: 20000, dueDate: addDays(today(), 12), creditDays: 30, shippedAt: addDays(today(), -18) },
+            { id: 'AR-1003', customer: '林明贸易', orderId: 'ORD-0905-02', amount: 89000, received: 89000, dueDate: addDays(today(), -2), creditDays: 45, shippedAt: addDays(today(), -47) },
+            { id: 'AR-1004', customer: '顺发工贸', orderId: 'ORD-0906-09', amount: 45200, received: 0, dueDate: addDays(today(), 33), creditDays: 60, shippedAt: addDays(today(), -27) },
+          ].map(r => this.derive(r));
+        },
+        derive(r) {
+          const balance = r.amount - r.received;
+          return Object.assign({}, r, {
+            balance,
+            settled: balance <= 0,
+            overdue: balance > 0 && r.dueDate < today(),
+          });
+        },
+        openReceipt(r) { this.receiptTarget = r; this.receiptAmount = null; },
+        submitReceipt() {
+          const cents = Math.round(this.receiptAmount * 100);
+          const target = this.receiptTarget;
+          const idx = this.receivables.findIndex(x => x.id === target.id);
+          this.receivables[idx].received += cents;
+          this.receivables[idx] = this.derive(this.receivables[idx]);
+          this.receiptTarget = null; this.receiptAmount = null;
+        },
+      },
+    }).mount('#app');
+  </script>
+</body>
+</html>

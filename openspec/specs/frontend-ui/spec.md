@@ -686,6 +686,60 @@
 - **WHEN** B 端对该订单执行发货
 - **THEN** 再次请求 → 状态 SHIPPED（已发货）
 
+### Requirement: 客户详情账期配置区
+
+系统 SHALL 在 B 端用户管理「客户详情」提供账期配置（story-ar-credit-customer / `accounts-receivable`）：
+
+- 展示 creditDays：`0` → 「现结客户」徽标；`>0` → 「账期客户 · N 天」。
+- 配置区仅运营可见（输入天数 0/30/45/60… + 保存）；老板/客服不渲染配置入口。
+- ZAPP 暗黑令牌、无圆角阴影、真实中文数据。
+
+- **Priority**: P0
+- **Rationale**: 账期配置是运营低频动作；对齐原型客户账期数据。
+
+#### Scenario: 运营配置客户账期
+- @e2e
+- **GIVEN** 运营已打开客户详情（现结客户）
+- **WHEN** 运营输入 creditDays=45 并保存
+- **THEN** 详情展示「账期客户 · 45 天」，保存成功反馈
+
+
+### Requirement: 应收视图（列表 + 回款登记）
+
+系统 SHALL 提供 B 端「应收账款」视图（story-ar-receipt-entry / `accounts-receivable` capability）：
+
+- **入口与角色**：B 端导航新增「应收账款」（运营可操作/老板只读；客服不可见）。
+- **应收单列表**：客户 / 订单 / 应收 / 已回 / 剩余 / 到期日 / 状态（未回款/部分回款/已结清/逾期）；状态过滤 Tabs。
+- **回款登记（运营）**：「登记回款」→ 金额输入（≤ 剩余）→ 确认入账 → 即时更新；老板无登记入口。
+- ZAPP 令牌、无圆角阴影、真实中文数据。
+
+- **Priority**: P0
+- **Rationale**: 财务/运营日常回款登记（research 访谈 2）；对齐原型。
+
+#### Scenario: 运营登记回款（部分 + 结清）
+- @e2e
+- **GIVEN** 运营进入「应收账款」，某应收单未结清
+- **WHEN** 运营登记部分回款并确认，再登记结清剩余
+- **THEN** 已回/剩余即时更新，结清后该行不再显示登记按钮
+
+
+
+### Requirement: 应收看板视图（指标卡 + 客户欠款集中度）
+
+系统 SHALL 提供 B 端「应收看板」视图（story-ar-dashboard / `accounts-receivable` capability，老板/运营只读）：
+
+- **指标卡**：应收总额 / 已回款 / 未回余额 / 逾期金额（颜色区分，后端权威聚合）。
+- **客户欠款集中度**：列表（客户/应收单数/未回余额/逾期金额/最大账期）。
+- **入口**：应收账款视图「总览/明细」切换；纯只读；客服不可见。
+- ZAPP 令牌、无圆角阴影、真实中文数据。
+
+- **Priority**: P1
+- **Rationale**: 老板一眼看应收健康度；对齐原型看板视图。
+
+#### Scenario: 老板应收看板展示
+- @e2e
+- **GIVEN** 老板进入应收看板（存在账期应收数据）
+- **THEN** 展示 4 指标卡与客户欠款集中度列表（与后端聚合一致）
 ## Governance Mapping
 
 - **Bounded Context**: Shared / Cross（`domain_model.html` 映射表：`bc-shared → cap-ui`，Cross-Context）

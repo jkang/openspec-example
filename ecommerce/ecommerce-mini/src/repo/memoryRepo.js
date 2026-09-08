@@ -260,3 +260,64 @@ export class ChannelConfigRepo {
     this.config = { appid: '', appsecret: '', mchid: '', enabled: false }
   }
 }
+
+/**
+ * 应收账款仓储（memory 模式，story-ar-credit-customer，accounts-receivable capability）：
+ * 接口与 file `ReceivableFileRepo` 一致（save / findAll / findById / findByUserId / findByOrderId / clear）。
+ */
+export class ReceivableRepo {
+  constructor() {
+    this.receivables = new Map()
+  }
+
+  save(r) {
+    this.receivables.set(r.id, r)
+    return r
+  }
+
+  findAll() {
+    return Array.from(this.receivables.values())
+  }
+
+  findById(id) {
+    return this.receivables.get(id)
+  }
+
+  findByUserId(userId) {
+    return this.findAll().filter(r => r.userId === userId)
+  }
+
+  findByOrderId(orderId) {
+    return this.findAll().find(r => r.orderId === orderId)
+  }
+
+  clear() {
+    this.receivables.clear()
+  }
+}
+
+/**
+ * 回款流水仓储（memory 模式，story-ar-receipt-entry）：接口与 file 一致（save/findAll/findByReceivableId/clear）。
+ */
+export class ReceiptRepo {
+  constructor() {
+    this.receipts = new Map()
+  }
+
+  save(rcpt) {
+    this.receipts.set(rcpt.id, rcpt)
+    return rcpt
+  }
+
+  findAll() {
+    return Array.from(this.receipts.values())
+  }
+
+  findByReceivableId(receivableId) {
+    return this.findAll().filter(r => r.receivableId === receivableId)
+  }
+
+  clear() {
+    this.receipts.clear()
+  }
+}
