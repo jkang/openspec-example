@@ -1,0 +1,32 @@
+{
+  "epicKey": "miniprogram-channel",
+  "title": "小程序渠道接入与账户打通",
+  "description": "把'生意搬进微信'的第一步：B 端小程序渠道配置（appid/appsecret 脱敏/商户号纯预留/启用状态，仅运营可写）+ 微信授权登录（openid→手机号绑定→复用现有 User 账户/会话体系，同源账户不建独立用户池）+ B 端订单管理展示渠道标识（channel=MINIPROGRAM），小程序订单可正常发货/取消（Phase 6 Epic 6.1）。",
+  "stories": [
+    {
+      "id": "story-miniprogram-channel-config",
+      "title": "小程序渠道配置（B 端）",
+      "description": "渠道配置 API（appid/appsecret 脱敏回显/商户号纯预留/启用状态），仅运营可写（扩展 R-ADM）；落盘 data/channel-config.json 即时生效；停用拒绝新登录 CHANNEL_DISABLED 既有会话照常；老板只读",
+      "status": "done",
+      "changeName": "story-miniprogram-channel-config",
+      "priority": "P0"
+    },
+    {
+      "id": "story-miniprogram-wechat-login",
+      "title": "微信授权登录与同源账户打通",
+      "description": "User.openid 字段 + 微信授权登录（code2session 换 openid，mock 网关 test 后门）；命中直连登录/未命中手机号绑定（撞号提示登录既有账号）；复用 user-session 会话 + MINIPROGRAM 渠道标记；渠道停用拒绝；小程序登录入口 UI",
+      "status": "done",
+      "changeName": "story-miniprogram-wechat-login",
+      "priority": "P0"
+    },
+    {
+      "id": "story-miniprogram-order-channel",
+      "title": "订单渠道标识（channel）",
+      "description": "Order.channel 字段（默认 WEB，会话来源继承写入防客户端伪造）；B 端订单管理列表渠道标识列展示；发货/取消流程与网页单一致；存量订单兼容默认 WEB",
+      "status": "done",
+      "changeName": "story-miniprogram-order-channel",
+      "priority": "P1"
+    }
+  ],
+  "updatedAt": "2026-09-08T16:00:00Z"
+}

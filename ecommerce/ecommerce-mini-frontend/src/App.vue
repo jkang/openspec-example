@@ -417,6 +417,9 @@
              :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'dashboard' ? 'border-primary bg-primary/5 text-primary font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">销售看板</a>
           <a v-if="isDashboardRole" @click="adminTab = 'stock'"
              :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'stock' ? 'border-primary bg-primary/5 text-primary font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">库存预警</a>
+          <div class="mt-8 px-6 py-2 text-sm font-medium text-muted-foreground uppercase tracking-wider">渠道管理</div>
+          <a v-if="isDashboardRole" @click="adminTab = 'channel'; fetchChannelConfig()"
+             :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'channel' ? 'border-primary bg-primary/5 text-primary font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">小程序渠道</a>
           <div class="mt-8 px-6 py-2 text-sm font-medium text-muted-foreground uppercase tracking-wider">交易管理</div>
           <a @click="adminTab = 'order'"
              :class="['flex items-center px-6 py-3 border-l-4 cursor-pointer transition-colors', adminTab === 'order' ? 'border-primary bg-primary/5 text-primary font-medium' : 'border-transparent text-muted-foreground hover:bg-muted']">订单列表</a>
@@ -773,6 +776,100 @@
             </template>
 
           </div><!-- /库存预警 tab -->
+
+          <!-- ===== 小程序渠道 tab（miniprogram-channel / Channel Context，运营可写 / 老板只读，R-CHN-001~009） ===== -->
+          <div v-if="adminTab === 'channel'">
+            <section v-if="!isDashboardRole" class="bg-card border border-border p-8">
+              <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold mb-4 border-b border-border pb-4">小程序渠道</h2>
+              <p class="text-sm text-foreground">无权限访问小程序渠道：本入口仅「运营」与「老板」角色可见。渠道配置属敏感后台信息。</p>
+            </section>
+
+            <template v-else>
+              <section class="bg-card border border-border p-8">
+                <div class="flex items-start justify-between mb-6">
+                  <div>
+                    <h2 class="font-display font-black uppercase tracking-tight text-lg font-bold">小程序渠道</h2>
+                    <p class="font-mono text-xs uppercase tracking-widest text-muted-foreground mt-1">miniprogram-channel · 渠道接入（appid / appsecret / 商户号 / 启用状态）</p>
+                  </div>
+                  <div class="text-right">
+                    <span class="inline-block border px-3 py-1 font-mono text-xs uppercase tracking-widest"
+                      :class="channelConfig?.enabled ? 'border-success text-success' : 'border-accent text-accent'">
+                      {{ channelConfig?.enabled ? '● 已启用' : '○ 已停用' }}
+                    </span>
+                    <p v-if="isBoss" class="font-mono text-[10px] text-muted-foreground mt-2 uppercase tracking-widest">纯只读 · 无配置入口</p>
+                  </div>
+                </div>
+
+                <!-- 停用警示（Q5：新微信登录将被拒绝） -->
+                <div v-if="!channelConfig?.enabled"
+                  class="border border-accent text-accent px-4 py-3 text-sm mb-6">
+                  渠道已停用 —— 小程序登录入口将隐藏，新微信登录被拒绝（CHANNEL_DISABLED）；既有会话不受影响
+                </div>
+                <p v-if="channelError" class="border border-accent text-accent px-3 py-2 text-sm mb-4">{{ channelError }}</p>
+
+                <div class="grid grid-cols-1 gap-5">
+                  <div>
+                    <label class="block text-sm mb-1">AppID <span class="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">小程序开发者 ID</span></label>
+                    <input v-if="isOperator" v-model.trim="channelForm.appid" placeholder="例如 wx4a2b8c9d0e1f2345"
+                      class="w-full border border-border bg-muted px-3 py-2 text-sm font-mono focus:outline-none focus:border-primary">
+                    <p v-else class="border border-border bg-muted px-3 py-2 text-sm font-mono text-muted-foreground">{{ channelConfig?.appid || '未配置' }}</p>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm mb-1">AppSecret <span class="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">已配置 → 掩码显示（脱敏，Q4）</span></label>
+                    <div v-if="isOperator" class="flex gap-2">
+                      <input v-if="!channelSecretEditing" :value="channelSecretDisplay" readonly
+                        class="flex-1 border border-border bg-muted px-3 py-2 text-sm font-mono text-muted-foreground" />
+                      <input v-else v-model="channelForm.appsecret" type="text" placeholder="输入新的 AppSecret（保存后仅显掩码）"
+                        class="flex-1 border border-border bg-muted px-3 py-2 text-sm font-mono focus:outline-none focus:border-primary" />
+                      <button @click="toggleChannelSecretEdit"
+                        class="border border-primary text-primary px-4 py-2 text-xs font-mono uppercase tracking-widest whitespace-nowrap hover:bg-secondary">
+                        {{ channelSecretEditing ? '取消' : '重新配置' }}
+                      </button>
+                    </div>
+                    <p v-else class="border border-border bg-muted px-3 py-2 text-sm font-mono text-muted-foreground">{{ channelSecretDisplay }}</p>
+                    <p v-if="isOperator && channelSecretEditing" class="text-xs text-muted-foreground mt-2">
+                      新密钥保存后立即生效，原密钥不可回读；保存后仅显示掩码（Q4）
+                    </p>
+                  </div>
+
+                  <div>
+                    <label class="block text-sm mb-1">商户号（mchid） <span class="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">本期纯配置预留 · 不参与支付（Q3）</span></label>
+                    <input v-if="isOperator" v-model.trim="channelForm.mchid" placeholder="例如 1900001234（真实微信支付资质后置 +X 评估）"
+                      class="w-full border border-border bg-muted px-3 py-2 text-sm font-mono focus:outline-none focus:border-primary">
+                    <p v-else class="border border-border bg-muted px-3 py-2 text-sm font-mono text-muted-foreground">{{ channelConfig?.mchid || '未配置' }}</p>
+                  </div>
+
+                  <div class="border-t border-border pt-5 flex items-center justify-between">
+                    <div>
+                      <p class="text-sm font-semibold">启用小程序渠道</p>
+                      <p class="text-xs text-muted-foreground mt-1">停用后：小程序登录入口隐藏，新微信登录拒绝（Q5）</p>
+                    </div>
+                    <template v-if="isOperator">
+                      <input type="checkbox" :checked="channelConfig?.enabled" @change="channelForm.enabled = $event.target.checked"
+                        class="w-5 h-5 border border-border accent-primary" />
+                    </template>
+                    <span v-else class="border border-border px-3 py-1 font-mono text-xs text-muted-foreground uppercase tracking-widest">只读</span>
+                  </div>
+
+                  <div class="flex items-center gap-3 pt-2">
+                    <button v-if="isOperator" @click="saveChannelConfig" :disabled="channelSaving"
+                      class="border border-primary bg-primary text-primary-foreground px-6 py-2 text-sm font-bold disabled:opacity-40">
+                      {{ channelSaving ? '保存中…' : '保存配置' }}
+                    </button>
+                    <span v-if="channelSavedFlag" class="text-success text-sm">✓ 已保存并即时生效</span>
+                  </div>
+                </div>
+              </section>
+
+              <section class="bg-card border border-border p-6 text-xs text-muted-foreground space-y-1">
+                <h3 class="font-display font-bold uppercase tracking-tight text-foreground text-sm mb-2">真实接入提示</h3>
+                <p>· 微信登录：小程序 wx.login() 取 code → 服务端以 appid + appsecret 调 code2session 换 openid（appsecret 严禁下发前端）</p>
+                <p>· 手机号：使用微信官方「手机号快速验证组件」获取，非表单直填；测试环境以 mock 网关模拟（Q6）</p>
+                <p>· 真实收款需企业主体 + 商户号与 appid 绑定 + API 证书 —— 本期仅预留商户号字段（Q3）</p>
+              </section>
+            </template>
+          </div><!-- /小程序渠道 tab -->
 
           <!-- ===== 优惠券管理 tab ===== -->
           <div v-if="adminTab === 'coupon'">
@@ -1270,6 +1367,7 @@
                     <th class="pb-3 font-medium">订单号</th>
                     <th class="pb-3 font-medium">用户</th>
                     <th class="pb-3 font-medium">商品数</th>
+                    <th class="pb-3 font-medium">渠道</th>
                     <th class="pb-3 font-medium">实付</th>
                     <th class="pb-3 font-medium">状态</th>
                     <th class="pb-3 font-medium text-right">操作</th>
@@ -1280,6 +1378,12 @@
                     <td class="py-3 font-mono font-medium text-foreground">{{ o.id }}</td>
                     <td class="py-3 font-mono text-muted-foreground">{{ o.userId }}</td>
                     <td class="py-3">{{ o.items.reduce((n, i) => n + i.quantity, 0) }} 件</td>
+                    <td class="py-3">
+                      <span class="inline-block border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest"
+                        :class="o.channel === 'MINIPROGRAM' ? 'border-electric text-electric' : 'border-border text-muted-foreground'">
+                        {{ o.channel === 'MINIPROGRAM' ? '小程序' : '网页' }}
+                      </span>
+                    </td>
                     <td class="py-3 font-mono text-primary">¥{{ (o.actualPaidCents / 100).toFixed(2) }}</td>
                     <td class="py-3"><span class="text-xs font-bold border border-border px-2 py-1">{{ orderStatusLabel(o.status) }}</span></td>
                     <td class="py-3 text-right">
@@ -1289,7 +1393,7 @@
                     </td>
                   </tr>
                   <tr v-if="filteredAdminOrders.length === 0">
-                    <td colspan="6" class="py-8 text-center text-muted-foreground">暂无订单</td>
+                    <td colspan="7" class="py-8 text-center text-muted-foreground">暂无订单</td>
                   </tr>
                 </tbody>
               </table>
@@ -1903,12 +2007,13 @@ const payLastOrder = async () => {
 }
 
 // ==================== B 端运营后台 ====================
-const adminTab = ref('coupon') // 'dashboard' | 'coupon' | 'product' | 'category' | 'order' | 'user'
+const adminTab = ref('coupon') // 'dashboard' | 'coupon' | 'product' | 'category' | 'order' | 'user' | 'stock' | 'channel'
 
 // 顶部路径分层面包屑映射（与侧边栏分组标题对齐：经营分析/交易管理/营销中心/账户中心）
 const pathMap = {
   dashboard: '经营分析 / 销售看板',
   stock: '经营分析 / 库存预警',
+  channel: '渠道管理 / 小程序渠道',
   order: '交易管理 / 订单列表',
   product: '交易管理 / 商品管理',
   category: '交易管理 / 分类管理',
@@ -1920,6 +2025,79 @@ const pathMap = {
 const isDashboardRole = computed(() => currentUser.value && ['运营', '老板'].includes(currentUser.value.role))
 // 老板角色判定：只读视角（库存预警无配置区 + 健康度卡片）
 const isBoss = computed(() => currentUser.value?.role === '老板')
+
+// ==================== 小程序渠道（miniprogram-channel / Channel Context，R-CHN-001~009） ====================
+const channelConfig = ref(null)
+const channelForm = ref({ appid: '', appsecret: '', mchid: '', enabled: false })
+const channelSecretEditing = ref(false)
+const channelError = ref('')
+const channelSaving = ref(false)
+const channelSavedFlag = ref(false)
+
+// AppSecret 脱敏回显：已配置 → 前 4 + 掩码 + 后 4（R-CHN-004，Q4）
+const channelSecretDisplay = computed(() => {
+  if (!channelConfig.value?.appsecretConfigured) return '未配置（仅运营可配置）'
+  const raw = channelForm.value.appsecret || ''
+  if (raw && !channelSecretEditing.value) return raw
+  return channelConfig.value.appsecretMasked || '已配置'
+})
+
+const fetchChannelConfig = async () => {
+  try {
+    const res = await fetch('/api/admin/channel/miniprogram', {
+      headers: { Authorization: `Bearer ${sessionToken.value}` }
+    })
+    if (res.status === 403) { channelError.value = '无权限访问小程序渠道'; return }
+    const data = await res.json()
+    channelConfig.value = data
+    channelForm.value = {
+      appid: data.appid || '',
+      appsecret: '',
+      mchid: data.mchid || '',
+      enabled: Boolean(data.enabled)
+    }
+    channelError.value = ''
+  } catch (e) {
+    console.error('获取小程序渠道配置失败:', e)
+    channelError.value = '获取小程序渠道配置失败'
+  }
+}
+
+const toggleChannelSecretEdit = () => {
+  channelSecretEditing.value = !channelSecretEditing.value
+  if (!channelSecretEditing.value) channelForm.value.appsecret = ''
+}
+
+const saveChannelConfig = async () => {
+  channelSaving.value = true
+  channelSavedFlag.value = false
+  channelError.value = ''
+  try {
+    const payload = {
+      appid: channelForm.value.appid,
+      mchid: channelForm.value.mchid,
+      enabled: channelForm.value.enabled
+    }
+    if (channelSecretEditing.value && channelForm.value.appsecret) payload.appsecret = channelForm.value.appsecret
+    const res = await fetch('/api/admin/channel/miniprogram', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${sessionToken.value}` },
+      body: JSON.stringify(payload)
+    })
+    if (res.status === 403) { channelError.value = '无权限修改小程序渠道'; return }
+    const data = await res.json()
+    channelConfig.value = data
+    channelSecretEditing.value = false
+    channelForm.value.appsecret = ''
+    channelSavedFlag.value = true
+    setTimeout(() => { channelSavedFlag.value = false }, 2500)
+  } catch (e) {
+    console.error('保存小程序渠道配置失败:', e)
+    channelError.value = '保存小程序渠道配置失败'
+  } finally {
+    channelSaving.value = false
+  }
+}
 
 // ==================== 库存预警（stock-insight / data-insights BC，R-STOCK-001~010） ====================
 const stockInsightData = ref(null)
@@ -2164,6 +2342,7 @@ const switchViewMode = (mode) => {
     fetchSalesDashboard()
     fetchSalesRanking()
     fetchStockInsight()
+    fetchChannelConfig()
     fetchAdminCoupons()
     fetchIssuances()
     fetchAdminProducts()

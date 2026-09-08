@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小程序微信授权登录 · Epic 6.1 原型（ZAPP 暗黑）</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script>
+    /* ZAPP 暗黑设计令牌 —— 唯一事实来源：docs/baseline/design-system/ */
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            background: '#08080E',
+            card: '#0F0F1C',
+            foreground: '#EFEFFA',
+            muted: '#15152A',
+            'muted-foreground': '#6E6E9A',
+            secondary: '#1A1A2E',
+            primary: '#C8FF00',
+            'primary-foreground': '#08080E',
+            accent: '#FF2D6B',
+            'accent-foreground': '#FFFFFF',
+            electric: '#3B6DFF',
+            warning: '#FF9A00',
+            'warning-foreground': '#08080E',
+            success: '#00E5A0',
+            'success-foreground': '#08080E',
+            border: '#222238',
+            ring: '#C8FF00',
+          },
+          fontFamily: {
+            display: ['"Exo 2"', 'sans-serif'],
+            sans: ['"DM Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@700;800;900&family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+    /* ZAPP 规范：零圆角 / 零阴影 / 零渐变 */
+    * { border-radius: 0 !important; box-shadow: none !important; }
+    html, body { background-color: #08080E; }
+    [v-cloak] { display: none; }
+    input:focus, select:focus { outline: none; border-color: #C8FF00 !important; }
+    button { cursor: pointer; }
+    .wechat-green { background-color: #07C160 !important; color: #FFFFFF; }
+  </style>
+</head>
+<body class="bg-background text-foreground font-sans antialiased">
+<div id="app" v-cloak class="min-h-screen bg-background text-foreground font-sans">
+
+  <!-- ═══ 顶部 ═══ -->
+  <header class="h-16 bg-card border-b border-border flex items-center justify-between px-6 sticky top-0 z-50">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-primary flex items-center justify-center">
+        <span class="font-display font-black text-primary-foreground text-sm">Z</span>
+      </div>
+      <span class="font-display font-black text-lg uppercase tracking-tight text-foreground">Minimal Store</span>
+      <span class="font-mono text-[10px] uppercase tracking-widest text-muted-foreground border border-border px-2 py-0.5 hidden sm:inline">微信小程序 · 授权登录原型</span>
+    </div>
+    <div class="flex items-center gap-3">
+      <span class="font-mono text-[10px] uppercase tracking-widest text-muted-foreground hidden md:inline">渠道状态</span>
+      <span class="font-mono text-xs px-2 py-1 border border-success text-success"
+            :class="channelEnabled ? 'border-success text-success' : 'border-accent text-accent'">
+        {{ channelEnabled ? '渠道已启用' : '渠道已停用' }}
+      </span>
+    </div>
+  </header>
+
+  <main class="max-w-screen-xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+    <!-- ═══ 左栏：演示场景控制 + 决策说明 ═══ -->
+    <section class="lg:col-span-5 space-y-6">
+      <div>
+        <h1 class="font-display font-black uppercase tracking-tight text-2xl mb-1">微信授权登录 · 同源账户打通</h1>
+        <p class="font-mono text-xs uppercase tracking-widest text-muted-foreground">Epic 6.1 · wechat-auth / User Context · Q1 openid=User 字段 · Q2 撞号提示登录 · Q5 停用拒绝新登录</p>
+      </div>
+
+      <!-- 渠道开关（运营视角演示） -->
+      <div class="border border-border bg-card p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h2 class="font-display font-bold uppercase tracking-tight text-sm">小程序渠道开关</h2>
+            <p class="text-xs text-muted-foreground mt-1">停用后：小程序登录入口隐藏，新微信登录被拒绝（CHANNEL_DISABLED），既有会话不受影响（Q5）</p>
+          </div>
+          <button @click="channelEnabled = !channelEnabled"
+            class="w-14 h-7 border transition-colors relative"
+            :class="channelEnabled ? 'bg-success border-success' : 'bg-muted border-border'">
+            <span class="absolute top-1/2 -translate-y-1/2 w-5 h-5 transition-all"
+              :class="channelEnabled ? 'left-8 bg-primary-foreground' : 'left-1 bg-muted-foreground'"></span>
+          </button>
+        </div>
+        <p v-if="!channelEnabled" class="mt-3 border border-accent text-accent px-3 py-2 text-xs">
+          渠道已停用 —— 以下演示将展示新用户登录被拒绝
+        </p>
+      </div>
+
+      <!-- 场景选择 -->
+      <div class="border border-border bg-card p-6">
+        <h2 class="font-display font-bold uppercase tracking-tight text-sm mb-4">选择演示场景</h2>
+        <div class="space-y-2">
+          <button v-for="s in scenarios" :key="s.id" @click="pickScenario(s.id)"
+            class="w-full text-left border px-4 py-3 transition-colors"
+            :class="active === s.id ? 'border-primary bg-secondary' : 'border-border hover:border-primary'">
+            <span class="block font-sans text-sm font-semibold">{{ s.name }}</span>
+            <span class="block text-xs text-muted-foreground mt-0.5">{{ s.desc }}</span>
+          </button>
+        </div>
+        <button @click="resetAll"
+          class="mt-4 w-full border border-border text-muted-foreground px-4 py-2 text-xs font-mono uppercase tracking-widest hover:text-foreground hover:border-primary">
+          重置演示
+        </button>
+      </div>
+
+      <!-- 决策口径说明 -->
+      <div class="border border-border bg-card p-6 text-xs space-y-2 text-muted-foreground">
+        <h3 class="font-display font-bold uppercase tracking-tight text-foreground text-sm mb-2">本页演示的已确认口径</h3>
+        <p>· <span class="text-foreground font-semibold">Q1</span>：openid 直接存于 User（一对一，不做独立映射表）</p>
+        <p>· <span class="text-foreground font-semibold">Q2</span>：微信手机号已被网页账号注册 → 提示登录既有账号再绑定（不合并、不静默拒绝）</p>
+        <p>· <span class="text-foreground font-semibold">Q5</span>：渠道停用 → 新微信登录拒绝（CHANNEL_DISABLED），既有会话照常</p>
+        <p>· <span class="text-foreground font-semibold">Q6</span>：微信网关（code2session / 手机号组件）在测试环境用 mock 后门模拟</p>
+        <p>· <span class="text-foreground font-semibold">Q8</span>：小程序登录入口 UI 属本 Epic（6.1）交付范围</p>
+      </div>
+    </section>
+
+    <!-- ═══ 右栏：手机模拟器（小程序画面） ═══ -->
+    <section class="lg:col-span-7 flex justify-center">
+      <div class="w-[360px] bg-background border-2 border-border relative">
+        <!-- 小程序顶部导航 -->
+        <div class="bg-card border-b border-border px-4 py-3 flex items-center justify-between">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 bg-primary flex items-center justify-center">
+              <span class="font-display font-black text-primary-foreground text-xs">M</span>
+            </div>
+            <span class="font-display font-black uppercase tracking-tight text-sm">Minimal Store</span>
+          </div>
+          <span class="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">微信小程序</span>
+        </div>
+
+        <div class="min-h-[560px] p-5">
+
+          <!-- ── 状态：渠道停用（登录入口隐藏 / 拒绝） ── -->
+          <div v-if="!channelEnabled" class="py-20 text-center">
+            <p class="font-mono text-xs uppercase tracking-widest text-accent mb-3">CHANNEL_DISABLED</p>
+            <h3 class="font-display font-bold uppercase tracking-tight text-lg mb-2">小程序渠道已停用</h3>
+            <p class="text-sm text-muted-foreground">当前暂不可通过微信登录，请联系店铺运营确认渠道状态（Q5）</p>
+          </div>
+
+          <!-- ── 状态：商品首页（未登录，可触发微信授权） ── -->
+          <div v-else-if="step === 'home'">
+            <p class="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-3">商品 · 精选</p>
+            <div class="space-y-3">
+              <div class="border border-border bg-card p-4 flex gap-4">
+                <div class="w-16 h-16 bg-secondary flex items-center justify-center">
+                  <span class="font-display font-black text-primary text-xl">KB</span>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold">极简机械键盘</p>
+                  <p class="text-xs text-muted-foreground mt-0.5">84 键紧凑布局 · 红轴</p>
+                  <p class="font-mono font-bold text-primary text-sm mt-1">¥299.00</p>
+                </div>
+              </div>
+              <div class="border border-border bg-card p-4 flex gap-4">
+                <div class="w-16 h-16 bg-secondary flex items-center justify-center">
+                  <span class="font-display font-black text-primary text-xl">MS</span>
+                </div>
+                <div>
+                  <p class="text-sm font-semibold">无线办公鼠标</p>
+                  <p class="text-xs text-muted-foreground mt-0.5">静音按键 · 人体工学</p>
+                  <p class="font-mono font-bold text-primary text-sm mt-1">¥89.00</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mt-8 border border-border bg-card p-5 text-center">
+              <p class="text-sm font-semibold mb-1">微信授权登录</p>
+              <p class="text-xs text-muted-foreground mb-4">无需注册，一键授权；网页老客户将直接关联既有账户（同源账户）</p>
+              <button @click="startWechatLogin"
+                class="wechat-green w-full py-3 text-sm font-semibold">
+                <span class="font-mono uppercase tracking-widest text-xs mr-1">WX</span>微信一键登录
+              </button>
+            </div>
+          </div>
+
+          <!-- ── 状态：授权中（模拟 wx.login → code2session） ── -->
+          <div v-else-if="step === 'loading'" class="py-24 text-center">
+            <div class="w-8 h-8 border-2 border-primary border-t-transparent animate-spin mx-auto mb-4"></div>
+            <p class="text-sm text-muted-foreground">微信授权登录中…</p>
+            <p class="font-mono text-[10px] text-muted-foreground mt-2 uppercase tracking-widest">wx.login → code2session(mock)</p>
+          </div>
+
+          <!-- ── 状态：命中老客户（openid 已绑定） ── -->
+          <div v-else-if="step === 'auto-login'">
+            <div class="border border-success text-success px-4 py-3 text-sm mb-4">✓ 已通过微信授权自动登录（同源账户直连）</div>
+            <div class="border border-border bg-card p-5">
+              <div class="flex items-center justify-between mb-3">
+                <div>
+                  <p class="font-display font-bold text-lg">{{ user.nickname }}</p>
+                  <p class="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mt-1">user_1002 · {{ user.phone }}</p>
+                </div>
+                <span class="border border-success text-success px-2 py-1 font-mono text-[10px]">已登录</span>
+              </div>
+            </div>
+
+            <p class="font-mono text-xs uppercase tracking-widest text-muted-foreground mt-6 mb-3">我的订单 · 历史延续（同源账户）</p>
+            <div class="space-y-3">
+              <div v-for="o in orders" :key="o.id" class="border border-border bg-card p-4">
+                <div class="flex items-center justify-between">
+                  <p class="font-mono text-[10px] uppercase tracking-widest text-muted-foreground">{{ o.id }}</p>
+                  <span class="border border-electric text-electric px-2 py-0.5 font-mono text-[10px]">小程序渠道</span>
+                </div>
+                <p class="text-sm mt-2">{{ o.title }}</p>
+                <p class="font-mono font-bold text-primary text-sm mt-1">{{ o.amount }} · <span class="text-success">{{ o.status }}</span></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ── 状态：新 openid → 需要绑定手机号 ── -->
+          <div v-else-if="step === 'bind'">
+            <p class="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-3">首次使用 · 绑定手机号</p>
+            <div class="border border-border bg-card p-5 mb-4">
+              <p class="text-sm mb-2">未检测到该微信账户的绑定记录</p>
+              <p class="text-xs text-muted-foreground">为延续网页端账户与订单，需要绑定手机号（同源账户，不做独立用户池）</p>
+            </div>
+
+            <button @click="useWechatPhone"
+              class="wechat-green w-full py-3 text-sm font-semibold mb-3">
+              使用微信手机号快捷绑定
+            </button>
+            <p class="text-center font-mono text-[10px] text-muted-foreground uppercase tracking-widest mb-3">—— 或 ——</p>
+
+            <div class="border border-border bg-card p-4">
+              <label class="block text-xs mb-1">手机号</label>
+              <input v-model.trim="bindForm.phone" type="tel" maxlength="11" placeholder="请输入 11 位手机号"
+                class="w-full border border-border bg-muted px-3 py-2 text-sm mb-3" />
+              <button @click="manualBind" :disabled="!bindForm.phone"
+                class="w-full border border-primary text-primary py-2 text-sm font-semibold disabled:opacity-40">
+                绑定并登录
+              </button>
+            </div>
+            <p v-if="bindError" class="mt-3 border border-accent text-accent px-3 py-2 text-xs">{{ bindError }}</p>
+          </div>
+
+          <!-- ── 状态：撞号 → 提示登录既有账号再绑定（Q2） ── -->
+          <div v-else-if="step === 'collision'">
+            <div class="border border-accent text-accent px-4 py-3 text-sm mb-4">该手机号已注册 —— 请登录既有账号完成微信绑定</div>
+            <div class="border border-border bg-card p-4 mb-4 text-xs text-muted-foreground">
+              <p>检测到手机号 <span class="text-foreground font-mono">{{ collisionPhone }}</span> 已注册账户 <span class="text-foreground font-semibold">{{ collisionUser.nickname }}</span></p>
+              <p class="mt-1">系统不会自动合并账户，为保障数据安全请登录该既有账号后完成微信绑定（Q2）</p>
+            </div>
+            <div class="border border-border bg-card p-4">
+              <label class="block text-xs mb-1">手机号</label>
+              <input v-model.trim="loginForm.phone" type="tel" maxlength="11" placeholder="既有账号手机号"
+                class="w-full border border-border bg-muted px-3 py-2 text-sm mb-3" />
+              <label class="block text-xs mb-1">密码</label>
+              <input v-model="loginForm.password" type="password" placeholder="既有账号密码"
+                class="w-full border border-border bg-muted px-3 py-2 text-sm mb-3" />
+              <button @click="loginExisting" :disabled="!loginForm.phone || !loginForm.password"
+                class="w-full border border-primary bg-primary text-primary-foreground py-2 text-sm font-bold disabled:opacity-40">
+                登录并绑定微信
+              </button>
+            </div>
+            <p v-if="loginError" class="mt-3 border border-accent text-accent px-3 py-2 text-xs">{{ loginError }}</p>
+          </div>
+
+          <!-- ── 状态：绑定成功 ── -->
+          <div v-else-if="step === 'bound'">
+            <div class="border border-success text-success px-4 py-3 text-sm mb-4">✓ 微信绑定成功，已自动登录</div>
+            <div class="border border-border bg-card p-5 mb-6">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-display font-bold text-lg">{{ boundUser.nickname }}</p>
+                  <p class="font-mono text-[10px] uppercase tracking-widest text-muted-foreground mt-1">{{ boundUser.id }} · {{ boundUser.phone }}</p>
+                </div>
+                <span class="border border-success text-success px-2 py-1 font-mono text-[10px]">已绑定微信</span>
+              </div>
+            </div>
+            <div class="border border-border bg-card p-4 text-xs text-muted-foreground">
+              <p v-if="boundUser.isExisting">· 网页历史订单已延续到微信端（同源账户，未丢失）</p>
+              <p v-else>· 已创建新账户，后续网页端可用同一手机号登录（同源账户）</p>
+              <p>· 会话由服务端 token→userId 管理，退出销毁、禁用即失效（复用既有 user-session）</p>
+            </div>
+          </div>
+
+          <!-- ── 状态：错误/拒绝 ── -->
+          <div v-else-if="step === 'denied'" class="py-20 text-center">
+            <p class="font-mono text-xs uppercase tracking-widest text-accent mb-3">CHANNEL_DISABLED</p>
+            <h3 class="font-display font-bold uppercase tracking-tight text-lg mb-2">登录被拒绝</h3>
+            <p class="text-sm text-muted-foreground">小程序渠道已停用，暂无法完成微信登录</p>
+            <button @click="backHome" class="mt-6 border border-border px-6 py-2 text-xs font-mono uppercase tracking-widest hover:border-primary">返回首页</button>
+          </div>
+        </div>
+
+        <!-- 底部 tab（示意） -->
+        <div class="border-t border-border bg-card px-6 py-3 flex justify-around">
+          <span class="font-mono text-[10px] text-primary uppercase tracking-widest">首页</span>
+          <span class="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">分类</span>
+          <span class="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">购物车</span>
+          <span class="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">我的</span>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script>
+    const { createApp } = Vue;
+    createApp({
+      data() {
+        return {
+          channelEnabled: true,          // 渠道开关（Q5）
+          active: 'returning',           // 当前场景
+          step: 'home',                  // home/loading/auto-login/bind/collision/bound/denied
+          scenarios: [
+            { id: 'returning', name: '老客户微信直接登录', desc: 'openid 已绑定 → 自动登录，历史订单延续（同源账户）' },
+            { id: 'fresh', name: '新客户首次使用（新手机号）', desc: 'openid 未绑定 → 微信快捷绑定 → 创建新账户自动登录' },
+            { id: 'collision', name: '新客户但微信手机号已被注册', desc: '撞号 → 提示登录既有账号再绑定（Q2，不合并）' },
+            { id: 'disabled', name: '渠道停用场景', desc: '登录入口隐藏 / 新登录拒绝 CHANNEL_DISABLED（Q5）' },
+          ],
+          bindForm: { phone: '' },
+          bindError: '',
+          loginForm: { phone: '13888217536', password: '' },
+          loginError: '',
+          user: { id: 'user_1002', nickname: '林晓明', phone: '13888217536' },
+          orders: [
+            { id: 'ORD-20260831-001', title: '极简机械键盘 × 1', amount: '¥299.00', status: '已发货' },
+            { id: 'ORD-20260828-007', title: '桌面收纳架 × 2', amount: '¥90.00', status: '已完成' },
+            { id: 'ORD-20260820-013', title: '铝合金笔记本支架 × 1', amount: '¥68.00', status: '已完成' },
+          ],
+          boundUser: null,
+          collisionPhone: '13888217536',
+          collisionUser: { nickname: '林晓明', phone: '13888217536', id: 'user_1002' },
+        };
+      },
+      watch: {
+        active() { this.resetFlow(); }
+      },
+      methods: {
+        pickScenario(id) { this.active = id; },
+        resetAll() {
+          this.channelEnabled = true;
+          this.resetFlow();
+        },
+        resetFlow() {
+          this.step = 'home';
+          this.bindError = ''; this.loginError = '';
+          this.bindForm.phone = ''; this.loginForm.password = '';
+          this.boundUser = null;
+        },
+        startWechatLogin() {
+          // 渠道停用直接拒绝（Q5）
+          if (!this.channelEnabled) { this.step = 'denied'; return; }
+          this.step = 'loading';
+          setTimeout(() => {
+            if (this.active === 'returning') {
+              this.step = 'auto-login';                  // openid 命中 → 自动登录
+            } else if (this.active === 'disabled') {
+              this.channelEnabled = false;               // 演示：登录过程中渠道被停用
+              this.step = 'denied';
+            } else {
+              this.step = 'bind';                        // 新 openid → 引导手机号绑定
+            }
+          }, 900);
+        },
+        useWechatPhone() {
+          // 模拟微信官方手机号组件取号
+          if (this.active === 'collision') {
+            this.bindForm.phone = '13888217536';          // 撞号：微信手机号=网页已注册手机号
+            this.step = 'collision';
+          } else {
+            this.boundUser = { id: 'user_1011', nickname: '王倩', phone: '13700005678', isExisting: false };
+            this.step = 'bound';
+          }
+        },
+        manualBind() {
+          this.bindError = '';
+          const p = this.bindForm.phone;
+          if (!/^1\d{10}$/.test(p)) { this.bindError = '请输入有效的 11 位手机号'; return; }
+          if (p === '13888217536') {
+            this.collisionPhone = p;
+            this.step = 'collision';                       // 撞号 → 既有账号登录
+          } else {
+            this.boundUser = { id: 'user_1012', nickname: '王倩', phone: p, isExisting: false };
+            this.step = 'bound';
+          }
+        },
+        loginExisting() {
+          this.loginError = '';
+          if (this.loginForm.phone !== '13888217536') { this.loginError = '手机号或密码不正确'; return; }
+          if (this.loginForm.password !== '123456') { this.loginError = '手机号或密码不正确'; return; }
+          this.boundUser = { id: 'user_1002', nickname: '林晓明', phone: '13888217536', isExisting: true };
+          this.step = 'bound';
+        },
+        backHome() { this.step = 'home'; }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>

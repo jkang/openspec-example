@@ -12,7 +12,13 @@ export class OrderService {
     this.categoryRepo = categoryRepo
   }
 
-  createOrder(userId, couponId = null) {
+  /**
+   * 创建订单（story-miniprogram-order-channel：channel 从会话来源继承，服务端判定 Q7）
+   * @param {string} userId 归属用户（会话解析）
+   * @param {string|null} [couponId] 指定优惠券（缺省自动推荐最优券）
+   * @param {"WEB" | "MINIPROGRAM"} [channel] 订单渠道来源（默认 WEB；MINIPROGRAM 由 HTTP 层从会话 channel 解析传入）
+   */
+  createOrder(userId, couponId = null, channel = 'WEB') {
     const cart = this.cartRepo.findByUserId(userId)
     if (!cart || cart.items.length === 0) {
       throw new Error('CART_EMPTY')
@@ -54,11 +60,12 @@ export class OrderService {
 
     const actualPaidCents = Math.max(0, subtotalCents - discountCents)
 
-    // 3. Create Order（不扣库存、不核销券，等待支付成功）
+    // 3. Create Order（不扣库存、不核销券，等待支付成功；channel 创建时写入不可变 R-ORDCH-005）
     const order = {
       id: `order_${Math.random().toString(36).substr(2, 9)}`,
       userId,
       status: 'PENDING_PAYMENT',
+      channel: channel === 'MINIPROGRAM' ? 'MINIPROGRAM' : 'WEB',
       totalCents: subtotalCents,
       discountCents,
       actualPaidCents,
@@ -74,8 +81,8 @@ export class OrderService {
     return order
   }
 
-  checkout(userId, couponId = null) {
-    return this.createOrder(userId, couponId)
+  checkout(userId, couponId = null, channel = 'WEB') {
+    return this.createOrder(userId, couponId, channel)
   }
 
   /** 取消订单：仅 PENDING_PAYMENT → CANCELLED（未扣库存/未核销券，无释放动作） */

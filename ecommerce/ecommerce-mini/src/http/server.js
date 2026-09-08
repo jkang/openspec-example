@@ -1,6 +1,7 @@
 import http from 'http'
-import { ProductRepo, CartRepo, OrderRepo, CouponRepo, IssuanceRepo, CategoryRepo, UserRepo, SessionRepo, StockConfigRepo } from '../repo/memoryRepo.js'
-import { FileRepoAdapter, UserFileRepo, SessionFileRepo, StockConfigFileRepo, resolveDataDir } from '../repo/fileRepo.js'
+import { ProductRepo, CartRepo, OrderRepo, CouponRepo, IssuanceRepo, CategoryRepo, UserRepo, SessionRepo, StockConfigRepo, ChannelConfigRepo } from '../repo/memoryRepo.js'
+import { FileRepoAdapter, UserFileRepo, SessionFileRepo, StockConfigFileRepo, ChannelConfigFileRepo, resolveDataDir } from '../repo/fileRepo.js'
+import { toPublicConfig, mergeConfigInput } from '../domain/channel.js'
 import { CatalogService } from '../services/catalog.js'
 import { CartService } from '../services/cart.js'
 import { OrderService, SALES_STATUSES } from '../services/order.js'
@@ -9,6 +10,7 @@ import { AdminCouponService } from '../services/adminCoupon.js'
 import { CategoryService } from '../services/category.js'
 import { PaymentService } from '../services/payment.js'
 import { AuthService } from '../services/auth.js'
+import { WechatAuthService } from '../services/wechatAuth.js'
 import { AdminUserService } from '../services/userAdmin.js'
 import { StockInsightService } from '../services/stockInsight.js'
 
@@ -127,6 +129,25 @@ function requireSession(req, authService) {
   const authHeader = req.headers['authorization'] || ''
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null
   return authService.getSessionUser(token)
+}
+
+/**
+ * 会话对象解析（story-miniprogram-order-channel，Q7）：读取会话的 channel 来源字段。
+ * 供下单链路按会话继承渠道（MINIPROGRAM/WEB）；服务端判定，不信任客户端传参（R-ORDCH-002）。
+ * @param {import('http').IncomingMessage} req HTTP 请求
+ * @param {import('../services/auth.js').AuthService} authService 认证服务（未使用，保持签名对称便于未来扩展）
+ * @param {any} sessionRepo 会话仓储（findByToken）
+ * @returns {{ token: string, userId: string, channel?: string } | null} 会话对象（缺失返回 null → 缺省 WEB）
+ */
+function resolveSession(req, authService, sessionRepo) {
+  const authHeader = req.headers['authorization'] || ''
+  const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null
+  if (!token) return null
+  try {
+    return sessionRepo.findByToken(token) || null
+  } catch (e) {
+    return null
+  }
 }
 
 /**
@@ -283,7 +304,9 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
   let sessionRepo
   /** @type {any} */
   let stockConfigRepo
-  
+  /** @type {any} */
+  let channelConfigRepo
+
   let testMode = false
 
   if (useFile) {
@@ -297,6 +320,7 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
     userRepo = new UserFileRepo({ dataDir: fileDataDir })
     sessionRepo = new SessionFileRepo({ dataDir: fileDataDir })
     stockConfigRepo = new StockConfigFileRepo({ dataDir: fileDataDir })
+    channelConfigRepo = new ChannelConfigFileRepo({ dataDir: fileDataDir })
     // 种子对齐：products/categories/coupons 沿用既有种子；users 注入演示用户 user_1001/user_1003；
     // carts/orders/issuances/sessions 由 FileStore 初始化为空数据集；stock-config 由 StockConfigFileRepo 自愈默认
     seedFileRepos({ productRepo, categoryRepo, couponRepo, userRepo })
@@ -311,6 +335,7 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
     userRepo = new UserRepo()
     sessionRepo = new SessionRepo()
     stockConfigRepo = new StockConfigRepo()
+    channelConfigRepo = new ChannelConfigRepo()
     // 测试后门仅 NODE_ENV=test + memory 模式生效（file 模式下必须 404）
     testMode = process.env.NODE_ENV === 'test'
 
@@ -329,6 +354,7 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
   const categoryService = new CategoryService(categoryRepo, productRepo)
   const paymentService = new PaymentService(orderRepo, productRepo, couponService)
   const authService = new AuthService(userRepo, sessionRepo)
+  const wechatAuthService = new WechatAuthService(userRepo, sessionRepo)
   const adminUserService = new AdminUserService(userRepo, orderRepo)
   const stockInsightService = new StockInsightService(orderService, productRepo, stockConfigRepo)
 
@@ -361,6 +387,7 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
         userRepo.clear()
         sessionRepo.clear()
         stockConfigRepo.clear()
+        channelConfigRepo.clear()
         initialProducts.forEach(p => productRepo.save({ ...p }))
         initialCoupons.forEach(c => couponRepo.save({ ...c }))
         initialCategories.forEach(c => categoryRepo.save({ ...c }))
@@ -470,14 +497,17 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
         const body = await readJson(req)
         // 下单绑定当前会话 userId（R-SES-007，替代 body.userId / user_dev 占位）
         const sessionUser = requireSession(req, authService)
-        const order = orderService.createOrder(sessionUser.id, body.couponId)
+        // 渠道来源从会话 channel 解析（Q7：服务端判定，不信任客户端 body.channel 防伪造，R-ORDCH-002）
+        const session = resolveSession(req, authService, sessionRepo)
+        const order = orderService.createOrder(sessionUser.id, body.couponId, session && session.channel)
         return sendJson(res, 201, order)
       }
 
       if (pathname === '/api/checkout' && req.method === 'POST') {
         const body = await readJson(req)
         const sessionUser = requireSession(req, authService)
-        const order = orderService.checkout(sessionUser.id, body.couponId)
+        const session = resolveSession(req, authService, sessionRepo)
+        const order = orderService.checkout(sessionUser.id, body.couponId, session && session.channel)
         return sendJson(res, 200, order)
       }
 
@@ -600,6 +630,22 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
         return sendJson(res, 200, config)
       }
 
+      // 小程序渠道配置（miniprogram-channel capability / Channel Context）：读取——运营/老板白名单（脱敏回显）
+      if (pathname === '/api/admin/channel/miniprogram' && req.method === 'GET') {
+        requireRole('运营', '老板')(req, authService)
+        const publicConfig = toPublicConfig(channelConfigRepo.getConfig())
+        return sendJson(res, 200, publicConfig)
+      }
+
+      // 小程序渠道配置（写）：仅运营；appsecret 脱敏（空保留已存值）；落盘即时生效
+      if (pathname === '/api/admin/channel/miniprogram' && req.method === 'PUT') {
+        requireRole('运营')(req, authService)
+        const body = await readJson(req)
+        const merged = mergeConfigInput(channelConfigRepo.getConfig(), body)
+        channelConfigRepo.save(merged)
+        return sendJson(res, 200, toPublicConfig(channelConfigRepo.getConfig()))
+      }
+
       if (pathname === '/api/coupons' && req.method === 'GET') {
         const userId = url.searchParams.get('userId')
         return sendJson(res, 200, couponService.list(userId))
@@ -672,6 +718,31 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
         return sendJson(res, 200, { ok: true })
       }
 
+      // 微信授权登录（wechat-auth capability / User Context，story-miniprogram-wechat-login）
+      if (pathname === '/api/auth/wechat/login' && req.method === 'POST') {
+        const body = await readJson(req)
+        const result = wechatAuthService.loginWithCode({ code: body.code }, channelConfigRepo)
+        return sendJson(res, 201, result)
+      }
+
+      // 微信手机号绑定（openid 未命中路径；新号建号 / 撞号引导登录既有账号，Q2）
+      if (pathname === '/api/auth/wechat/bind' && req.method === 'POST') {
+        const body = await readJson(req)
+        const result = wechatAuthService.bindByPhone(
+          { code: body.code, phoneCode: body.phoneCode, phone: body.phone, nickname: body.nickname },
+          channelConfigRepo
+        )
+        return sendJson(res, 201, result)
+      }
+
+      // 撞号完成绑定：既有账号会话将 openid 写入该 User（防越权：requireSession 保证已登录归属）
+      if (pathname === '/api/auth/wechat/bind-openid' && req.method === 'POST') {
+        const sessionUser = requireSession(req, authService)
+        const body = await readJson(req)
+        const result = wechatAuthService.bindOpenidToExisting({ openid: body.openid }, sessionUser)
+        return sendJson(res, 200, result)
+      }
+
       sendError(res, 'NOT_FOUND', 'Endpoint not found', 404)
 
     } catch (e) {
@@ -735,6 +806,21 @@ export function createServer({ storage, dataDir } = { storage: undefined, dataDi
         return sendError(res, 'USER_DISABLED', '该账户已被禁用，如有疑问请联系平台客服', 403)
       if (e.message === 'FORBIDDEN')
         return sendError(res, 'FORBIDDEN', '无权限访问该资源', 403)
+      // 微信授权登录错误（wechat-auth capability）
+      if (e.message === 'CHANNEL_DISABLED')
+        return sendError(res, 'CHANNEL_DISABLED', '小程序渠道已停用，暂不可通过微信登录', 403)
+      if (e.message === 'WECHAT_BIND_REQUIRED')
+        return sendError(res, 'WECHAT_BIND_REQUIRED', '该微信未绑定账户，请先绑定手机号', 400)
+      if (e.message === 'PHONE_EXISTS_NEED_LOGIN')
+        return sendError(res, 'PHONE_EXISTS_NEED_LOGIN', '该手机号已注册：请登录既有账号完成微信绑定', 409)
+      if (e.message === 'WECHAT_CODE_INVALID')
+        return sendError(res, 'WECHAT_CODE_INVALID', '微信登录凭证无效或已过期', 400)
+      if (e.message === 'WECHAT_PHONE_REQUIRED')
+        return sendError(res, 'WECHAT_PHONE_REQUIRED', '请输入有效的 11 位手机号', 400)
+      if (e.message === 'WECHAT_OPENID_TAKEN')
+        return sendError(res, 'WECHAT_OPENID_TAKEN', '该微信已绑定其他账户', 409)
+      if (e.message === 'WECHAT_GATEWAY_NOT_CONFIGURED')
+        return sendError(res, 'WECHAT_GATEWAY_NOT_CONFIGURED', '微信网关未接入（资质后置）', 501)
       if (e.message === 'USER_NOT_FOUND')
         return sendError(res, 'USER_NOT_FOUND', '用户不存在', 404)
       if (e.message === 'INVALID_STATUS')

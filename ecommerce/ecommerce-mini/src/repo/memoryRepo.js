@@ -159,6 +159,12 @@ export class UserRepo {
     return Array.from(this.users.values()).find(u => u.phone === phone)
   }
 
+  /** 微信 openid 命中查询（wechat-auth，Q1：openid 单小程序一对一） */
+  findByOpenid(openid) {
+    if (!openid) return undefined
+    return Array.from(this.users.values()).find(u => u.openid === openid)
+  }
+
   clear() {
     this.users.clear()
     this.sequence = 1000
@@ -198,12 +204,14 @@ export class SessionRepo {
   /**
    * 创建会话
    * @param {string} userId 归属用户
+   * @param {"WEB" | "MINIPROGRAM"} [channel] 会话来源渠道（默认 WEB；微信授权登录传 MINIPROGRAM，Q7）
    * @returns {import('../domain/types.js').Session}
    */
-  create(userId) {
+  create(userId, channel = 'WEB') {
     const session = {
       token: crypto.randomUUID(),
       userId,
+      channel,
       createdAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
     }
     this.sessions.set(session.token, session)
@@ -225,5 +233,30 @@ export class SessionRepo {
 
   clear() {
     this.sessions.clear()
+  }
+}
+
+/**
+ * 小程序渠道配置仓储（memory 模式，story-miniprogram-channel-config）：
+ * 接口与 file `ChannelConfigFileRepo` 一致（getConfig / save / clear）。
+ * 默认配置 = defaultChannelConfig（appid 空 / appsecret 空 / mchid 空 / enabled=false，R-CHN-009 默认停用）。
+ */
+export class ChannelConfigRepo {
+  constructor() {
+    // 默认停用（R-CHN-009，防止未配置即开放）
+    this.config = { appid: '', appsecret: '', mchid: '', enabled: false }
+  }
+
+  getConfig() {
+    return this.config
+  }
+
+  save(cfg) {
+    this.config = cfg
+    return this.config
+  }
+
+  clear() {
+    this.config = { appid: '', appsecret: '', mchid: '', enabled: false }
   }
 }

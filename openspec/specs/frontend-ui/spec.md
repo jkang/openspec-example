@@ -549,6 +549,74 @@
 - **AND** 已售罄数卡片显示 1（`healthOverview.soldOutCount`）、超卖风险数卡片显示 2（`healthOverview.riskCount`）
 - **AND** 页面无阈值配置入口（「纯只读 · 无配置入口」标识 + 无「保存配置」按钮与阈值输入框）
 
+### Requirement: B 端小程序渠道配置视图
+
+系统 SHALL 提供 B 端「小程序渠道」配置视图（story-miniprogram-channel-config / `miniprogram-channel` capability，遵循 ZAPP 暗黑令牌 / 无圆角 / 无阴影 / 全中文真实数据）：
+
+- **入口与角色可见性**：B 端后台导航新增「小程序渠道」入口（仅 `role=运营 / 老板` 可见；老板视图标注「纯只读 · 无配置入口」）。
+- **配置表单（运营可写）**：AppID / AppSecret / 商户号 / 启用开关；AppSecret 若已配置显示掩码（前 4 + 掩码 + 后 4）+「已配置」标记，运营可点「重新配置」覆盖（保存后仍只显掩码，不读回明文）；商户号输入框带「本期纯配置预留」提示。
+- **启用状态展示**：启用 → `border-success text-success`「● 已启用」；停用 → `border-accent text-accent`「○ 已停用」+ 停用警示条（新微信登录将被拒绝 CHANNEL_DISABLED）。
+- **保存反馈**：「保存配置」→ 保存成功「✓ 已保存并即时生效」反馈。
+- **老板只读态**：老板视图只读展示启用状态与脱敏配置（只读文本，**不渲染**任何配置输入框、启用开关与保存按钮）。
+
+- **Priority**: P0
+- **Rationale**: 「可视即价值」——渠道状态对老板"看得见"（research 访谈 1）；Q4 脱敏与 Q5 停用警示的 UI 落点（原型 `miniprogram-channel-admin.html`）。
+
+#### Scenario: 运营配置并启用渠道（前端交互）
+- @e2e
+- **GIVEN** 运营（陈晓芸）已登录并进入「小程序渠道」视图
+- **WHEN** 运营填写 AppID/AppSecret/商户号并打开启用开关、点击「保存配置」
+- **THEN** 页面展示「✓ 已保存并即时生效」与「● 已启用」徽标
+- **AND** AppSecret 显示为掩码（前 4 + 掩码 + 后 4），无明文
+
+#### Scenario: 老板只读渠道状态
+- @e2e
+- **GIVEN** 老板（李老板）已登录并进入「小程序渠道」视图
+- **THEN** 展示渠道启用状态与脱敏配置，标题旁「纯只读 · 无配置入口」
+- **AND** 页面无 AppID/AppSecret/商户号输入框、无启用开关、无「保存配置」按钮（只读文本展示）
+
+### Requirement: 小程序登录入口 UI（微信授权登录）
+
+系统 SHALL 提供小程序登录入口 UI（story-miniprogram-wechat-login / `wechat-auth` capability，Q8：Epic 6.1 含小程序登录入口 UI；ZAPP 极简约束 / 全中文 / 真实数据）：
+
+- **微信一键登录**：小程序首页提供「微信一键登录」（wx.login() 授权动作），openid 命中老客户 → 展示登录成功态与「我的订单 · 历史延续」（同源账户）；渠道停用时入口隐藏 / 展示「渠道已停用」提示。
+- **手机号绑定页**：openid 未命中 → 引导绑定手机号（微信手机号快捷绑定 或 手动输入）；新手机号绑定成功自动登录。
+- **撞号引导（Q2）**：绑定手机号已注册 → 提示「该手机号已注册：请登录既有账号完成微信绑定」，引导输入既有账号（手机号+密码）登录并完成绑定。
+- **登录成功态**：展示用户标识（昵称/手机号）+ 历史订单延续提示。
+
+- **Priority**: P0
+- **Rationale**: 「可视即价值」——授权即登录、少填表是买家核心诉求（research 访谈 3）；Q8 已确认小程序登录入口 UI 属本 Epic 交付（6.2 承载完整购物旅程）。
+
+#### Scenario: 微信授权登录成功（老客户历史订单延续）
+- @e2e
+- **GIVEN** 小程序渠道已启用，openid=openid_demo_001 已绑定用户 林晓明（user_1002，有历史订单）
+- **WHEN** 买家在小程序点击「微信一键登录」（code=mock code_demo_001）
+- **THEN** 展示登录成功态（林晓明 + 历史订单可见，同源账户未丢失）
+
+#### Scenario: 撞号引导登录既有账号
+- @e2e
+- **GIVEN** openid=openid_demo_003 未绑定，绑定手机号 13888217536 已注册（林晓明）
+- **WHEN** 买家尝试绑定该手机号
+- **THEN** 提示「该手机号已注册：请登录既有账号完成微信绑定」
+- **AND** 输入既有账号（13888217536 + 密码）校验通过后完成绑定并自动登录（Q2，不合并账户）
+
+### Requirement: B 端订单管理「渠道」标识列
+
+系统 SHALL 在 B 端订单管理列表新增「渠道」标识列（story-miniprogram-order-channel / `order-management` capability 消费）：
+
+- 每单显示渠道标识徽标：`MINIPROGRAM` → `border-electric text-electric`「小程序」；`WEB` → `border-border text-muted-foreground`「网页」。
+- 页眉说明：「渠道标识仅展示 · 不改变订单流程（Q7）」。
+- 存量订单（channel 缺省）展示「网页」。
+
+- **Priority**: P1
+- **Rationale**: 运营一眼识别订单来源；MVP 仅标识列展示（Q7，不做筛选）。
+
+#### Scenario: 订单列表渠道标识列渲染
+- @e2e
+- **GIVEN** 运营已进入 B 端订单管理，列表含小程序单与网页单
+- **WHEN** 运营查看订单列表
+- **THEN** 小程序单显示「小程序」徽标（electric 色）、网页单显示「网页」徽标（muted 色）
+
 ## Governance Mapping
 
 - **Bounded Context**: Shared / Cross（`domain_model.html` 映射表：`bc-shared → cap-ui`，Cross-Context）

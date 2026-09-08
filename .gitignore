@@ -235,6 +235,9 @@ ecommerce/ecommerce-mini/data/orders.json
 ecommerce/ecommerce-mini/data/users.json
 ecommerce/ecommerce-mini/data/sessions.json
 ecommerce/ecommerce-mini/data/issuances.json
+# 配置类运行态落盘（stock-config 阈值配置 / channel-config 小程序渠道配置，与实体数据同策略忽略）
+ecommerce/ecommerce-mini/data/stock-config.json
+ecommerce/ecommerce-mini/data/channel-config.json
 e2e-tests/cucumber-report.html
 ecommerce/ecommerce-mini/data/*.tmp
 ecommerce/ecommerce-mini/data/*.corrupt-*

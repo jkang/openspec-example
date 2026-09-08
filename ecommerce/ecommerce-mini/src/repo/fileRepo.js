@@ -110,6 +110,12 @@ export class UserFileRepo extends FileRepoAdapter {
     return this.findAll().find(u => u.phone === String(phone))
   }
 
+  /** 微信 openid 命中查询（wechat-auth，Q1：openid 单小程序一对一） */
+  findByOpenid(openid) {
+    if (!openid) return undefined
+    return this.findAll().find(u => u.openid === openid)
+  }
+
   clear() {
     this.store.clear()
   }
@@ -200,10 +206,11 @@ export class SessionFileRepo {
     this.store = new FileStore(resolveDataFile('sessions.json', dataDir), 'token')
   }
 
-  create(userId) {
+  create(userId, channel = 'WEB') {
     const session = {
       token: crypto.randomUUID(),
       userId,
+      channel,
       createdAt: new Date().toISOString().slice(0, 16).replace('T', ' ')
     }
     this.store.set(session.token, session)
@@ -225,5 +232,72 @@ export class SessionFileRepo {
 
   clear() {
     this.store.clear()
+  }
+}
+
+/**
+ * 小程序渠道配置仓储（channel-config.json 持久化，story-miniprogram-channel-config）：
+ * 单对象文件 `{ appid, appsecret, mchid, enabled }`，
+ * 接口与 memory `ChannelConfigRepo` 一致（getConfig / save / clear）。
+ * 原子写（tmp + rename），损坏/缺失自愈为默认配置（appid 空 / appsecret 空 / mchid 空 / enabled=false，R-CHN-009 默认停用），不抛异常。
+ * ⚠️ appsecret 明文仅存服务端文件，读取 API 由 Domain `toPublicConfig` 脱敏（永不回显明文，Q4）。
+ */
+export class ChannelConfigFileRepo {
+  /**
+   * @param {{ dataDir?: string }} [options]
+   */
+  constructor({ dataDir } = { dataDir: undefined }) {
+    this.filePath = resolveDataFile('channel-config.json', dataDir)
+    /** @type {{ appid: string, appsecret: string, mchid: string, enabled: boolean }} */
+    this.config = { appid: '', appsecret: '', mchid: '', enabled: false }
+    this.load()
+  }
+
+  /** 加载配置；文件缺失 → 自动创建默认配置；解析失败 → 备份损坏文件后以默认配置启动（不崩溃） */
+  load() {
+    if (!fs.existsSync(this.filePath)) {
+      this.saveAll()
+      return
+    }
+    try {
+      const json = JSON.parse(fs.readFileSync(this.filePath, 'utf-8'))
+      this.config = {
+        appid: typeof json.appid === 'string' ? json.appid : '',
+        appsecret: typeof json.appsecret === 'string' ? json.appsecret : '',
+        mchid: typeof json.mchid === 'string' ? json.mchid : '',
+        enabled: json.enabled === true
+      }
+    } catch (e) {
+      const backupPath = `${this.filePath}.corrupt-${Date.now()}`
+      try {
+        fs.renameSync(this.filePath, backupPath)
+        console.error(`[ChannelConfigFileRepo] 配置文件解析失败，已备份为 ${backupPath} 并以默认配置启动: ${e.message}`)
+      } catch (backupErr) {
+        console.error(`[ChannelConfigFileRepo] 配置文件解析失败且备份失败（${backupErr.message}），仅以默认配置启动: ${e.message}`)
+      }
+      this.config = { appid: '', appsecret: '', mchid: '', enabled: false }
+    }
+  }
+
+  /** 原子落盘当前配置（tmp + rename，避免崩溃窗口留下截断文件） */
+  saveAll() {
+    const tmpPath = `${this.filePath}.tmp`
+    fs.writeFileSync(tmpPath, JSON.stringify(this.config, null, 2))
+    fs.renameSync(tmpPath, this.filePath)
+  }
+
+  getConfig() {
+    return this.config
+  }
+
+  save(cfg) {
+    this.config = cfg
+    this.saveAll()
+    return this.config
+  }
+
+  clear() {
+    this.config = { appid: '', appsecret: '', mchid: '', enabled: false }
+    this.saveAll()
   }
 }

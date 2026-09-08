@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小程序渠道配置 · Epic 6.1 原型（ZAPP 暗黑）</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script>
+    /* ZAPP 暗黑设计令牌 —— 唯一事实来源：docs/baseline/design-system/ */
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            background: '#08080E',
+            card: '#0F0F1C',
+            foreground: '#EFEFFA',
+            muted: '#15152A',
+            'muted-foreground': '#6E6E9A',
+            secondary: '#1A1A2E',
+            primary: '#C8FF00',
+            'primary-foreground': '#08080E',
+            accent: '#FF2D6B',
+            'accent-foreground': '#FFFFFF',
+            electric: '#3B6DFF',
+            warning: '#FF9A00',
+            'warning-foreground': '#08080E',
+            success: '#00E5A0',
+            'success-foreground': '#08080E',
+            border: '#222238',
+            ring: '#C8FF00',
+          },
+          fontFamily: {
+            display: ['"Exo 2"', 'sans-serif'],
+            sans: ['"DM Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@700;800;900&family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+
+    /* ZAPP 规范：零圆角 / 零阴影 / 零渐变 */
+    * { border-radius: 0 !important; box-shadow: none !important; }
+    html, body { background-color: #08080E; }
+    [v-cloak] { display: none; }
+    input:focus, select:focus { outline: none; border-color: #C8FF00 !important; }
+    button { cursor: pointer; }
+  </style>
+</head>
+<body class="bg-background text-foreground font-sans antialiased">
+<div id="app" v-cloak class="min-h-screen bg-background text-foreground font-sans">
+
+  <!-- ═══ 顶部导航 ═══ -->
+  <header class="h-16 bg-card border-b border-border flex items-center justify-between px-6 sticky top-0 z-50">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-primary flex items-center justify-center">
+        <span class="font-display font-black text-primary-foreground text-sm">M</span>
+      </div>
+      <span class="font-display font-black text-lg uppercase tracking-tight text-foreground">Minimal Store</span>
+      <span class="font-mono text-[10px] uppercase tracking-widest text-muted-foreground border border-border px-2 py-0.5 hidden sm:inline">运营后台 · 渠道管理</span>
+    </div>
+    <!-- 角色切换（运营可写 / 老板只读） -->
+    <div class="flex items-center gap-4">
+      <span class="font-mono text-[10px] uppercase tracking-widest text-muted-foreground hidden sm:inline">角色</span>
+      <div class="flex border border-border">
+        <button @click="role = '运营'"
+          :class="role === '运营' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'"
+          class="px-4 py-2 font-mono text-xs uppercase tracking-wider transition-colors">运营 · 陈晓芸</button>
+        <button @click="role = '老板'"
+          :class="role === '老板' ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-muted'"
+          class="px-4 py-2 font-mono text-xs uppercase tracking-wider transition-colors">老板 · 李老板</button>
+      </div>
+    </div>
+  </header>
+
+  <!-- ═══ 左侧导航 + 主区 ═══ -->
+  <div class="flex">
+    <aside class="w-52 border-r border-border bg-card min-h-[calc(100vh-4rem)] p-4 hidden md:block">
+      <nav class="space-y-1">
+        <a v-for="m in nav" :key="m.id" @click.prevent="view = m.id"
+          class="block px-3 py-2 text-sm border border-transparent cursor-pointer"
+          :class="view === m.id ? 'border-primary text-primary' : 'text-muted-foreground hover:text-foreground'">
+          {{ m.label }}
+        </a>
+      </nav>
+    </aside>
+
+    <main class="flex-1 p-6 lg:p-8 max-w-4xl">
+
+      <!-- ═══ 视图 1：小程序渠道配置 ═══ -->
+      <template v-if="view === 'channel'">
+        <div class="flex items-start justify-between mb-6">
+          <div>
+            <h1 class="font-display font-black uppercase tracking-tight text-2xl">小程序渠道</h1>
+            <p class="font-mono text-xs uppercase tracking-widest text-muted-foreground mt-1">
+              miniprogram-channel · Channel Context · 新增 capability
+            </p>
+          </div>
+          <!-- 启用状态徽标 -->
+          <div class="text-right">
+            <span class="inline-block border px-3 py-1 font-mono text-xs uppercase tracking-widest"
+              :class="config.enabled ? 'border-success text-success' : 'border-accent text-accent'">
+              {{ config.enabled ? '● 已启用' : '○ 已停用' }}
+            </span>
+            <p v-if="role === '老板'" class="font-mono text-[10px] text-muted-foreground mt-2 uppercase tracking-widest">纯只读 · 无配置入口</p>
+          </div>
+        </div>
+
+        <!-- 仅运营可见的"停用警告"态 -->
+        <div v-if="role === '运营' && !config.enabled"
+          class="border border-accent text-accent bg-card px-4 py-3 text-sm mb-6">
+          渠道已停用 —— 新微信登录将被拒绝（CHANNEL_DISABLED），既有会话不受影响（Q5）
+        </div>
+        <div v-else-if="role === '老板' && !config.enabled"
+          class="border border-accent text-accent bg-card px-4 py-3 text-sm mb-6">
+          当前小程序渠道处于停用状态 —— 新微信登录将被拒绝（Q5）
+        </div>
+
+        <section class="border border-border bg-card p-6 space-y-5">
+          <div>
+            <h2 class="font-display font-bold uppercase tracking-tight text-sm mb-1">基础配置</h2>
+            <p class="text-xs text-muted-foreground mb-4">配置仅运营角色可写；appsecret 敏感脱敏，不读回明文（Q4）</p>
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1">AppID <span class="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">小程序开发者 ID</span></label>
+            <input v-model="config.appid" :readonly="role === '老板'" :disabled="role === '老板'"
+              class="w-full border border-border bg-muted px-3 py-2 text-sm font-mono disabled:opacity-60" />
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1">AppSecret <span class="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">已配置 → 掩码显示</span></label>
+            <div class="flex gap-2">
+              <input v-if="!secretEditing" :value="secretMasked" readonly
+                class="flex-1 border border-border bg-muted px-3 py-2 text-sm font-mono text-muted-foreground" />
+              <input v-else v-model="config.appsecret" type="text" placeholder="输入新的 AppSecret"
+                class="flex-1 border border-border bg-muted px-3 py-2 text-sm font-mono" />
+              <button v-if="role === '运营'" @click="toggleSecretEdit"
+                class="border border-primary text-primary px-4 py-2 text-xs font-mono uppercase tracking-widest whitespace-nowrap hover:bg-secondary">
+                {{ secretEditing ? '取消' : '重新配置' }}
+              </button>
+            </div>
+            <p v-if="role === '运营' && secretEditing" class="text-xs text-muted-foreground mt-2">
+              新密钥保存后立即生效，原密钥不可回读；保存后仅显示掩码（Q4）
+            </p>
+          </div>
+
+          <div>
+            <label class="block text-sm mb-1">商户号（mchid） <span class="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">本期纯配置预留 · 不参与支付</span></label>
+            <input v-model="config.mchid" :readonly="role === '老板'" :disabled="role === '老板'"
+              placeholder="如 1900001234（真实微信支付资质后置 +X 评估，Q3）"
+              class="w-full border border-border bg-muted px-3 py-2 text-sm font-mono disabled:opacity-60" />
+          </div>
+
+          <div class="border-t border-border pt-5 flex items-center justify-between">
+            <div>
+              <p class="text-sm font-semibold">启用小程序渠道</p>
+              <p class="text-xs text-muted-foreground mt-1">停用后：小程序登录入口隐藏，新微信登录拒绝（Q5）</p>
+            </div>
+            <button v-if="role === '运营'" @click="config.enabled = !config.enabled"
+              class="w-14 h-7 border transition-colors relative"
+              :class="config.enabled ? 'bg-success border-success' : 'bg-muted border-border'">
+              <span class="absolute top-1/2 -translate-y-1/2 w-5 h-5 transition-all"
+                :class="config.enabled ? 'left-8 bg-primary-foreground' : 'left-1 bg-muted-foreground'"></span>
+            </button>
+            <span v-else class="border border-border px-3 py-1 font-mono text-xs text-muted-foreground uppercase tracking-widest">只读</span>
+          </div>
+
+          <!-- 保存 -->
+          <div class="flex items-center gap-3 pt-2">
+            <button v-if="role === '运营'" @click="saveChannel" :disabled="saving"
+              class="border border-primary bg-primary text-primary-foreground px-6 py-2 text-sm font-bold disabled:opacity-40">
+              {{ saving ? '保存中…' : '保存配置' }}
+            </button>
+            <span v-if="savedFlash" class="text-success text-sm">✓ 已保存并即时生效</span>
+          </div>
+        </section>
+
+        <!-- 微信平台提示 -->
+        <section class="mt-6 border border-border bg-card p-5 text-xs text-muted-foreground space-y-1">
+          <h3 class="font-display font-bold uppercase tracking-tight text-foreground text-sm mb-2">真实接入提示</h3>
+          <p>· 微信登录：小程序 wx.login() 取 code → 服务端以 appid + appsecret 调 code2session 换 openid（appsecret 严禁下发前端）</p>
+          <p>· 手机号：使用微信官方「手机号快速验证组件」获取，非表单直填；测试环境以 mock 网关模拟（Q6）</p>
+          <p>· 真实收款需企业主体 + 商户号与 appid 绑定 + API 证书 —— 本期仅预留商户号字段（Q3）</p>
+        </section>
+      </template>
+
+      <!-- ═══ 视图 2：订单管理（含渠道标识） ═══ -->
+      <template v-if="view === 'orders'">
+        <div class="mb-6">
+          <h1 class="font-display font-black uppercase tracking-tight text-2xl">订单管理</h1>
+          <p class="font-mono text-xs uppercase tracking-widest text-muted-foreground mt-1">
+            列表新增「渠道」来源标识（order-management 修改 · Order.channel）
+          </p>
+        </div>
+
+        <section class="border border-border bg-card">
+          <div class="border-b border-border px-5 py-3 flex items-center justify-between">
+            <span class="font-mono text-xs uppercase tracking-widest text-muted-foreground">共 {{ orders.length }} 单</span>
+            <span class="font-mono text-[10px] text-muted-foreground uppercase tracking-widest">渠道标识仅展示 · 不改变订单流程（Q7）</span>
+          </div>
+          <table class="w-full text-sm">
+            <thead>
+              <tr class="border-b border-border text-left font-mono text-[10px] uppercase tracking-widest text-muted-foreground">
+                <th class="px-5 py-3 font-normal">订单号</th>
+                <th class="px-5 py-3 font-normal">买家</th>
+                <th class="px-5 py-3 font-normal">商品</th>
+                <th class="px-5 py-3 font-normal">金额</th>
+                <th class="px-5 py-3 font-normal">渠道</th>
+                <th class="px-5 py-3 font-normal">状态</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="o in orders" :key="o.id" class="border-b border-border last:border-b-0 hover:bg-muted/50">
+                <td class="px-5 py-3 font-mono text-xs text-muted-foreground">{{ o.id }}</td>
+                <td class="px-5 py-3">{{ o.user }}</td>
+                <td class="px-5 py-3 text-xs">{{ o.items }}</td>
+                <td class="px-5 py-3 font-mono font-bold text-primary">{{ o.amount }}</td>
+                <td class="px-5 py-3">
+                  <span class="inline-block border px-2 py-0.5 font-mono text-[10px] uppercase tracking-widest"
+                    :class="o.channel === 'MINIPROGRAM' ? 'border-electric text-electric' : 'border-border text-muted-foreground'">
+                    {{ o.channel === 'MINIPROGRAM' ? '小程序' : '网页' }}
+                  </span>
+                </td>
+                <td class="px-5 py-3">
+                  <span class="text-xs" :class="o.status === '待发货' ? 'text-warning' : 'text-success'">{{ o.status }}</span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </section>
+
+        <section class="mt-6 border border-border bg-card p-5 text-xs text-muted-foreground space-y-1">
+          <h3 class="font-display font-bold uppercase tracking-tight text-foreground text-sm mb-2">渠道标识口径（Q7 已确认）</h3>
+          <p>· 订单渠道来源自「会话来源」继承：经微信授权登录（wechat-auth）创建的会话下单 → channel = MINIPROGRAM；网页登录下单 → channel = WEB</p>
+          <p>· 服务端判定，不信任客户端传参（防伪造）</p>
+          <p>· 小程序订单发货 / 取消与网页单完全同流程（不因渠道分流）</p>
+        </section>
+      </template>
+
+    </main>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script>
+    const { createApp } = Vue;
+    createApp({
+      data() {
+        return {
+          role: '运营',
+          view: 'channel',
+          nav: [
+            { id: 'channel', label: '小程序渠道' },
+            { id: 'orders', label: '订单管理' },
+          ],
+          config: {
+            appid: 'wx4a2b8c9d0e1f2345',
+            appsecret: 'a1b2c3d4e5f60718293a4b5c6d7e8f90',
+            enabled: true,
+            mchid: '1900001234',
+          },
+          secretEditing: false,
+          saving: false,
+          savedFlash: false,
+          orders: [
+            { id: 'ORD-20260908-023', user: '王倩', items: '无线办公鼠标 × 1', amount: '¥89.00', channel: 'MINIPROGRAM', status: '待发货' },
+            { id: 'ORD-20260907-118', user: '林晓明', items: '极简机械键盘 × 1', amount: '¥299.00', channel: 'MINIPROGRAM', status: '已发货' },
+            { id: 'ORD-20260906-097', user: '陈晓芸', items: '高清显示器 × 1', amount: '¥1299.00', channel: 'WEB', status: '已完成' },
+            { id: 'ORD-20260905-061', user: '王倩', items: '桌面收纳架 × 2', amount: '¥90.00', channel: 'MINIPROGRAM', status: '已完成' },
+            { id: 'ORD-20260903-014', user: '林晓明', items: '铝合金笔记本支架 × 1', amount: '¥68.00', channel: 'WEB', status: '已完成' },
+          ],
+        };
+      },
+      computed: {
+        secretMasked() {
+          const s = this.config.appsecret;
+          return s ? s.slice(0, 4) + '•'.repeat(20) + s.slice(-4) : '';
+        }
+      },
+      methods: {
+        toggleSecretEdit() {
+          this.secretEditing = !this.secretEditing;
+          if (!this.secretEditing) this.config.appsecret = 'a1b2c3d4e5f60718293a4b5c6d7e8f90';
+        },
+        saveChannel() {
+          this.saving = true;
+          this.secretEditing = false;
+          setTimeout(() => {
+            this.saving = false;
+            this.savedFlash = true;
+            setTimeout(() => { this.savedFlash = false; }, 2500);
+          }, 500);
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>

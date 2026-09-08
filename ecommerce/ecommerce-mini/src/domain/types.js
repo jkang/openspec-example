@@ -48,6 +48,7 @@
  * @property {string} [couponId]
  * @property {OrderItem[]} items
  * @property {string} userId
+ * @property {"WEB" | "MINIPROGRAM"} [channel] 订单渠道来源（创建时写入：网页登录会话默认 WEB，微信小程序来源会话 MINIPROGRAM——从会话继承服务端判定，不信任客户端传参，Q7；存量缺省视为 WEB）
  * @property {string} [createdAt] 下单时间（ISO 8601）
  * @property {string} [paidAt] 支付时间（ISO 8601，支付成功时写入；销售看板时间归属基准，R-DASH-005）
  */
@@ -81,6 +82,7 @@
  * @property {string} phone 手机号（11 位中国大陆手机号，全局唯一）
  * @property {string} passwordHash 密码哈希（scrypt:<salt>:<hash>），不存明文
  * @property {string} nickname 昵称（≤20 字；未填时默认 "<尾号>用户"）
+ * @property {string} [openid] 微信小程序 openid（微信授权登录因子，Q1 方案 A；可空，单小程序一对一，绑定后存在）
  * @property {"正常" | "禁用"} status 用户状态（注册默认"正常"；B 端启停动作迁移）
  * @property {"客户" | "运营" | "客服" | "老板"} [role] 用户角色（注册默认"客户"；运营可访问 B 端用户管理 R-ADM-001；老板为只读看板角色，可访问 GET /api/admin/dashboard/*，无管理写权限，R-DASH-006）
  * @property {string} createdAt 创建时间 (YYYY-MM-DD HH:mm)
@@ -90,5 +92,6 @@
  * @typedef {Object} Session
  * @property {string} token 会话凭证（随机 UUID）
  * @property {string} userId 归属用户
+ * @property {"WEB" | "MINIPROGRAM"} [channel] 会话来源渠道（登录创建时写入；网页登录默认 WEB，微信授权登录 MINIPROGRAM——供下单写 Order.channel 消费，Q7）
  * @property {string} createdAt 创建时间 (YYYY-MM-DD HH:mm)
  */
