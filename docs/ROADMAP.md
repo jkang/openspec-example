@@ -26,7 +26,8 @@ AI Agent 在执行需求探索（`/req:explore`）阶段时，**必须首先查�
 - **销售报表看板（Phase 5 Epic 5.1 完成）**: B 端销售总览（4 指标卡：销售额/订单量/客单价/优惠让利 + 今日/近7日/近30日切换 + SVG 趋势 + 优惠券效果）+ 商品 TOP10 / 分类 TOP10 排行；新增 `role=老板`（只读看板视角）；仅运营/老板可访问（客服/未登录 403）；新增 `data-insights` BC 与 `sales-dashboard` capability（Baseline Sync 已完成）。
 - **库存预警与补货建议（Phase 5 Epic 5.2 完成）**: B 端库存洞察——低库存预警列表（`stock ≤ 阈值` 入列 + 已售罄置顶 + 超卖风险标识）、阈值两级配置（全局默认 10 件 + 商品级覆盖，仅运营可写，落盘 `data/stock-config.json` 即时生效）、补货建议（近7日日均销量 → 预计售罄天数 → 建议补货量 = `max(0, ⌈日均×7⌉ − stock)`，到货周期固定 7 天，无销量展示「暂无销量」）、老板只读全局库存健康度总览（预警/已售罄/超卖风险计数）；仅运营/老板可访问（客户/客服 403、未登录 401）；新增 `stock-insight` capability（data-insights BC，Baseline Sync 已完成）。
 - **持久化与真实数据**: JSON 文件持久化（products/categories/coupons/issuances/orders/carts/users/sessions/stock-config/channel-config），真实数据落地。
-- **SDD 工作流**: 基于 OpenSpec 的规格驱动开发闭环，Epic/Story/Bug Fix/Tech Debt 共 31 个变更已归档；E2E Cucumber 覆盖 65 场景（含小程序渠道 4 + 微信登录 6 + 订单渠道 5 + 小程序购物旅程 6 契约场景）。
+- **SDD 工作流**: 基于 OpenSpec 的规格驱动开发闭环，Epic/Story/Bug Fix/Tech Debt 共 31 个变更已归档；E2E Cucumber 覆盖 72 场景（含小程序渠道 4 + 微信登录 6 + 订单渠道 5 + 小程序购物旅程 6 + 应收账款闭环 7 场景）。
+- **回款与应收账款闭环（Phase 7 完成）**: 账期客户（User.creditDays>0）订单免现结（服务端信用放行），发货 SHIPPED 自动生成应收（金额=订单实付 priceCents、到期日=发货日+账期）→ 运营登记回款（部分/整单，金额≤剩余，Receipt 流水）→ 剩余/结清/逾期推导（到期未结清即逾期）→ 老板/运营应收看板（总应收/已回/未回余额/逾期金额 + 客户欠款集中度，与登记同源）；兑现"回款节点驱动应收账款看板"差异化承诺；新增 `accounts-receivable` capability（Order Context 扩展，Receivable/Receipt 实体）；C 端零改动。
 - **小程序 C 端交易链路（Phase 6 Epic 6.2 完成）**: 微信小程序内完整购物旅程（真实 6 商品浏览/名称搜索/价格排序/分类筛选/商品详情/加购 → 购物车（会话归属）→ 结算（自动最优券）→ 提交订单（Order.channel=MINIPROGRAM 会话自动继承）→ 模拟支付 → 我的订单（列表 + 状态轨迹：待支付→已支付→已发货→已完成/已取消））；Web 与小程序同库同源实时一致；技术形态 B：独立小程序原生工程（`ecommerce/ecommerce-miniprogram/`，微信开发者工具可打开，仓库以 HTML 原型 + 后端契约 E2E 验证降级）；E2E Cucumber 覆盖 65 场景。
 - **微信小程序渠道接入与账户打通（Phase 6 Epic 6.1 完成）**: B 端小程序渠道配置（AppID / AppSecret 脱敏回显 / 商户号纯预留 / 启用状态开关，仅运营可写、老板只读，落盘 `data/channel-config.json` 即时生效；停用 → 新微信登录拒绝 `CHANNEL_DISABLED`、既有会话照常）+ 微信授权登录（openid 存 `User` 一对一，`wx.login()` code → code2session 换 openid → 命中直连同源账户 / 未命中引导手机号绑定，撞号提示登录既有账号再绑定不合并）+ 订单渠道标识（`Order.channel` 会话来源继承防伪造，B 端订单列表展示「小程序/网页」）；mock 微信网关（测试环境固定映射）；新增 `Channel Context` BC + `wechat-auth` / `miniprogram-channel` capability taxonomy（Baseline Sync 已完成）。
 
@@ -134,15 +135,15 @@ AI Agent 在执行需求探索（`/req:explore`）阶段时，**必须首先查�
   - **治理映射**: User Context 新增 `wechat-auth` capability；新增 `Channel Context`（B 端渠道配置）BC 与 `miniprogram-channel` capability；Order 增加渠道来源（`channel=MINIPROGRAM`）；`domain_model.html` / `service_blueprint.html` 显式标注"新增"。
   - **极简 UI**: 小程序遵循与 Web 一致的极简约束（无圆角阴影、slate 色系、真实中文数据）；具体技术栈（原生 WXML / uni-app / Taro）由 lead 与 engineer 评估后定，roadmap 不锁定。
 
-### 🚀 未来 +2 个月 — Phase 7: 回款与应收账款闭环（产品差异化终点）
+### 📍 当前阶段 (Current Phase) — Phase 7: 回款与应收账款闭环（产品差异化终点）✅ 已完成
 
-- **目标**: 兑现"回款节点驱动应收账款看板"的核心承诺。
+- **目标**: 兑现"回款节点驱动应收账款看板"的核心承诺 ✅ 已交付（2026-09-08）。
 - **范围**: 应收账款 / 账期管理、回款节点登记、回款状态看板（老板与财务视角）。
 - **产品理由**: 这是 `PRODUCT.md` 中与"订单散落、回款在群聊"痛点直接对应的差异化能力，是产品从"电商工具"升级为"运营闭环系统"的标志；复用 Phase 5 看板底座。
 - **代表性 Epic**: `epic-accounts-receivable`
-- **触发条件**: Phase 6 交付后评估。
+- **触发条件**: Phase 6 已交付 ✅ 已启动并完成；Phase 8 待启动评估。
 
-### 🚀 未来 +3 个月 — Phase 8: 运营效率增强
+### 🚀 未来 +1 个月 — Phase 8: 运营效率增强（下一阶段）
 
 - **目标**: 降低 B 端重复性人工操作成本。
 - **范围**: 订单批量处理（批量发货/取消）、数据导出（CSV）、常用查询保存。

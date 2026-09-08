@@ -876,7 +876,11 @@
                 ['Channel', '渠道停用拒绝新登录', '渠道 enabled=false 或未配置 → 小程序新微信登录拒绝（CHANNEL_DISABLED）；既有会话不受影响（Q5，MVP 只管新流量）。'],
                 ['User', '微信授权登录因子', 'openid 为 User 新登录因子（Q1 方案 A，单小程序一对一）；code2session 换 openid 命中即复用会话直连（channel=MINIPROGRAM）；未命中引导手机号绑定。'],
                 ['User', '撞号提示登录既有账号', '微信绑定手机号已被既有账号占用 → 返回 PHONE_EXISTS_NEED_LOGIN，引导既有账号登录再绑定（bind-openid），不自动合并/不静默拒绝（Q2）。'],
-                ['User', 'mock 微信网关', '测试环境（NODE_ENV=test）code2session / 手机号组件由 mock 固定映射模拟（Q6）；真实微信网关资质后置 +X 未接入。']
+                ['User', 'mock 微信网关', '测试环境（NODE_ENV=test）code2session / 手机号组件由 mock 固定映射模拟（Q6）；真实微信网关资质后置 +X 未接入。'],
+                ['Order', '账期客户免现结', 'User.creditDays>0 客户订单免模拟支付（服务端信用放行 → PAID）；creditDays=0 现结客户维持既有先付后货语义（R-AR-002/004）。'],
+                ['Order', '履约即转应收', '账期客户订单发货 SHIPPED 自动生成应收：金额=订单 actualPaidCents、到期日=发货日+creditDays、receivedCents=0；一单一应收（R-AR-003）。'],
+                ['Order', '回款登记口径', '登记金额 >0 且 ≤ 剩余应收；部分回款多次 → receivedCents 累加、剩余递减；剩余 0 → 已结清不可再登记（R-AR-102/103）。'],
+                ['Order', '应收逾期推导', '到期日已过且剩余>0 → 逾期（推导态不落库，R-AR-104）；看板逾期金额 = Σ 到期未结清单的剩余应收（R-AR-203）。']
             ],
             readModels: [
                 ['Catalog', '商品搜索结果', '供买家浏览与筛选。'],
@@ -887,7 +891,9 @@
                 ['Operator', '销售看板', '老板/运营查看销售总览（4 指标/时间维度/趋势/优惠券效果）与商品/分类排行，只读聚合自订单明细（data-insights BC）。'],
                 ['Operator', '用户列表', 'B 端用户管理：ID/昵称/手机号/订单数/注册日期/状态。'],
                 ['Operator', '用户详情', '基础信息 + 该用户订单聚合（一人多单）。'],
-                ['Customer', '我的订单', '按会话 userId 归属查询当前登录用户的订单。']
+                ['Customer', '我的订单', '按会话 userId 归属查询当前登录用户的订单。'],
+                ['Operator', '应收账款', '运营登记回款/查看应收单（未回/部分/结清/逾期）；账期客户应收自动生成。'],
+                ['Boss/Operator', '应收看板', '老板/运营只读：总应收/已回/未回余额/逾期金额 + 客户欠款集中度（与应收单登记同源，R-AR-201~205）。']
             ]
         };
 
@@ -916,7 +922,7 @@
             {
                 title: 'Order Aggregate',
                 root: 'Order (id, userId, status, channel, totalCents, discountCents, actualPaidCents, couponId)',
-                entities: 'OrderItem (productId, priceCents, quantity)',
+                entities: 'OrderItem (productId, priceCents, quantity)；Receivable (id, userId, orderId, amountCents, receivedCents, dueDate) 由账期客户订单履约生成，Receipt (id, receivableId, amountCents, recordedAt, operator) 登记回款流水（accounts-receivable，Phase 7）。',
                 values: 'FinancialPrecision',
                 invariant: 'actualPaidCents 一旦支付确认即锁定；历史价格不因商品改价而变化；channel（WEB/MINIPROGRAM）创建时写入不可变（会话来源继承，服务端判定不信任客户端，Q7）。'
             },
@@ -929,7 +935,7 @@
             },
             {
                 title: 'User Aggregate',
-                root: 'User (id, phone, openid, passwordHash, nickname, status, role, createdAt)',
+                root: 'User (id, phone, openid, creditDays, passwordHash, nickname, status, role, createdAt)',
                 entities: 'Session (token, userId, channel, createdAt) 作为跨聚合凭证对象由 User Context 管理（channel 记录会话来源渠道：WEB 网页 / MINIPROGRAM 微信授权，供下单写 Order.channel）。',
                 values: 'PhoneNumber, Openid, PasswordHash, UserRole, AccountStatus',
                 invariant: '手机号全局唯一；密码仅存 scrypt 哈希不落明文；openid 为微信授权登录因子（可空，单小程序一对一，Q1）；status ∈ {正常, 禁用}（注册默认正常）；role ∈ {客户, 运营, 客服, 老板}（注册默认客户）；禁用后登录与既有会话访问均被拒绝，启用后恢复。'
@@ -937,7 +943,7 @@
         ];
 
         const mappingGraph = {
-            canvas: { width: 1180, height: 1680, nodeWidth: 240, nodeHeight: 120 },
+            canvas: { width: 1180, height: 1740, nodeWidth: 240, nodeHeight: 120 },
             nodes: [
                 { id: 'bc-catalog', title: 'Catalog Context', subtitle: 'Bounded Context', meta: ['Governance'], x: 100, y: 40 },
                 { id: 'bc-cart', title: 'Cart Context', subtitle: 'Bounded Context', meta: ['Governance'], x: 100, y: 180 },
@@ -964,7 +970,8 @@
                 { id: 'cap-sales-dashboard', title: 'sales-dashboard', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1320 },
                 { id: 'cap-stock-insight', title: 'stock-insight', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1420 },
                 { id: 'cap-wechat-auth', title: 'wechat-auth', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1520 },
-                { id: 'cap-miniprogram-channel', title: 'miniprogram-channel', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1620 }
+                { id: 'cap-miniprogram-channel', title: 'miniprogram-channel', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1620 },
+                { id: 'cap-accounts-receivable', title: 'accounts-receivable', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1720 }
             ],
             edges: [
                 { from: 'bc-catalog', to: 'cap-catalog', label: 'Governs', rule: 'Catalog 边界负责商品元数据与库存管理' },
@@ -983,7 +990,8 @@
                 { from: 'bc-user', to: 'cap-wechat-auth', label: 'Governs', rule: 'User 边界负责微信授权登录因子（openid 关联/手机号绑定/同源账户，code2session + mock 网关）' },
                 { from: 'bc-data-insights', to: 'cap-sales-dashboard', label: 'Governs', rule: 'Data Insights 边界负责销售报表看板（指标聚合/时间维度/趋势/排行，只读消费 Order 数据）' },
                 { from: 'bc-data-insights', to: 'cap-stock-insight', label: 'Governs', rule: 'Data Insights 边界负责库存洞察（低库存预警/阈值配置/补货建议，只读消费 Catalog stock 与 Order 销量）' },
-                { from: 'bc-channel', to: 'cap-miniprogram-channel', label: 'Governs', rule: 'Channel 边界负责 B 端小程序渠道配置（appid/appsecret 脱敏/商户号纯预留/启用状态，仅运营可写；停用拒绝新登录）' }
+                { from: 'bc-channel', to: 'cap-miniprogram-channel', label: 'Governs', rule: 'Channel 边界负责 B 端小程序渠道配置（appid/appsecret 脱敏/商户号纯预留/启用状态，仅运营可写；停用拒绝新登录）' },
+                { from: 'bc-order', to: 'cap-accounts-receivable', label: 'Governs', rule: 'Order 边界负责应收账款闭环：账期客户履约转应收 + 回款登记 + 只读聚合（Receivable/Receipt）' }
             ]
         };
 
