@@ -50,31 +50,82 @@ def read(path):
 
 
 def scan_roadmap():
-    """解析 ROADMAP.md：当前阶段、未来阶段、规划中 Epic。"""
-    text = read(os.path.join(ROOT, "docs", "ROADMAP.md"))
-    current = re.search(r"## 📍 当前阶段[^\n]*—\s*(Phase\s*\d+)\s*:\s*([^\n]+)", text)
-    current_no = int(re.search(r"Phase\s*(\d+)", current.group(1)).group(1)) if current else 5
-    current_name = current.group(2).strip() if current else "数据洞察与经营决策"
+    """解析 ROADMAP.md：当前阶段、阶段状态、未来阶段、规划中 Epic。
 
-    # 从 ROADMAP.md 动态解析阶段标题（当前 + 未来），覆盖 PHASE_NAMES 硬编码默认值
+    阶段标题形如 `## 前缀 — Phase N: 名称 [✅ 已完成 |（下一阶段）]`；
+    状态由标题里的 ✅已完成 / 下一阶段 / 未来 标记驱动，避免依赖"唯一当前阶段"绝对位置。
+    """
+    text = read(os.path.join(ROOT, "docs", "ROADMAP.md"))
+
+    # 收集正式阶段标题：行首 2~4 个 #，含 "Phase N:"（N=1..20），不含 Guardrails 等子标题
+    phase_hits = []
+    for m in re.finditer(r"^#{2,4}\s+(.*?—?\s*Phase\s*(\d+)\s*:\s*(.+?))\s*$", text, re.M):
+        no = int(m.group(2))
+        name = re.sub(r"^\s*[^\w—\s]+\s*", "", m.group(1)).strip()   # 去 "📍 当前阶段 (Current Phase) — " 前缀
+        name = re.sub(r"^.*?[—–-]\s*", "", name).strip()              # 取 "— " 之后的名称部分
+        # 重取：直接取 "Phase N:" 之后的名称
+        name = m.group(3).strip()
+        status_marker = name
+        if "✅ 已完成" in status_marker or "已完成" in status_marker or "已交付" in status_marker:
+            status = "done"
+        elif "下一阶段" in status_marker or "未来" in status_marker or "待启动" in status_marker:
+            status = "future"
+        else:
+            status = "current"
+        # 名称清理：去掉状态后缀标记，保留纯名
+        name = re.sub(r"\s*[✅✓].*$", "", name).strip()
+        name = re.sub(r"\s*[（(].*$", "", name).strip()
+        phase_hits.append((no, name, status))
+    phase_hits.sort(key=lambda x: x[0])
+
     phase_names = dict(PHASE_NAMES)
-    max_no = current_no
-    for m in re.finditer(r"#{2,4}\s+[^\n]*—\s*Phase\s*(\d+)\s*:\s*([^\n]+)", text):
-        no = int(m.group(1))
-        phase_names[no] = m.group(2).strip()
+    done_nos, future_nos = set(), set()
+    max_no = 0
+    for no, name, status in phase_hits:
+        if name:
+            phase_names[no] = name
+        if status == "done":
+            done_nos.add(no)
+        elif status == "future":
+            future_nos.add(no)
         max_no = max(max_no, no)
 
+    # 初建阶段列表：显式标记优先，未标记的暂标 current（后续统一重算）
     phases = []
     for no in range(1, max_no + 1):
-        status = "done" if no < current_no else ("current" if no == current_no else "future")
-        name = phase_names.get(no, f"Phase {no}")
-        phases.append({"no": no, "name": name, "status": status})
+        if no in done_nos:
+            st = "done"
+        elif no in future_nos:
+            st = "future"
+        else:
+            st = "current"
+        phases.append({"no": no, "name": phase_names.get(no, f"Phase {no}"), "status": st})
 
-    # 当前阶段 In Scope 中的 Epic（规划中/待启动）
+    # 补全：凡编号 <= 最大已交付阶段 且未显式标记"未来/进行中"的，视为已完成
+    # （历史 ROADMAP 未为 Phase 1~4 单列标题，但已交付，故按编号连续补 done）
+    if done_nos:
+        max_done = max(done_nos)
+        for p in phases:
+            if p["no"] <= max_done and p["status"] not in ("done", "future"):
+                p["status"] = "done"
+
+    # 当前(目标)阶段 = 最小的未完成阶段；它标 current，其余未完成标 future
+    target = next((p for p in phases if p["status"] != "done"), None)
+    if target:
+        for p in phases:
+            if p["status"] == "done":
+                continue
+            p["status"] = "current" if p["no"] == target["no"] else "future"
+        current_no = target["no"]
+    else:
+        current_no = max_no + 1
+    current_name = phase_names.get(current_no, f"Phase {current_no}")
+
+    # 规划中 Epic = 未来/下一阶段段内声明的 Epic（当前阶段已交付的不计入）
     planned = []
-    scope_match = re.search(r"### 📥 In Scope(.*?)### 🚫", text, re.S)
-    if scope_match:
-        for m in re.finditer(r"\*\*Epic\s+[\d.]+[^\n]*`([a-z0-9-]+)`\s*—\s*([^\n]+)", scope_match.group(1)):
+    future_block = re.search(r"### 🚀 未来[^\n]*— Phase\s*(\d+)(.*?)(?=\n### |\n## |$)", text, re.S)
+    if future_block:
+        for m in re.finditer(r"\*\*\s*Epic\s+[\d.]+[^\n]*`([a-z0-9-]+)`\s*—\s*([^\n]+)", future_block.group(2)):
             title = re.sub(r"[*:：\s]+$", "", m.group(2)).strip()
             planned.append({"key": m.group(1), "title": title})
     return {"current": {"no": current_no, "name": current_name}, "phases": phases, "planned": planned}
@@ -511,7 +562,7 @@ body {{ background-color: #f8fafc; font-family: -apple-system, 'PingFang SC', 'M
   <div class="flex justify-between items-end mb-8 border-b-2 border-slate-900 pb-4">
     <div>
       <h1 class="text-4xl font-black text-slate-900 tracking-tighter">交付看板</h1>
-      <p class="text-slate-500 mt-2">极简电商系统 · 规格驱动开发（SDD）治理与团队需求管理</p>
+      <p class="text-slate-500 mt-2">小型电商系统 · 规格驱动开发（SDD）治理与团队需求管理</p>
     </div>
     <div class="text-right">
       <span class="inline-block bg-slate-900 text-white text-xs font-bold px-3 py-1 mb-2">当前阶段：阶段 {r["current"]["no"]} · {esc(r["current"]["name"])}</span>
