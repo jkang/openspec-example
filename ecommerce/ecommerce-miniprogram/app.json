@@ -1,0 +1,29 @@
+{
+  "pages": [
+    "pages/index/index",
+    "pages/detail/detail",
+    "pages/cart/cart",
+    "pages/checkout/checkout",
+    "pages/orders/orders"
+  ],
+  "window": {
+    "navigationBarBackgroundColor": "#0F0F1C",
+    "navigationBarTitleText": "Minimal Store",
+    "navigationBarTextStyle": "white",
+    "backgroundColor": "#08080E",
+    "backgroundTextStyle": "dark"
+  },
+  "tabBar": {
+    "color": "#6E6E9A",
+    "selectedColor": "#C8FF00",
+    "backgroundColor": "#0F0F1C",
+    "borderStyle": "white",
+    "list": [
+      { "pagePath": "pages/index/index", "text": "首页" },
+      { "pagePath": "pages/cart/cart", "text": "购物车" },
+      { "pagePath": "pages/orders/orders", "text": "我的" }
+    ]
+  },
+  "style": "v2",
+  "sitemapLocation": "sitemap.json"
+}

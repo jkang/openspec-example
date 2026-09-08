@@ -1,0 +1,10 @@
+.rows .row { display: flex; justify-content: space-between; padding: 12rpx 0; font-size: 28rpx; }
+.divider { border-top: 2rpx solid var(--border); margin-top: 8rpx; }
+.big { font-size: 44rpx; }
+.hint { font-size: 20rpx; margin-top: 12rpx; }
+.submit { width: 100%; margin-top: 24rpx; }
+.ghost { background: transparent; }
+.center { text-align: center; padding: 60rpx 24rpx; }
+.oid { margin: 16rpx 0; }
+.small { font-size: 24rpx; }
+.empty { text-align: center; padding: 100rpx 0; }

@@ -1,0 +1,44 @@
+/* Minimal Store 微信小程序全局样式 —— ZAPP 暗黑令牌（等价 docs/baseline/design-system/ 语义令牌）
+   约束：无圆角 / 无阴影 / 无渐变；全中文；真实数据。小程序无 Tailwind，以 CSS 变量等价映射。 */
+page {
+  --bg: #08080E;
+  --card: #0F0F1C;
+  --foreground: #EFEFFA;
+  --muted: #15152A;
+  --muted-fg: #6E6E9A;
+  --secondary: #1A1A2E;
+  --primary: #C8FF00;
+  --primary-fg: #08080E;
+  --accent: #FF2D6B;
+  --electric: #3B6DFF;
+  --warning: #FF9A00;
+  --success: #00E5A0;
+  --border: #222238;
+
+  background: var(--bg);
+  color: var(--foreground);
+  font-family: -apple-system, "PingFang SC", "Helvetica Neue", sans-serif;
+  font-size: 28rpx;
+}
+
+/* 全局零圆角 / 零阴影 */
+view, button, input, image { border-radius: 0; box-shadow: none; }
+
+/* 等宽价格 / 编码（小程序无 JetBrains Mono，使用等宽回退） */
+.mono, .price { font-family: "SF Mono", "Menlo", Consolas, monospace; }
+
+.page { min-height: 100vh; background: var(--bg); padding: 24rpx; box-sizing: border-box; }
+.card { background: var(--card); border: 2rpx solid var(--border); padding: 24rpx; box-sizing: border-box; }
+.price { color: var(--primary); font-weight: 700; }
+.muted { color: var(--muted-fg); }
+.label-tag { color: var(--muted-fg); font-size: 20rpx; letter-spacing: 2rpx; }
+
+.btn-primary { background: var(--primary); color: var(--primary-fg); font-weight: 700; border: none; }
+.btn-primary.disabled { opacity: 0.4; }
+.btn-outline { background: transparent; color: var(--foreground); border: 2rpx solid var(--primary); }
+.btn-accent { color: var(--accent); }
+.text-success { color: var(--success); }
+.text-warning { color: var(--warning); }
+.text-accent { color: var(--accent); }
+.badge { border: 2rpx solid var(--border); font-size: 20rpx; padding: 4rpx 12rpx; }
+.badge-electric { border-color: var(--electric); color: var(--electric); }

@@ -1,0 +1,32 @@
+<view class="page">
+  <view wx:if="{{!loggedIn}}" class="card center muted">
+    <text>登录后查看我的订单</text>
+    <button class="btn-primary login" bindtap="goLogin">微信登录</button>
+  </view>
+
+  <block wx:else>
+    <view wx:if="{{orders.length === 0}}" class="card center muted">暂无订单</view>
+    <view wx:for="{{orders}}" wx:key="id" class="card order">
+      <view class="head">
+        <text class="oid mono muted">#{{item.id}}</text>
+        <text class="badge {{item.status === 'CANCELLED' ? 'text-accent' : ''}}">{{item.statusText}}</text>
+      </view>
+      <view class="body" data-id="{{item.id}}" bindtap="toggle">
+        <text class="sum muted">{{item.summary}}</text>
+        <text class="amt price mono">{{item.amountText}}</text>
+      </view>
+      <view wx:if="{{item.expanded}}" class="detail">
+        <view class="drow"><text class="muted">商品总额</text><text class="mono">{{item.totalText}}</text></view>
+        <view class="drow"><text class="muted">优惠券</text><text class="mono">{{item.couponText}}</text></view>
+        <view class="drow"><text class="muted">折扣</text><text class="mono text-accent">-{{item.discountText}}</text></view>
+        <view class="drow"><text class="muted">实付</text><text class="mono price">{{item.amountText}}</text></view>
+        <view class="track">
+          <text
+            wx:for="{{['待支付','已支付','已发货','已完成']}}" wx:for-item="s" wx:for-index="si" wx:key="*this"
+            class="step {{item.step >= si ? 'on' : ''}}">{{s}}</text>
+          <text wx:if="{{item.status === 'CANCELLED'}}" class="step on accent">已取消</text>
+        </view>
+      </view>
+    </view>
+  </block>
+</view>

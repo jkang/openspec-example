@@ -1,0 +1,15 @@
+{
+  "description": "Minimal Store 微信小程序项目配置。仓库开发演示：appid 使用测试占位（微信开发者工具选择「测试号」或「不校验合法域名」即可预览）。真实发布需企业主体小程序 appid + 业务域名配置（交付后 +X）。",
+  "setting": {
+    "urlCheck": false,
+    "es6": true,
+    "enhance": true,
+    "postcss": true,
+    "minified": true
+  },
+  "compileType": "miniprogram",
+  "libVersion": "3.0.0",
+  "appid": "touristappid",
+  "projectname": "minimal-store-miniprogram",
+  "condition": {}
+}

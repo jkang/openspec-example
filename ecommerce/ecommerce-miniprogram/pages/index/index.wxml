@@ -1,0 +1,35 @@
+<view class="page">
+  <!-- 搜索 + 排序 -->
+  <view class="search-row">
+    <input class="search-input" placeholder="搜索商品..." value="{{keyword}}" bindinput="onKeyword" bindconfirm="reload" />
+    <button class="btn-outline sort-btn" size="mini" bindtap="toggleSort">价格{{ sortAsc ? '↑' : '↓' }}</button>
+  </view>
+
+  <!-- 分类 Tabs -->
+  <scroll-view class="cats" scroll-x enable-flex>
+    <view
+      wx:for="{{catList}}" wx:key="key"
+      class="cat {{activeCat === item.key ? 'active' : ''}}"
+      data-key="{{item.key}}" bindtap="onCat">{{item.name}}</view>
+  </scroll-view>
+
+  <!-- 商品网格 -->
+  <view class="grid">
+    <view
+      wx:for="{{products}}" wx:key="id"
+      class="product card" data-id="{{item.id}}" bindtap="openDetail">
+      <view class="ph">{{item.logo}}</view>
+      <view class="p-name">{{item.name}}</view>
+      <view class="p-desc muted">{{item.description}}</view>
+      <view class="p-price price">{{item.priceText}}</view>
+    </view>
+  </view>
+  <view wx:if="{{products.length === 0}}" class="empty muted">无匹配商品</view>
+
+  <!-- 登录引导条（未登录） -->
+  <view wx:if="{{!loggedIn}}" class="card login-bar">
+    <text class="muted">登录后可加购下单（微信一键登录）</text>
+    <button class="btn-primary" size="mini" bindtap="goLogin">微信登录</button>
+  </view>
+  <view wx:else class="muted login-bar">{{user.nickname}} · 已登录</view>
+</view>

@@ -1,0 +1,28 @@
+<view class="page">
+  <view wx:if="{{items.length === 0}}" class="card empty muted">
+    <text wx:if="{{loggedIn}}">购物车为空</text>
+    <text wx:else>登录后查看购物车</text>
+  </view>
+
+  <block wx:else>
+    <view class="card line" wx:for="{{items}}" wx:key="productId">
+      <view class="ph">{{item.logo}}</view>
+      <view class="mid">
+        <view class="nm">{{item.name}}</view>
+        <view class="price mono">{{item.priceText}}</view>
+      </view>
+      <view class="qty">
+        <button class="qbtn" size="mini" data-index="{{index}}" bindtap="dec">−</button>
+        <text class="qn mono">{{item.quantity}}</text>
+        <button class="qbtn" size="mini" data-index="{{index}}" bindtap="inc">+</button>
+      </view>
+      <button class="rm muted" size="mini" data-index="{{index}}" bindtap="remove">移除</button>
+    </view>
+
+    <view class="card total-row">
+      <text>合计（{{totalQty}} 件）</text>
+      <text class="total price mono">{{totalText}}</text>
+    </view>
+    <button class="btn-primary checkout" bindtap="goCheckout">去结算</button>
+  </block>
+</view>

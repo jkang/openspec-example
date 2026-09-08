@@ -1,0 +1,17 @@
+<view class="page" wx:if="{{p}}">
+  <view class="card">
+    <view class="ph">{{p.logo}}</view>
+    <view class="p-name">{{p.name}}</view>
+    <view class="p-desc muted">{{p.description}}</view>
+    <view class="price-row">
+      <text class="p-price price">{{p.priceText}}</text>
+      <text class="stock {{p.stockLevel}}">{{p.stockText}}</text>
+    </view>
+    <view class="btn-row">
+      <button wx:if="{{p.stock > 0}}" class="btn-primary buy-btn" bindtap="addToCart">加入购物车</button>
+      <button wx:if="{{p.stock > 0}}" class="btn-outline buy-btn" bindtap="buyNow">立即购买</button>
+      <button wx:else class="btn-primary buy-btn disabled" disabled>已售罄</button>
+    </view>
+  </view>
+  <view wx:if="{{loggedIn === false}}" class="card tip muted">登录后可加购下单</view>
+</view>

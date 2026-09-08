@@ -1,0 +1,39 @@
+<view class="page">
+  <!-- 待支付态 -->
+  <block wx:if="{{!paid}}">
+    <view class="card rows" wx:if="{{loading}}">
+      <view class="muted">加载购物车…</view>
+    </view>
+    <view class="card rows" wx:elif="{{items.length > 0}}">
+      <view class="row"><text class="muted">商品总额</text><text class="mono">{{totalText}}</text></view>
+      <view class="row"><text class="muted">优惠（最优券 {{couponText}}）</text><text class="mono text-accent">-{{discountText}}</text></view>
+      <view class="row divider"><text>应付金额</text><text class="price mono big">{{payText}}</text></view>
+      <view class="hint muted">模拟支付 · 与 Web 一致 · 订单渠道自动识别</view>
+    </view>
+    <view class="card muted empty" wx:else>购物车为空</view>
+    <button class="btn-primary submit" wx:if="{{items.length > 0}}" bindtap="submitOrder" disabled="{{submitting}}">
+      {{submitting ? '提交中…' : '提交订单'}}
+    </button>
+  </block>
+
+  <!-- 待支付：订单已创建，需模拟支付 -->
+  <block wx:elif="{{!lastPaid}}">
+    <view class="card center">
+      <view class="label-tag">订单已创建 · 待支付</view>
+      <view class="oid mono muted">#{{orderId}}</view>
+      <view class="muted small">库存将在支付成功后扣减（模拟支付）</view>
+    </view>
+    <button class="btn-primary submit" bindtap="pay">模拟支付 {{payText}}</button>
+  </block>
+
+  <!-- 支付成功 -->
+  <block wx:else>
+    <view class="card center">
+      <view class="label-tag text-success">支付成功</view>
+      <view class="ok muted">订单已支付，库存已扣减，等待商家发货</view>
+      <view class="oid mono muted">#{{orderId}}</view>
+    </view>
+    <button class="btn-primary submit" bindtap="goOrders">查看我的订单</button>
+    <button class="btn-outline submit ghost" bindtap="goHome">继续购物</button>
+  </block>
+</view>

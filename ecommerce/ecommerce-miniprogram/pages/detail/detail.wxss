@@ -1,0 +1,9 @@
+.ph { height: 360rpx; background: var(--secondary); display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 72rpx; color: var(--primary); }
+.p-name { font-size: 36rpx; font-weight: 700; margin-top: 20rpx; }
+.p-desc { font-size: 26rpx; margin-top: 8rpx; }
+.price-row { display: flex; justify-content: space-between; align-items: center; margin-top: 20rpx; }
+.p-price { font-size: 44rpx; }
+.stock { font-size: 24rpx; }
+.btn-row { display: flex; gap: 16rpx; margin-top: 28rpx; }
+.buy-btn { flex: 1; }
+.tip { margin-top: 16rpx; font-size: 22rpx; }

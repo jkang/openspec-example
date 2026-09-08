@@ -617,6 +617,75 @@
 - **WHEN** 运营查看订单列表
 - **THEN** 小程序单显示「小程序」徽标（electric 色）、网页单显示「网页」徽标（muted 色）
 
+### Requirement: 小程序商品发现旅程 UI（首页/搜索/分类/详情/加购）
+
+系统 SHALL 在小程序原生工程提供**商品发现旅程**（story-miniprogram-shopping-browse / Epic 6.2，技术形态 B：独立小程序原生工程 `ecommerce/ecommerce-miniprogram/`；ZAPP 暗黑令牌 WXSS 变量等价映射，全中文真实数据）：
+
+- **首页**（`pages/index`）：真实在售商品卡片网格（与 Web 同源 `GET /api/products`）；关键词（name）搜索；价格↑/↓排序（price_asc/desc）；分类 Tabs（`GET /api/categories`）。
+- **详情页**（`pages/detail`）：商品占位图 + 名称/描述/价格（等宽 primary）/库存状态（有货/低库存/售罄 accent「已售罄」）+ 「加入购物车」（售罄禁用）。
+- **加购（R-MB-006）**：`POST /api/cart/items`（会话 userId 归属）；售罄商品加购/下单被拒（下单 OUT_OF_STOCK，R-MB-006 后端语义）。
+- **数据一致性（R-MB-008）**：小程序消费与 Web 同源后端 API，无独立数据源。
+
+- **Priority**: P0
+- **Rationale**: 买家微信内快捷找货（research 访谈 1）；后端 100% 复用（访谈 4）；决策 B 独立原生工程（用户裁定）。
+
+#### Scenario: 小程序首页浏览与选品（同源数据）
+- @e2e
+- **GIVEN** 后端服务 Web 与小程序同源，小程序渠道已启用
+- **WHEN** 小程序调用商品列表/分类/详情 API
+- **THEN** 返回与 Web 一致的商品数据（6 件真实商品；搜索/排序/分类语义一致）
+
+#### Scenario: 售罄商品下单被拒
+- @api
+- **GIVEN** 购物车含商品且随后该商品库存置零
+- **WHEN** 提交订单
+- **THEN** 返回 OUT_OF_STOCK（409），订单未创建
+
+### Requirement: 小程序购物车 + 结算 + 模拟支付 UI
+
+系统 SHALL 在小程序原生工程提供**成交旅程**（story-miniprogram-shopping-checkout / Epic 6.2，技术形态 B）：
+
+- **购物车**（`pages/cart`）：行内商品 + 数量 +/−（下限 1）+ 移除 + 合计；按会话 userId 归属（与 Web 同库）。
+- **结算**（`pages/checkout`）：商品总额 / 自动最优券（优惠让利）/ 应付金额 + 「提交订单」。
+- **提交订单（R-MC-005/006）**：绑定会话 userId；`Order.channel` 由会话来源自动继承 = MINIPROGRAM（服务端判定，UI 不传渠道、不暴露渠道概念）。
+- **模拟支付（R-MC-007）**：`POST /api/payments/{id}` → PAID（库存扣减、幂等）；成功态引导我的订单。
+
+- **Priority**: P0
+- **Rationale**: 买家微信内一气呵成成交（research 访谈 1）；channel=MINIPROGRAM 会话继承已由服务端落地（6.1 Q7）。
+
+#### Scenario: 最优券结算并下单 channel=MINIPROGRAM
+- @e2e
+- **GIVEN** 小程序渠道已启用，买家微信登录（会话 channel=MINIPROGRAM），购物车含 ¥178.00 且存在可用券
+- **WHEN** 小程序提交订单
+- **THEN** 订单创建成功，自动选择实际支付最低的最优券，应付金额含优惠
+- **AND** 订单 `channel = 'MINIPROGRAM'`（服务端按会话来源判定，小程序未传渠道）
+
+#### Scenario: 模拟支付成功（库存扣减）
+- @api
+- **GIVEN** 小程序订单处于 PENDING_PAYMENT（channel=MINIPROGRAM）
+- **WHEN** 发起模拟支付
+- **THEN** 订单 PAID、库存扣减；重复支付幂等
+
+### Requirement: 小程序我的订单 UI（列表 + 状态轨迹）
+
+系统 SHALL 在小程序原生工程提供**订单追踪旅程**（story-miniprogram-shopping-orders / Epic 6.2，技术形态 B）：
+
+- **我的订单**（`pages/orders`）：列表卡片（`#订单号` mono / 状态徽标 / 商品摘要 / 等宽 primary 金额），按会话 userId 归属（`GET /api/orders`，Web 下单与小程序下单同列表，同库同账，R-MO-001/002）。
+- **状态轨迹**：展开订单展示金额明细 + 状态步骤（待支付 → 已支付 → 已发货 → 已完成；已取消独立标注，R-MO-003/004）。
+- **C 端不展示渠道概念（Q3，R-MO-006）**：列表/详情不显示 channel。
+- 未登录访问引导登录（R-MO-005）。
+
+- **Priority**: P1
+- **Rationale**: 买家支付后微信内安心追踪订单；同源账户 Web/小程序同列表（访谈 2 王老板同账诉求）。
+
+#### Scenario: 我的订单会话归属 + 状态推进
+- @e2e
+- **GIVEN** 买家微信登录且存在已支付订单（channel=MINIPROGRAM）
+- **WHEN** 请求我的订单 API
+- **THEN** 列表返回该订单（金额/状态一致）
+- **WHEN** B 端对该订单执行发货
+- **THEN** 再次请求 → 状态 SHIPPED（已发货）
+
 ## Governance Mapping
 
 - **Bounded Context**: Shared / Cross（`domain_model.html` 映射表：`bc-shared → cap-ui`，Cross-Context）

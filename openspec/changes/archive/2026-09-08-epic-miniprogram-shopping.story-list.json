@@ -1,0 +1,32 @@
+{
+  "epicKey": "miniprogram-shopping",
+  "title": "小程序 C 端交易链路",
+  "description": "补齐小程序 C 端完整购物旅程（首页/搜索/分类/详情、购物车、结算自动最优券、模拟支付、我的订单状态轨迹），后端 100% 复用既有 Catalog/Cart/Coupon/Order API 与 6.1 会话/channel 底座；技术形态 B（独立小程序原生工程）；Web 与小程序同库实时一致（Phase 6 Epic 6.2）。",
+  "stories": [
+    {
+      "id": "story-miniprogram-shopping-browse",
+      "title": "小程序商品发现（首页/搜索/分类/详情）",
+      "description": "小程序首页（真实 6 商品卡片）+ 关键词搜索 + 价格排序 + 分类筛选 + 商品详情（价格/库存/描述）+ 加入购物车（会话归属）；复用 GET /api/products / {id} / categories",
+      "status": "done",
+      "changeName": "story-miniprogram-shopping-browse",
+      "priority": "P0"
+    },
+    {
+      "id": "story-miniprogram-shopping-checkout",
+      "title": "小程序购物车 + 结算 + 模拟支付",
+      "description": "购物车（数量/移除/合计，会话归属）→ 结算（自动最优券）→ 下单（会话 channel 继承 MINIPROGRAM）→ 模拟支付 → 成功态；复用购物车/优惠券/下单/支付 API",
+      "status": "done",
+      "changeName": "story-miniprogram-shopping-checkout",
+      "priority": "P0"
+    },
+    {
+      "id": "story-miniprogram-shopping-orders",
+      "title": "小程序我的订单（列表 + 状态轨迹）",
+      "description": "我的订单列表（订单号/状态/金额/摘要）+ 展开详情（状态轨迹：待支付→已支付→已发货→已完成/已取消）；复用 GET /api/orders 会话归属（Web 与小程序同库）",
+      "status": "done",
+      "changeName": "story-miniprogram-shopping-orders",
+      "priority": "P1"
+    }
+  ],
+  "updatedAt": "2026-09-08T20:00:00Z"
+}

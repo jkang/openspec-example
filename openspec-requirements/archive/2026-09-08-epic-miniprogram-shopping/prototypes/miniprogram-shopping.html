@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>小程序 C 端交易旅程 · Epic 6.2 原型（ZAPP 暗黑）</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script>
+    /* ZAPP 暗黑设计令牌 —— 唯一事实来源：docs/baseline/design-system/ */
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            background: '#08080E', card: '#0F0F1C', foreground: '#EFEFFA',
+            muted: '#15152A', 'muted-foreground': '#6E6E9A', secondary: '#1A1A2E',
+            primary: '#C8FF00', 'primary-foreground': '#08080E',
+            accent: '#FF2D6B', 'accent-foreground': '#FFFFFF',
+            electric: '#3B6DFF', warning: '#FF9A00', success: '#00E5A0',
+            border: '#222238', ring: '#C8FF00',
+          },
+          fontFamily: {
+            display: ['"Exo 2"', 'sans-serif'],
+            sans: ['"DM Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+        },
+      },
+    };
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Exo+2:wght@700;800;900&family=DM+Sans:wght@300;400;500;700&family=JetBrains+Mono:wght@400;500;700&display=swap');
+    * { border-radius: 0 !important; box-shadow: none !important; }
+    html, body { background-color: #08080E; }
+    [v-cloak] { display: none; }
+    button { cursor: pointer; }
+    .wechat-green { background-color: #07C160 !important; color: #fff; }
+  </style>
+</head>
+<body class="bg-background text-foreground font-sans antialiased">
+<div id="app" v-cloak class="min-h-screen bg-background text-foreground font-sans">
+
+  <!-- ═══ 顶部 ═══ -->
+  <header class="h-16 bg-card border-b border-border flex items-center justify-between px-6 sticky top-0 z-50">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-primary flex items-center justify-center">
+        <span class="font-display font-black text-primary-foreground text-sm">M</span>
+      </div>
+      <span class="font-display font-black text-lg uppercase tracking-tight text-foreground">Minimal Store</span>
+      <span class="font-mono text-[10px] uppercase tracking-widest text-muted-foreground border border-border px-2 py-0.5 hidden sm:inline">小程序 · C 端旅程原型</span>
+    </div>
+    <div class="flex items-center gap-2">
+      <span class="font-mono text-[10px] uppercase tracking-widest text-muted-foreground hidden md:inline">角色</span>
+      <div class="flex border border-border">
+        <button @click="resetFlow" :class="['px-3 py-1.5 font-mono text-xs uppercase tracking-wider', true ? 'bg-primary text-primary-foreground' : '']">买家 · 林采购</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-screen-xl mx-auto px-6 py-8 grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+    <!-- ═══ 左栏：旅程说明 + 重置 ═══ -->
+    <section class="lg:col-span-4 space-y-6">
+      <div>
+        <h1 class="font-display font-black uppercase tracking-tight text-2xl mb-1">小程序 C 端交易旅程</h1>
+        <p class="font-mono text-xs uppercase tracking-widest text-muted-foreground">Epic 6.2 · frontend-ui · 复用后端 API（零后端改动）· 微信登录会话 → Order.channel=MINIPROGRAM</p>
+      </div>
+
+      <div class="border border-border bg-card p-6 text-xs text-muted-foreground space-y-2">
+        <h3 class="font-display font-bold uppercase tracking-tight text-foreground text-sm mb-2">本页演示的完整旅程</h3>
+        <p>① <span class="text-foreground">首页浏览</span>：真实 6 商品卡片 + 顶部搜索 + 分类筛选</p>
+        <p>② <span class="text-foreground">商品详情</span>：价格 / 库存 / 描述 + 「加入购物车」</p>
+        <p>③ <span class="text-foreground">购物车</span>：数量 + / −、移除、合计（会话归属）</p>
+        <p>④ <span class="text-foreground">结算</span>：自动最优券 → 应付金额 → 确认下单</p>
+        <p>⑤ <span class="text-foreground">模拟支付</span>：订单 PAID、库存扣减</p>
+        <p>⑥ <span class="text-foreground">我的订单</span>：状态轨迹（待支付→已支付→已发货→已完成/已取消）</p>
+      </div>
+
+      <div class="border border-border bg-card p-6 text-xs text-muted-foreground space-y-2">
+        <h3 class="font-display font-bold uppercase tracking-tight text-foreground text-sm mb-2">与后端的一致性（决策口径）</h3>
+        <p>· 全部数据来自既有后端 API 语义（本原型以真实 6 商品 + 真实价格构造，供交互确认）</p>
+        <p>· 小程序登录（6.1 wechat-auth）→ 会话 channel=MINIPROGRAM → 下单自动写 Order.channel（Q7，本页无需感知渠道概念）</p>
+        <p>· 模拟支付复用既有支付语义；Web/小程序同库同账</p>
+      </div>
+
+      <button @click="resetFlow" class="border border-border text-muted-foreground px-4 py-2 text-xs font-mono uppercase tracking-widest hover:text-foreground hover:border-primary">重置旅程演示</button>
+    </section>
+
+    <!-- ═══ 右栏：手机模拟器（小程序画面） ═══ -->
+    <section class="lg:col-span-8 flex justify-center">
+      <div class="w-[375px] bg-background border-2 border-border relative min-h-[700px] flex flex-col">
+        <!-- 小程序导航 -->
+        <div class="bg-card border-b border-border px-4 py-3 flex items-center justify-between shrink-0">
+          <div class="flex items-center gap-2">
+            <div class="w-7 h-7 bg-primary flex items-center justify-center">
+              <span class="font-display font-black text-primary-foreground text-xs">M</span>
+            </div>
+            <span class="font-display font-black uppercase tracking-tight text-sm">Minimal Store</span>
+          </div>
+          <span class="font-mono text-[9px] uppercase tracking-widest text-muted-foreground">微信小程序</span>
+        </div>
+
+        <!-- 页面标题 -->
+        <div class="px-4 pt-3 pb-1 shrink-0">
+          <template v-if="page === 'home'">
+            <div class="flex gap-2">
+              <input v-model.trim="searchText" type="text" placeholder="搜索商品..."
+                class="flex-1 border border-border bg-muted px-3 py-2 text-sm focus:outline-none focus:border-primary" @input="page='home'">
+              <button @click="sortToggle = !sortToggle" class="border border-border px-3 py-2 text-xs font-mono whitespace-nowrap"
+                :class="sortToggle ? 'border-primary text-primary' : 'text-muted-foreground'">价格{{ sortToggle ? '↑' : '↓' }}</button>
+            </div>
+            <div class="flex gap-1.5 mt-2 overflow-x-auto pb-1">
+              <button v-for="c in [{id:null,name:'全部'},...categories]" :key="c.id || 'all'" @click="activeCategory = c.id"
+                class="border px-3 py-1 text-xs whitespace-nowrap"
+                :class="activeCategory === c.id ? 'border-primary text-primary' : 'border-border text-muted-foreground'">{{ c.name }}</button>
+            </div>
+          </template>
+          <template v-else-if="page === 'detail'">
+            <div class="flex items-center gap-2">
+              <button @click="page='home'" class="text-muted-foreground text-sm border border-border px-2 py-1">‹ 返回</button>
+              <h2 class="font-display font-black uppercase tracking-tight text-base">商品详情</h2>
+            </div>
+          </template>
+          <template v-else-if="page === 'cart'">
+            <h2 class="font-display font-black uppercase tracking-tight text-base">购物车</h2>
+          </template>
+          <template v-else-if="page === 'checkout'">
+            <div class="flex items-center gap-2">
+              <button @click="page='cart'" class="text-muted-foreground text-sm border border-border px-2 py-1">‹ 返回</button>
+              <h2 class="font-display font-black uppercase tracking-tight text-base">结算确认</h2>
+            </div>
+          </template>
+          <template v-else-if="page === 'orders'">
+            <h2 class="font-display font-black uppercase tracking-tight text-base">我的订单</h2>
+          </template>
+          <template v-else-if="page === 'success'">
+            <h2 class="font-display font-black uppercase tracking-tight text-base">订单完成</h2>
+          </template>
+        </div>
+
+        <!-- 内容滚动区 -->
+        <div class="flex-1 overflow-y-auto px-4 py-3">
+
+          <!-- ── 首页：商品列表 ── -->
+          <div v-if="page === 'home'" class="grid grid-cols-2 gap-3">
+            <div v-for="p in filteredProducts" :key="p.id" @click="openDetail(p)" class="border border-border bg-card p-3 cursor-pointer hover:border-primary">
+              <div class="h-20 bg-secondary flex items-center justify-center mb-2">
+                <span class="font-display font-black text-primary text-lg">{{ p.logo }}</span>
+              </div>
+              <p class="text-xs font-semibold leading-tight">{{ p.name }}</p>
+              <p class="text-[10px] text-muted-foreground mt-0.5 truncate">{{ p.description }}</p>
+              <p class="font-mono font-bold text-primary text-sm mt-1">¥{{ (p.priceCents / 100).toFixed(2) }}</p>
+            </div>
+            <div v-if="filteredProducts.length === 0" class="col-span-2 py-12 text-center text-sm text-muted-foreground">无匹配商品</div>
+          </div>
+
+          <!-- ── 详情页 ── -->
+          <div v-else-if="page === 'detail' && currentProduct">
+            <div class="border border-border bg-card">
+              <div class="h-36 bg-secondary flex items-center justify-center">
+                <span class="font-display font-black text-primary text-3xl">{{ currentProduct.logo }}</span>
+              </div>
+              <div class="p-4">
+                <h3 class="font-display font-bold text-lg">{{ currentProduct.name }}</h3>
+                <p class="text-sm text-muted-foreground mt-1">{{ currentProduct.description }}</p>
+                <div class="flex items-center justify-between mt-3">
+                  <span class="font-mono font-bold text-primary text-xl">¥{{ (currentProduct.priceCents / 100).toFixed(2) }}</span>
+                  <span class="text-xs" :class="currentProduct.stock > 10 ? 'text-success' : currentProduct.stock > 0 ? 'text-warning' : 'text-accent'">
+                    {{ currentProduct.stock > 0 ? `库存 ${currentProduct.stock} 件` : '已售罄' }}
+                  </span>
+                </div>
+                <div class="flex gap-2 mt-4">
+                  <button v-if="currentProduct.stock > 0" @click="addToCart(currentProduct)" class="flex-1 bg-primary text-primary-foreground py-2.5 text-sm font-bold">加入购物车</button>
+                  <button v-if="currentProduct.stock > 0" @click="addToCart(currentProduct); page='cart'" class="flex-1 border border-primary text-primary py-2.5 text-sm font-semibold">立即购买</button>
+                  <button v-else disabled class="flex-1 border border-border text-muted-foreground py-2.5 text-sm">已售罄</button>
+                </div>
+              </div>
+            </div>
+            <p v-if="cartToast" class="border border-success text-success px-3 py-2 text-xs mt-3">✓ 已加入购物车（{{ cartToast }}）</p>
+          </div>
+
+          <!-- ── 购物车 ── -->
+          <div v-else-if="page === 'cart'">
+            <div v-if="cartItems.length === 0" class="border border-border bg-card py-16 text-center text-sm text-muted-foreground">购物车为空</div>
+            <div v-else class="space-y-3">
+              <div v-for="(it, idx) in cartItems" :key="it.productId" class="border border-border bg-card p-3 flex items-center gap-3">
+                <div class="w-12 h-12 bg-secondary flex items-center justify-center">
+                  <span class="font-display font-black text-primary text-xs">{{ it.logo }}</span>
+                </div>
+                <div class="flex-1">
+                  <p class="text-xs font-semibold">{{ it.name }}</p>
+                  <p class="font-mono text-primary text-xs mt-0.5">¥{{ (it.priceCents / 100).toFixed(2) }}</p>
+                </div>
+                <div class="flex items-center gap-1">
+                  <button @click="changeQty(idx, -1)" class="w-7 h-7 border border-border text-sm">−</button>
+                  <span class="w-7 text-center text-sm font-mono">{{ it.quantity }}</span>
+                  <button @click="changeQty(idx, 1)" class="w-7 h-7 border border-border text-sm">+</button>
+                </div>
+                <button @click="removeCart(idx)" class="text-xs text-muted-foreground border border-border px-2 py-1">移除</button>
+              </div>
+              <div class="border border-border bg-card p-4 flex items-center justify-between">
+                <span class="text-sm">合计（{{ totalQty }} 件）</span>
+                <span class="font-mono font-bold text-primary text-lg">¥{{ (subtotalCents / 100).toFixed(2) }}</span>
+              </div>
+              <button @click="goCheckout" class="w-full bg-primary text-primary-foreground py-3 text-sm font-bold">去结算</button>
+            </div>
+          </div>
+
+          <!-- ── 结算 ── -->
+          <div v-else-if="page === 'checkout'">
+            <div class="border border-border bg-card p-4 space-y-3">
+              <div class="flex justify-between text-sm"><span>商品总额</span><span class="font-mono">¥{{ (subtotalCents / 100).toFixed(2) }}</span></div>
+              <div class="flex justify-between text-sm">
+                <span>优惠（最优券 {{ bestCouponName }}）</span>
+                <span class="font-mono text-accent">-¥{{ (discountCents / 100).toFixed(2) }}</span>
+              </div>
+              <div class="border-t border-border pt-3 flex justify-between items-center">
+                <span class="text-sm font-semibold">应付金额</span>
+                <span class="font-mono font-bold text-primary text-xl">¥{{ (payCents / 100).toFixed(2) }}</span>
+              </div>
+              <p class="text-[10px] text-muted-foreground">模拟支付 · 与 Web 一致；订单 channel=MINIPROGRAM（自动）</p>
+            </div>
+            <button @click="confirmOrder" class="w-full bg-primary text-primary-foreground py-3 text-sm font-bold mt-4">提交订单</button>
+          </div>
+
+          <!-- ── 支付/成功 ── -->
+          <div v-else-if="page === 'success'">
+            <div v-if="!lastPaid" class="text-center py-16">
+              <p class="font-mono text-xs uppercase tracking-widest text-muted-foreground mb-3">订单已创建 · 待支付</p>
+              <p class="text-sm text-muted-foreground mb-6">库存将在支付成功后扣减（模拟支付）</p>
+              <button @click="payOrder" class="bg-primary text-primary-foreground w-full py-3 text-sm font-bold">模拟支付 ¥{{ (lastOrder.payCents / 100).toFixed(2) }}</button>
+            </div>
+            <div v-else class="text-center py-12">
+              <p class="font-mono text-xs uppercase tracking-widest text-success mb-3">✓ 支付成功</p>
+              <p class="text-sm text-foreground font-semibold mb-1">订单已支付，库存已扣减，等待商家发货</p>
+              <p class="text-xs text-muted-foreground mb-6">订单号 #{{ lastOrder.id }}</p>
+              <button @click="page='orders'" class="border border-primary text-primary w-full py-3 text-sm font-semibold">查看我的订单</button>
+              <button @click="resetFlow" class="border border-border text-muted-foreground w-full py-2.5 text-xs mt-2">继续购物</button>
+            </div>
+          </div>
+
+          <!-- ── 我的订单 ── -->
+          <div v-else-if="page === 'orders'" class="space-y-3">
+            <div v-if="orders.length === 0" class="border border-border bg-card py-16 text-center text-sm text-muted-foreground">暂无订单</div>
+            <div v-for="o in orders" :key="o.id" class="border border-border bg-card">
+              <div class="p-3 border-b border-border flex items-center justify-between">
+                <span class="font-mono text-[10px] text-muted-foreground">#{{ o.id }}</span>
+                <span class="text-xs font-bold border border-border px-2 py-0.5">{{ o.statusLabel }}</span>
+              </div>
+              <div class="p-3 flex justify-between text-sm">
+                <span>{{ o.summary }}</span>
+                <span class="font-mono font-bold text-primary">¥{{ (o.payCents / 100).toFixed(2) }}</span>
+              </div>
+              <div class="px-3 pb-3 flex items-center gap-1 text-[10px] text-muted-foreground">
+                <span v-for="(s, i) in ['待支付','已支付','已发货','已完成']" :key="i"
+                  :class="['px-1.5 py-0.5 border', statusStep(o.status) >= i ? 'border-primary text-foreground font-bold' : 'border-border']">{{ s }}</span>
+                <span v-if="o.status === 'CANCELLED'" class="ml-1 px-1.5 py-0.5 border border-primary text-foreground font-bold">已取消</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 底部 tabBar -->
+        <div class="border-t border-border bg-card px-4 py-2.5 flex justify-around shrink-0">
+          <button @click="page='home'" :class="['flex flex-col items-center text-[10px]', page==='home' ? 'text-primary' : 'text-muted-foreground']">
+            <span class="text-base leading-none">⌕</span><span>首页</span></button>
+          <button @click="page='home'" :class="['flex flex-col items-center text-[10px]', 'text-muted-foreground']">
+            <span class="text-base leading-none">☰</span><span>分类</span></button>
+          <button @click="page='cart'" :class="['relative flex flex-col items-center text-[10px]', page==='cart' ? 'text-primary' : 'text-muted-foreground']">
+            <span class="text-base leading-none">⊕</span><span>购物车</span>
+            <span v-if="totalQty > 0" class="absolute -top-1 right-1 bg-accent text-accent-foreground text-[8px] font-bold w-3.5 h-3.5 flex items-center justify-center font-mono">{{ totalQty > 9 ? '9+' : totalQty }}</span></button>
+          <button @click="page='orders'" :class="['flex flex-col items-center text-[10px]', page==='orders' ? 'text-primary' : 'text-muted-foreground']">
+            <span class="text-base leading-none">★</span><span>我的</span></button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script>
+    const { createApp, computed } = Vue;
+    createApp({
+      data() {
+        return {
+          page: 'home',
+          searchText: '',
+          activeCategory: null,
+          sortToggle: false,
+          cartToast: '',
+          lastOrder: null,
+          lastPaid: false,
+          categories: [
+            { id: 'cat-keyboard', name: '键鼠外设' },
+            { id: 'cat-display', name: '显示设备' },
+            { id: 'cat-desk', name: '桌面收纳' },
+            { id: 'cat-audio', name: '音频设备' },
+          ],
+          products: [
+            { id: '1', name: '极简机械键盘', description: '84键紧凑布局，红轴', priceCents: 29900, stock: 99, logo: 'KB', categoryId: 'cat-keyboard' },
+            { id: '2', name: '无线办公鼠标', description: '静音按键，人体工学设计', priceCents: 8900, stock: 99, logo: 'MS', categoryId: 'cat-keyboard' },
+            { id: '3', name: '高清显示器', description: '27英寸 4K分辨率', priceCents: 129900, stock: 99, logo: 'MO', categoryId: 'cat-display' },
+            { id: '4', name: '桌面收纳架', description: '实木材质，双层结构', priceCents: 4500, stock: 99, logo: 'RK', categoryId: 'cat-desk' },
+            { id: '5', name: '铝合金笔记本支架', description: '折叠便携，多档调节', priceCents: 6800, stock: 99, logo: 'ST', categoryId: 'cat-desk' },
+            { id: '6', name: '桌面拾音氛围灯', description: 'RGB色彩，支持音频同步', priceCents: 12800, stock: 99, logo: 'LA', categoryId: 'cat-audio' },
+          ],
+          cart: [], // {productId, quantity}
+          orders: [],
+          coupons: [
+            { id: 'FLAT10', name: '满 50 减 10', type: 'FLAT', value: 1000, minSpendCents: 5000 },
+          ],
+          currentProduct: null,
+        };
+      },
+      computed: {
+        filteredProducts() {
+          let list = this.products.slice();
+          if (this.activeCategory) list = list.filter(p => p.categoryId === this.activeCategory);
+          if (this.searchText) list = list.filter(p => p.name.includes(this.searchText) || p.description.includes(this.searchText));
+          if (this.sortToggle) list.sort((a, b) => a.priceCents - b.priceCents);
+          else list.sort((a, b) => b.priceCents - a.priceCents);
+          return list;
+        },
+        cartItems() {
+          return this.cart.map(it => {
+            const p = this.products.find(x => x.id === it.productId);
+            return { ...it, name: p.name, logo: p.logo, priceCents: p.priceCents };
+          });
+        },
+        totalQty() { return this.cart.reduce((n, i) => n + i.quantity, 0); },
+        subtotalCents() { return this.cart.reduce((n, i) => n + i.priceCents * i.quantity, 0); },
+        bestCoupon() {
+          const sub = this.subtotalCents;
+          const usable = this.coupons.filter(c => sub >= c.minSpendCents);
+          if (!usable.length) return null;
+          // 最优 = 减免最大
+          return usable.map(c => ({ ...c, saving: Math.min(c.type === 'FLAT' ? c.value : Math.floor(sub * (10 - c.value) / 10), c.type === 'FLAT' ? c.value : sub - Math.floor(sub * c.value / 10)) }))
+            .sort((a, b) => b.saving - a.saving)[0];
+        },
+        bestCouponName() { return this.bestCoupon ? this.bestCoupon.name : '无可用券'; },
+        discountCents() { return this.bestCoupon ? this.bestCoupon.saving : 0; },
+        payCents() { return Math.max(0, this.subtotalCents - this.discountCents); },
+      },
+      methods: {
+        openDetail(p) { this.currentProduct = p; this.page = 'detail'; this.cartToast = ''; },
+        addToCart(p) {
+          const line = this.cart.find(i => i.productId === p.id);
+          if (line) line.quantity += 1; else this.cart.push({ productId: p.id, quantity: 1 });
+          this.cartToast = p.name;
+        },
+        changeQty(idx, d) {
+          const it = this.cart[idx];
+          it.quantity += d;
+          if (it.quantity <= 0) this.cart.splice(idx, 1);
+        },
+        removeCart(idx) { this.cart.splice(idx, 1); },
+        goCheckout() { if (this.cart.length) this.page = 'checkout'; },
+        confirmOrder() {
+          const id = `ORD-${Date.now().toString().slice(-6)}`;
+          const summary = this.cartItems.map(i => `${i.name} × ${i.quantity}`).join('、');
+          this.lastOrder = { id, payCents: this.payCents, summary };
+          this.lastPaid = false;
+          this.cart = [];
+          this.page = 'success';
+        },
+        payOrder() {
+          this.lastPaid = true;
+          this.orders.unshift({ id: this.lastOrder.id, status: 'PAID', statusLabel: '已支付', summary: this.lastOrder.summary, payCents: this.lastOrder.payCents });
+        },
+        statusStep(s) { return { PENDING_PAYMENT: 0, PAID: 1, SHIPPED: 2, COMPLETED: 3, CANCELLED: 0 }[s]; },
+        resetFlow() {
+          this.page = 'home'; this.searchText = ''; this.activeCategory = null; this.sortToggle = false;
+          this.cartToast = ''; this.lastOrder = null; this.lastPaid = false; this.cart = []; this.orders = [];
+          this.currentProduct = null;
+        },
+      },
+    }).mount('#app');
+  </script>
+</body>
+</html>

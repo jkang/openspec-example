@@ -1,0 +1,14 @@
+.center { text-align: center; padding: 80rpx 24rpx; }
+.login { margin-top: 24rpx; width: 100%; }
+.order { margin-bottom: 16rpx; }
+.head { display: flex; justify-content: space-between; align-items: center; border-bottom: 2rpx solid var(--border); padding-bottom: 12rpx; }
+.oid { font-size: 22rpx; }
+.body { display: flex; justify-content: space-between; align-items: center; padding: 20rpx 0; }
+.sum { font-size: 26rpx; flex: 1; margin-right: 16rpx; }
+.amt { font-size: 32rpx; }
+.detail { border-top: 2rpx solid var(--border); padding-top: 16rpx; }
+.drow { display: flex; justify-content: space-between; padding: 6rpx 0; font-size: 24rpx; }
+.track { display: flex; gap: 8rpx; margin-top: 16rpx; flex-wrap: wrap; }
+.step { font-size: 20rpx; padding: 4rpx 12rpx; border: 2rpx solid var(--border); color: var(--muted-fg); }
+.step.on { border-color: var(--primary); color: var(--foreground); font-weight: 700; }
+.step.accent { border-color: var(--accent); color: var(--accent); }
