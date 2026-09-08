@@ -6,7 +6,7 @@ updated_at: 2026-08-31
 
 # 产品路线图 (Product Roadmap)
 
-本文档定义了 OpenSpec-Practice 极简电商系统的高阶业务规划。
+本文档定义了 OpenSpec-Practice 小型电商系统的高阶业务规划。
 AI Agent 在执行需求探索（`/req:explore`）阶段时，**必须首先查阅此文档**，确保新构思的需求符合当前所处的业务阶段与产品价值方向。
 
 ---

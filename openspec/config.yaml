@@ -3,7 +3,7 @@ schema: spec-driven
 
 # 全局上下文注入
 context: |
-  项目: ecommerce-mini - 一个展示 OpenSpec 规范驱动开发 (SDD) 的电商系统，采用 ZAPP Design System。
+  项目: ecommerce-mini - 一个展示 OpenSpec 规范驱动开发 (SDD) 的小型电商系统，采用 ZAPP Design System。
   治理文档 (唯一事实来源):
     - 流程 SOP: docs/SOPS/SDD_WORKFLOW.md (分支流转与指令规范)
     - 产品定位: docs/PRODUCT.md (Elevator Pitch 与业务导向)

@@ -149,7 +149,7 @@
 ### Requirement: UI 文案语言约束
 系统 SHALL 保证 C 端店铺首页、结算成功弹窗与 B 端运营后台中所有用户可见的交互文案（按钮、标题、空状态、状态反馈、提示语）均为中文。仅允许以下两类豁免保留英文：品牌标识（如 `Minimal Store`）与领域技术枚举值（如 `FLAT`、`PERCENTAGE`、`ACTIVE` 等状态/类型代码及括号标注）。
 - **Priority**: P0
-- **Rationale**: 语言一致性是「可视即价值」极简电商的基本体验底线，`docs/FRONTEND.md` 与 `openspec/config.yaml` 均强制「UI 交互界面必须完全使用中文」；英文残留破坏产品一致性并造成买家认知负担。
+- **Rationale**: 语言一致性是「可视即价值」小型电商的基本体验底线，`docs/FRONTEND.md` 与 `openspec/config.yaml` 均强制「UI 交互界面必须完全使用中文」；英文残留破坏产品一致性并造成买家认知负担。
 
 #### Scenario: C 端首页按钮与文案中文化
 - @e2e

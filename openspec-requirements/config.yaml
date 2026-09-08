@@ -3,7 +3,7 @@ schema: req-sdd
 
 # 需求侧上下文注入
 context: |
-  项目: ecommerce-mini - 一个展示 OpenSpec 规格驱动开发 (SDD) 的极简电商系统。
+  项目: ecommerce-mini - 一个展示 OpenSpec 规格驱动开发 (SDD) 的小型电商系统。
   需求侧工作区: openspec-requirements/ - 产品经理 (PM) 专属，仅用于大块 Epic 需求。
   需求漏斗: research → explore → prototype(Epic整体) → storymap → story（业务面交付物）。
   需求分析工具箱: openspec-requirements/tools/ - 8 个 AI4PM 需求工程工具（可选增强，产物在 epics/<key>/analysis/ 或 docs/baseline/design-system/）。
