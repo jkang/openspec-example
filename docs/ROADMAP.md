@@ -26,7 +26,8 @@ AI Agent 在执行需求探索（`/req:explore`）阶段时，**必须首先查�
 - **销售报表看板（Phase 5 Epic 5.1 完成）**: B 端销售总览（4 指标卡：销售额/订单量/客单价/优惠让利 + 今日/近7日/近30日切换 + SVG 趋势 + 优惠券效果）+ 商品 TOP10 / 分类 TOP10 排行；新增 `role=老板`（只读看板视角）；仅运营/老板可访问（客服/未登录 403）；新增 `data-insights` BC 与 `sales-dashboard` capability（Baseline Sync 已完成）。
 - **库存预警与补货建议（Phase 5 Epic 5.2 完成）**: B 端库存洞察——低库存预警列表（`stock ≤ 阈值` 入列 + 已售罄置顶 + 超卖风险标识）、阈值两级配置（全局默认 10 件 + 商品级覆盖，仅运营可写，落盘 `data/stock-config.json` 即时生效）、补货建议（近7日日均销量 → 预计售罄天数 → 建议补货量 = `max(0, ⌈日均×7⌉ − stock)`，到货周期固定 7 天，无销量展示「暂无销量」）、老板只读全局库存健康度总览（预警/已售罄/超卖风险计数）；仅运营/老板可访问（客户/客服 403、未登录 401）；新增 `stock-insight` capability（data-insights BC，Baseline Sync 已完成）。
 - **持久化与真实数据**: JSON 文件持久化（products/categories/coupons/issuances/orders/carts/users/sessions/stock-config/channel-config），真实数据落地。
-- **SDD 工作流**: 基于 OpenSpec 的规格驱动开发闭环，Epic/Story/Bug Fix/Tech Debt 共 31 个变更已归档；E2E Cucumber 覆盖 59 场景（含小程序渠道 4 + 微信登录 6 + 订单渠道 5 场景）。
+- **SDD 工作流**: 基于 OpenSpec 的规格驱动开发闭环，Epic/Story/Bug Fix/Tech Debt 共 31 个变更已归档；E2E Cucumber 覆盖 65 场景（含小程序渠道 4 + 微信登录 6 + 订单渠道 5 + 小程序购物旅程 6 契约场景）。
+- **小程序 C 端交易链路（Phase 6 Epic 6.2 完成）**: 微信小程序内完整购物旅程（真实 6 商品浏览/名称搜索/价格排序/分类筛选/商品详情/加购 → 购物车（会话归属）→ 结算（自动最优券）→ 提交订单（Order.channel=MINIPROGRAM 会话自动继承）→ 模拟支付 → 我的订单（列表 + 状态轨迹：待支付→已支付→已发货→已完成/已取消））；Web 与小程序同库同源实时一致；技术形态 B：独立小程序原生工程（`ecommerce/ecommerce-miniprogram/`，微信开发者工具可打开，仓库以 HTML 原型 + 后端契约 E2E 验证降级）；E2E Cucumber 覆盖 65 场景。
 - **微信小程序渠道接入与账户打通（Phase 6 Epic 6.1 完成）**: B 端小程序渠道配置（AppID / AppSecret 脱敏回显 / 商户号纯预留 / 启用状态开关，仅运营可写、老板只读，落盘 `data/channel-config.json` 即时生效；停用 → 新微信登录拒绝 `CHANNEL_DISABLED`、既有会话照常）+ 微信授权登录（openid 存 `User` 一对一，`wx.login()` code → code2session 换 openid → 命中直连同源账户 / 未命中引导手机号绑定，撞号提示登录既有账号再绑定不合并）+ 订单渠道标识（`Order.channel` 会话来源继承防伪造，B 端订单列表展示「小程序/网页」）；mock 微信网关（测试环境固定映射）；新增 `Channel Context` BC + `wechat-auth` / `miniprogram-channel` capability taxonomy（Baseline Sync 已完成）。
 
 ### 🔍 现状评估 (Product Expert Review)
@@ -47,7 +48,7 @@ AI Agent 在执行需求探索（`/req:explore`）阶段时，**必须首先查�
 - `User` 角色已含 `客户 / 运营 / 客服 / 老板` + **`openid`**（微信登录因子）→ B 端权限模型完整（老板只读看板/预警视角）+ 微信渠道账户打通。
 - `domain_model.html` 前瞻 ReadModel `Operator 库存看板` 已扩展并落地（预警 + 补货建议口径）；新增 `Channel Context` BC 与 `wechat-auth` / `miniprogram-channel` capability（Epic 6.1 完成）。
 
-**结论**: 「订单生命周期与履约闭环」（Phase 3）+「用户资产与账户体系」（Phase 4）+「销售报表看板」（Epic 5.1）+「库存预警与补货建议」（Epic 5.2）+「微信小程序渠道接入与账户打通」（Epic 6.1）均已交付。**Phase 6 Epic 6.1（渠道底座）Exit Criteria 达成**；下一阶段：**Epic 6.2 小程序 C 端购物链路**（在 6.1 渠道 + 同源账户 + channel 标识之上复用既有 Catalog/Cart/Coupon/Order API 构建移动端购物旅程）。
+**结论**: 「订单生命周期与履约闭环」（Phase 3）+「用户资产与账户体系」（Phase 4）+「销售报表看板」（Epic 5.1）+「库存预警与补货建议」（Epic 5.2）+「微信小程序渠道接入与账户打通」（Epic 6.1）+「小程序 C 端交易链路」（Epic 6.2）均已交付，**Phase 6 Exit Criteria 全部达成**。下一阶段：**Phase 7 回款与应收账款闭环**（产品差异化终点）。
 
 ---
 
@@ -108,7 +109,7 @@ AI Agent 在执行需求探索（`/req:explore`）阶段时，**必须首先查�
 
 > 各阶段为高价值方向，进入前需重新评估现状与优先级。
 
-### 📍 当前阶段 (Current Phase) — Phase 6: 微信小程序渠道（C 端移动化入口）🔄 进行中
+### 📍 当前阶段 (Current Phase) — Phase 6: 微信小程序渠道（C 端移动化入口）✅ 已完成
 
 > **Epic 6.1（渠道接入与账户打通）已交付**（2026-09-08：渠道配置 / 微信授权登录同源打通 / 订单渠道标识，Baseline Sync 已完成）。当前进行 **Epic 6.2 小程序 C 端购物链路**。
 
@@ -119,12 +120,12 @@ AI Agent 在执行需求探索（`/req:explore`）阶段时，**必须首先查�
     - 微信授权登录（openid 存 User 一对一）→ 手机号绑定（撞号提示登录既有账号不合并）→ 复用现有 User 账户/会话体系（同源账户，不做独立用户池）。
     - B 端订单管理展示订单渠道标识（`channel=MINIPROGRAM`，会话来源继承防伪造），小程序订单可正常发货/取消。
     - 新增 `Channel Context` BC + `wechat-auth` / `miniprogram-channel` capability taxonomy（Baseline Sync 已完成）。
-  - **Epic 6.2 `epic-miniprogram-shopping` — 小程序 C 端交易链路** 🔄 待启动:
+  - **Epic 6.2 `epic-miniprogram-shopping` — 小程序 C 端交易链路** ✅ 已交付（2026-09-08）:
     - 商品浏览 / 关键词搜索 / 分类 / 详情、购物车、结算（优惠券最优核销）、模拟支付、我的订单（列表 + 状态轨迹）。
     - 完全复用现有 Catalog / Cart / Coupon / Order 后端 API 与数据源，Web 与小程序同库实时一致。
 - **产品理由**: 目标买家（贸易型中小企业客户）日常活跃于微信，小程序是零安装、低门槛的移动购物入口，直接承接"订单散落在表格、回款在群聊"痛点中买家侧的数字化下单诉求；复用 Phase 3-5 沉淀的交易/库存/营销闭环 + Epic 6.1 渠道/账户底座，边际成本低，兑现"可视即价值"。
 - **代表性 Epic**: `epic-miniprogram-channel`（✅ 已完成）/ `epic-miniprogram-shopping`（进行中）
-- **触发条件**: Phase 5 Exit Criteria 已全达成（含 Epic 5.2 库存预警交付）✅ 可启动；Epic 6.1 底座已交付（2026-09-08）✅ Epic 6.2 可启动。
+- **触发条件**: Phase 5 Exit Criteria 已全达成 ✅ 可启动；Epic 6.1 + 6.2 已全部交付（2026-09-08）✅ Phase 6 完成，可进入 Phase 7 评估。
 - **Explore Guardrails（Phase 6 硬约束）**:
   - **B/C 双端视角（强约束）**: 小程序是 C 端触点，但渠道配置（appid/secret/商户号）、订单渠道标识、用户绑定管理是 B 端承诺项；严禁只设计 C 端。
   - **同源账户**: 小程序用户与 Web 用户同一 User 表，openid/手机号只是新的登录因子，不做数据孤岛。
