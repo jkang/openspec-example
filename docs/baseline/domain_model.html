@@ -391,8 +391,8 @@
                     <div>
                         <h3 class="section-title">1. Bounded Context Map</h3>
                         <div class="section-desc">
-                            用上下文边界而不是技术模块来定义系统职责。重点描述 Catalog、Cart、Coupon、Order、User
-                            之间交换的业务事实，以及哪些规则在边界内被维护。
+                            用上下文边界而不是技术模块来定义系统职责。重点描述 Catalog、Cart、Coupon、Order、User、Channel、
+                            Data Insights 之间交换的业务事实，以及哪些规则在边界内被维护。
                         </div>
                     </div>
                 </div>
@@ -500,7 +500,7 @@
                 </div>
             </section>
 
-            <div class="footer-note">Last Updated: 2026-08-31</div>
+            <div class="footer-note">Last Updated: 2026-09-08</div>
         </div>
     </div>
 
@@ -870,7 +870,13 @@
                 ['DataInsights', '销售口径约束', '销售额=SUM(actualPaidCents)，仅计 PAID/SHIPPED/COMPLETED，按 paidAt 时间归属；优惠让利=SUM(discountCents) 单列；CANCELLED/PENDING 不计入。'],
                 ['DataInsights', '库存预警判定', 'stock ≤ 有效阈值（商品级覆盖优先，否则全局默认 10 件）入列；stock=0 已售罄置顶；超卖风险 = 预计售罄天数 < 7 天。'],
                 ['DataInsights', '库存预警门禁', '预警接口（dashboard/stock）仅 role=运营 或 role=老板 可访问；配置写（stock-config）仅运营；客服/客户 403、未登录 401。'],
-                ['DataInsights', '补货建议口径', '日均销量=近7日成交 Σ(items.quantity)÷7（向上取整 0.1）；建议补货量=max(0,⌈日均×7⌉−stock)，到货周期固定 7 天；无销量不计算天数。']
+                ['DataInsights', '补货建议口径', '日均销量=近7日成交 Σ(items.quantity)÷7（向上取整 0.1）；建议补货量=max(0,⌈日均×7⌉−stock)，到货周期固定 7 天；无销量不计算天数。'],
+                ['Channel', '渠道配置门禁', '小程序渠道配置（channel/miniprogram）写操作仅 role=运营（扩展 R-ADM 家族）；老板只读查看启用状态（无配置入口）；客服/客户/未登录 401/403。'],
+                ['Channel', 'AppSecret 脱敏', 'AppSecret 写入后不读回明文（回显前 4 + 掩码 + 后 4 + configured 标记），支持重新配置覆盖（Q4）。'],
+                ['Channel', '渠道停用拒绝新登录', '渠道 enabled=false 或未配置 → 小程序新微信登录拒绝（CHANNEL_DISABLED）；既有会话不受影响（Q5，MVP 只管新流量）。'],
+                ['User', '微信授权登录因子', 'openid 为 User 新登录因子（Q1 方案 A，单小程序一对一）；code2session 换 openid 命中即复用会话直连（channel=MINIPROGRAM）；未命中引导手机号绑定。'],
+                ['User', '撞号提示登录既有账号', '微信绑定手机号已被既有账号占用 → 返回 PHONE_EXISTS_NEED_LOGIN，引导既有账号登录再绑定（bind-openid），不自动合并/不静默拒绝（Q2）。'],
+                ['User', 'mock 微信网关', '测试环境（NODE_ENV=test）code2session / 手机号组件由 mock 固定映射模拟（Q6）；真实微信网关资质后置 +X 未接入。']
             ],
             readModels: [
                 ['Catalog', '商品搜索结果', '供买家浏览与筛选。'],
@@ -909,10 +915,10 @@
             },
             {
                 title: 'Order Aggregate',
-                root: 'Order (id, userId, status, totalCents, discountCents, actualPaidCents, couponId)',
+                root: 'Order (id, userId, status, channel, totalCents, discountCents, actualPaidCents, couponId)',
                 entities: 'OrderItem (productId, priceCents, quantity)',
                 values: 'FinancialPrecision',
-                invariant: 'actualPaidCents 一旦支付确认即锁定；历史价格不因商品改价而变化。'
+                invariant: 'actualPaidCents 一旦支付确认即锁定；历史价格不因商品改价而变化；channel（WEB/MINIPROGRAM）创建时写入不可变（会话来源继承，服务端判定不信任客户端，Q7）。'
             },
             {
                 title: 'Coupon Aggregate',
@@ -923,15 +929,15 @@
             },
             {
                 title: 'User Aggregate',
-                root: 'User (id, phone, passwordHash, nickname, status, role, createdAt)',
-                entities: 'Session (token, userId, createdAt) 作为跨聚合凭证对象由 User Context 管理。',
-                values: 'PhoneNumber, PasswordHash, UserRole, AccountStatus',
-                invariant: '手机号全局唯一；密码仅存 scrypt 哈希不落明文；status ∈ {正常, 禁用}（注册默认正常）；role ∈ {客户, 运营, 客服, 老板}（注册默认客户）；禁用后登录与既有会话访问均被拒绝，启用后恢复。'
+                root: 'User (id, phone, openid, passwordHash, nickname, status, role, createdAt)',
+                entities: 'Session (token, userId, channel, createdAt) 作为跨聚合凭证对象由 User Context 管理（channel 记录会话来源渠道：WEB 网页 / MINIPROGRAM 微信授权，供下单写 Order.channel）。',
+                values: 'PhoneNumber, Openid, PasswordHash, UserRole, AccountStatus',
+                invariant: '手机号全局唯一；密码仅存 scrypt 哈希不落明文；openid 为微信授权登录因子（可空，单小程序一对一，Q1）；status ∈ {正常, 禁用}（注册默认正常）；role ∈ {客户, 运营, 客服, 老板}（注册默认客户）；禁用后登录与既有会话访问均被拒绝，启用后恢复。'
             }
         ];
 
         const mappingGraph = {
-            canvas: { width: 1180, height: 1560, nodeWidth: 240, nodeHeight: 120 },
+            canvas: { width: 1180, height: 1680, nodeWidth: 240, nodeHeight: 120 },
             nodes: [
                 { id: 'bc-catalog', title: 'Catalog Context', subtitle: 'Bounded Context', meta: ['Governance'], x: 100, y: 40 },
                 { id: 'bc-cart', title: 'Cart Context', subtitle: 'Bounded Context', meta: ['Governance'], x: 100, y: 180 },
@@ -940,6 +946,7 @@
                 { id: 'bc-shared', title: 'Shared / Cross', subtitle: 'Shared Boundary', meta: ['Governance'], x: 100, y: 600 },
                 { id: 'bc-user', title: 'User Context', subtitle: 'Bounded Context', meta: ['Governance'], x: 100, y: 740 },
                 { id: 'bc-data-insights', title: 'Data Insights', subtitle: 'Bounded Context', meta: ['Governance'], x: 100, y: 880 },
+                { id: 'bc-channel', title: 'Channel Context', subtitle: 'Bounded Context', meta: ['Governance'], x: 100, y: 1020 },
 
                 { id: 'cap-catalog', title: 'catalog-management', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 20 },
                 { id: 'cap-prodquery', title: 'product-query', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 120 },
@@ -955,24 +962,28 @@
                 { id: 'cap-session', title: 'user-session', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1120 },
                 { id: 'cap-admin', title: 'user-admin', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1220 },
                 { id: 'cap-sales-dashboard', title: 'sales-dashboard', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1320 },
-                { id: 'cap-stock-insight', title: 'stock-insight', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1440 }
+                { id: 'cap-stock-insight', title: 'stock-insight', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1420 },
+                { id: 'cap-wechat-auth', title: 'wechat-auth', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1520 },
+                { id: 'cap-miniprogram-channel', title: 'miniprogram-channel', subtitle: 'Spec Capability', meta: ['Spec'], x: 740, y: 1620 }
             ],
             edges: [
                 { from: 'bc-catalog', to: 'cap-catalog', label: 'Governs', rule: 'Catalog 边界负责商品元数据与库存管理' },
                 { from: 'bc-catalog', to: 'cap-prodquery', label: 'Governs', rule: 'Catalog 边界负责搜索与展现逻辑' },
                 { from: 'bc-cart', to: 'cap-cart', label: 'Governs', rule: 'Cart 边界负责 Session 一致性与加购逻辑' },
                 { from: 'bc-coupon', to: 'cap-coupon', label: 'Governs', rule: 'Coupon 边界负责券生命周期与推荐算法' },
-                { from: 'bc-order', to: 'cap-order', label: 'Governs', rule: 'Order 边界负责订单状态流转与审计' },
+                { from: 'bc-order', to: 'cap-order', label: 'Governs', rule: 'Order 边界负责订单状态流转与审计（含 Order.channel 渠道来源，Q7）' },
                 { from: 'bc-order', to: 'cap-checkout', label: 'Governs', rule: 'Order 边界负责交易编排入口' },
                 { from: 'bc-order', to: 'cap-payment', label: 'Governs', rule: 'Order 边界负责支付对接与状态确认' },
                 { from: 'bc-shared', to: 'cap-domain', label: 'Cross-Context', rule: '共享领域对象结构定义' },
                 { from: 'bc-shared', to: 'cap-error', label: 'Cross-Context', rule: '全局错误码与异常处理规范' },
                 { from: 'bc-shared', to: 'cap-ui', label: 'Cross-Context', rule: '全局 ZAPP 暗黑 UI 组件库与视觉规范' },
                 { from: 'bc-user', to: 'cap-account', label: 'Governs', rule: 'User 边界负责账户注册/登录认证与生命周期状态' },
-                { from: 'bc-user', to: 'cap-session', label: 'Governs', rule: 'User 边界负责会话创建/校验/销毁' },
+                { from: 'bc-user', to: 'cap-session', label: 'Governs', rule: 'User 边界负责会话创建/校验/销毁（会话带来源 channel）' },
                 { from: 'bc-user', to: 'cap-admin', label: 'Governs', rule: 'User 边界负责 B 端用户管理（列表/检索/详情/启停 + 权限门禁 + role=老板 只读扩展）' },
+                { from: 'bc-user', to: 'cap-wechat-auth', label: 'Governs', rule: 'User 边界负责微信授权登录因子（openid 关联/手机号绑定/同源账户，code2session + mock 网关）' },
                 { from: 'bc-data-insights', to: 'cap-sales-dashboard', label: 'Governs', rule: 'Data Insights 边界负责销售报表看板（指标聚合/时间维度/趋势/排行，只读消费 Order 数据）' },
-                { from: 'bc-data-insights', to: 'cap-stock-insight', label: 'Governs', rule: 'Data Insights 边界负责库存洞察（低库存预警/阈值配置/补货建议，只读消费 Catalog stock 与 Order 销量）' }
+                { from: 'bc-data-insights', to: 'cap-stock-insight', label: 'Governs', rule: 'Data Insights 边界负责库存洞察（低库存预警/阈值配置/补货建议，只读消费 Catalog stock 与 Order 销量）' },
+                { from: 'bc-channel', to: 'cap-miniprogram-channel', label: 'Governs', rule: 'Channel 边界负责 B 端小程序渠道配置（appid/appsecret 脱敏/商户号纯预留/启用状态，仅运营可写；停用拒绝新登录）' }
             ]
         };
 

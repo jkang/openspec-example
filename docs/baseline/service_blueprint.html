@@ -472,7 +472,7 @@
                     所有能力命名优先对齐 `domain_model.html` 中的 Capability taxonomy。
                 </p>
             </div>
-            <div class="meta">Baseline / Last Updated: 2026-08-31</div>
+            <div class="meta">Baseline / Last Updated: 2026-09-08</div>
         </div>
 
         <div class="intro-grid">
@@ -529,7 +529,7 @@
                     <div class="stage-cell" id="SB-STAGE-01" data-blueprint-stage="SB-STAGE-01">
                         <span class="stage-index">Stage 01</span>
                         <h2 class="stage-name">触达与发现</h2>
-                        <p class="stage-note">首页进入、商品浏览、搜索与排序、单品详情查看；顶部登录/注册入口（账户体系）。</p>
+                        <p class="stage-note">首页进入（Web + 微信小程序双触点）、商品浏览、搜索与排序、单品详情查看；顶部登录/注册入口（账户体系）+ 小程序「微信一键登录」入口（openid 授权，同源账户，Q8/Epic 6.1）。</p>
                     </div>
                     <div class="stage-cell" id="SB-STAGE-02" data-blueprint-stage="SB-STAGE-02">
                         <span class="stage-index">Stage 02</span>
@@ -571,6 +571,7 @@
                                 <li>搜索商品名称 / 按价格排序</li>
                                 <li>打开商品详情确认图片与库存</li>
                                 <li>注册账户（手机号+昵称+密码）或登录（恢复身份，R-REG/R-LOG）</li>
+                                <li>小程序「微信一键登录」：openid 授权即登录（老客户直连同源账户）；新 openid 引导手机号绑定（撞号提示登录既有账号再绑定，Q2）</li>
                             </ul>
                         </div>
                         <div class="cell-block">
@@ -590,7 +591,11 @@
                                 </div>
                                 <div class="capability" data-capability="user-session">
                                     <span class="capability-name">user-session</span>
-                                    <span class="capability-desc">登录/注册成功创建持久会话凭证</span>
+                                    <span class="capability-desc">登录/注册成功创建持久会话凭证（会话带来源渠道 channel）</span>
+                                </div>
+                                <div class="capability" data-capability="wechat-auth">
+                                    <span class="capability-name">wechat-auth</span>
+                                    <span class="capability-desc">微信授权登录因子：code2session 换 openid → 命中直连 / 未命中手机号绑定（撞号提示登录既有账号），复用会话（User Context 新增 taxonomy，Epic 6.1）</span>
                                 </div>
                                 <div class="capability support" data-capability="frontend-ui">
                                     <span class="capability-name">frontend-ui</span>
@@ -859,6 +864,7 @@
                                 <li>以订单数据复盘营销效果</li>
                                 <li>用户管理（运营角色）：按手机号/昵称检索用户、查看详情与订单聚合、禁用/启用（R-ADM-001~007）</li>
                                 <li>关注库存预警与补货建议（阈值配置仅运营可写，老板只读）</li>
+                                <li>配置微信小程序渠道（AppID / AppSecret 脱敏 / 商户号预留 / 启用状态，仅运营可写，老板只读监督；停用 → 新微信登录拒绝 CHANNEL_DISABLED，Epic 6.1）</li>
                             </ul>
                         </div>
                         <div class="cell-block">
@@ -866,15 +872,19 @@
                             <div class="capability-list">
                                 <div class="capability" data-capability="order-management">
                                     <span class="capability-name">order-management</span>
-                                    <span class="capability-desc">订单查询/发货/取消（B 端管理）</span>
+                                    <span class="capability-desc">订单查询/发货/取消（B 端管理，含渠道标识列展示）</span>
                                 </div>
                                 <div class="capability" data-capability="user-admin">
                                     <span class="capability-name">user-admin</span>
                                     <span class="capability-desc">B 端用户管理：列表/检索/详情（订单聚合）/禁用启用；仅运营角色</span>
                                 </div>
+                                <div class="capability" data-capability="miniprogram-channel">
+                                    <span class="capability-name">miniprogram-channel</span>
+                                    <span class="capability-desc">小程序渠道配置：appid / appsecret（脱敏回显）/ 商户号（纯预留）/ 启用状态（Channel Context 新增 taxonomy，Epic 6.1）</span>
+                                </div>
                                 <div class="capability support" data-capability="frontend-ui">
                                     <span class="capability-name">frontend-ui</span>
-                                    <span class="capability-desc">成功反馈、继续购物入口</span>
+                                    <span class="capability-desc">成功反馈、继续购物入口、小程序渠道配置视图</span>
                                 </div>
                             </div>
                         </div>
@@ -968,10 +978,13 @@
                             <ul class="activity-list">
                                 <li>创建订单并写入 `PENDING_PAYMENT`（下单仅校验库存，不扣减）</li>
                                 <li>持久化 `discountCents / actualPaidCents` 并绑定优惠券</li>
+                                <li>订单渠道来源写入 `channel`（从会话 channel 继承：MINIPROGRAM / WEB，服务端判定防伪造，Q7/Epic 6.1）</li>
                                 <li>成功后清空购物车并保证幂等</li>
-                                <li>`/api/admin/orders` 列表（状态过滤/搜索）与 ship/cancel 接口</li>
+                                <li>`/api/admin/orders` 列表（状态过滤/搜索，含渠道标识）与 ship/cancel 接口</li>
                                 <li>`GET /api/orders` 按会话解析 userId 返回我的订单（归属隔离，倒序，R-SES-003）</li>
                                 <li>B 端用户管理：`GET /api/admin/users`（列表/检索）、`GET /api/admin/users/:id`（详情+订单聚合）、`PATCH /api/admin/users/:id/status`（禁用/启用）——仅运营角色（R-ADM-001）</li>
+                                <li>微信登录网关对接：`POST /api/auth/wechat/login|bind|bind-openid`——code2session 换 openid → 命中直连 / 未命中手机号绑定（撞号引导登录既有账号）；渠道门禁（enabled=false → CHANNEL_DISABLED）；mock 网关（NODE_ENV=test 固定映射，Q6）</li>
+                                <li>渠道配置持久化：`GET/PUT /api/admin/channel/miniprogram`——AppSecret 脱敏回显（Q4）、商户号纯预留（Q3）、启用状态落盘 `data/channel-config.json` 即时生效（R-CHN-006）</li>
                             </ul>
                         </div>
                         <div class="cell-block">
@@ -995,7 +1008,15 @@
                                 </div>
                                 <div class="capability" data-capability="user-session">
                                     <span class="capability-name">user-session</span>
-                                    <span class="capability-desc">会话校验门禁（禁用即失效）供 B 端接口复用</span>
+                                    <span class="capability-desc">会话校验门禁（禁用即失效）供 B 端接口复用；会话带来源渠道 channel</span>
+                                </div>
+                                <div class="capability" data-capability="wechat-auth">
+                                    <span class="capability-name">wechat-auth</span>
+                                    <span class="capability-desc">微信授权登录/绑定后台编排（code2session + mock 网关，User Context 新增 taxonomy，Epic 6.1）</span>
+                                </div>
+                                <div class="capability" data-capability="miniprogram-channel">
+                                    <span class="capability-name">miniprogram-channel</span>
+                                    <span class="capability-desc">渠道配置 API 后台（脱敏/预留/落盘即时生效，Channel Context 新增 taxonomy，Epic 6.1）</span>
                                 </div>
                             </div>
                         </div>
