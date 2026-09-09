@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenSpec 分层治理体系 · 三层流程图 + Balance 权衡全景</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700;800&family=Noto+Serif+SC:wght@700;900&display=swap" rel="stylesheet">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        serif: ['"Noto Serif SC"', 'serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                        sans: ['system-ui', '-apple-system', 'sans-serif'],
+                    },
+                    colors: {
+                        aidd: {
+                            green: '#00b96b',
+                            blue: '#1677ff',
+                            slate: '#1e293b',
+                            gray: '#94a3b8',
+                            light: '#f8fafc',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #eef2f7;
+            color: #1e293b;
+            font-family: 'system-ui', sans-serif;
+        }
+        .slide-container { max-width: 1500px; margin: 0 auto; padding: 40px 24px; }
+        .slide {
+            width: 100%;
+            background: white;
+            box-shadow: 0 40px 90px -30px rgba(0, 0, 0, 0.18);
+            margin-bottom: 56px;
+            border-radius: 22px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(0, 0, 0, 0.05);
+        }
+        .slide-header {
+            padding: 20px 34px;
+            border-bottom: 1px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+        }
+        .bp-body { padding: 14px 24px; }
+        .bp-svg { width: 100%; height: auto; display: block; }
+        .bp-svg text { font-family: 'system-ui', -apple-system, sans-serif; }
+        .bp-svg .mono { font-family: 'JetBrains Mono', monospace; }
+        .bp-svg .serif { font-family: '"Noto Serif SC"', serif; }
+        .balance-card { border-top: 1px solid #f1f5f9; }
+        .kpi-label { font-family: 'JetBrains Mono', monospace; letter-spacing: 0.15em; }
+    </style>
+</head>
+<body>
+
+    <div class="slide-container" id="slides"></div>
+
+    <footer class="py-16 text-center">
+        <p class="text-slate-400 font-mono text-xs tracking-[0.3em] uppercase">
+            Spec-Driven Development · Governance Framework V2.0 · 三层 × Balance 权衡全景
+        </p>
+    </footer>
+
+    <script>
+    // ==========================================================================
+    //  5-Lane Blueprint SVG generator — single viewBox ⇒ guaranteed alignment.
+    //  (Reused verbatim from workflow-blueprint.html)
+    // ==========================================================================
+
+    const C = {
+        green: '#00b96b',
+        blue:  '#1677ff',
+        slate: '#1e293b',
+        gray:  '#94a3b8',
+    };
+
+    const LANE = {
+        agent:   { top: 8,   h: 50 },
+        flow:    { top: 66,  h: 252 },
+        skill:   { top: 328, h: 54 },
+        command: { top: 390, h: 54 },
+        deliv:   { top: 454, h: 148 },
+    };
+    const VB_H = 454 + 148 + 6;               // 608
+    const CARD_TOP = LANE.flow.top + 22;      // 88
+    const CARD_BOT = LANE.flow.top + 150;     // 216
+    const FLOW_CY  = (CARD_TOP + CARD_BOT) / 2; // 152
+    const LOOP_Y   = CARD_BOT + 10;           // 226
+
+    const X_LEFT   = 84;
+    const X_RIGHT  = 1252;
+    const GUTTER   = 8;
+    const GUTTER_W = 70;
+
+    const esc = s => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
+
+    function evenCenters(n, xL = X_LEFT, xR = X_RIGHT) {
+        const cw = (xR - xL) / n;
+        return Array.from({ length: n }, (_, i) => xL + cw * (i + 0.5));
+    }
+
+    function card(x0, x1, y0, y1, opts = {}) {
+        const rx = opts.rx ?? 18;
+        const w = x1 - x0, h = y1 - y0;
+        const fill = opts.fill ?? '#ffffff';
+        const stroke = opts.stroke ?? '#cbd5e1';
+        const sw = opts.sw ?? 1.8;
+        const dash = opts.dash ? ` stroke-dasharray="${opts.dash}"` : '';
+        const shadow = opts.shadow === false ? '' : ' filter="url(#shadow)"';
+        return `<rect x="${x0}" y="${y0}" width="${w}" height="${h}" rx="${rx}" ry="${rx}" fill="${fill}" stroke="${stroke}" stroke-width="${sw}"${dash}${shadow}/>`;
+    }
+
+    function text(cx, cy, lines, opts = {}) {
+        const size = opts.size ?? 13;
+        const color = opts.color ?? '#0f172a';
+        const weight = opts.weight ?? 700;
+        const family = opts.family ?? 'system-ui';
+        const lh = opts.lh ?? (size * 1.28);
+        const totalH = lines.length * lh;
+        let y = cy - totalH / 2 + lh * 0.82;
+        let out = '';
+        for (const ln of lines) {
+            out += `<text x="${cx}" y="${y}" text-anchor="middle" font-size="${size}" font-weight="${weight}" fill="${color}" class="${family}">${esc(ln)}</text>`;
+            y += lh;
+        }
+        return out;
+    }
+
+    function hArrow(x1, x2, y, stroke, opts = {}) {
+        const sw = opts.sw ?? 3.2;
+        const dash = opts.dash ? ` stroke-dasharray="${opts.dash}"` : '';
+        const head = 13;
+        const dir = x2 > x1 ? 1 : -1;
+        const hx = x2 - dir * head;
+        let s = '';
+        if (Math.abs(x2 - x1) > 6) {
+            s += `<path d="M ${x1} ${y} L ${hx} ${y}" fill="none" stroke="${stroke}" stroke-width="${sw}"${dash} stroke-linecap="round"/>`;
+        }
+        s += `<path d="M ${x2} ${y} L ${x2 - dir * head} ${y - head * 0.55} L ${x2 - dir * head} ${y + head * 0.55} Z" fill="${stroke}"/>`;
+        return s;
+    }
+
+    function loopArc(srcX, tgtX, stroke, labelStr, opts = {}) {
+        const drop = opts.drop ?? 96;
+        const sw = opts.sw ?? 2.4;
+        const y = LOOP_Y;
+        const dir = tgtX >= srcX ? 1 : -1;
+        const d = `M ${srcX} ${y} C ${srcX} ${y + drop}, ${tgtX} ${y + drop}, ${tgtX} ${y}`;
+        const head = 11;
+        let s = `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${sw}" stroke-dasharray="9 8" stroke-linecap="round"/>`;
+        s += `<path d="M ${tgtX} ${y} L ${tgtX - head * 0.42} ${y + head} L ${tgtX + head * 0.42} ${y + head} Z" fill="${stroke}"/>`;
+        if (labelStr) {
+            s += `<text x="${(srcX + tgtX) / 2}" y="${y + drop * 0.5}" text-anchor="middle" font-size="10" font-weight="800" fill="${stroke}" class="mono" letter-spacing="1">${esc(labelStr)}</text>`;
+        }
+        return s;
+    }
+
+    function laneLabel(cy, str) {
+        return `<text x="${GUTTER + 24}" y="${cy}" text-anchor="middle" transform="rotate(-90 ${GUTTER + 24} ${cy})" font-size="11" font-weight="900" fill="#94a3b8" class="mono" letter-spacing="2">${esc(str)}</text>`;
+    }
+
+    function laneBg(y0, y1) {
+        return `<rect x="${GUTTER_W}" y="${y0}" width="${X_RIGHT - GUTTER_W}" height="${y1 - y0}" fill="#fbfcfd"/>`;
+    }
+
+    function agentBand(cols, i0, i1, color, labelStr, opts = {}) {
+        const x0 = cols[i0].x0, x1 = cols[i1].x1;
+        const y0 = LANE.agent.top + 9, y1 = LANE.agent.top + LANE.agent.h - 5;
+        const solid = opts.solid === true;
+        const fill = solid ? color : (opts.fill ?? color + '1f');
+        let s = card(x0, x1, y0, y1, { rx: 12, fill, stroke: color, sw: solid ? 0 : 1.8, shadow: false });
+        s += text((x0 + x1) / 2, (y0 + y1) / 2, [labelStr], { size: 12, weight: 900, color: solid ? '#ffffff' : color, family: 'mono', lh: 15 });
+        return s;
+    }
+
+    function blockCard(c, f) {
+        const y0 = CARD_TOP - 10, y1 = CARD_BOT + 6;
+        const xx0 = c.x0, xx1 = c.x1;
+        let colStroke = '#cbd5e1', colColor = '#0f172a';
+        if (f.kind === 'green') { colStroke = C.green; colColor = C.green; }
+        if (f.kind === 'blue')  { colStroke = C.blue;  colColor = C.blue; }
+        if (f.kind === 'dark')  { colStroke = C.slate; colColor = '#ffffff'; }
+
+        let s = card(xx0, xx1, y0, y1, { rx: 20, fill: '#f8fafc', stroke: colStroke, sw: 2, dash: '5 5' });
+        s += text((xx0 + xx1) / 2, y0 + 16, [f.stage], { size: 11, weight: 900, color: colColor, family: 'mono', lh: 13 });
+        const pillTop = y0 + 30, pillBot = y1 - 8;
+        const pillH = pillBot - pillTop;
+        const n = f.subpills.length;
+        const innerL = xx0 + 10, innerR = xx1 - 10;
+        const gap = 8;
+        const pw = (innerR - innerL - gap * (n - 1)) / n;
+        for (let i = 0; i < n; i++) {
+            const px0 = innerL + i * (pw + gap), px1 = px0 + pw;
+            const cxm = (px0 + px1) / 2;
+            const pyl = (pillTop + pillBot) / 2;
+            const lines = f.subpills[i];
+            s += card(px0, px1, pillTop, pillBot, { rx: 12, fill: '#ffffff', stroke: colStroke, sw: 1.6 });
+            if (lines.length === 1) {
+                s += `<text x="${cxm}" y="${pyl + 4}" text-anchor="middle" font-size="13" font-weight="800" fill="${colColor}">${esc(lines[0])}</text>`;
+            } else {
+                s += `<text x="${cxm}" y="${pyl - 2}" text-anchor="middle" font-size="12.5" font-weight="800" fill="${colColor}">${esc(lines[0])}</text>`;
+                s += `<text x="${cxm}" y="${pyl + 14}" text-anchor="middle" font-size="8.5" font-weight="600" fill="${colColor}99" class="mono">${esc(lines[1])}</text>`;
+            }
+        }
+        return s;
+    }
+
+    // --------------------------------------------------------------------------
+    function renderLayer(lay, cfg = {}) {
+        const cx = lay.columns.map(c => ({ cx: c.cx, w: c.w, x0: c.cx - c.w / 2, x1: c.cx + c.w / 2 }));
+        const cols = lay.columns.map((c, i) => Object.assign({}, c, cx[i]));
+        let s = `<svg class="bp-svg" viewBox="0 0 1312 ${VB_H}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">`;
+
+        s += `<defs><filter id="shadow" x="-20%" y="-20%" width="140%" height="170%">
+            <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.10"/>
+        </filter></defs>`;
+
+        s += laneBg(LANE.agent.top, LANE.agent.top + LANE.agent.h);
+        s += laneBg(LANE.flow.top, LANE.flow.top + LANE.flow.h);
+        s += laneBg(LANE.skill.top, LANE.skill.top + LANE.skill.h);
+        s += laneBg(LANE.command.top, LANE.command.top + LANE.command.h);
+        s += laneBg(LANE.deliv.top, LANE.deliv.top + LANE.deliv.h);
+        s += laneLabel(LANE.agent.top + LANE.agent.h / 2, 'AGENT');
+        s += laneLabel(LANE.flow.top + LANE.flow.h / 2, 'FLOW');
+        s += laneLabel(LANE.skill.top + LANE.skill.h / 2, 'SKILL');
+        s += laneLabel(LANE.command.top + LANE.command.h / 2, 'COMMAND');
+        s += laneLabel(LANE.deliv.top + LANE.deliv.h / 2, 'OUTPUT');
+
+        s += `<line x1="${GUTTER_W}" x2="${X_RIGHT}" y1="${LANE.agent.top + LANE.agent.h}" y2="${LANE.agent.top + LANE.agent.h}" stroke="#eef2f7" stroke-width="2"/>`;
+        s += `<line x1="${GUTTER_W}" x2="${X_RIGHT}" y1="${LANE.skill.top}" y2="${LANE.skill.top}" stroke="#eef2f7" stroke-width="2"/>`;
+        s += `<line x1="${GUTTER_W}" x2="${X_RIGHT}" y1="${LANE.command.top}" y2="${LANE.command.top}" stroke="#eef2f7" stroke-width="2"/>`;
+        s += `<line x1="${GUTTER_W}" x2="${X_RIGHT}" y1="${LANE.deliv.top}" y2="${LANE.deliv.top}" stroke="#eef2f7" stroke-width="2"/>`;
+
+        for (const ag of lay.agents) s += agentBand(cx, ag.from, ag.to, ag.color, ag.label, ag);
+
+        for (const a of lay.arrows) {
+            const src = cx[a.from], tgt = cx[a.to];
+            const x1 = src.x1 + 4, x2 = tgt.x0 - 4;
+            if (x2 > x1) s += hArrow(x1, x2, FLOW_CY, '#94a3b8', { sw: 3.2 });
+        }
+
+        for (const c of cols) {
+            const f = c.flow;
+            if (f.block) { s += blockCard(c, f); continue; }
+            const y0 = CARD_TOP, y1 = CARD_BOT;
+            const xx0 = c.x0, xx1 = c.x1;
+            let colStroke = '#cbd5e1', colFill = '#ffffff', colColor = '#0f172a', sw = 2;
+            if (f.kind === 'green') { colStroke = C.green; colColor = C.green; }
+            if (f.kind === 'blue')  { colStroke = C.blue;  colColor = C.blue; }
+            if (f.kind === 'dark')  { colStroke = C.slate; colFill = C.slate; colColor = '#ffffff'; sw = 0; }
+            s += card(xx0, xx1, y0, y1, { rx: 20, fill: colFill, stroke: colStroke, sw });
+            const cxm = (xx0 + xx1) / 2;
+            s += `<text x="${cxm}" y="${FLOW_CY - 3}" text-anchor="middle" font-size="14.5" font-weight="900" fill="${colColor}">${esc(f.title)}</text>`;
+            s += `<text x="${cxm}" y="${FLOW_CY + 16}" text-anchor="middle" font-size="10" font-weight="700" fill="${f.kind === 'dark' ? '#cbd5e1' : '#94a3b8'}">${esc(f.sub)}</text>`;
+        }
+
+        for (const lp of lay.loops) {
+            const srcC = cx[lp.fromCol], tgtC = cx[lp.toCol];
+            const srcX = lp.fromEdge === 'left' ? srcC.x0 : srcC.x1;
+            const tgtX = lp.toEdge === 'left' ? tgtC.x0 : tgtC.x1;
+            s += loopArc(srcX, tgtX, lp.color, lp.label, { drop: lp.drop ?? 96 });
+        }
+
+        for (const c of cols) {
+            s += `<line x1="${c.cx}" y1="${CARD_BOT + 2}" x2="${c.cx}" y2="${LANE.skill.top}" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="3 4"/>`;
+        }
+
+        for (const c of cols) {
+            const y0 = LANE.skill.top, y1 = LANE.skill.top + LANE.skill.h;
+            s += text(c.cx, (y0 + y1) / 2, c.skills, { size: 11.5, weight: 700, color: '#64748b', family: 'mono', lh: 15 });
+        }
+
+        for (const c of cols) {
+            const y0 = LANE.command.top, y1 = LANE.command.top + LANE.command.h;
+            s += text(c.cx, (y0 + y1) / 2, c.cmds, { size: 11.5, weight: 800, color: '#1e293b', family: 'mono', lh: 15 });
+        }
+
+        for (const c of cols) {
+            const d = c.deliv;
+            const y0 = LANE.deliv.top + 8, y1 = LANE.deliv.top + LANE.deliv.h - 6;
+            const xx0 = c.x0 + 2, xx1 = c.x1 - 2;
+            const dark = d.dark;
+            s += card(xx0, xx1, y0, y1, { rx: 12, fill: dark ? C.slate : '#ffffff', stroke: dark ? C.slate : '#e2e8f0', sw: dark ? 0 : 1.6 });
+            const titleColor = dark ? '#ffffff' : '#0f172a';
+            const descColor = dark ? '#cbd5e1' : '#64748b';
+            const cxm = (xx0 + xx1) / 2;
+            s += `<text x="${cxm}" y="${y0 + 22}" text-anchor="middle" font-size="11.5" font-weight="800" fill="${titleColor}" class="mono">${esc(d.title)}</text>`;
+            s += `<line x1="${xx0 + 10}" x2="${xx1 - 10}" y1="${y0 + 33}" y2="${y0 + 33}" stroke="${dark ? '#334155' : '#e8edf3'}" stroke-width="1.4"/>`;
+            s += text(cxm, y0 + 48, d.desc, { size: 10.5, weight: 500, color: descColor, lh: 14 });
+        }
+
+        s += `</svg>`;
+        return s;
+    }
+
+    // ==========================================================================
+    //  LAYER 01 — 极简交付 (Single Change Pipeline)
+    // ==========================================================================
+    const L1 = evenCenters(5);
+    const layer1 = {
+        agents: [
+            { label: 'ENGINEER AGENT (PRIMARY)', color: C.blue, from: 0, to: 3, fill: '#eaf2ff' },
+            { label: 'LEAD (GOVERNANCE)', color: C.slate, from: 4, to: 4, solid: true },
+        ],
+        columns: [
+            { cx: L1[0], w: 214, flow: { title: '探索 Explore', sub: '业务初探 · idea.md', kind: 'blue' }, skills: ['explore'], cmds: ['/opsx:explore'], deliv: { title: 'idea.md', desc: ['记录业务初探设计', '明确意图与价值'] } },
+            { cx: L1[1], w: 214, flow: { title: '提案 Propose', sub: '工程提案 + 原型', kind: 'blue' }, skills: ['propose'], cmds: ['/opsx:propose'], deliv: { title: 'proposal.md', desc: ['确立工程实施方案', '对齐交付路径'] } },
+            { cx: L1[2], w: 214, flow: { title: '实施 Apply', sub: '代码实施与验证', kind: 'blue' }, skills: ['apply-change'], cmds: ['/opsx:apply'], deliv: { title: 'code + verify.md', desc: ['原子化变更', '验证门禁证据'] } },
+            { cx: L1[3], w: 214, flow: { title: '同步 Sync', sub: 'delta 规格回写', kind: 'blue' }, skills: ['sync-specs'], cmds: ['/opsx:sync'], deliv: { title: 'delta specs', desc: ['认知回流规格基线', '更新 specs/*.md'] } },
+            { cx: L1[4], w: 214, flow: { title: '归档 Archive', sub: '审计追踪', kind: 'dark' }, skills: ['archive-change'], cmds: ['/opsx:archive'], deliv: { title: 'archive/', desc: ['完整变更审计追踪', '回填业务基线'] } },
+        ],
+        arrows: [ { from: 0, to: 1 }, { from: 1, to: 2 }, { from: 2, to: 3 }, { from: 3, to: 4 } ],
+        loops: [],
+    };
+
+    // ==========================================================================
+    //  LAYER 02 — 轻量产品 (Baseline Guardrail + Multi-Story Loop)
+    // ==========================================================================
+    const L2 = [
+        { cx: 159, w: 150 }, { cx: 317, w: 150 }, { cx: 475, w: 150 }, { cx: 633, w: 150 },
+        { cx: 836, w: 240 }, { cx: 1039, w: 150 }, { cx: 1187, w: 130 },
+    ];
+    const layer2 = {
+        agents: [
+            { label: 'LEAD / PM (GUARDRAIL)', color: C.green, from: 0, to: 1, fill: '#e9f8f0' },
+            { label: 'ENGINEER AGENT (STORY LOOP)', color: C.blue, from: 2, to: 4, fill: '#eaf2ff' },
+            { label: 'LEAD (SYNC · ARCHIVE)', color: C.slate, from: 5, to: 6, solid: true },
+        ],
+        columns: [
+            { cx: L2[0].cx, w: L2[0].w, flow: { title: '规划 Plan', sub: '基线护栏', kind: 'green' }, skills: ['product-planning'], cmds: ['/opsx:planning:*'], deliv: { title: 'ROADMAP.md', desc: ['对齐产品愿景', '规划基线'] } },
+            { cx: L2[1].cx, w: L2[1].w, flow: { title: '业务基线', sub: 'Business', kind: 'green' }, skills: ['blueprint'], cmds: ['/opsx:baseline/sync'], deliv: { title: 'baseline/', desc: ['稳定业务边界', '蓝图层治理'] } },
+            { cx: L2[2].cx, w: L2[2].w, flow: { title: '探索 Explore', sub: '需求侧', kind: 'blue' }, skills: ['explore'], cmds: ['/req:explore'], deliv: { title: 'idea.md', desc: ['多 Story 协同设计'] } },
+            { cx: L2[3].cx, w: L2[3].w, flow: { title: '提案 Propose', sub: '工程侧', kind: 'blue' }, skills: ['propose'], cmds: ['/opsx:propose'], deliv: { title: 'proposal.md', desc: ['解构工程执行计划'] } },
+            { cx: L2[4].cx, w: L2[4].w, flow: { kind: 'blue', block: true, stage: 'MULTI-STORY EXECUTION', subpills: [['原型', 'Proto'], ['故事', 'Story'], ['实施', 'Apply']] }, skills: ['prototype', 'story', 'apply-change'], cmds: ['/req:prototype', '/req:story', '/opsx:apply'], deliv: { title: 'Story Artifacts', desc: ['精细化规格与验证', '多 Story 循环交付'] } },
+            { cx: L2[5].cx, w: L2[5].w, flow: { title: '同步 Sync', sub: 'Spec Sync', kind: 'dark' }, skills: ['sync-specs'], cmds: ['/opsx:sync'], deliv: { title: 'Spec Sync', desc: ['认知持续对齐'] } },
+            { cx: L2[6].cx, w: L2[6].w, flow: { title: '归档 Archive', sub: '基线回流', kind: 'dark' }, skills: ['archive-change'], cmds: ['/opsx:archive'], deliv: { title: 'Baseline Update', desc: ['更新路线图基线'] } },
+        ],
+        arrows: [ { from: 0, to: 1 }, { from: 1, to: 2 }, { from: 2, to: 3 }, { from: 3, to: 4 }, { from: 4, to: 5 }, { from: 5, to: 6 } ],
+        loops: [
+            { fromCol: 6, toCol: 4, label: 'NEXT STORY', color: C.blue, drop: 56, fromEdge: 'left', toEdge: 'right' },
+            { fromCol: 6, toCol: 0, label: 'REVIEW → PLANNING (BASELINE)', color: C.green, drop: 92, fromEdge: 'left', toEdge: 'right' },
+        ],
+    };
+
+    // ==========================================================================
+    //  LAYER 03 — 业务产品 (Requirement Funnel + Double-Loop Governance)
+    // ==========================================================================
+    const L3arr = [
+        { cx: 123, w: 78 }, { cx: 209, w: 78 }, { cx: 295, w: 78 }, { cx: 497, w: 310 },
+        { cx: 704, w: 88 }, { cx: 911, w: 310 }, { cx: 1116, w: 84 }, { cx: 1205, w: 78 },
+    ];
+    const layer3 = {
+        agents: [
+            { label: 'LEAD', color: C.slate, from: 0, to: 2, fill: '#eef2f7' },
+            { label: 'PM AGENT (REQ FUNNEL)', color: C.green, from: 3, to: 3, solid: true },
+            { label: 'BRIDGE', color: C.slate, from: 4, to: 4, solid: true },
+            { label: 'ENGINEER AGENT (EXECUTION)', color: C.blue, from: 5, to: 5, solid: true },
+            { label: 'LEAD / GOVERNANCE', color: C.slate, from: 6, to: 7, solid: true },
+        ],
+        columns: [
+            { cx: L3arr[0].cx, w: L3arr[0].w, flow: { title: '规划', sub: 'Plan', kind: 'green' }, skills: ['product-planning'], cmds: ['/opsx:planning:*'], deliv: { title: 'ROADMAP.md', desc: ['对齐产品愿景'] } },
+            { cx: L3arr[1].cx, w: L3arr[1].w, flow: { title: '业务基线', sub: 'Business', kind: 'green' }, skills: ['blueprint'], cmds: ['/opsx:baseline/sync'], deliv: { title: 'baseline/', desc: ['稳定业务边界'] } },
+            { cx: L3arr[2].cx, w: L3arr[2].w, flow: { title: '任务类型?', sub: 'Epic / Fix', kind: 'dark' }, skills: ['router'], cmds: ['/req:handoff'], deliv: { title: '类型路由', desc: ['Epic→漏斗', 'Fix→交付'] } },
+            { cx: L3arr[3].cx, w: L3arr[3].w, flow: { kind: 'green', block: true, stage: 'REQUIREMENT FUNNEL', subpills: [['调研', 'Research'], ['探索', 'Explore'], ['原型', 'Prototype'], ['拆分', 'Storymap'], ['故事', 'Story']] }, skills: ['research', 'explore', 'prototype', 'storymap', 'story'], cmds: ['/req:research', '/req:explore', '/req:prototype', '/req:storymap', '/req:story'], deliv: { title: 'Story (Freeze)', desc: ['业务面冻结 / E2E 断言'] } },
+            { cx: L3arr[4].cx, w: L3arr[4].w, flow: { title: '交接', sub: 'Handoff', kind: 'dark' }, skills: ['handoff'], cmds: ['/req:handoff'], deliv: { title: 'Synthesized', desc: ['交接契约驱动交付'], dark: true } },
+            { cx: L3arr[5].cx, w: L3arr[5].w, flow: { kind: 'blue', block: true, stage: 'EXECUTION PIPELINE', subpills: [['提案', 'Propose'], ['规格', 'Specs'], ['设计', 'Design'], ['实施', 'Apply']] }, skills: ['propose', 'spec-design', 'apply-change', 'verify'], cmds: ['/opsx:propose', '/opsx:spec-design', '/opsx:apply'], deliv: { title: 'Specs (SDD)', desc: ['行为规格驱动的产线'] } },
+            { cx: L3arr[6].cx, w: L3arr[6].w, flow: { title: '规格同步', sub: 'Spec Sync', kind: 'dark' }, skills: ['sync-specs'], cmds: ['/opsx:sync'], deliv: { title: 'delta specs', desc: ['认知回流规格', '保持规格基线'] } },
+            { cx: L3arr[7].cx, w: L3arr[7].w, flow: { title: '归档', sub: 'Archive', kind: 'dark' }, skills: ['archive-change'], cmds: ['/opsx:archive'], deliv: { title: 'archive/', desc: ['完整审计追踪'] } },
+        ],
+        arrows: [
+            { from: 0, to: 1 }, { from: 1, to: 2 }, { from: 2, to: 3 }, { from: 3, to: 4 },
+            { from: 4, to: 5 }, { from: 5, to: 6 }, { from: 6, to: 7 },
+        ],
+        loops: [
+            { fromCol: 7, toCol: 3, label: 'NEXT STORY', color: C.blue, drop: 56, fromEdge: 'left', toEdge: 'right' },
+            { fromCol: 7, toCol: 0, label: 'BASELINE LOOP (NEXT EPIC · REVIEW)', color: C.green, drop: 92, fromEdge: 'left', toEdge: 'right' },
+        ],
+    };
+
+    // ==========================================================================
+    //  Balance 卡片数据（轻量 ↔ 易用 ↔ 有效）
+    // ==========================================================================
+    const cards = {
+        1: {
+            theme: 'green', accent: 'text-aidd-green', chip: 'NON-COMPLEX · LOW GATE',
+            scenarios: ['单兵 / 小团队', '低复杂度变更', '想法快速验证'],
+            value: '确立「意图 → 规格 → 代码」线性转换管线，追求交付响应速度。',
+            balance: [
+                { k: '轻量', v: '最低治理，单 Agent 一路到归档，无基线依赖。', c: '最轻' },
+                { k: '易用', v: '上手极快，无 HITL 门禁拖慢，适合快速试错。', c: '最易' },
+                { k: '有效', v: '仅靠「验证门禁」兜底；无基线，变更一多就漂移。', c: '最弱' },
+            ],
+            pick: '零门槛但防线薄弱——**验证门禁是唯一护栏**。当变更开始跨模块/累积时，该迁往 Layer 02。',
+            tip: '不要在这个形态硬塞业务基线：会拖慢"想法→验证"的响应速度（轻量提案 §3.1「最小治理集合」）。',
+            cases: ['epic-account-system（轻量多 Story）', 'epic-sales-dashboard（多 Story 协同）'],
+        },
+        2: {
+            theme: 'blue', accent: 'text-aidd-blue', chip: 'MULTI-STORY · BASE GUARDRAIL',
+            scenarios: ['复杂业务逻辑', '多 Story 循环', '业务价值对齐'],
+            value: '引入 Planning 与 Business 基线，将复杂变更拆成多 Story 循环，降低系统性风险。',
+            balance: [
+                { k: '轻量', v: '基线只放**必选**（PRODUCT/ROADMAP/domain/process），service_blueprint、delivery_board 按需增强。', c: '中' },
+                { k: '易用', v: '原型/Story 各有一道 HITL 确认，认知密度适中；PM 与 Engineer 各管一段。', c: '中' },
+                { k: '有效', v: '基线护栏兜住"方向不偏"，多 Story 循环防大爆炸。', c: '中强' },
+            ],
+            pick: '用**最小治理集合**换取方向可控——**别把基线一次铺满**（轻量提案 §3.1：必需四项 + 按需增强项）。',
+            tip: '交互复杂时优先**单文件 HTML 原型**而非完整前端工程（轻量提案 §3.2「原型形式选择」），控易用性成本。',
+            cases: ['epic-account-system（登入/注册/会话/管理 多 Story）', 'epic-sales-dashboard（概览/排名多 Story）'],
+        },
+        3: {
+            theme: 'slate', accent: 'text-slate-900', chip: 'CROSS-ROLE · DOUBLE-LOOP',
+            scenarios: ['跨角色大规模协作', '多 Epic 并行', '需持续架构演进'],
+            value: '需求侧/交付侧彻底解耦，标准化工序消除模糊性，分层 Sync 保规格连续 + 基线稳定。',
+            balance: [
+                { k: '轻量', v: '门禁最多、HITL 最多，落地门槛最高；但**完整而不臃肿**——治理力度随复杂度自适应。', c: '最重' },
+                { k: '易用', v: '各司其职：PM 管业务语义，Engineer 管实现；交接契约化，跨侧不互相等待。', c: '中' },
+                { k: '有效', v: '需求/交付解耦 + 分层 Sync = 最高防漂移，可审计、可追溯、可规模化。', c: '最强' },
+            ],
+            pick: '效率与治理的胜负手在**分层 Sync**：Spec Sync 逐 change 回流、Baseline Sync 到 Epic 收尾才做——避免中间态污染。',
+            tip: '面向复杂业务，**治理力度随复杂度自适应**，不陷入文档膨胀与过度治理（完整版 §3.7「Complexity-Balanced」）。',
+            baseline: {
+                assets: [
+                    { n: 'domain_model.html', d: '业务边界 / BC→Capability 映射 / 聚合与不变量' },
+                    { n: 'business_process.html', d: 'L1/L2/L3 流程节点（验收引用源）' },
+                    { n: 'service_blueprint.html', d: '跨角色泳道 / 旅程阶段 SB-STAGE-* / SB-<LANE>-*' },
+                    { n: 'ROADMAP.md / PRODUCT.md', d: '规划基线：阶段即 Epic / 定位与决策准则' },
+                ],
+                merge: '**Spec Sync（change 级）**每个 change 归档前回流主规格，保证下一 Story 依赖最新 specs；**Baseline Sync（Epic 级）**在 Epic 全部 Story 归档后统一回流三件套 + Roadmap——避免单个 Story 中间态污染 baseline、避免反复改写；到点须显式判定（Needs Sync 或 No-op 均记录）。',
+            },
+            cases: ['epic-accounts-receivable（3 Story → 9 change → Baseline）', 'epic-miniprogram-channel（登录/下单/配置）'],
+        },
+    };
+
+    // ==========================================================================
+    //  渲染：流程图 + Balance 卡合成一张 slide
+    // ==========================================================================
+    function balanceCardHTML(num, c) {
+        const n = Number(String(num).replace(/^0+/, '')) || Number(num);
+        const b = cards[n];
+        const themeMap = { 1: 'bg-aidd-green', 2: 'bg-aidd-blue', 3: 'bg-slate-900' };
+        const themeChip = {
+            1: 'bg-green-50 text-aidd-green border border-green-100',
+            2: 'bg-blue-50 text-aidd-blue border border-blue-100',
+            3: 'bg-slate-100 text-slate-600 border border-slate-200',
+        }[n];
+        const blob = (s) => s.replace(/\*\*(.+?)\*\*/g, '<b>$1</b>');
+
+        const scenarioPills = b.scenarios.map(s =>
+            `<span class="inline-block px-3 py-1 bg-slate-50 border border-slate-200 rounded-full text-xs font-bold text-slate-600">${s}</span>`
+        ).join('');
+
+        const balRows = b.balance.map(row => `
+            <div class="flex-1 p-3 bg-slate-50 rounded-xl border border-slate-100">
+                <div class="flex items-center justify-between mb-1">
+                    <span class="kpi-label text-[10px] font-black ${b.accent} uppercase">${row.k}</span>
+                    <span class="text-[10px] font-black ${row.c === '最重' || row.c === '最强' ? 'text-slate-900' : 'text-slate-400'}">${row.c}</span>
+                </div>
+                <p class="text-[12px] text-slate-600 leading-snug">${blob(row.v)}</p>
+            </div>`).join('');
+
+        const casePills = b.cases.map(s =>
+            `<code class="px-2 py-0.5 bg-slate-100 rounded text-[11px] font-mono text-slate-600 border border-slate-200">${s}</code>`
+        ).join('');
+
+        const baselineBlock = b.baseline
+            ? `
+            <div class="mt-3 p-3 rounded-xl bg-slate-50 border border-slate-200">
+                <p class="kpi-label text-[10px] font-black ${b.accent} uppercase mb-2">Baseline 资产 · 何时合并（重要）</p>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-2 mb-2">
+                    ${b.baseline.assets.map(a => `
+                    <div class="p-2 bg-white rounded-lg border border-slate-200">
+                        <code class="text-[11px] font-mono font-bold text-slate-900">${a.n}</code>
+                        <p class="text-[11px] text-slate-500 leading-snug mt-1">${blob(a.d)}</p>
+                    </div>`).join('')}
+                </div>
+                <p class="text-[12px] leading-snug text-slate-600">${blob(b.baseline.merge)}</p>
+            </div>`
+            : '';
+
+        return `
+        <div class="balance-card px-8 py-5">
+            <div class="flex items-center justify-between mb-4">
+                <div>
+                    <span class="inline-block px-3 py-1 mb-1 rounded-full text-[10px] font-black tracking-tighter ${themeChip}">${b.chip}</span>
+                    <h3 class="text-sm font-black text-slate-900 flex items-center gap-2">
+                        <span class="w-2 h-2 ${themeMap[n]}"></span>Balance 权衡 · 轻量 ↔ 易用 ↔ 有效
+                    </h3>
+                </div>
+                <div class="flex gap-2">${scenarioPills}</div>
+            </div>
+            <div class="grid grid-cols-3 gap-3 mb-3">${balRows}</div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <div class="p-3 rounded-xl border ${themeMap[n] === 'bg-slate-900' ? 'bg-slate-900 text-white border-slate-900' : 'bg-white border-slate-200'}">
+                    <p class="kpi-label text-[10px] font-black ${b.accent} uppercase mb-1">何时选它 · 平衡点</p>
+                    <p class="text-[12px] leading-snug ${themeMap[n] === 'bg-slate-900' ? 'text-slate-100' : 'text-slate-600'}">${blob(b.pick)}</p>
+                </div>
+                <div class="p-3 rounded-xl bg-white border border-slate-200">
+                    <p class="kpi-label text-[10px] font-black ${b.accent} uppercase mb-1">警示 · 别踩</p>
+                    <p class="text-[12px] leading-snug text-slate-600">${blob(b.tip)}</p>
+                    <p class="kpi-label text-[10px] font-black ${b.accent} uppercase mb-1 mt-2">真实案例锚点</p>
+                    <div class="flex flex-wrap gap-2">${casePills}</div>
+                </div>
+            </div>
+            ${baselineBlock}
+        </div>`;
+    }
+
+    function slideHTML(num, theme, title, subtitle, tag, tagClass, svg) {
+        const numBg = theme === 'green' ? 'bg-aidd-green' : theme === 'blue' ? 'bg-aidd-blue' : 'bg-slate-900';
+        const numShadow = theme === 'green' ? 'shadow-green-200' : theme === 'blue' ? 'shadow-blue-200' : 'shadow-slate-400';
+        return `<section class="slide">
+            <div class="slide-header">
+                <div class="flex items-center gap-6">
+                    <div class="${numBg} text-white flex items-center justify-center text-3xl font-black rounded-2xl shadow-lg ${numShadow} w-16 h-16">${num}</div>
+                    <div>
+                        <h2 class="text-3xl font-serif font-black text-slate-900">${title}</h2>
+                        <p class="text-slate-400 font-medium uppercase tracking-widest text-sm mt-1">${subtitle}</p>
+                    </div>
+                </div>
+                <span class="px-4 py-1 rounded-full text-xs font-bold tracking-tighter ${tagClass}">${tag}</span>
+            </div>
+            <div class="bp-body">${svg}</div>
+            ${balanceCardHTML(num)}
+        </section>`;
+    }
+
+    const slidesHtml = [
+        slideHTML('01', 'green', '极简交付 · Layer 01', 'Minimalist Delivery / Single Change Pipeline',
+            'SPEC-DRIVEN DEVELOPMENT', 'bg-slate-100 text-slate-500', renderLayer(layer1)),
+        slideHTML('02', 'blue', '轻量产品 · Layer 02', 'Lightweight Product / Baseline Guardrail / Multi-Story Loop',
+            'COLLABORATIVE SDD', 'bg-slate-100 text-slate-500', renderLayer(layer2)),
+        slideHTML('03', 'dark', '业务产品 · Layer 03', 'Business Product / Requirement Funnel / Double-Loop Governance',
+            'ENTERPRISE SDD FRAMEWORK', 'bg-aidd-green text-white', renderLayer(layer3)),
+    ];
+
+    document.getElementById('slides').innerHTML = slidesHtml.join('');
+    </script>
+</body>
+</html>
