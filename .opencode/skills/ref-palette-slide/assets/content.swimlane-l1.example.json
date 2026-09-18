@@ -1,0 +1,129 @@
+{
+  "layout": "swimlane",
+  "index": "01",
+  "tone": "green",
+  "title": "极简交付 · Layer 01",
+  "subtitle": "Minimalist Delivery / Single Change Pipeline",
+  "tag": "SPEC-DRIVEN DEVELOPMENT",
+  "agents": [
+    {
+      "label": "ENGINEER AGENT (PRIMARY)",
+      "color": "blue",
+      "from": 0,
+      "to": 3
+    },
+    {
+      "label": "LEAD (GOVERNANCE)",
+      "color": "dark",
+      "from": 4,
+      "to": 4,
+      "solid": true
+    }
+  ],
+  "columns": [
+    {
+      "flow": {
+        "title": "探索 Explore",
+        "sub": "业务初探 · idea.md",
+        "kind": "blue"
+      },
+      "skills": [
+        "explore"
+      ],
+      "cmds": [
+        "/opsx:explore"
+      ],
+      "deliv": {
+        "title": "idea.md",
+        "desc": [
+          "记录业务初探设计",
+          "明确意图与价值"
+        ]
+      }
+    },
+    {
+      "flow": {
+        "title": "提案 Propose",
+        "sub": "工程提案 + 原型",
+        "kind": "blue"
+      },
+      "skills": [
+        "propose"
+      ],
+      "cmds": [
+        "/opsx:propose"
+      ],
+      "deliv": {
+        "title": "proposal.md",
+        "desc": [
+          "确立工程实施方案",
+          "对齐交付路径"
+        ]
+      }
+    },
+    {
+      "flow": {
+        "title": "实施 Apply",
+        "sub": "代码实施与验证",
+        "kind": "blue"
+      },
+      "skills": [
+        "apply-change"
+      ],
+      "cmds": [
+        "/opsx:apply"
+      ],
+      "deliv": {
+        "title": "code + verify.md",
+        "desc": [
+          "原子化变更",
+          "验证门禁证据"
+        ]
+      }
+    },
+    {
+      "flow": {
+        "title": "同步 Sync",
+        "sub": "delta 规格回写",
+        "kind": "blue"
+      },
+      "skills": [
+        "sync-specs"
+      ],
+      "cmds": [
+        "/opsx:sync"
+      ],
+      "deliv": {
+        "title": "delta specs",
+        "desc": [
+          "认知回流规格基线",
+          "更新 specs/*.md"
+        ]
+      }
+    },
+    {
+      "flow": {
+        "title": "归档 Archive",
+        "sub": "审计追踪",
+        "kind": "dark"
+      },
+      "skills": [
+        "archive-change"
+      ],
+      "cmds": [
+        "/opsx:archive"
+      ],
+      "deliv": {
+        "title": "archive/",
+        "desc": [
+          "完整变更审计追踪",
+          "回填业务基线"
+        ],
+        "dark": true
+      }
+    }
+  ],
+  "loops": [],
+  "footer": "NiDD City Lab | 成都站 · AI+ 研发数字峰会",
+  "footer_right": "OpenSpec 蓝图级分层治理"
+}

@@ -1,0 +1,39 @@
+{
+  "layout": "diagram-embed",
+  "title_lead": "扩展 SDD 实践：",
+  "title_accent": "逐步尝试来如何支持",
+  "intro": {
+    "context_label": "背景",
+    "context": "实践过 Harness 和 SDD 的伙伴应该有感受：要实践好还是有一定门槛的；对产品经理 / BA / SA 更是如此，让整个团队协同流畅工作更是挑战。",
+    "question_label": "问题",
+    "question": "如何保持简单，以最易上手的方式，先支撑需求端半自动化走起来、并流畅衔接到开发端？"
+  },
+  "placeholder": {
+    "hint": "在此粘贴 OpenSpec 标准流程图",
+    "note": "建议尺寸 12.49″ × 2.10″（约 5.9 : 1）"
+  },
+  "progression": {
+    "label": "支持路径：从最小可用开始，逐步扩展",
+    "nodes": [
+      {
+        "tier": "L1 · 极简交付",
+        "tone": "green",
+        "team": "小型工具团队"
+      },
+      {
+        "tier": "L2 · 轻量产品",
+        "tone": "blue",
+        "team": "小型业务产品团队"
+      },
+      {
+        "tier": "L3 · 业务产品",
+        "tone": "slate",
+        "team": "复杂业务产品团队"
+      }
+    ],
+    "axis_left": "简单 · 轻治理",
+    "axis_right": "复杂 · 重治理"
+  },
+  "footer": "NiDD City Lab | 成都站 · AI+ 研发数字峰会",
+  "footer_right": "示意数据 · 仅供说明"
+}

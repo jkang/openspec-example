@@ -41,90 +41,110 @@
 
 ## 01.5 分层治理可视化：OpenSpec 的三种形态
 
-> **提示**：为获得最佳视觉体验，请打开 [OpenSpec 蓝图级分层治理体系全景图（含 Balance 权衡，动态版）](visuals/blueprint-embed.html)——每层一张 16:9 幻灯片，含 5 车道流程图 + 轻量/易用/有效权衡卡 + 真实案例锚点；如无网络，可用同目录的 [静态渲染版](visuals/blueprint-embed.static.html)。
->
-> **分场景使用**：不是一张图讲到底，而是**逐层对应演讲场景**——
-> - **Layer 01（极简交付）**：讲"单一变更如何闭环"时用。
-> - **Layer 02（轻量产品）**：讲"多个 Story + 基线护栏"时用。
-> - **Layer 03（业务产品）**：讲"需求侧/交付侧解耦 + 分层治理"时用（本演讲的重点形态）。
-
-三种形态是**同一框架随复杂度递增的升级弧线**，不是并列三套方案：
-
-```
-极简交付（Single Change）
-   │  + 规划 / 业务基线护栏 → 多 Story 循环
-   ▼
-轻量产品（Baseline Guardrail + Multi-Story）
-   │  + 需求侧/交付侧解耦 → 分层同步 → 双环治理
-   ▼
-业务产品（Requirement Funnel + Double-Loop Governance）
-```
+> **提示**：为了获得最佳视觉体验，请查看 [OpenSpec 蓝图级分层治理体系全景图 (Blueprint)](file:///Users/superkkk/MyCoding/OpenSpec-practice/learning-sdd/visuals/workflow-blueprint.html)。
 
 ### 形态一：极简交付 (Minimalist Delivery)
-专注于单 Change 的快速闭环，确立了"意图 -> 规格 -> 代码"的原始管线。
-**适用场景**：单兵 / 小团队、低复杂度变更、想法快速验证。（详见 embed 的 Layer 01 幻灯片）
-**Balance**：最轻、最易用，但"有效"最弱——**验证门禁是唯一护栏**，无基线，变更一多就漂移；不要在此硬塞业务基线（会拖慢"想法→验证"的响应速度）。
+专注于单 Change 的快速闭环，确立了“意图 -> 规格 -> 代码”的原始管线。
+
+```mermaid
+graph LR
+    subgraph LeadAgent [Lead Agent]
+        direction TB
+        E[归档 Archive<br/><small>Cmd: /opsx:archive<br/>Skill: archive-change</small>]
+    end
+
+    subgraph EngineerAgent [Engineer Agent]
+        direction TB
+        A[探索 Explore<br/><small>idea.md<br/>Cmd: /opsx:explore<br/>Skill: explore</small>]
+        B[提案 Propose<br/><small>proposal.md<br/>Cmd: /opsx:propose<br/>Skill: propose</small>]
+        C[实施 Apply<br/><small>Code + verify.md<br/>Cmd: /opsx:apply<br/>Skill: apply-change</small>]
+        D[同步 Sync<br/><small>Delta Specs<br/>Cmd: /opsx:sync<br/>Skill: sync-specs</small>]
+    end
+
+    A --> B --> C --> D --> E
+
+    style A fill:#fff,stroke:#1677ff,stroke-width:4px
+    style B fill:#fff,stroke:#1677ff,stroke-width:4px
+    style C fill:#fff,stroke:#1677ff,stroke-width:4px
+    style D fill:#fff,stroke:#1677ff,stroke-width:4px
+    style E fill:#f8fafc,stroke:#94a3b8,stroke-width:4px
+```
 
 ### 形态二：轻量产品 (Lightweight Product)
-引入"规划 + 业务基线护栏"，支持 Multi-Story 循环迭代，解决复杂业务逻辑的拆解与价值对齐。
-**适用场景**：复杂业务逻辑、多 Story 循环、业务价值对齐。（详见 embed 的 Layer 02 幻灯片）
-**Balance**：基线只放**必选**（产品定位 / ROADMAP / 领域模型 / 流程），`service_blueprint` 与 `delivery_board` 按需增强；交互复杂时优先**单文件 HTML 原型**而非完整前端工程，控住易用性成本。
+引入了“规划与业务基线”，支持 Multi-Story 循环迭代，解决了复杂业务逻辑的拆解与价值对齐问题。
+
+```mermaid
+graph LR
+    subgraph LeadPM [Lead / PM]
+        direction TB
+        A([规划 Plan<br/><small>ROADMAP.md</small>])
+        B([基线 Base<br/><small>Blueprint</small>])
+        K[回顾 Review<br/><small>Roadmap Update</small>]
+    end
+
+    subgraph Execution [Engineer Agent / Story Loop]
+        direction TB
+        C[探索 Explore<br/><small>idea.md</small>]
+        D[提案 Propose<br/><small>proposal.md</small>]
+        subgraph Loop [Multi-Story Loop]
+            direction TB
+            E[原型 Prototype]
+            F[实施 Apply]
+        end
+        G[同步 Sync<br/><small>Spec Sync</small>]
+        H[归档 Archive]
+    end
+
+    A --> B --> C --> D --> E --> F
+    F -- Next Story --> E
+    F --> G --> H --> K
+    K -.-> A
+
+    style A fill:#fff,stroke:#1677ff,stroke-width:4px
+    style B fill:#fff,stroke:#1677ff,stroke-width:4px
+    style Loop fill:#eff6ff,stroke:#dbeafe,stroke-dasharray: 5 5
+    style K fill:#fff,stroke:#1677ff,stroke-width:4px
+```
 
 ### 形态三：业务产品 (Business Product)
-实现需求侧与交付侧的深度解耦，通过标准漏斗、交接契约与分层同步，支持规模化协作与持续架构演进。
-**适用场景**：跨角色大规模协作、多 Epic 并行、需持续架构演进。（详见 embed 的 Layer 03 幻灯片）
-**Balance**：门禁与 HITL 最多、落地门槛最高，但**有效**最强；治理力度**随复杂度自适应**，完整而不臃肿，不陷入"文档膨胀 + 过度治理"（见下节 Baseline 深度剖析）。
+实现了需求侧与交付侧的深度解耦，通过标准化漏斗、交接契约与分层同步，支持规模化协作与持续架构演进。
 
-> **一句话**：流程不是越全越好，而是**按需求类型选路径**——简单直走、复杂深控，层与层之间是**递进迁移**，不是互相替代。
+```mermaid
+graph LR
+    subgraph Funnel [PM / Requirement Funnel]
+        direction TB
+        P1[调研 Research]
+        P2[探索 Explore]
+        P3[故事 Story]
+    end
 
----
+    subgraph Bridge [Lead]
+        H1[交接 Handoff<br/><small>Synthesized Proposal</small>]
+    end
 
-## 01.6 Balance 权衡总览 + Layer 3 基线资产剖析
+    subgraph Pipeline [Engineer / Execution Pipeline]
+        direction TB
+        D1[规格 Spec]
+        D2[实施 Apply]
+        D3[同步 Sync]
+    end
 
-### Balance：轻量 ↔ 易用 ↔ 有效 三力权衡（逐层对照）
+    subgraph Governance [Lead / Governance]
+        direction TB
+        G1[归档 Archive]
+        G2[基线同步 Baseline Sync]
+    end
 
-> **三力定义**：**轻量** = 落地门槛/治理成本越低越好；**易用** = 人 & AI 上手越顺越好；**有效** = 防返工、防漂移、可追溯越强越好。三者天然拉扯——治理加得太多，轻量/易用就受损；治理太少，有效就崩盘。**Balance 的本质是在三力间选一个"当下最划算"的落点。**
+    P1 --> P2 --> P3 --> H1 --> D1 --> D2 --> D3 --> G1 --> G2
+    G1 -- Next Story --> P3
+    G2 -- Next Epic --> P1
 
-| 形态 | 轻量（门槛） | 易用（上手） | 有效（防漂移） | 适合团队 | 平衡点 |
-|---|---|---|---|---|---|
-| **L1 极简交付** | 最轻（零治理） | 最易（单 Agent 一路到归档） | 最弱（仅验证门禁兜底） | 单兵/小团队；想法验证 | **响应速度优先**——不要硬塞基线 |
-| **L2 轻量产品** | 中（只放必选基线） | 中（原型/Story 各一道 HITL） | 中强（基线护栏兜方向） | 复杂业务；多 Story 并行 | **最小治理集合**替换方向可控；原型优先单文件 HTML |
-| **L3 业务产品** | 最重（门禁/HITL 最多） | 中（需求/交付各司其职） | 最强（解耦+分层 Sync） | 跨角色协作；多 Epic；架构演进 | **完整但不臃肿**——治理随复杂度自适应 |
-
-> 关键认知迁移：**L1→L2→L3 不是"加更多文档"，而是把"单点防线"升级成"分层防线"**——L1 靠验证门禁，L2 加基线护栏，L3 用需求/交付解耦 + 分层同步，让"防线"随复杂度涨价。代价是门槛上升，所以**必须按需求类型选择**，而非一刀切全上。
-
-### Layer 3 深度剖析：哪些 Baseline 资产重要？在什么节点合并？
-
-**为什么复杂产品必须重视 Baseline**：当多 Epic 并行、跨角色协作、系统持续演进时，若不把"业务知识"沉淀为稳定基线，知识与代码会漂移（业务文档说 A、实现是 B），系统沦为黑盒。Baseline 是**领域语义的守恒层**，也是 AI 自治（L4）的护栏。
-
-**基线资产清单与各自治理什么**：
-
-| 基线资产 | 治理什么 | 何时更新 |
-|---|---|---|
-| **domain_model.html** | 业务边界 / BC→Capability 映射 / 聚合·状态机·业务不变量 | 边界或映射、taxonomy、领域事件/命令/策略变化时 |
-| **business_process.html** | L1/L2/L3 流程节点（L3 规则环节，验收引用源） | 流程节点增删改时 |
-| **service_blueprint.html** | 跨角色泳道 / 旅程阶段 SB-STAGE-* / SB-<LANE>-* / 能力状态 | 能力分布、阶段覆盖、跨阶段支撑变化时 |
-| **ROADMAP.md / PRODUCT.md** | 排期 / 阶段边界（每阶段条目即 Epic）/ 产品定位与决策准则 | 每阶段收尾、月度滚动 |
-
-**关键合并时点：分层 Sync（决定性理由）**
-
-```
-Spec Sync（change 级）  每个 change 归档【前】 → 合并 delta specs 入 openspec/specs/
-                        🎯 保证下一个 Story 依赖【最新 specs】——认知随变更持续回流
-Baseline Sync（Epic 级） Epic【所有 Story 归档后】 → 统一回流 docs/baseline/*.html + ROADMAP
-                        🎯 避免单个 Story 中间态污染 baseline、避免反复改写、
-                           Roadmap 完成判定需 Epic Exit Criteria 全达成
+    style Funnel fill:#f6ffed,stroke:#00b96b,stroke-width:2px
+    style Pipeline fill:#eff6ff,stroke:#1677ff,stroke-width:2px
+    style Bridge fill:#1e293b,color:#fff
+    style G2 fill:#fff,stroke:#00b96b,stroke-width:4px
 ```
 
-**为什么必须分层、不能合并成一次 Sync**：
-1. **Spec 需要逐变更新鲜**：后续 Story 的规格要基于最新主规格推导，所以每个 change 归档前都要 Spec Sync。
-2. **Baseline 需要 Epic 级整洁**：baseline 是"阶段认知的稳定快照"，若每个 Story 都洗一遍，会出现中间态污染、反复改写，且 Roadmap 的"该阶段是否完成"要等全部 Story 达标才判定。
-3. **到点须显式判定**：Baseline Sync 不是"每段必做"，而是**到 Epic 收尾时做 Sync Assessment**——明确判断 Service Blueprint / Domain Model 是否需回流；若无变化，也要**显式记录 No-op 及理由**，而非静默跳过（防基线腐蚀）。
-
-**真实案例证据（`epic-accounts-receivable`）**：
-- 需求侧整目录归档 `openspec-requirements/archive/2026-09-08-epic-accounts-receivable/`（保留 research/idea/prototypes/storymap/stories 完整交付记录）。
-- Epic 收尾触发 Baseline Sync：`domain_model.html` 新增 Order 聚合 + Receivable/Receipt 实体、User +creditDays、BC→capability 映射；`service_blueprint.html` 新增 SB-OPS-* 应收活动阶段；`delivery_board.html` 刷新；`ROADMAP.md` 更新（Phase 7 标注已完成）。
-- 交付侧 9 个 change（`story-ar-dashboard`/`story-ar-receipt-entry`/`story-ar-credit-customer` 等）各自归档**前**做 Spec Sync，聚合为 Epic 级后**只做一次** Baseline Sync。
 
 ---
 

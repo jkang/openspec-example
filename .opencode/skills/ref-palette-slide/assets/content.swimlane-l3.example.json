@@ -1,0 +1,269 @@
+{
+  "layout": "swimlane",
+  "index": "03",
+  "tone": "slate",
+  "title": "业务产品 · Layer 03",
+  "subtitle": "Business Product / Requirement Funnel / Double-Loop Governance",
+  "tag": "ENTERPRISE SDD FRAMEWORK",
+  "tag_solid": true,
+  "agents": [
+    {
+      "label": "LEAD",
+      "color": "dark",
+      "from": 0,
+      "to": 2
+    },
+    {
+      "label": "PM AGENT (REQ FUNNEL)",
+      "color": "green",
+      "from": 3,
+      "to": 3,
+      "solid": true
+    },
+    {
+      "label": "BRIDGE",
+      "color": "dark",
+      "from": 4,
+      "to": 4,
+      "solid": true
+    },
+    {
+      "label": "ENGINEER AGENT (EXECUTION)",
+      "color": "blue",
+      "from": 5,
+      "to": 5,
+      "solid": true
+    },
+    {
+      "label": "LEAD / GOVERNANCE",
+      "color": "dark",
+      "from": 6,
+      "to": 7,
+      "solid": true
+    }
+  ],
+  "columns": [
+    {
+      "flow": {
+        "title": "规划 Plan",
+        "sub": "Plan",
+        "kind": "green"
+      },
+      "skills": [
+        "product-planning"
+      ],
+      "cmds": [
+        "/opsx:planning:*"
+      ],
+      "deliv": {
+        "title": "ROADMAP.md",
+        "desc": [
+          "对齐产品愿景"
+        ]
+      }
+    },
+    {
+      "flow": {
+        "title": "业务基线",
+        "sub": "Business",
+        "kind": "green"
+      },
+      "skills": [
+        "blueprint"
+      ],
+      "cmds": [
+        "/opsx:baseline/sync"
+      ],
+      "deliv": {
+        "title": "baseline/",
+        "desc": [
+          "稳定业务边界"
+        ]
+      }
+    },
+    {
+      "flow": {
+        "title": "任务类型?",
+        "sub": "Epic / Fix",
+        "kind": "dark"
+      },
+      "skills": [
+        "router"
+      ],
+      "cmds": [
+        "/req:handoff"
+      ],
+      "deliv": {
+        "title": "类型路由",
+        "desc": [
+          "Epic → 漏斗",
+          "Fix → 交付"
+        ],
+        "dark": true
+      }
+    },
+    {
+      "flow": {
+        "block": true,
+        "stage": "REQUIREMENT FUNNEL",
+        "kind": "green",
+        "subpills": [
+          [
+            "调研",
+            "Scan"
+          ],
+          [
+            "探索",
+            "Explore"
+          ],
+          [
+            "原型",
+            "Proto"
+          ],
+          [
+            "故事",
+            "Story"
+          ]
+        ]
+      },
+      "skills": [
+        "research",
+        "explore",
+        "prototype",
+        "storymap/story"
+      ],
+      "cmds": [
+        "/req:research",
+        "/req:explore",
+        "/req:prototype",
+        "/req:story"
+      ],
+      "deliv": {
+        "title": "Story (Freeze)",
+        "desc": [
+          "业务面冻结",
+          "E2E 断言"
+        ]
+      }
+    },
+    {
+      "flow": {
+        "title": "交接 Handoff",
+        "sub": "Handoff",
+        "kind": "dark"
+      },
+      "skills": [
+        "handoff"
+      ],
+      "cmds": [
+        "/req:handoff"
+      ],
+      "deliv": {
+        "title": "Synthesized",
+        "desc": [
+          "交接契约驱动交付"
+        ],
+        "dark": true
+      }
+    },
+    {
+      "flow": {
+        "block": true,
+        "stage": "EXECUTION PIPELINE",
+        "kind": "blue",
+        "subpills": [
+          [
+            "提案",
+            "Propose"
+          ],
+          [
+            "规格",
+            "Specs"
+          ],
+          [
+            "设计",
+            "Design"
+          ],
+          [
+            "实施",
+            "Apply"
+          ]
+        ]
+      },
+      "skills": [
+        "propose",
+        "spec-design",
+        "apply-change",
+        "verify"
+      ],
+      "cmds": [
+        "/opsx:propose",
+        "/opsx:spec-design",
+        "/opsx:apply"
+      ],
+      "deliv": {
+        "title": "Specs (SDD)",
+        "desc": [
+          "行为规格驱动的产线"
+        ]
+      }
+    },
+    {
+      "flow": {
+        "title": "规格同步",
+        "sub": "Spec Sync",
+        "kind": "dark"
+      },
+      "skills": [
+        "sync-specs"
+      ],
+      "cmds": [
+        "/opsx:sync"
+      ],
+      "deliv": {
+        "title": "delta specs",
+        "desc": [
+          "认知回流规格",
+          "保持规格基线"
+        ],
+        "dark": true
+      }
+    },
+    {
+      "flow": {
+        "title": "归档 Archive",
+        "sub": "Archive",
+        "kind": "dark"
+      },
+      "skills": [
+        "archive-change"
+      ],
+      "cmds": [
+        "/opsx:archive"
+      ],
+      "deliv": {
+        "title": "archive/",
+        "desc": [
+          "完整审计追踪"
+        ],
+        "dark": true
+      }
+    }
+  ],
+  "loops": [
+    {
+      "from": 7,
+      "to": 3,
+      "label": "NEXT STORY",
+      "color": "blue"
+    },
+    {
+      "from": 7,
+      "to": 0,
+      "label": "BASELINE LOOP (NEXT EPIC · REVIEW)",
+      "color": "green"
+    }
+  ],
+  "footer": "NiDD City Lab | 成都站 · AI+ 研发数字峰会",
+  "footer_right": "OpenSpec 蓝图级分层治理"
+}

@@ -241,3 +241,14 @@ ecommerce/ecommerce-mini/data/channel-config.json
 e2e-tests/cucumber-report.html
 ecommerce/ecommerce-mini/data/*.tmp
 ecommerce/ecommerce-mini/data/*.corrupt-*
+outputs/1_编码自动化了_需求还是手工作坊.pptx
+outputs/2_需求侧五大痛点.pptx
+outputs/3_需求过程达到L3的五个破局点.pptx
+outputs/4_三类流程与团队分型.pptx
+learning-sdd/从 PRD 到 Specs：AI 重塑需求工程 v2.pptx
+learning-sdd/TALK_PRD_TO_SPECS.md
+outputs/5_workflow-blueprint_L1_极简交付.pptx
+outputs/6_workflow-blueprint_L2_轻量产品.pptx
+outputs/7_workflow-blueprint_L3_业务产品.pptx
+outputs/8_核心实践_对PM-BA-SA的两项硬要求.pptx
+outputs/9_扩展SDD实践_逐步尝试来如何支持.pptx

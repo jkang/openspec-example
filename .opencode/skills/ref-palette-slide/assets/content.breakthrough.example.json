@@ -1,0 +1,55 @@
+{
+  "layout": "breakthrough",
+  "title_lead": "如果需求过程想要达到 ",
+  "title_accent": "L3",
+  "subtitle": "从 L0~L1 的手工模式，跨到 L3 有条件自动化 —— 差距落在五个维度上，每个维度都有一个破局点。",
+  "problem_label": "现状",
+  "solution_label": "破局",
+  "scale": {
+    "levels": [
+      ["L0", "纯手工"],
+      ["L1", "辅助编程"],
+      ["L2", "部分自动化"],
+      ["L3", "有条件自动化"],
+      ["L4", "高度自动化"],
+      ["L5", "完全自动化"]
+    ],
+    "now": { "from": 0, "to": 1, "label": "现在 · 手工模式" },
+    "target": { "index": 3, "label": "目标 · 有条件自动化" }
+  },
+  "columns": [
+    {
+      "name": "工具",
+      "icon": "gear",
+      "problem": "缺少像 Codex 一样趁手的需求 Agent 工具",
+      "solution": "在需求端提供一套「OpenSpec」，让 AI 承接操作型任务，人只做核心判断。"
+    },
+    {
+      "name": "流程",
+      "icon": "flow",
+      "problem": "流程长、传统且固化，未达标就不能进入开发",
+      "solution": "允许不同域的产品团队采用不同流程，让更多团队先轻量运转起来。"
+    },
+    {
+      "name": "组织",
+      "icon": "people",
+      "problem": "业务与 IT 割裂，角色之间来回传递",
+      "solution": "让割裂的角色融合为一个角色，缩短沟通链路。"
+    },
+    {
+      "name": "知识",
+      "icon": "doc",
+      "problem": "需求治理长期缺位，过往文档参考价值低",
+      "solution": "借鉴 OpenSpec / archive，让 AI 闭环沉淀知识，取代人工整理文档。"
+    },
+    {
+      "name": "人",
+      "icon": "person",
+      "problem": "产品经理和 BA、SA 并未真正拥抱 AI",
+      "solution": "没有选择 —— 必须转变态度。意愿问题没有工具可以替代。"
+    }
+  ],
+  "thesis": "五个维度里，四个可以靠设计解决 —— 只有「人」，必须自己决定。",
+  "footer": "NiDD City Lab | 成都站 · AI+ 研发数字峰会",
+  "footer_right": "示意数据 · 仅供说明"
+}
