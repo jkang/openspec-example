@@ -65,8 +65,8 @@ git clone -b release/v2-lightweight https://github.com/jkang/openspec-example.gi
 
 | 分支 | 内容 |
 | :--- | :--- |
-| `main` | 默认分支。承载本导航文档，代码内容为 **v2 轻量版** |
-| `full-sdd` | **v3 完整版**开发线（最新） |
+| `main` | **默认分支，v3 完整版**（最新） |
+| `full-sdd` | v3 开发线别名（与 `main` 同源） |
 | `release/v1-minimal` | v1 只读快照（= tag `v1.0-minimal-delivery`） |
 | `release/v2-lightweight` | v2 只读快照（= tag `v2.0-lightweight-sdd`） |
 | `release/v3-full` | v3 只读快照（= tag `v3.0-full-sdd`） |
