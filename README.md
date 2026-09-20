@@ -6,6 +6,17 @@
 
 ---
 
+> **📌 版本演进**：本仓库保留了三代 SDD 脚手架，可按 tag 检出对照 ——
+> [`v1.0-minimal-delivery` 极简交付](https://github.com/jkang/openspec-example/tree/v1.0-minimal-delivery) ·
+> [`v2.0-lightweight-sdd` 轻量版](https://github.com/jkang/openspec-example/tree/v2.0-lightweight-sdd) ·
+> [`v3.0-full-sdd` 完整版](https://github.com/jkang/openspec-example/tree/v3.0-full-sdd)
+>
+> 两两差异：[极简 → 轻量](https://github.com/jkang/openspec-example/compare/v1.0-minimal-delivery...v2.0-lightweight-sdd) ·
+> [轻量 → 完整](https://github.com/jkang/openspec-example/compare/v2.0-lightweight-sdd...v3.0-full-sdd)
+> ｜完整说明见 **[VERSIONS.md](VERSIONS.md)**
+
+---
+
 ## 📋 目录
 1. [核心价值：为什么需要端到端 SDD？](#1-核心价值为什么需要端到端-sdd)
 2. [方案全貌：四层架构与治理闭环](#2-方案全貌四层架构与治理闭环)
