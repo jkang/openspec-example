@@ -252,3 +252,13 @@ outputs/6_workflow-blueprint_L2_轻量产品.pptx
 outputs/7_workflow-blueprint_L3_业务产品.pptx
 outputs/8_核心实践_对PM-BA-SA的两项硬要求.pptx
 outputs/9_扩展SDD实践_逐步尝试来如何支持.pptx
+learning-sdd/\[AiDD成都]从 PRD 到 Specs：AI 重塑需求工程 v1.0.key
+outputs/10_分侧_需求侧为什么必须独立于开发侧.pptx
+outputs/11_反向沉淀机制_原型确认到进入代码仓.pptx
+outputs/12_用产能指标管理需求管线.pptx
+outputs/13_结尾_三重转变_对PM-BA-SA的新要求.pptx
+outputs/14_结尾_规模化落地路径与Tips.pptx
+
+# 临时原型 HTML（暂不纳入版本控制）
+ecommerce/customer-service-agent-prototype.html
+ecommerce/ecommerce-miniprogram/home-preview.html
