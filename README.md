@@ -24,6 +24,7 @@
 4. [落地指引：如何迁移与扩展到新项目](#4-落地指引如何迁移与扩展到新项目)
 5. [成熟度定义：L3 与 L4](#5-成熟度定义l3-与-l4)
 6. [目录导航与资源](#6-目录导航与资源)
+7. [版本、分支与 Tag](#7-版本分支与-tag)
 
 ---
 
@@ -146,6 +147,49 @@
 - [SDD 完整版提案](./learning-sdd/ai4se-sdd-proposal.md)
 - [OpenSpec 综合手册](./learning-sdd/openspec-user-manual.md)
 - [v2.0 升级解析](./learning-sdd/openspec-v2.0-upgrade.md)
+
+---
+
+## 7. 版本、分支与 Tag
+
+本仓库保留了三代 SDD 脚手架：用 **Tag 冻结版本快照**，用 **分支承载当前开发线与只读快照**。
+
+### 🏷️ 版本 Tag（按时间递进）
+
+| Tag | 日期 | 定位 | 相对上一代新增 |
+| :--- | :--- | :--- | :--- |
+| [`v1.0-minimal-delivery`](https://github.com/jkang/openspec-example/tree/v1.0-minimal-delivery) | 2026-08-17 | **极简交付** — OpenSpec 原生单 Change 管线 | 三件最小扩展：跨工具脚手架（`.trae` / `.cursor` / `.agents`）、仓库内 Schema 与模板、原型能力 |
+| [`v2.0-lightweight-sdd`](https://github.com/jkang/openspec-example/tree/v2.0-lightweight-sdd) | 2026-08-28 | **轻量版** — 单条知识闭环的最小集 | 规划层（Product / ROADMAP）、业务基线（Blueprint / Process / Domain）、Story、Harness / E2E |
+| [`v3.0-full-sdd`](https://github.com/jkang/openspec-example/tree/v3.0-full-sdd) | 2026-09-18 | **完整版** — 复杂业务端到端 | 需求侧 / 交付侧两级解耦（`openspec-requirements/`）、需求工程链路、分层 Sync、4 角色协同 |
+
+**看演进（两两对比）**：
+[极简 → 轻量](https://github.com/jkang/openspec-example/compare/v1.0-minimal-delivery...v2.0-lightweight-sdd) ·
+[轻量 → 完整](https://github.com/jkang/openspec-example/compare/v2.0-lightweight-sdd...v3.0-full-sdd) ·
+[极简 → 完整](https://github.com/jkang/openspec-example/compare/v1.0-minimal-delivery...v3.0-full-sdd)
+
+### 🌿 分支
+
+| 分支 | 内容 | 用途 |
+| :--- | :--- | :--- |
+| `main` | **v3 完整版**（最新） | 默认分支，承载版本导航 |
+| `full-sdd` | 与 `main` 同源 | v3 开发线别名 |
+| `release/v1-minimal` | = tag `v1.0-minimal-delivery` | v1 只读快照 |
+| `release/v2-lightweight` | = tag `v2.0-lightweight-sdd` | v2 只读快照 |
+| `release/v3-full` | = tag `v3.0-full-sdd` | v3 只读快照 |
+
+### 📥 检出任意版本
+
+```bash
+# 用 Tag 检出（推荐）
+git clone -b v1.0-minimal-delivery https://github.com/jkang/openspec-example.git
+git clone -b v2.0-lightweight-sdd  https://github.com/jkang/openspec-example.git
+git clone -b v3.0-full-sdd         https://github.com/jkang/openspec-example.git
+
+# 用只读分支检出
+git clone -b release/v2-lightweight https://github.com/jkang/openspec-example.git
+```
+
+> 各版本的完整说明、运行方式与提案文档索引见 **[VERSIONS.md](VERSIONS.md)**。
 
 ---
 
