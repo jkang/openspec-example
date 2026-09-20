@@ -423,7 +423,6 @@ OpenSpec-practice/                        # 极简交付快照（2026-08-17 · c
 | **极简交付终态** | commit `05cb6d8`（`update config`，2026-08-17） |
 | 任务类型分类引入（极简交付**之后**） | commit `9ba9b6c`（`introduce multiple requirement/types`，08-19）+ `a7d8271`（动态分支流程图） |
 | 极简交付概念图 | `learning-sdd/visuals/workflow-blueprint.html`（Layer 01）、`workflow-evolution.html`（Slide 1） |
-| 演讲分层说明 | `learning-sdd/TALK_PRD_TO_SPECS.md`（§01.5 / §01.6） |
 | 轻量版提案 | `learning-sdd/ai4se-lightweight-sdd-proposal.md` |
 | 完整版提案 | `learning-sdd/ai4se-sdd-proposal.md` |
 | 当前流程权威 | `docs/SOPS/SDD_WORKFLOW.md` |

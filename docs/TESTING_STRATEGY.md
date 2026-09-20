@@ -48,7 +48,7 @@ updated_at: 2026-08-23
 
 ### E2E 步骤命名空间化规范（防跨 Story 冲突）
 
-> 背景：多个 Story 的 E2E 步骤集中在同一 `e2e-tests/steps/` 目录，若步骤文本（Given/When/Then）高度相似，Cucumber 会报 **ambiguous（步骤定义歧义）**，导致回归失败（见 flow-issues-log ISSUE-015）。
+> 背景：多个 Story 的 E2E 步骤集中在同一 `e2e-tests/steps/` 目录，若步骤文本（Given/When/Then）高度相似，Cucumber 会报 **ambiguous（步骤定义歧义）**，导致回归失败。
 
 **强制规范**：
 

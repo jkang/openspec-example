@@ -356,7 +356,4 @@ OpenSpec-practice/
 - **需求侧工作区说明**: `openspec-requirements/README.md`
 - **需求分析工具箱**: `openspec-requirements/tools/README.md`
 - **Schema（唯一事实来源）**: `openspec/schemas/spec-driven.yaml`、`openspec-requirements/schemas/req-sdd.yaml`
-- **演讲材料与讲解**: `learning-sdd/TALK_PRD_TO_SPECS.md`、`learning-sdd/visuals/`（`blueprint-embed.html` / `workflow-blueprint.html` / `workflow-evolution.html`）
-- **流程演进与问题记录**: `learning-sdd/flow-issues-log.md`、`learning-sdd/openspec-ai-workflow-analysis.md`
-- **OpenSpec 使用手册与升级说明**: `learning-sdd/openspec-user-manual.md`、`learning-sdd/openspec-v2.0-upgrade.md`、`learning-sdd/openspec-v2.0-workflow-practice.md`
-- **驾驭工程**: `learning-sdd/harness-engineering-in-sdd.md`
+- **演进图（可视化）**: `learning-sdd/visuals/`（`blueprint-embed.html` / `workflow-blueprint.html` / `workflow-evolution.html`）

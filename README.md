@@ -145,8 +145,8 @@
 
 ### 📚 学习资源
 - [SDD 完整版提案](./learning-sdd/ai4se-sdd-proposal.md)
-- [OpenSpec 综合手册](./learning-sdd/openspec-user-manual.md)
-- [v2.0 升级解析](./learning-sdd/openspec-v2.0-upgrade.md)
+- [版本演进导航 (VERSIONS.md)](./VERSIONS.md)
+- [SDD 工作流 SOP](./docs/SOPS/SDD_WORKFLOW.md)
 
 ---
 

@@ -267,3 +267,14 @@ ecommerce/ecommerce-miniprogram/home-preview.html
 learning-sdd/openspec-user-manual-v2.pptx
 learning-sdd/SDD 入门讲解：规格驱动开发.pptx
 learning-sdd/visuals/blueprint-embed.static.html
+
+# 工作坊素材、方法论笔记与调试脚本（与项目无关，不纳入版本控制）
+learning-sdd/workshop-facilitation.html
+learning-sdd/workshop-facilitation v2.html
+learning-sdd/flow-issues-log.md
+learning-sdd/openspec-ai-workflow-analysis.md
+learning-sdd/openspec-user-manual.md
+learning-sdd/openspec-v2.0-workflow-practice.md
+learning-sdd/openspec-v2.0-upgrade.md
+learning-sdd/harness-engineering-in-sdd.md
+dbg.mjs
