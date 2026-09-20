@@ -262,3 +262,8 @@ outputs/14_结尾_规模化落地路径与Tips.pptx
 # 临时原型 HTML（暂不纳入版本控制）
 ecommerce/customer-service-agent-prototype.html
 ecommerce/ecommerce-miniprogram/home-preview.html
+
+# 演示稿与静态产物（与项目无关，不纳入版本控制）
+learning-sdd/openspec-user-manual-v2.pptx
+learning-sdd/SDD 入门讲解：规格驱动开发.pptx
+learning-sdd/visuals/blueprint-embed.static.html
