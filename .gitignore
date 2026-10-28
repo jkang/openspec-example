@@ -266,7 +266,11 @@ ecommerce/ecommerce-miniprogram/home-preview.html
 # 演示稿与静态产物（与项目无关，不纳入版本控制）
 learning-sdd/openspec-user-manual-v2.pptx
 learning-sdd/SDD 入门讲解：规格驱动开发.pptx
+learning-sdd/\[AiDD成都]从 PRD 到 Specs：AI 重塑需求工程 v1.0.pptx
 learning-sdd/visuals/blueprint-embed.static.html
+
+# 打包产物（导出/分发用压缩包，不纳入版本控制）
+outputs/*.zip
 
 # 工作坊素材、方法论笔记与调试脚本（与项目无关，不纳入版本控制）
 learning-sdd/workshop-facilitation.html
