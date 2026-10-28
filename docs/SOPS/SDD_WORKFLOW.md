@@ -83,7 +83,7 @@ handoff                            ← 交接 → 合成开发侧 proposal → s
 
 ## 核心阶段与指令
 
-项目统一使用 `/opsx:` 前缀指令（由 Trae 技能提供）。
+项目统一使用 `/opsx:` 前缀指令（Trae / Cursor 由 `commands/` 提供，`.agents/commands/` 为镜像；opencode 由 `lead` agent 加载对应 skill 执行）。
 
 ### 0. 规划层 (Planning Layer) - 全局治理
 在进入具体的变更开发前，必须明确产品定位与路线图。规划层产出全局上下文，注入所有后续指令。

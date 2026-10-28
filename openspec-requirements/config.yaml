@@ -52,8 +52,8 @@ rules:
   prototype:
     - 在需求拆分（storymap）之前完成，针对 Epic 整体做原型（一次完成）
     - 必须严格遵循 docs/FRONTEND.md 的 UI 规范
-    - 现代扁平化：禁止圆角 (rounded-none)、禁止阴影 (shadow-none)、禁止装饰性 Emoji
-    - 颜色方案：使用 slate 色系 (slate-50 背景, slate-200 边框, slate-900 强调色)
+    - 暗黑高端 (ZAPP)：禁止圆角 (rounded-none / rounded-sm)、禁止阴影与渐变、禁止装饰性 Emoji
+    - 颜色方案：强制使用 docs/baseline/design-system/ 的语义令牌（bg-background / bg-card / border-border / text-foreground / text-primary / text-accent 等），禁止硬编码 hex 与 slate 色系
     - 数据要求：严禁使用空洞模板（foo/test），必须填充真实的业务数据示例
     - 交互界面：必须完全使用中文
     - 技术实现：使用 Vue 3 (CDN) + Tailwind CSS (CDN) 的可交互 HTML

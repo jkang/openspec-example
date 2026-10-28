@@ -1,7 +1,7 @@
 # Research: 小程序会员积分（会员权益与积分）需求调研
 
 > Epic Key: `epic-miniprogram-membership-points`
-> 阶段: 未登记（`docs/ROADMAP.md` 当前无对应阶段/Epic，详见「Epic 背景」缺口说明）
+> 阶段: **Phase 9「会员与复购」**（2026-10-20 已登记 `docs/ROADMAP.md`；调研时该阶段尚未存在，缺口记录见「Epic 背景」且已闭环）
 > 产出后需用户确认（HITL）
 
 <!--
@@ -16,13 +16,14 @@
 ## Epic 背景 (Epic Context)
 
 - **Epic 一句话（业务意图）**：让小程序买家在支付成功后获得积分，能查看余额与明细、用积分兑换权益；B 端能配置积分规则、处理补发/扣减并留痕，把"一次性成交"变成"可识别的复购关系"。
-- **所属阶段**：**未登记**。`docs/ROADMAP.md` 当前没有「会员积分」阶段或 Epic，本 Epic 处于"有业务诉求、无规划条目"的状态。
-- **ROADMAP 缺口（如实记录，不自行修改规划）**：
-  - `docs/ROADMAP.md` 的「当前 Baseline」已列出 Phase 6（微信小程序渠道）与 Phase 7（应收账款）完成。
-  - 「未来 +1 个月」为 **Phase 8 运营效率增强**（订单批量处理/数据导出/常用查询保存），**不含会员积分**。
-  - 「未来 +X 个月 — 探索方向（未排期）」只提到多仓/多店铺、供应商协同、复杂促销引擎（满减/阶梯价）、真实微信支付与订阅消息推送，**同样不含积分/会员**。
-  - 历史证据：`openspec-requirements/archive/2026-08-29-account-system/research.md` 与 `idea.md` 明确把「积分/会员等级」列为 Phase 4 的 **Out of Scope**，说明这是历史延后能力，而非当前阶段承诺。
-  - 处理方式：本文件只记录缺口；Epic 如何登记 ROADMAP 属规划层（`/opsx:planning:product-planning`）职责，需 HITL 裁定（见「疑问与待澄清项」Q1）。**未登记前不具备 handoff 条件**。
+- **所属阶段**：**Phase 9「会员与复购」**（2026-10-20 用户裁定并已登记 `docs/ROADMAP.md`；登记前调研记录为"未登记"，见下方缺口说明）。
+- **ROADMAP 缺口（调研时如实记录；已于 2026-10-20 由规划层登记闭环）**：
+  - 调研时 `docs/ROADMAP.md` 的「当前 Baseline」只列出 Phase 6（微信小程序渠道）与 Phase 7（应收账款）完成。
+  - 调研时「未来 +1 个月」为 **Phase 8 运营效率增强**（订单批量处理/数据导出/常用查询保存），**不含会员积分**。
+  - 调研时「未来 +X 个月 — 探索方向（未排期）」只提到多仓/多店铺、供应商协同、复杂促销引擎（满减/阶梯价）、真实微信支付与订阅消息推送，**同样不含积分/会员**。
+  - 历史证据：`openspec-requirements/archive/2026-08-29-account-system/research.md` 与 `idea.md` 明确把「积分/会员等级」列为 Phase 4 的 **Out of Scope**，说明这是历史延后能力，而非当时的阶段承诺。
+  - 处理方式：本文件只记录缺口（调研阶段不自行修改规划）；Epic 如何登记 ROADMAP 属规划层（`/opsx:planning:product-planning`）职责，需 HITL 裁定（见「疑问与待澄清项」Q1）。
+  - **闭环结论（2026-10-20）**：Q1=A——新增 **Phase 9「会员与复购」**，首个 Epic 即 `epic-miniprogram-membership-points`，已写入 `docs/ROADMAP.md`（含 In/Out of Scope、Exit Criteria、Explore Guardrails 与 draft Story 拆分）。**本 Epic 已具备 handoff 的规划依据**，Phase 8 延后评估。
 - **可复用的前置底座（现状事实）**：
   - 订单生命周期 `PENDING_PAYMENT → PAID → SHIPPED → COMPLETED / CANCELLED`，支付成功时扣库存、核销券、写 `paidAt`。
   - 同源账户体系（手机号注册/登录 + 微信 openid 登录），角色 `客户 / 运营 / 客服 / 老板`，会话带来源渠道 `channel`。
@@ -370,7 +371,7 @@
 ## 调研结论 (Research Conclusion)
 
 - **关键发现**：
-  1. **规划缺口是首要问题**：ROADMAP 无会员积分阶段/Epic，历史 account-system 明确将其列为 Out of Scope；在 Q1 裁定前，本 Epic 不能进入 handoff。
+  1. **规划缺口是首要问题**：调研时 ROADMAP 无会员积分阶段/Epic，历史 account-system 明确将其列为 Out of Scope。**已闭环**：Q1=A，2026-10-20 新增 Phase 9「会员与复购」并登记本 Epic，handoff 前置条件已满足。
   2. **诉求真实但分散**：买家要"按实付计发 + 可见 + 易兑换"；老板要"复购抓手 + 一本总账 + 账期风险控制"；运营要"复用券体系 + 留痕 + 权限分层"。
   3. **计发基数与触发点是两个关键口径**：`actualPaidCents=26910` 与 `totalCents=29900` 差异真实存在；账期客户"PAID 但未收款"使 `PAID` 触发点存在兑付风险。
   4. **C 端触点不是加按钮**：小程序「我的」当前就是订单页，无个人中心；Web 也无个人中心，需要页面结构决策。

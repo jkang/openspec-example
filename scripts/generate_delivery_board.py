@@ -65,10 +65,12 @@ def scan_roadmap():
         name = re.sub(r"^.*?[—–-]\s*", "", name).strip()              # 取 "— " 之后的名称部分
         # 重取：直接取 "Phase N:" 之后的名称
         name = m.group(3).strip()
-        status_marker = name
-        if "✅ 已完成" in status_marker or "已完成" in status_marker or "已交付" in status_marker:
+        status_marker = m.group(1)
+        if "当前阶段" in status_marker or "Current Phase" in status_marker:
+            status = "current"
+        elif "✅ 已完成" in status_marker or "已完成" in status_marker or "已交付" in status_marker:
             status = "done"
-        elif "下一阶段" in status_marker or "未来" in status_marker or "待启动" in status_marker:
+        elif "下一阶段" in status_marker or "未来" in status_marker or "待启动" in status_marker or "未启动" in status_marker:
             status = "future"
         else:
             status = "current"
@@ -79,7 +81,7 @@ def scan_roadmap():
     phase_hits.sort(key=lambda x: x[0])
 
     phase_names = dict(PHASE_NAMES)
-    done_nos, future_nos = set(), set()
+    done_nos, future_nos, current_nos = set(), set(), set()
     max_no = 0
     for no, name, status in phase_hits:
         if name:
@@ -88,6 +90,8 @@ def scan_roadmap():
             done_nos.add(no)
         elif status == "future":
             future_nos.add(no)
+        elif status == "current":
+            current_nos.add(no)
         max_no = max(max_no, no)
 
     # 初建阶段列表：显式标记优先，未标记的暂标 current（后续统一重算）
@@ -109,8 +113,10 @@ def scan_roadmap():
             if p["no"] <= max_done and p["status"] not in ("done", "future"):
                 p["status"] = "done"
 
-    # 当前(目标)阶段 = 最小的未完成阶段；它标 current，其余未完成标 future
-    target = next((p for p in phases if p["status"] != "done"), None)
+    # 当前(目标)阶段：优先采用 ROADMAP 显式标记的"当前阶段"；否则取最小的未完成阶段
+    target = next((p for p in phases if p["no"] in current_nos), None)
+    if target is None:
+        target = next((p for p in phases if p["status"] != "done"), None)
     if target:
         for p in phases:
             if p["status"] == "done":
@@ -377,7 +383,7 @@ def render_html(data, refreshed):
         ("需求探索中", f'{exploring_n} 项', "需求侧 Epic 漏斗 + 想法池"),
         ("设计中", f'{design_n} 项', "提案/技术设计阶段"),
         ("开发中", f'{coding_n} 项', "任务实施与验证阶段"),
-        ("已归档（近7天）", f'{archived_n} 项', f"最近 {data["days"]} 天完成的变更"),
+        ("已归档（近7天）", f'{archived_n} 项', f"最近 {data['days']} 天完成的变更"),
         ("质量信号", f'{quality_pct}%', f"最近 {len(verified)} 个变更验证门禁通过率"),
     ]
     metrics_html = ""

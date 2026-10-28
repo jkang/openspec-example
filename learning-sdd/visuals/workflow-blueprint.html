@@ -26,6 +26,7 @@
                             slate: '#1e293b',
                             gray: '#94a3b8',
                             light: '#f8fafc',
+                            red: '#be123c',
                         }
                     }
                 }
@@ -67,8 +68,77 @@
         .bp-body {
             flex: 1;
             min-height: 0;
-            padding: 14px 24px;
+            padding: 14px 8px;
         }
+        .bp-body.with-legend {
+            display: grid;
+            grid-template-rows: minmax(0, 1fr) auto;
+            gap: 8px;
+            padding-left: 8px;
+            padding-right: 8px;
+        }
+        .bp-body.with-legend .bp-svg {
+            min-height: 0;
+            height: 100%;
+        }
+        .bp-legend {
+            border-top: 1px solid #eef2f7;
+            padding-top: 6px;
+            color: #64748b;
+            font-size: 8.5px;
+            line-height: 1.3;
+            letter-spacing: 0.01em;
+        }
+        .bp-legend .legend-line {
+            display: inline-block;
+            width: 18px;
+            height: 0;
+            border-top-width: 2px;
+            vertical-align: middle;
+        }
+        .bp-legend .legend-solid {
+            display: inline-block;
+            width: 18px;
+            height: 2px;
+            background: #94a3b8;
+            vertical-align: middle;
+        }
+        .bp-legend .legend-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            white-space: nowrap;
+        }
+        .bp-legend .legend-group {
+            flex: 0 0 30px;
+            width: 30px;
+            padding-top: 1px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 7.5px;
+            font-weight: 900;
+            letter-spacing: 0.08em;
+            color: #94a3b8;
+        }
+        .bp-legend .legend-desc { color: #64748b; }
+        .bp-legend .legend-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 12px;
+            padding: 0 5px;
+            border-radius: 999px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 7px;
+            font-weight: 900;
+            letter-spacing: 0.02em;
+            line-height: 1;
+        }
+        .legend-badge.must { background: #ecfdf3; color: #008a52; border: 1px solid #86efac; }
+        .legend-badge.opt { background: #ffffff; color: #64748b; border: 1px dashed #cbd5e1; }
+        .legend-badge.ifui { background: #eff6ff; color: #1677ff; border: 1px solid #bfdbfe; }
+        .legend-badge.epic { background: #eef2f7; color: #1e293b; border: 1px solid #cbd5e1; }
+        .legend-badge.hitl { background: #f59e0b; color: #ffffff; border: 1px solid #f59e0b; }
+        .legend-badge.gate { background: #ffffff; color: #8a3b4a; border: 1px solid #9f4a5a; }
         .bp-svg {
             width: 100%;
             height: 100%;
@@ -101,6 +171,19 @@
         blue:  '#1677ff',
         slate: '#1e293b',
         gray:  '#94a3b8',
+        red:   '#9f4a5a',
+        amber: '#d97706',
+        teal:  '#0d9488',
+    };
+
+    const TONE = {
+        must: { fill: '#e9f8f0', stroke: '#00b96b', text: '#008a52' },
+        opt:  { fill: '#ffffff', stroke: '#94a3b8', text: '#64748b', dash: '3 3' },
+        ifui: { fill: '#eaf2ff', stroke: '#1677ff', text: '#1677ff' },
+        epic: { fill: '#eef2f7', stroke: '#1e293b', text: '#1e293b' },
+        hitl: { fill: '#f59e0b', stroke: '#f59e0b', text: '#ffffff' },
+        gate: { fill: '#ffffff', stroke: '#9f4a5a', text: '#8a3b4a' },
+        auto: { fill: '#f1f5f9', stroke: '#cbd5e1', text: '#64748b' },
     };
 
     // Vertical bands (viewBox units) — flow lane is tall so loops stay INSIDE it
@@ -158,6 +241,19 @@
         return out;
     }
 
+    function badge(x, y, label, tone = 'must', opts = {}) {
+        const t = TONE[tone] ?? TONE.must;
+        const size = opts.size ?? 7.5;
+        const h = opts.h ?? (size + 5);
+        const w = Math.max(18, label.length * size * 0.62 + 10);
+        const align = opts.align ?? 'center';
+        let bx = x - w / 2;
+        if (align === 'left') bx = x;
+        if (align === 'right') bx = x - w;
+        const dash = t.dash ? ` stroke-dasharray="${t.dash}"` : '';
+        return `<g><rect x="${bx}" y="${y - h / 2}" width="${w}" height="${h}" rx="${h / 2}" fill="${t.fill}" stroke="${t.stroke}" stroke-width="1"${dash}/><text x="${bx + w / 2}" y="${y + size * 0.36}" text-anchor="middle" font-size="${size}" font-weight="900" fill="${t.text}" class="mono" letter-spacing="0.4">${esc(label)}</text></g>`;
+    }
+
     function hArrow(x1, x2, y, stroke, opts = {}) {
         const sw = opts.sw ?? 3.2;
         const dash = opts.dash ? ` stroke-dasharray="${opts.dash}"` : '';
@@ -176,24 +272,31 @@
     function loopArc(srcX, tgtX, stroke, labelStr, opts = {}) {
         const drop = opts.drop ?? 96;
         const sw = opts.sw ?? 2.4;
-        const y = LOOP_Y;
-        const dir = tgtX >= srcX ? 1 : -1;
+        const dash = opts.dash ?? '9 8';
+        const y = opts.y ?? LOOP_Y;
         const d = `M ${srcX} ${y} C ${srcX} ${y + drop}, ${tgtX} ${y + drop}, ${tgtX} ${y}`;
         const head = 11;
-        let s = `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${sw}" stroke-dasharray="9 8" stroke-linecap="round"/>`;
+        let s = `<path d="${d}" fill="none" stroke="${stroke}" stroke-width="${sw}" stroke-dasharray="${dash}" stroke-linecap="round"/>`;
         s += `<path d="M ${tgtX} ${y} L ${tgtX - head * 0.42} ${y + head} L ${tgtX + head * 0.42} ${y + head} Z" fill="${stroke}"/>`;
         if (labelStr) {
-            s += `<text x="${(srcX + tgtX) / 2}" y="${y + drop * 0.5}" text-anchor="middle" font-size="10" font-weight="800" fill="${stroke}" class="mono" letter-spacing="1">${esc(labelStr)}</text>`;
+            const size = opts.labelSize ?? 10;
+            const lx = opts.labelX ?? (srcX + tgtX) / 2;
+            const ly = y + drop * 0.5 + (opts.labelDy ?? 0);
+            if (opts.labelBg) {
+                const lw = labelStr.length * size * 0.62 + 10;
+                s += `<rect x="${lx - lw / 2}" y="${ly - size - 1}" width="${lw}" height="${size + 5}" rx="4" fill="#fbfcfd" opacity="0.96"/>`;
+            }
+            s += `<text x="${lx}" y="${ly}" text-anchor="middle" font-size="${size}" font-weight="800" fill="${stroke}" class="mono" letter-spacing="1">${esc(labelStr)}</text>`;
         }
         return s;
     }
 
-    function laneLabel(cy, str) {
-        return `<text x="${GUTTER + 24}" y="${cy}" text-anchor="middle" transform="rotate(-90 ${GUTTER + 24} ${cy})" font-size="11" font-weight="900" fill="#94a3b8" class="mono" letter-spacing="2">${esc(str)}</text>`;
+    function laneLabel(cy, str, x = GUTTER + 24) {
+        return `<text x="${x}" y="${cy}" text-anchor="middle" transform="rotate(-90 ${x} ${cy})" font-size="11" font-weight="900" fill="#94a3b8" class="mono" letter-spacing="2">${esc(str)}</text>`;
     }
 
-    function laneBg(y0, y1) {
-        return `<rect x="${GUTTER_W}" y="${y0}" width="${X_RIGHT - GUTTER_W}" height="${y1 - y0}" fill="#fbfcfd"/>`;
+    function laneBg(y0, y1, gutterW = GUTTER_W, xRight = X_RIGHT) {
+        return `<rect x="${gutterW}" y="${y0}" width="${xRight - gutterW}" height="${y1 - y0}" fill="#fbfcfd"/>`;
     }
 
     // Agent band across columns [i0..i1] — ranges must be disjoint
@@ -203,17 +306,36 @@
         const solid = opts.solid === true;
         const fill = solid ? color : (opts.fill ?? color + '1f');
         let s = card(x0, x1, y0, y1, { rx: 12, fill, stroke: color, sw: solid ? 0 : 1.8, shadow: false });
-        s += text((x0 + x1) / 2, (y0 + y1) / 2, [labelStr], { size: 12, weight: 900, color: solid ? '#ffffff' : color, family: 'mono', lh: 15 });
+        const size = opts.size ?? 12;
+        s += text((x0 + x1) / 2, (y0 + y1) / 2, [labelStr], { size, weight: 900, color: solid ? '#ffffff' : color, family: 'mono', lh: size * 1.25 });
         return s;
     }
 
-    // Block card containing sub-pills (big rounded rounded container)
+    function normPill(p) {
+        if (Array.isArray(p)) return { title: p[0] ?? '', sub: p[1] ?? '', tone: null };
+        if (typeof p === 'string') return { title: p, sub: '', tone: null };
+        return {
+            title: p.label ?? '',
+            sub: p.sub ?? '',
+            tone: p.tone ?? null,
+            badge: p.badge ?? null,
+            badgeTone: p.badgeTone ?? p.tone ?? null,
+            hitl: !!p.hitl,
+            gateAfter: p.gateAfter ?? null,
+            subSize: p.subSize ?? null,
+            titleSize: p.titleSize ?? null,
+        };
+    }
+
+    // Block card containing sub-pills (big rounded container)
     function blockCard(c, f) {
         const y0 = CARD_TOP - 10, y1 = CARD_BOT + 6;
         const xx0 = c.x0, xx1 = c.x1;
         let colStroke = '#cbd5e1', colColor = '#0f172a';
         if (f.kind === 'green') { colStroke = C.green; colColor = C.green; }
         if (f.kind === 'blue')  { colStroke = C.blue;  colColor = C.blue; }
+        if (f.kind === 'teal')  { colStroke = C.teal;  colColor = C.teal; }
+        if (f.kind === 'slate') { colStroke = C.slate; colColor = C.slate; }
         if (f.kind === 'dark')  { colStroke = C.slate; colColor = '#ffffff'; }
 
         let s = card(xx0, xx1, y0, y1, { rx: 20, fill: '#f8fafc', stroke: colStroke, sw: 2, dash: '5 5' });
@@ -221,54 +343,125 @@
         s += text((xx0 + xx1) / 2, y0 + 16, [f.stage], { size: 11, weight: 900, color: colColor, family: 'mono', lh: 13 });
         // pills
         const pillTop = y0 + 30, pillBot = y1 - 8;
-        const pillH = pillBot - pillTop;
         const n = f.subpills.length;
         const innerL = xx0 + 10, innerR = xx1 - 10;
         const gap = 8;
         const pw = (innerR - innerL - gap * (n - 1)) / n;
+        const rendered = [];
         for (let i = 0; i < n; i++) {
+            const p = normPill(f.subpills[i]);
             const px0 = innerL + i * (pw + gap), px1 = px0 + pw;
             const cxm = (px0 + px1) / 2;
             const pyl = (pillTop + pillBot) / 2;
-            const lines = f.subpills[i];
-            s += card(px0, px1, pillTop, pillBot, { rx: 12, fill: '#ffffff', stroke: colStroke, sw: 1.6 });
-            if (lines.length === 1) {
-                s += `<text x="${cxm}" y="${pyl + 4}" text-anchor="middle" font-size="13" font-weight="800" fill="${colColor}">${esc(lines[0])}</text>`;
+            let stroke = colStroke, fill = '#ffffff';
+            if (p.tone === 'opt')  { stroke = '#94a3b8'; fill = '#ffffff'; }
+            if (p.tone === 'ifui') { stroke = C.blue; }
+            if (p.tone === 'epic') { stroke = C.slate; }
+            if (p.tone === 'teal') { stroke = C.teal; }
+            const pillDash = p.tone === 'opt' ? '4 4' : null;
+            s += card(px0, px1, pillTop, pillBot, { rx: 12, fill, stroke, sw: 1.6, dash: pillDash });
+            const pillColor = p.tone === 'opt' ? '#64748b' : p.tone === 'teal' ? C.teal : colColor;
+            if (p.sub) {
+                s += `<text x="${cxm}" y="${pyl - 2}" text-anchor="middle" font-size="${p.titleSize ?? 12.5}" font-weight="800" fill="${pillColor}">${esc(p.title)}</text>`;
+                s += `<text x="${cxm}" y="${pyl + 14}" text-anchor="middle" font-size="${p.subSize ?? 8.5}" font-weight="600" fill="${p.tone === 'opt' ? '#94a3b8' : pillColor + '99'}" class="mono">${esc(p.sub)}</text>`;
             } else {
-                s += `<text x="${cxm}" y="${pyl - 2}" text-anchor="middle" font-size="12.5" font-weight="800" fill="${colColor}">${esc(lines[0])}</text>`;
-                s += `<text x="${cxm}" y="${pyl + 14}" text-anchor="middle" font-size="8.5" font-weight="600" fill="${colColor}99" class="mono">${esc(lines[1])}</text>`;
+                s += `<text x="${cxm}" y="${pyl + 4}" text-anchor="middle" font-size="13" font-weight="800" fill="${pillColor}">${esc(p.title)}</text>`;
             }
+            if (p.badge) s += badge(cxm, pillTop + 9, p.badge, p.badgeTone ?? 'must', { size: 7 });
+            if (p.hitl) s += badge(cxm, pillBot - 8, 'HITL', 'hitl', { size: 7 });
+            rendered.push({ p, px0, px1 });
+        }
+        // HITL gate dividers between sub-pills
+        for (let i = 0; i < rendered.length - 1; i++) {
+            const cur = rendered[i], next = rendered[i + 1];
+            if (cur.p.gateAfter !== 'hitl' && cur.p.gateAfter !== 'optional') continue;
+            const gx = (cur.px1 + next.px0) / 2;
+            const hitl = cur.p.gateAfter === 'hitl';
+            s += `<line x1="${gx}" y1="${pillTop + 16}" x2="${gx}" y2="${pillBot - 16}" stroke="${hitl ? C.amber : C.gray}" stroke-width="2" stroke-dasharray="${hitl ? '4 4' : '2 4'}"/>`;
+            s += `<circle cx="${gx}" cy="${pillTop + 9}" r="2.2" fill="${hitl ? C.amber : C.gray}"/>`;
+        }
+        return s;
+    }
+
+    function singleFlowCard(c, f) {
+        const y0 = CARD_TOP, y1 = CARD_BOT;
+        const xx0 = c.x0, xx1 = c.x1;
+        let colStroke = '#cbd5e1', colFill = '#ffffff', colColor = '#0f172a', sw = 2, dash = null;
+        if (f.kind === 'green') { colStroke = C.green; colColor = C.green; }
+        if (f.kind === 'blue')  { colStroke = C.blue;  colColor = C.blue; }
+        if (f.kind === 'teal')  { colStroke = C.teal;  colColor = C.teal; colFill = '#ffffff'; }
+        if (f.kind === 'review'){ colStroke = C.red;  colColor = '#8a3b4a';  colFill = '#fbf1f3'; sw = 2.2; }
+        if (f.kind === 'slate') { colStroke = '#94a3b8'; colFill = '#eef2f7'; colColor = '#334155'; sw = 1.8; }
+        if (f.kind === 'dark')  { colStroke = '#94a3b8'; colFill = '#eef2f7'; colColor = '#334155'; sw = 1.8; }
+        if (f.kind === 'opt')   { colStroke = '#94a3b8'; colColor = '#64748b'; dash = '5 4'; }
+        if (f.dash) dash = f.dash;
+        let s = card(xx0, xx1, y0, y1, { rx: 20, fill: colFill, stroke: colStroke, sw, dash });
+        const cxm = (xx0 + xx1) / 2;
+        s += `<text x="${cxm}" y="${FLOW_CY - 3}" text-anchor="middle" font-size="14.5" font-weight="900" fill="${colColor}">${esc(f.title)}</text>`;
+        const subs = Array.isArray(f.sub) ? f.sub : (f.sub ? [f.sub] : []);
+        const subColor = f.kind === 'dark' ? '#64748b' : (f.kind === 'review' ? '#9f5a68' : (f.kind === 'slate' ? '#64748b' : (f.kind === 'teal' ? '#0f766e' : (f.kind === 'opt' ? '#64748b' : '#94a3b8'))));
+        const subSize = f.subSize ?? 10;
+        if (subs.length === 1) {
+            s += `<text x="${cxm}" y="${FLOW_CY + 16}" text-anchor="middle" font-size="${subSize}" font-weight="700" fill="${subColor}">${esc(subs[0])}</text>`;
+        } else if (subs.length > 1) {
+            s += text(cxm, FLOW_CY + (subs.length >= 3 ? 18 : 12), subs, { size: subSize, weight: 700, color: subColor, lh: subSize + 2.5 });
+        }
+        if (f.badge) s += badge(xx0 + 9, y0 + 12, f.badge, f.badgeTone ?? 'must', { align: 'left', size: 7 });
+        if (f.badge2) s += badge(xx1 - 9, y0 + 12, f.badge2, f.badge2Tone ?? 'epic', { align: 'right', size: 7 });
+        if (f.hitl) s += badge(xx1 - 9, y1 - 10, 'HITL', 'hitl', { align: 'right', size: 7 });
+        if (f.gate) s += badge(xx1 - 9, y1 - 10, f.gate, f.gateTone ?? 'gate', { align: 'right', size: 7 });
+        return s;
+    }
+
+    function gateRail(cols, gates) {
+        let s = '';
+        for (const g of gates) {
+            const gx = (cols[g.left].x1 + cols[g.right].x0) / 2;
+            s += badge(gx, LANE.flow.top + 6.5, g.label, g.tone, { size: 7.5, h: 11 });
         }
         return s;
     }
 
     // --------------------------------------------------------------------------
     function renderLayer(lay, cfg = {}) {
-        const cx = lay.columns.map(c => ({ cx: c.cx, w: c.w, x0: c.cx - c.w / 2, x1: c.cx + c.w / 2 }));
+        const fit = lay.fitWidth === true;
+        const oldL = 84, oldR = 1252;
+        const newL = 56, newR = lay.xRight ?? 1392;
+        const sx = fit ? (newR - newL) / (oldR - oldL) : 1;
+        const mapX = v => fit ? newL + (v - oldL) * sx : v;
+        const mapW = v => fit ? v * sx : v;
+        const cx = lay.columns.map(c => {
+            const ccx = mapX(c.cx), cw = mapW(c.w);
+            return { cx: ccx, w: cw, x0: ccx - cw / 2, x1: ccx + cw / 2 };
+        });
         const cols = lay.columns.map((c, i) => Object.assign({}, c, cx[i])); // each col carries x0/x1
-        let s = `<svg class="bp-svg" viewBox="0 0 1312 ${VB_H}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">`;
+        const vbW = lay.vbW ?? 1410;
+        const gutterW = lay.gutterW ?? 48;
+        const xRight = lay.xRight ?? 1392;
+        const labelX = lay.labelX ?? 26;
+        let s = `<svg class="bp-svg" viewBox="0 0 ${vbW} ${VB_H}" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">`;
 
         s += `<defs><filter id="shadow" x="-20%" y="-20%" width="140%" height="170%">
             <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#0f172a" flood-opacity="0.10"/>
         </filter></defs>`;
 
         // lane backgrounds + labels
-        s += laneBg(LANE.agent.top, LANE.agent.top + LANE.agent.h);
-        s += laneBg(LANE.flow.top, LANE.flow.top + LANE.flow.h);
-        s += laneBg(LANE.skill.top, LANE.skill.top + LANE.skill.h);
-        s += laneBg(LANE.command.top, LANE.command.top + LANE.command.h);
-        s += laneBg(LANE.deliv.top, LANE.deliv.top + LANE.deliv.h);
-        s += laneLabel(LANE.agent.top + LANE.agent.h / 2, 'AGENT');
-        s += laneLabel(LANE.flow.top + LANE.flow.h / 2, 'FLOW');
-        s += laneLabel(LANE.skill.top + LANE.skill.h / 2, 'SKILL');
-        s += laneLabel(LANE.command.top + LANE.command.h / 2, 'COMMAND');
-        s += laneLabel(LANE.deliv.top + LANE.deliv.h / 2, 'OUTPUT');
+        s += laneBg(LANE.agent.top, LANE.agent.top + LANE.agent.h, gutterW, xRight);
+        s += laneBg(LANE.flow.top, LANE.flow.top + LANE.flow.h, gutterW, xRight);
+        s += laneBg(LANE.skill.top, LANE.skill.top + LANE.skill.h, gutterW, xRight);
+        s += laneBg(LANE.command.top, LANE.command.top + LANE.command.h, gutterW, xRight);
+        s += laneBg(LANE.deliv.top, LANE.deliv.top + LANE.deliv.h, gutterW, xRight);
+        s += laneLabel(LANE.agent.top + LANE.agent.h / 2, 'AGENT', labelX);
+        s += laneLabel(LANE.flow.top + LANE.flow.h / 2, 'FLOW', labelX);
+        s += laneLabel(LANE.skill.top + LANE.skill.h / 2, 'SKILL', labelX);
+        s += laneLabel(LANE.command.top + LANE.command.h / 2, 'COMMAND', labelX);
+        s += laneLabel(LANE.deliv.top + LANE.deliv.h / 2, 'OUTPUT', labelX);
 
         // vertical dividers between lane rows
-        s += `<line x1="${GUTTER_W}" x2="${X_RIGHT}" y1="${LANE.agent.top + LANE.agent.h}" y2="${LANE.agent.top + LANE.agent.h}" stroke="#eef2f7" stroke-width="2"/>`;
-        s += `<line x1="${GUTTER_W}" x2="${X_RIGHT}" y1="${LANE.skill.top}" y2="${LANE.skill.top}" stroke="#eef2f7" stroke-width="2"/>`;
-        s += `<line x1="${GUTTER_W}" x2="${X_RIGHT}" y1="${LANE.command.top}" y2="${LANE.command.top}" stroke="#eef2f7" stroke-width="2"/>`;
-        s += `<line x1="${GUTTER_W}" x2="${X_RIGHT}" y1="${LANE.deliv.top}" y2="${LANE.deliv.top}" stroke="#eef2f7" stroke-width="2"/>`;
+        s += `<line x1="${gutterW}" x2="${xRight}" y1="${LANE.agent.top + LANE.agent.h}" y2="${LANE.agent.top + LANE.agent.h}" stroke="#eef2f7" stroke-width="2"/>`;
+        s += `<line x1="${gutterW}" x2="${xRight}" y1="${LANE.skill.top}" y2="${LANE.skill.top}" stroke="#eef2f7" stroke-width="2"/>`;
+        s += `<line x1="${gutterW}" x2="${xRight}" y1="${LANE.command.top}" y2="${LANE.command.top}" stroke="#eef2f7" stroke-width="2"/>`;
+        s += `<line x1="${gutterW}" x2="${xRight}" y1="${LANE.deliv.top}" y2="${LANE.deliv.top}" stroke="#eef2f7" stroke-width="2"/>`;
 
         // ----- Lane 1: Agent bands -----
         for (const ag of lay.agents) s += agentBand(cx, ag.from, ag.to, ag.color, ag.label, ag);
@@ -276,49 +469,57 @@
         // ----- Lane 2: main solid arrows (behind cards) -----
         for (const a of lay.arrows) {
             const src = cx[a.from], tgt = cx[a.to];
-            const x1 = src.x1 + 4, x2 = tgt.x0 - 4;
-            if (x2 > x1) s += hArrow(x1, x2, FLOW_CY, '#94a3b8', { sw: 3.2 });
+            const pad = a.kind ? 2 : 4;
+            const x1 = src.x1 + pad, x2 = tgt.x0 - pad;
+            const kind = a.kind ?? 'auto';
+            const color = kind === 'hitl' ? C.amber : (kind === 'optional' ? C.gray : '#94a3b8');
+            const dash = kind === 'hitl' ? '6 4' : (kind === 'optional' ? '2 4' : null);
+            if (x2 > x1) s += hArrow(x1, x2, FLOW_CY, color, { sw: kind === 'auto' ? 3.2 : 2.4, dash });
         }
 
         // ----- Lane 2: flow cards / blocks -----
         for (const c of cols) {
             const f = c.flow;
-            if (f.block) { s += blockCard(c, f); continue; }
-            const y0 = CARD_TOP, y1 = CARD_BOT;
-            const xx0 = c.x0, xx1 = c.x1;
-            let colStroke = '#cbd5e1', colFill = '#ffffff', colColor = '#0f172a', sw = 2;
-            if (f.kind === 'green') { colStroke = C.green; colColor = C.green; }
-            if (f.kind === 'blue')  { colStroke = C.blue;  colColor = C.blue; }
-            if (f.kind === 'dark')  { colStroke = C.slate; colFill = C.slate; colColor = '#ffffff'; sw = 0; }
-            s += card(xx0, xx1, y0, y1, { rx: 20, fill: colFill, stroke: colStroke, sw });
-            const cxm = (xx0 + xx1) / 2;
-            s += `<text x="${cxm}" y="${FLOW_CY - 3}" text-anchor="middle" font-size="14.5" font-weight="900" fill="${colColor}">${esc(f.title)}</text>`;
-            s += `<text x="${cxm}" y="${FLOW_CY + 16}" text-anchor="middle" font-size="10" font-weight="700" fill="${f.kind === 'dark' ? '#cbd5e1' : '#94a3b8'}">${esc(f.sub)}</text>`;
+            s += f.block ? blockCard(c, f) : singleFlowCard(c, f);
         }
 
-        // ----- Lane 2: feedback loops (dashed, inside flow lane) -----
-        for (const lp of lay.loops) {
-            const srcC = cx[lp.fromCol], tgtC = cx[lp.toCol];
-            const srcX = lp.fromEdge === 'left' ? srcC.x0 : srcC.x1;
-            const tgtX = lp.toEdge === 'left' ? tgtC.x0 : tgtC.x1;
-            s += loopArc(srcX, tgtX, lp.color, lp.label, { drop: lp.drop ?? 96 });
-        }
+        // ----- Lane 2: gate rail (AUTO / HITL / OPT chips above cards) -----
+        if (lay.gates) s += gateRail(cols, lay.gates);
+
+        const drawLoops = () => {
+            for (const lp of lay.loops) {
+                const srcC = cx[lp.fromCol], tgtC = cx[lp.toCol];
+                const srcX = lp.fromEdge === 'left' ? srcC.x0 : lp.fromEdge === 'right' ? srcC.x1 : srcC.cx;
+                const tgtX = lp.toEdge === 'left' ? tgtC.x0 : lp.toEdge === 'right' ? tgtC.x1 : tgtC.cx;
+                s += loopArc(srcX, tgtX, lp.color, lp.label, {
+                    drop: lp.drop ?? 96,
+                    dash: lp.dash,
+                    sw: lp.sw,
+                    labelSize: lp.labelSize,
+                    labelX: lp.labelX,
+                    labelDy: lp.labelDy,
+                    labelBg: lp.labelBg,
+                });
+            }
+        };
+        if (!lay.loopOnTop) drawLoops();
 
         // drop-wires from cards to Skill/Command/Output lanes
         for (const c of cols) {
             s += `<line x1="${c.cx}" y1="${CARD_BOT + 2}" x2="${c.cx}" y2="${LANE.skill.top}" stroke="#e2e8f0" stroke-width="1.5" stroke-dasharray="3 4"/>`;
         }
+        if (lay.loopOnTop) drawLoops();
 
         // ----- Lane 3: Skill -----
         for (const c of cols) {
             const y0 = LANE.skill.top, y1 = LANE.skill.top + LANE.skill.h;
-            s += text(c.cx, (y0 + y1) / 2, c.skills, { size: 11.5, weight: 700, color: '#64748b', family: 'mono', lh: 15 });
+            s += text(c.cx, (y0 + y1) / 2, c.skills, { size: c.skillSize ?? 11.5, weight: 700, color: '#64748b', family: 'mono', lh: c.skillLh ?? 15 });
         }
 
         // ----- Lane 4: Command -----
         for (const c of cols) {
             const y0 = LANE.command.top, y1 = LANE.command.top + LANE.command.h;
-            s += text(c.cx, (y0 + y1) / 2, c.cmds, { size: 11.5, weight: 800, color: '#1e293b', family: 'mono', lh: 15 });
+            s += text(c.cx, (y0 + y1) / 2, c.cmds, { size: c.cmdSize ?? 11.5, weight: 800, color: '#1e293b', family: 'mono', lh: c.cmdLh ?? (c.cmdSize ? 14 : 15) });
         }
 
         // ----- Lane 5: Deliverables -----
@@ -327,13 +528,19 @@
             const y0 = LANE.deliv.top + 8, y1 = LANE.deliv.top + LANE.deliv.h - 6;
             const xx0 = c.x0 + 2, xx1 = c.x1 - 2;
             const dark = d.dark;
-            s += card(xx0, xx1, y0, y1, { rx: 12, fill: dark ? C.slate : '#ffffff', stroke: dark ? C.slate : '#e2e8f0', sw: dark ? 0 : 1.6 });
-            const titleColor = dark ? '#ffffff' : '#0f172a';
-            const descColor = dark ? '#cbd5e1' : '#64748b';
+            const accent = d.accent ?? (dark ? C.slate : '#e2e8f0');
+            const fill = d.fill ?? (dark ? C.slate : '#ffffff');
+            s += card(xx0, xx1, y0, y1, { rx: 12, fill, stroke: accent, sw: dark ? 0 : (d.accent ? 1.8 : 1.6), dash: d.dash ? '4 4' : null });
+            const titleColor = d.titleColor ?? (dark ? '#ffffff' : '#0f172a');
+            const descColor = d.descColor ?? (dark ? '#cbd5e1' : '#64748b');
             const cxm = (xx0 + xx1) / 2;
-            s += `<text x="${cxm}" y="${y0 + 22}" text-anchor="middle" font-size="11.5" font-weight="800" fill="${titleColor}" class="mono">${esc(d.title)}</text>`;
-            s += `<line x1="${xx0 + 10}" x2="${xx1 - 10}" y1="${y0 + 33}" y2="${y0 + 33}" stroke="${dark ? '#334155' : '#e8edf3'}" stroke-width="1.4"/>`;
-            s += text(cxm, y0 + 48, d.desc, { size: 10.5, weight: 500, color: descColor, lh: 14 });
+            const titleY = lay.outputV2 ? y0 + 21 : y0 + 22;
+            const dividerY = lay.outputV2 ? y0 + 32 : y0 + 33;
+            const descY = lay.outputV2 ? y0 + 51 : y0 + 48;
+            const descLh = lay.outputV2 ? 12.5 : 14;
+            s += `<text x="${cxm}" y="${titleY}" text-anchor="middle" font-size="${d.titleSize ?? 11.5}" font-weight="800" fill="${titleColor}" class="mono">${esc(d.title)}</text>`;
+            s += `<line x1="${xx0 + 10}" x2="${xx1 - 10}" y1="${dividerY}" y2="${dividerY}" stroke="${dark ? '#334155' : '#e8edf3'}" stroke-width="1.4"/>`;
+            s += text(cxm, descY, d.desc, { size: d.descSize ?? 10.5, weight: 500, color: descColor, lh: descLh });
         }
 
         s += `</svg>`;
@@ -345,9 +552,10 @@
     // ==========================================================================
     const L1 = evenCenters(5);
     const layer1 = {
+        fitWidth: true,
         agents: [
             { label: 'ENGINEER AGENT (PRIMARY)', color: C.blue, from: 0, to: 3, fill: '#eaf2ff' },
-            { label: 'LEAD (GOVERNANCE)', color: C.slate, from: 4, to: 4, solid: true },
+            { label: 'LEAD (GOVERNANCE)', color: C.slate, from: 4, to: 4, fill: '#eef2f7' },
         ],
         columns: [
             { cx: L1[0], w: 214, flow: { title: '探索 Explore', sub: '业务初探 · idea.md', kind: 'blue' }, skills: ['explore'], cmds: ['/opsx:explore'], deliv: { title: 'idea.md', desc: ['记录业务初探设计', '明确意图与价值'] } },
@@ -368,10 +576,11 @@
         { cx: 836, w: 240 }, { cx: 1039, w: 150 }, { cx: 1187, w: 130 },
     ];
     const layer2 = {
+        fitWidth: true,
         agents: [
             { label: 'LEAD / PM (GUARDRAIL)', color: C.green, from: 0, to: 1, fill: '#e9f8f0' },
             { label: 'ENGINEER AGENT (STORY LOOP)', color: C.blue, from: 2, to: 4, fill: '#eaf2ff' },
-            { label: 'LEAD (SYNC · ARCHIVE)', color: C.slate, from: 5, to: 6, solid: true },
+            { label: 'LEAD (SYNC · ARCHIVE)', color: C.slate, from: 5, to: 6, fill: '#eef2f7' },
         ],
         columns: [
             { cx: L2[0].cx, w: L2[0].w, flow: { title: '规划 Plan', sub: '基线护栏', kind: 'green' }, skills: ['product-planning'], cmds: ['/opsx:planning:*'], deliv: { title: 'ROADMAP.md', desc: ['对齐产品愿景', '规划基线'] } },
@@ -397,22 +606,23 @@
         { cx: 704, w: 88 }, { cx: 911, w: 310 }, { cx: 1116, w: 84 }, { cx: 1205, w: 78 },
     ];
     const layer3 = {
+        fitWidth: true,
         agents: [
             { label: 'LEAD', color: C.slate, from: 0, to: 2, fill: '#eef2f7' },
-            { label: 'PM AGENT (REQ FUNNEL)', color: C.green, from: 3, to: 3, solid: true },
-            { label: 'BRIDGE', color: C.slate, from: 4, to: 4, solid: true },
-            { label: 'ENGINEER AGENT (EXECUTION)', color: C.blue, from: 5, to: 5, solid: true },
-            { label: 'LEAD / GOVERNANCE', color: C.slate, from: 6, to: 7, solid: true },
+            { label: 'PM AGENT (REQ FUNNEL)', color: C.green, from: 3, to: 3, fill: '#e9f8f0' },
+            { label: 'BRIDGE', color: C.slate, from: 4, to: 4, fill: '#eef2f7' },
+            { label: 'ENGINEER AGENT (EXECUTION)', color: C.blue, from: 5, to: 5, fill: '#eaf2ff' },
+            { label: 'LEAD / GOVERNANCE', color: C.slate, from: 6, to: 7, fill: '#eef2f7' },
         ],
         columns: [
-            { cx: L3arr[0].cx, w: L3arr[0].w, flow: { title: '规划', sub: 'Plan', kind: 'green' }, skills: ['product-planning'], cmds: ['/opsx:planning:*'], deliv: { title: 'ROADMAP.md', desc: ['对齐产品愿景'] } },
-            { cx: L3arr[1].cx, w: L3arr[1].w, flow: { title: '业务基线', sub: 'Business', kind: 'green' }, skills: ['blueprint'], cmds: ['/opsx:baseline/sync'], deliv: { title: 'baseline/', desc: ['稳定业务边界'] } },
-            { cx: L3arr[2].cx, w: L3arr[2].w, flow: { title: '任务类型?', sub: 'Epic / Fix', kind: 'dark' }, skills: ['router'], cmds: ['/req:handoff'], deliv: { title: '类型路由', desc: ['Epic→漏斗', 'Fix→交付'] } },
-            { cx: L3arr[3].cx, w: L3arr[3].w, flow: { kind: 'green', block: true, stage: 'REQUIREMENT FUNNEL', subpills: [['调研', 'Scan'], ['探索', 'Explore'], ['原型', 'Proto'], ['故事', 'Story']] }, skills: ['research', 'explore', 'prototype', 'storymap/story'], cmds: ['/req:research', '/req:explore', '/req:prototype', '/req:story'], deliv: { title: 'Story (Freeze)', desc: ['业务面冻结 / E2E 断言'] } },
-            { cx: L3arr[4].cx, w: L3arr[4].w, flow: { title: '交接', sub: 'Handoff', kind: 'dark' }, skills: ['handoff'], cmds: ['/req:handoff'], deliv: { title: 'Synthesized', desc: ['交接契约驱动交付'], dark: true } },
-            { cx: L3arr[5].cx, w: L3arr[5].w, flow: { kind: 'blue', block: true, stage: 'EXECUTION PIPELINE', subpills: [['提案', 'Propose'], ['规格', 'Specs'], ['设计', 'Design'], ['实施', 'Apply']] }, skills: ['propose', 'spec-design', 'apply-change', 'verify'], cmds: ['/opsx:propose', '/opsx:spec-design', '/opsx:apply'], deliv: { title: 'Specs (SDD)', desc: ['行为规格驱动的产线'] } },
-            { cx: L3arr[6].cx, w: L3arr[6].w, flow: { title: '规格同步', sub: 'Spec Sync', kind: 'dark' }, skills: ['sync-specs'], cmds: ['/opsx:sync'], deliv: { title: 'delta specs', desc: ['认知回流规格', '保持规格基线'] } },
-            { cx: L3arr[7].cx, w: L3arr[7].w, flow: { title: '归档', sub: 'Archive', kind: 'dark' }, skills: ['archive-change'], cmds: ['/opsx:archive'], deliv: { title: 'archive/', desc: ['完整审计追踪'] } },
+            { cx: L3arr[0].cx, w: L3arr[0].w, flow: { title: '规划', sub: 'Plan', kind: 'green' }, skills: ['product-planning'], cmds: ['/opsx:planning:*'], skillSize: 8.5, cmdSize: 7.5, deliv: { title: 'ROADMAP.md', desc: ['对齐产品愿景'] } },
+            { cx: L3arr[1].cx, w: L3arr[1].w, flow: { title: '业务基线', sub: 'Business', kind: 'green' }, skills: ['blueprint'], cmds: ['/opsx:baseline/sync'], skillSize: 8.5, cmdSize: 7.5, deliv: { title: 'baseline/', desc: ['稳定业务边界'] } },
+            { cx: L3arr[2].cx, w: L3arr[2].w, flow: { title: '任务类型?', sub: 'Epic / Fix', kind: 'dark' }, skills: ['router'], cmds: ['/req:handoff'], skillSize: 9, cmdSize: 8, deliv: { title: '类型路由', desc: ['Epic→漏斗', 'Fix→交付'] } },
+            { cx: L3arr[3].cx, w: L3arr[3].w, flow: { kind: 'green', block: true, stage: 'REQUIREMENT FUNNEL', subpills: [['调研', 'Scan'], ['探索', 'Explore'], ['原型', 'Proto'], ['故事', 'Story']] }, skills: ['research', 'explore', 'prototype', 'storymap/story'], cmds: ['/req:research', '/req:explore', '/req:prototype', '/req:story'], skillSize: 8.5, skillLh: 11, cmdSize: 8, cmdLh: 11, deliv: { title: 'Story (Freeze)', desc: ['业务面冻结 / E2E 断言'] } },
+            { cx: L3arr[4].cx, w: L3arr[4].w, flow: { title: '交接', sub: 'Handoff', kind: 'dark' }, skills: ['handoff'], cmds: ['/req:handoff'], skillSize: 10, cmdSize: 9, deliv: { title: 'Synthesized', desc: ['交接契约驱动交付'] } },
+            { cx: L3arr[5].cx, w: L3arr[5].w, flow: { kind: 'blue', block: true, stage: 'EXECUTION PIPELINE', subpills: [['提案', 'Propose'], ['规格', 'Specs'], ['设计', 'Design'], ['实施', 'Apply']] }, skills: ['propose', 'spec-design', 'apply-change', 'verify'], cmds: ['/opsx:propose', '/opsx:spec-design', '/opsx:apply'], skillSize: 8.5, skillLh: 11, cmdSize: 8, cmdLh: 11, deliv: { title: 'Specs (SDD)', desc: ['行为规格驱动的产线'] } },
+            { cx: L3arr[6].cx, w: L3arr[6].w, flow: { title: '规格同步', sub: 'Spec Sync', kind: 'dark' }, skills: ['sync-specs'], cmds: ['/opsx:sync'], skillSize: 9, cmdSize: 8.5, deliv: { title: 'delta specs', desc: ['认知回流规格', '保持规格基线'] } },
+            { cx: L3arr[7].cx, w: L3arr[7].w, flow: { title: '归档', sub: 'Archive', kind: 'dark' }, skills: ['archive-change'], cmds: ['/opsx:archive'], skillSize: 8.5, cmdSize: 8.5, deliv: { title: 'archive/', desc: ['完整审计追踪'] } },
         ],
         arrows: [
             { from: 0, to: 1 }, { from: 1, to: 2 }, { from: 2, to: 3 }, { from: 3, to: 4 },
@@ -425,13 +635,221 @@
     };
 
     // ==========================================================================
-    function slideHTML(num, theme, title, subtitle, tag, tagClass, svg) {
-        const numBg = theme === 'green' ? 'bg-aidd-green' : theme === 'blue' ? 'bg-aidd-blue' : 'bg-slate-900';
-        const numShadow = theme === 'green' ? 'shadow-green-200' : theme === 'blue' ? 'shadow-blue-200' : 'shadow-slate-400';
+    //  LAYER 04 — 生产级交付 (Engineering-Hardened Delivery)
+    //  Test Left-Shift · Optional Architecture Gate · Adversarial Review Agent
+    // ==========================================================================
+    const L4 = [
+        { cx: 98,   w: 84 },   // 0 planning
+        { cx: 194,  w: 84 },   // 1 business baseline
+        { cx: 290,  w: 84 },   // 2 task router
+        { cx: 534,  w: 380 },  // 3 requirement funnel (6 sub-pills)
+        { cx: 774,  w: 76 },   // 4 handoff
+        { cx: 964,  w: 280 },  // 5 execution pipeline (4 sub-pills)
+        { cx: 1158, w: 84 },   // 6 adversarial review (narrow gate)
+        { cx: 1254, w: 84 },   // 7 spec sync
+        { cx: 1350, w: 84 },   // 8 archive
+    ];
+
+    const layer4 = {
+        loopOnTop: true,
+        outputV2: true,
+        vbW: 1410,
+        gutterW: 48,
+        xRight: 1392,
+        labelX: 26,
+        columns: [
+            {
+                cx: L4[0].cx, w: L4[0].w,
+                flow: { kind: 'green', title: '规划', sub: 'Plan' },
+                skills: ['product-planning'],
+                cmds: ['/opsx:planning:*'],
+                cmdSize: 8,
+                deliv: { title: 'ROADMAP.md', titleSize: 9.5, desc: ['对齐产品愿景', '规划基线'], descSize: 8.5 },
+            },
+            {
+                cx: L4[1].cx, w: L4[1].w,
+                flow: { kind: 'green', title: '业务基线', sub: 'Business' },
+                skills: ['blueprint'],
+                cmds: ['/opsx:baseline/sync'],
+                cmdSize: 7.5,
+                deliv: { title: 'baseline/', titleSize: 9.5, desc: ['稳定业务边界', '蓝图层治理'], descSize: 8.5 },
+            },
+            {
+                cx: L4[2].cx, w: L4[2].w,
+                flow: { kind: 'slate', title: '任务类型', sub: 'Epic / Fix' },
+                skills: ['router'],
+                cmds: ['—'],
+                cmdSize: 8,
+                deliv: { title: '类型路由', titleSize: 8.5, desc: ['Epic → 漏斗', 'Fix → 交付'], descSize: 8.5 },
+            },
+            {
+                cx: L4[3].cx, w: L4[3].w,
+                flow: {
+                    kind: 'green', block: true, stage: 'REQUIREMENT FUNNEL',
+                    subpills: [
+                        { label: '调研', sub: 'Research', badge: 'MUST', badgeTone: 'must', hitl: true, gateAfter: 'hitl' },
+                        { label: '探索', sub: 'Explore', badge: 'MUST', badgeTone: 'must', hitl: true, gateAfter: 'hitl' },
+                        { label: '原型', sub: 'Prototype', badge: 'IF UI', badgeTone: 'ifui', tone: 'ifui', hitl: true, gateAfter: 'hitl' },
+                        { label: '架构', sub: '可选', badge: 'OPT', badgeTone: 'opt', tone: 'opt', hitl: true },
+                        { label: '故事', sub: 'Story', badge: 'MUST', badgeTone: 'must', hitl: true, gateAfter: 'hitl' },
+                        { label: '测试设计', sub: 'QA · 分层', badge: 'MUST', badgeTone: 'must', hitl: true, titleSize: 11.5 },
+                    ],
+                },
+                skills: ['research · explore · prototype', 'arch-impact (opt) · storymap · story · test-design'],
+                cmds: ['/req:research · /req:explore · /req:prototype', '/req:arch (opt) · /req:storymap · /req:story · /req:test-design'],
+                skillSize: 8.5,
+                cmdSize: 8,
+                deliv: {
+                    title: 'REQ ARTIFACTS', titleSize: 9.5,
+                    desc: [
+                        'research.md · idea.md · prototypes/ (IF UI)',
+                        'architecture-impact.md (OPT)',
+                        'storymap.md 覆盖对账 · story.md 业务面冻结',
+                        'test-design.md 分层用例 + 追溯矩阵',
+                    ],
+                    descSize: 9,
+                },
+            },
+            {
+                cx: L4[4].cx, w: L4[4].w,
+                flow: { kind: 'slate', title: '交接', sub: 'Handoff', badge: 'MUST', badgeTone: 'must' },
+                skills: ['handoff'],
+                cmds: ['/req:handoff'],
+                cmdSize: 8,
+                deliv: { title: 'proposal.md', titleSize: 9, desc: ['handoff 合成', 'Epic 队列登记'], descSize: 8.5 },
+            },
+            {
+                cx: L4[5].cx, w: L4[5].w,
+                flow: {
+                    kind: 'blue', block: true, stage: 'EXECUTION PIPELINE',
+                    subpills: [
+                        { label: '提案', sub: 'Propose', badge: 'MUST', badgeTone: 'must' },
+                        { label: '规格', sub: 'Spec', badge: 'MUST', badgeTone: 'must' },
+                        { label: '设计', sub: 'Design', badge: 'MUST', badgeTone: 'must', hitl: true, gateAfter: 'hitl' },
+                        { label: '实施', sub: 'Apply', badge: 'MUST', badgeTone: 'must' },
+                    ],
+                },
+                skills: ['propose', 'spec-design', 'apply-change'],
+                cmds: ['/opsx:propose', '/opsx:spec-design', '/opsx:apply'],
+                cmdSize: 8.5,
+                deliv: { title: 'specs + code', titleSize: 9, desc: ['specs · design · tasks', '直走任务 → /opsx:propose', '代码 + tasks [x]'], descSize: 8.5 },
+            },
+            {
+                cx: L4[6].cx, w: L4[6].w,
+                flow: {
+                    kind: 'review', title: '对抗审查', sub: 'Review Agent', subSize: 8,
+                    badge: 'MUST', badgeTone: 'must', gate: 'GATE', gateTone: 'gate',
+                },
+                skills: ['qa-review'],
+                cmds: ['/opsx:review'],
+                cmdSize: 8.5,
+                deliv: {
+                    title: 'review.md', titleSize: 9,
+                    desc: ['PASS/WARN/FAIL', 'file:line 证据', '2× FAIL → HITL'],
+                    descSize: 8.5, accent: C.red, fill: '#fbf1f3', titleColor: '#8a3b4a', descColor: '#9f5a68',
+                },
+            },
+            {
+                cx: L4[7].cx, w: L4[7].w,
+                flow: { kind: 'slate', title: '规格同步', sub: 'Spec Sync', badge: 'MUST', badgeTone: 'must' },
+                skills: ['sync-specs'],
+                cmds: ['/opsx:sync'],
+                cmdSize: 8.5,
+                deliv: { title: 'verify + specs', titleSize: 8.5, desc: ['Hard/Soft', 'delta specs', '→ openspec'], descSize: 8.5 },
+            },
+            {
+                cx: L4[8].cx, w: L4[8].w,
+                flow: { kind: 'slate', title: '归档', sub: 'Archive', badge: 'MUST', badgeTone: 'must', badge2: 'EPIC', badge2Tone: 'epic' },
+                skills: ['archive'],
+                cmds: ['/opsx:archive'],
+                cmdSize: 8.5,
+                deliv: { title: 'archive', titleSize: 9, desc: ['archive/', 'baseline/', '+ ROADMAP'], descSize: 8.5 },
+            },
+        ],
+        agents: [
+            { label: 'LEAD', color: C.slate, from: 0, to: 2, fill: '#eef2f7' },
+            { label: 'PM AGENT (REQ FUNNEL)', color: C.green, from: 3, to: 3, fill: '#e9f8f0' },
+            { label: 'BRIDGE', color: C.slate, from: 4, to: 4, fill: '#eef2f7' },
+            { label: 'ENGINEER AGENT (EXECUTION)', color: C.blue, from: 5, to: 5, fill: '#eaf2ff' },
+            { label: 'REVIEW AGENT', color: C.red, from: 6, to: 6, fill: '#fbf1f3', size: 9 },
+            { label: 'LEAD / GOVERNANCE', color: C.slate, from: 7, to: 8, fill: '#eef2f7' },
+        ],
+        arrows: [
+            { from: 0, to: 1, kind: 'auto' },
+            { from: 1, to: 2, kind: 'auto' },
+            { from: 2, to: 3, kind: 'auto' },
+            { from: 3, to: 4, kind: 'hitl' },
+            { from: 4, to: 5, kind: 'auto' },
+            { from: 5, to: 6, kind: 'auto' },
+            { from: 6, to: 7, kind: 'auto' },
+            { from: 7, to: 8, kind: 'auto' },
+        ],
+        gates: [
+            { left: 3, right: 4, label: 'HITL', tone: 'hitl' },
+            { left: 4, right: 5, label: 'AUTO', tone: 'auto' },
+            { left: 5, right: 6, label: 'AUTO', tone: 'auto' },
+            { left: 6, right: 7, label: 'AUTO', tone: 'auto' },
+            { left: 7, right: 8, label: 'AUTO', tone: 'auto' },
+        ],
+        loops: [
+            { fromCol: 6, toCol: 5, label: 'FIX LOOP', color: C.red, drop: 44, fromEdge: 'center', toEdge: 'center', dash: '6 4', labelSize: 9, labelBg: true, labelX: 1061 },
+            { fromCol: 8, toCol: 3, label: 'NEXT STORY', color: C.blue, drop: 64, fromEdge: 'left', toEdge: 'right', dash: '8 6', labelBg: true, labelX: 860 },
+            { fromCol: 8, toCol: 0, label: 'EPIC DONE · BASELINE SYNC + HITL', color: C.green, drop: 88, fromEdge: 'left', toEdge: 'left', dash: '8 6', labelSize: 8.5, labelBg: true },
+        ],
+    };
+
+    const LEGEND_04 = `
+        <div class="grid grid-cols-2 gap-x-8 gap-y-1">
+            <div class="space-y-1">
+                <div class="flex items-start gap-2">
+                    <span class="legend-group">流转</span>
+                    <div class="flex flex-1 flex-wrap items-center gap-x-4 gap-y-1">
+                        <span class="legend-item"><span class="legend-solid"></span>AUTO</span>
+                        <span class="legend-item"><span class="legend-line" style="border-style:dashed;border-color:#d97706"></span>HITL</span>
+                        <span class="legend-item"><span class="legend-line" style="border-style:dashed;border-color:#94a3b8"></span>OPT</span>
+                        <span class="legend-item"><span class="legend-line" style="border-style:dashed;border-color:#9f4a5a"></span>FIX</span>
+                        <span class="legend-item"><span class="legend-line" style="border-style:dashed;border-color:#1677ff"></span>NEXT STORY</span>
+                        <span class="legend-item"><span class="legend-line" style="border-style:dashed;border-color:#00b96b"></span>EPIC BASE</span>
+                    </div>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="legend-group">步骤</span>
+                    <div class="flex flex-1 flex-wrap items-center gap-x-3 gap-y-1">
+                        <span class="legend-badge must">MUST</span><span class="legend-desc">必做</span>
+                        <span class="legend-badge opt">OPT</span><span class="legend-desc">可选</span>
+                        <span class="legend-badge ifui">IF UI</span><span class="legend-desc">仅UI</span>
+                        <span class="legend-badge epic">EPIC</span><span class="legend-desc">收尾</span>
+                        <span class="legend-badge hitl">HITL</span><span class="legend-desc">必停</span>
+                        <span class="legend-badge gate">GATE</span><span class="legend-desc">门禁</span>
+                    </div>
+                </div>
+            </div>
+            <div class="space-y-1">
+                <div class="flex items-start gap-2">
+                    <span class="legend-group">口径</span>
+                    <div class="flex-1 font-mono font-bold text-slate-700 leading-tight">
+                        <div>12 MUST · 1 IF UI · 1 OPT · 1 EPIC</div>
+                        <div>8 HITL · 5 AUTO · 1 Review Gate</div>
+                    </div>
+                </div>
+                <div class="flex items-start gap-2">
+                    <span class="legend-group">HITL</span>
+                    <div class="flex-1 text-amber-700 leading-tight">调研 → 探索 → 原型(IF UI) → 架构(OPT) → 故事 → 测试设计 → 设计冻结 → Baseline(Epic)</div>
+                </div>
+                <div class="text-[7.5px] text-slate-400 leading-tight">* /req:arch · /req:test-design · /opsx:review = Layer 04 建议新增</div>
+            </div>
+        </div>`;
+
+    // ==========================================================================
+    function slideHTML(num, theme, title, subtitle, tag, tagClass, svg, opts = {}) {
+        const numBg = theme === 'green' ? 'bg-aidd-green' : theme === 'blue' ? 'bg-aidd-blue' : theme === 'red' ? 'bg-rose-50 border border-rose-200' : 'bg-slate-900';
+        const numText = theme === 'red' ? 'text-rose-800' : 'text-white';
+        const numShadow = theme === 'green' ? 'shadow-green-200' : theme === 'blue' ? 'shadow-blue-200' : theme === 'red' ? 'shadow-rose-100' : 'shadow-slate-400';
+        const bodyClass = opts.legend ? 'bp-body with-legend' : 'bp-body';
         return `<section class="slide">
             <div class="slide-header">
                 <div class="flex items-center gap-6">
-                    <div class="${numBg} text-white flex items-center justify-center text-3xl font-black rounded-2xl shadow-lg ${numShadow} w-16 h-16">${num}</div>
+                    <div class="${numBg} ${numText} flex items-center justify-center text-3xl font-black rounded-2xl shadow-lg ${numShadow} w-16 h-16">${num}</div>
                     <div>
                         <h2 class="text-3xl font-serif font-black text-slate-900">${title}</h2>
                         <p class="text-slate-400 font-medium uppercase tracking-widest text-sm mt-1">${subtitle}</p>
@@ -439,7 +857,7 @@
                 </div>
                 <span class="px-4 py-1 rounded-full text-xs font-bold tracking-tighter ${tagClass}">${tag}</span>
             </div>
-            <div class="bp-body">${svg}</div>
+            <div class="${bodyClass}">${svg}${opts.legend ? `<div class="bp-legend">${opts.legend}</div>` : ''}</div>
         </section>`;
     }
 
@@ -450,6 +868,8 @@
             'COLLABORATIVE SDD', 'bg-slate-100 text-slate-500', renderLayer(layer2)),
         slideHTML('03', 'dark', '业务产品 · Layer 03', 'Business Product / Requirement Funnel / Double-Loop Governance',
             'ENTERPRISE SDD FRAMEWORK', 'bg-aidd-green text-white', renderLayer(layer3)),
+        slideHTML('04', 'red', '生产级交付 · Layer 04', 'Production-Grade SDD / Test Left-Shift · Arch Gate (OPT) · Adversarial Review (MUST)',
+            'HARNESS · 12 MUST · 8 HITL · 5 AUTO', 'bg-rose-50 text-rose-800 border border-rose-200', renderLayer(layer4), { legend: LEGEND_04 }),
     ];
 
     document.getElementById('slides').innerHTML = slidesHtml.join('');
