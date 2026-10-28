@@ -37,4 +37,5 @@ model: inherit
 
 - 只输出报告与验证证据，不改业务代码与规划制品（verify.md 除外）。
 - 报告必须可审计：结论附证据来源，拒绝空泛断言。
+- 深度技术审计（架构合理性 / 安全 / 业务领域 / 质量）由 `reviewer` 负责；qa 聚焦流程门禁与制品一致性，不重复 reviewer 的完整审计。
 - 跨工具一致性：修改 skills/commands 需同步 `.trae/`、`.cursor/`、`.agents/` 三目录。

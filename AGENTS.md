@@ -14,7 +14,7 @@
 
 ### 🧑💻 SDD 团队角色 (Team Roles)
 
-本项目以 4 人团队形态模拟最新软件团队，角色定义**跨工具同步**，各工具按自身机制加载：
+本项目以 4 人交付团队 + 独立技术评审人（reviewer）的形态模拟最新软件团队，角色定义**跨工具同步**，各工具按自身机制加载：
 
 | 角色 | 职责 | opencode（权威） | Cursor |
 | :--- | :--- | :--- | :--- |
@@ -22,9 +22,10 @@
 | **pm** (产品经理) | 产品定位/路线图、需求侧工作区（需求漏斗，仅 Epic）、需求调研/探索、业务评审 | `.opencode/agents/pm.md` | `.cursor/agents/pm.md` |
 | **engineer** (全栈工程师) | 从 proposal 起步：行为规格 specs/技术设计/代码实施（需求侧原型由 pm 承担） | `.opencode/agents/engineer.md` | `.cursor/agents/engineer.md` |
 | **qa** (质量工程师) | 验证门禁/对抗审查（含需求侧 req-sdd 制品质量兜底） | `.opencode/agents/qa.md` | `.cursor/agents/qa.md` |
+| **reviewer** (技术评审/Tech Lead) | 对当前实现做架构合理性/技术架构/业务领域/安全/质量五维深度审计，输出 P0-P3 缺陷分级、修复紧迫度与分阶段修复计划 | `.opencode/agents/reviewer.md` | `.cursor/agents/reviewer.md` |
 
 - **同步规则**：任何对团队角色定义（职责、约束、协作契约）的修改，必须同步更新 2 处（`.opencode/agents/` 权威 + `.cursor/agents/` 格式适配副本）。
-- **编排契约**：`lead` 是用户与团队的唯一对话入口，通过任务委派调度 pm/engineer/qa；每个 HITL 检查点（需求调研/探索/原型/Story/验证/Baseline Sync 确认）必须暂停征求用户确认。
+- **编排契约**：`lead` 是用户与团队的唯一对话入口，通过任务委派调度 pm/engineer/qa/reviewer；每个 HITL 检查点（需求调研/探索/原型/Story/验证/技术评审 P0/P1 风险裁决/Baseline Sync 确认）必须暂停征求用户确认。
 - **唯一事实来源**：角色职责的权威内容以 `.opencode/agents/*.md` 为基准（含权限与 mode 配置），Cursor 副本为格式适配。
 
 ## 📚 治理与深链接 (Governance & Deep Links)

@@ -86,7 +86,7 @@
 
 | 工具 | 入口 | 使用方式 |
 | :--- | :--- | :--- |
-| **opencode（权威）** | `opencode` → `lead` agent | `lead` 自动调度 `pm` / `engineer` / `qa`，按阶段加载 `.agents/skills/` 下对应 skill；无需记忆 slash command |
+| **opencode（权威）** | `opencode` → `lead` agent | `lead` 自动调度 `pm` / `engineer` / `qa` / `reviewer`，按阶段加载 `.agents/skills/` 下对应 skill；无需记忆 slash command |
 | **Trae** | `.trae/commands/` | 输入 `/req:*`、`/opsx:*` 指令 |
 | **Cursor** | `.cursor/commands/` + `.cursor/agents/` | 输入 `/req:*`、`/opsx:*` 指令 |
 
@@ -108,6 +108,7 @@
 | 规格设计 | `spec-design` | `/opsx:spec-design` | 生成 specs / design / tasks |
 | 实施 | `apply-change` | `/opsx:apply` | 按 `tasks.md` 实施 |
 | 验证 | `verify` | `/opsx:verify` | 硬门禁 + E2E 证据写入 `verify.md` |
+| 技术评审 | `reviewer` agent | `/opsx:review` | 五维审计，P0-P3 分级 + 修复计划写入 `review.md` |
 | 计划修订 | `update-change` | `/opsx:update` | 先改规格/设计，再继续实施 |
 | Spec Sync | `sync-specs` | `/opsx:sync` | change 级同步 |
 | 归档 | `archive-change` | `/opsx:archive` | 更新 Epic 队列并归档 |

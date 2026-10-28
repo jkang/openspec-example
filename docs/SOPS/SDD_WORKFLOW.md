@@ -142,7 +142,11 @@ graph TD
     F6 --> U
 
     U --> V((验证门禁 /opsx:verify))
-    V --> W{需要更新规划?}
+    V --> VR[技术评审 /opsx:review<br/>五维审计 + P0-P3]
+    VR --> VR2{P0 / 未接受 P1?}
+    VR2 -->|是| RF[修复：engineer 执行 review 计划]
+    RF --> V
+    VR2 -->|否| W{需要更新规划?}
     W -->|是| X[更新规划 /opsx:update]
     X --> U
     W -->|否| Y[Spec Sync /opsx:sync<br/>change 级]
@@ -155,6 +159,7 @@ graph TD
 ```
 
 > **分层 Sync 说明**：每个 change 归档前只做 **Spec Sync**（`/opsx:sync`，change 级）；**Baseline Sync**（`/opsx:baseline/sync`）在 Epic 全部 Story 归档后统一执行（+ Roadmap 更新）。
+> **技术评审说明**：`/opsx:verify` 通过后必须执行 `/opsx:review`（`reviewer` agent）。P0 必须修复；P1 阻断归档，除非用户书面接受风险；P2/P3 登记技术债。存在阻断项时不得进入 `/opsx:sync`。
 > **简化说明**：Bug Fix / Tech Debt / 简单功能修改**直走 `/opsx:propose`**（不再有独立的 `/opsx:explore` 与 `/opsx:story` 阶段——需求澄清已前移到需求侧，直走任务的业务意图直接在提案中明确）。
 
 ### 1. 探索与业务评审前移说明 (Explore & Story 已前移)
@@ -218,13 +223,30 @@ graph TD
   - 动态读取 `tasks.md` 中的复选框，完成一项则将 `- [ ]` 标记为 `- [x]`。
   - **测试驱动实现 (TDD/BDD)**: 必须严格按照 `spec.md` 上的标签 (`@unit`, `@api`, `@e2e`) 编写对应的测试代码。对于 `@e2e` 任务，必须在全局 `e2e-tests/` 目录中完成 Cucumber 步骤。
   - **强制门禁 (Hard Gates)**: 开始实现前必须通过 `openspec validate "<name>"`，并在 `openspec/changes/<name>/verify.md` 初始化验证证据
-  - **强制门禁 (Hard Gates)**: 全部任务勾选完成后必须运行 `/opsx:verify <name>`，确保 Node 测试、Python 测试与前端构建均为 PASS，并将结果写入 `verify.md`
+  - **强制门禁 (Hard Gates)**: 全部任务勾选完成后必须运行 `/opsx:verify <name>`，确保 Node 测试、Python 测试与前端构建均为 PASS，并将结果写入 `verify.md`；verify 通过后执行 `/opsx:review <name>`，按 7.5 的评审门禁处理 P0/P1
   - **建议门禁 (Soft Gates)**: E2E 建议运行 `./init.sh e2e:run`，失败时必须在 `verify.md` 记录失败摘要与原因；同时执行 **E2E 覆盖完整性审查**（对照 proposal/specs 确认受影响旅程已覆盖、smoke 主链路完整），结论（FULL/GAP）写入 verify.md。
 
 ### 7. 更新阶段 (Update) - 可选
 - **指令**: `/opsx:update`
 - **目标**: 当实施过程中发现需要修改规划（如 specs 或 design）时使用。
 - **原则**: 先修改规格/设计，通过验证后，再继续 `/opsx:apply`。
+
+### 7.5 技术评审阶段 (Review)
+
+- **指令**: `/opsx:review [<name>|epic:<epic-key>|repo]`
+- **执行者**: `reviewer`（技术评审 / Tech Lead，subagent）
+- **时机**: `/opsx:verify` 通过后、`/opsx:sync` 之前；也可在 Epic 收尾、Baseline Sync 前，或用户要求"审计当前实现"时独立执行。
+- **目标**: 从**架构合理性 / 技术架构设计 / 业务知识深度 / 安全 / 质量**五个维度对实现做深度审计，识别架构缺陷、业务逻辑缺陷与安全缺陷，给出 P0-P3 分级、修复紧迫度与分阶段修复计划。
+- **产物**:
+  - change 级：`<changeRoot>/review.md`
+  - Epic / 全仓级：`docs/governance/reviews/YYYY-MM-DD-<scope>.md`
+- **门禁规则**:
+  - **P0（Blocker）**: 必须修复，禁止进入 sync / archive。
+  - **P1（High）**: 阻断归档；若用户书面接受风险，可带风险进入 sync / archive，并在 `review.md` 记录接受人、期限、补偿措施与复审触发。
+  - **P2 / P3**: 不阻断，登记技术债或后续 change。
+- **HITL**: `reviewer` 输出 Verdict + Top 风险，由 `lead` 呈报用户裁决（修复 / 风险接受 / 回退）。
+- **与 qa 的边界**: `qa` 负责机器门禁与制品一致性（`verify.md`）；`reviewer` 负责深度技术审计与风险分级（`review.md`）。`reviewer` 不重复执行 `qa` 的完整门禁，但可运行目标测试验证具体怀疑。
+- **复审**: P0/P1 修复后，`engineer` 执行、`qa` 复验门禁、`reviewer` 只做增量复审（更新 finding 状态），不复审全量。
 
 ### 8. 同步阶段 (Sync) - 分层 Sync
 
@@ -263,6 +285,7 @@ graph TD
 - **流程**:
   - **全局 BDD 测试门禁**: 归档前必须运行 `init.sh e2e:run`，确保全局 Cucumber 测试通过。
   - 归档前必须确保已经完成过 Spec Sync（`/opsx:sync`）。
+  - 归档前必须确保 `review.md` 无 P0 与未获书面风险接受的 P1（见 7.5）。
   - **技术债登记**: 登记本次变更遗留的技术债。
   - 移动路径: `openspec/changes/<name>/` -> `openspec/changes/archive/YYYY-MM-DD-<name>/`。
   - **Epic 队列同步**: 归档完成后必须更新对应 `epic-*.story-list.json` 中该 Story 的状态为 `done`；若所有 Story 均已 `done`，将该 `story-list.json` 一并归档至 `openspec/changes/archive/`（文件名加 `YYYY-MM-DD-` 前缀），保留 Epic 交付记录，禁止直接删除。**Epic 收尾后**提示执行 `Baseline Sync`（8.2）+ Roadmap 更新。
