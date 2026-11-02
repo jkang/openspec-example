@@ -636,7 +636,7 @@
 
     // ==========================================================================
     //  LAYER 04 — 生产级交付 (Engineering-Hardened Delivery)
-    //  Test Left-Shift · Optional Architecture Gate · Adversarial Review Agent
+    //  Test Left-Shift · Optional Architecture Gate · Adversarial Review + Acceptance
     // ==========================================================================
     const L4 = [
         { cx: 98,   w: 84 },   // 0 planning
@@ -645,17 +645,17 @@
         { cx: 534,  w: 380 },  // 3 requirement funnel (6 sub-pills)
         { cx: 774,  w: 76 },   // 4 handoff
         { cx: 964,  w: 280 },  // 5 execution pipeline (4 sub-pills)
-        { cx: 1158, w: 84 },   // 6 adversarial review (narrow gate)
-        { cx: 1254, w: 84 },   // 7 spec sync
-        { cx: 1350, w: 84 },   // 8 archive
+        { cx: 1172, w: 112 },  // 6 adversarial review + acceptance (gate)
+        { cx: 1282, w: 84 },   // 7 spec sync
+        { cx: 1378, w: 84 },   // 8 archive
     ];
 
     const layer4 = {
         loopOnTop: true,
         outputV2: true,
-        vbW: 1410,
+        vbW: 1438,
         gutterW: 48,
-        xRight: 1392,
+        xRight: 1420,
         labelX: 26,
         columns: [
             {
@@ -737,16 +737,16 @@
             {
                 cx: L4[6].cx, w: L4[6].w,
                 flow: {
-                    kind: 'review', title: '对抗审查', sub: 'Review Agent', subSize: 8,
+                    kind: 'review', title: '对抗审查', sub: 'Review + Acceptance', subSize: 8,
                     badge: 'MUST', badgeTone: 'must', gate: 'GATE', gateTone: 'gate',
                 },
-                skills: ['qa-review'],
-                cmds: ['/opsx:review'],
+                skills: ['qa-review', 'acceptance'],
+                cmds: ['/opsx:review', '/opsx:acceptance'],
                 cmdSize: 8.5,
                 deliv: {
-                    title: 'review.md', titleSize: 9,
-                    desc: ['PASS/WARN/FAIL', 'file:line 证据', '2× FAIL → HITL'],
-                    descSize: 8.5, accent: C.red, fill: '#fbf1f3', titleColor: '#8a3b4a', descColor: '#9f5a68',
+                    title: 'review + acceptance', titleSize: 8.5,
+                    desc: ['PASS/WARN/FAIL', 'file:line 证据', '2× FAIL → HITL', 'acceptance report'],
+                    descSize: 7.5, accent: C.red, fill: '#fbf1f3', titleColor: '#8a3b4a', descColor: '#9f5a68',
                 },
             },
             {
@@ -771,7 +771,7 @@
             { label: 'PM AGENT (REQ FUNNEL)', color: C.green, from: 3, to: 3, fill: '#e9f8f0' },
             { label: 'BRIDGE', color: C.slate, from: 4, to: 4, fill: '#eef2f7' },
             { label: 'ENGINEER AGENT (EXECUTION)', color: C.blue, from: 5, to: 5, fill: '#eaf2ff' },
-            { label: 'REVIEW AGENT', color: C.red, from: 6, to: 6, fill: '#fbf1f3', size: 9 },
+            { label: 'REVIEW / ACCEPTANCE', color: C.red, from: 6, to: 6, fill: '#fbf1f3', size: 8.5 },
             { label: 'LEAD / GOVERNANCE', color: C.slate, from: 7, to: 8, fill: '#eef2f7' },
         ],
         arrows: [
@@ -792,7 +792,7 @@
             { left: 7, right: 8, label: 'AUTO', tone: 'auto' },
         ],
         loops: [
-            { fromCol: 6, toCol: 5, label: 'FIX LOOP', color: C.red, drop: 44, fromEdge: 'center', toEdge: 'center', dash: '6 4', labelSize: 9, labelBg: true, labelX: 1061 },
+            { fromCol: 6, toCol: 5, label: 'FIX LOOP', color: C.red, drop: 44, fromEdge: 'center', toEdge: 'center', dash: '6 4', labelSize: 9, labelBg: true, labelX: 1068 },
             { fromCol: 8, toCol: 3, label: 'NEXT STORY', color: C.blue, drop: 64, fromEdge: 'left', toEdge: 'right', dash: '8 6', labelBg: true, labelX: 860 },
             { fromCol: 8, toCol: 0, label: 'EPIC DONE · BASELINE SYNC + HITL', color: C.green, drop: 88, fromEdge: 'left', toEdge: 'left', dash: '8 6', labelSize: 8.5, labelBg: true },
         ],
@@ -836,7 +836,7 @@
                     <span class="legend-group">HITL</span>
                     <div class="flex-1 text-amber-700 leading-tight">调研 → 探索 → 原型(IF UI) → 架构(OPT) → 故事 → 测试设计 → 设计冻结 → Baseline(Epic)</div>
                 </div>
-                <div class="text-[7.5px] text-slate-400 leading-tight">* /req:arch · /req:test-design · /opsx:review = Layer 04 建议新增</div>
+                <div class="text-[7.5px] text-slate-400 leading-tight">* /req:arch · /req:test-design · /opsx:acceptance · /opsx:review = Layer 04 建议新增</div>
             </div>
         </div>`;
 
@@ -868,7 +868,7 @@
             'COLLABORATIVE SDD', 'bg-slate-100 text-slate-500', renderLayer(layer2)),
         slideHTML('03', 'dark', '业务产品 · Layer 03', 'Business Product / Requirement Funnel / Double-Loop Governance',
             'ENTERPRISE SDD FRAMEWORK', 'bg-aidd-green text-white', renderLayer(layer3)),
-        slideHTML('04', 'red', '生产级交付 · Layer 04', 'Production-Grade SDD / Test Left-Shift · Arch Gate (OPT) · Adversarial Review (MUST)',
+        slideHTML('04', 'red', '生产级交付 · Layer 04', 'Production-Grade SDD / Test Left-Shift · Arch Gate (OPT) · Adversarial Review + Acceptance (MUST)',
             'HARNESS · 12 MUST · 8 HITL · 5 AUTO', 'bg-rose-50 text-rose-800 border border-rose-200', renderLayer(layer4), { legend: LEGEND_04 }),
     ];
 
