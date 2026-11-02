@@ -24,7 +24,7 @@ metadata:
 | :--- | :--- |
 | 路线图阶段进度（阶段 1~N 状态，随 ROADMAP 动态） | `docs/ROADMAP.md`（当前阶段 / 未来阶段） |
 | 规划中（待启动 Epic） | `docs/ROADMAP.md` 当前阶段 In Scope 中**尚未进入需求侧/交付侧**的 Epic |
-| 需求漏斗（需求侧 Epic 阶段状态） | `openspec-requirements/epics/*/STATUS.md` + 各阶段制品存在性（research.md / idea.md / prototypes/ / storymap.md / stories/） |
+| 需求漏斗（需求侧 Epic 阶段状态） | `openspec-requirements/epics/*/STATUS.md` + 各阶段制品存在性（research.md / idea.md / prototypes/ / architecture-impact.md(OPT) / storymap.md / stories/ / test-design.md） |
 | 探索中（想法池 + 需求侧活跃 Epic + 交付侧骨架） | `openspec/changes/ideas/idea.md` · 需求侧活跃 Epic · `openspec/changes/` 无 proposal 的变更 |
 | 设计中 / 开发中 | `openspec/changes/<name>/` 中 proposal.md / design.md / tasks.md 的存在性推断 |
 | 已归档（近 7 天）与归档历史 | `openspec/changes/archive/` 目录名前缀日期 |
@@ -84,7 +84,7 @@ jobs:
 - **路线图阶段进度**：阶段 1~N 状态条（已完成 / 当前 / 未来，随 ROADMAP 动态）+ 完成百分比。
 - **指标行**：规划中 / 需求探索中 / 设计中 / 开发中 / 已归档（近 N 天）/ 质量信号。
 - **业务基线**：三张内容摘要卡片（阶段数 / 节点数 / Bounded Context 数 + 更新时间 + 查看链接），不只是文件名。
-- **需求漏斗**：需求侧 Epic 各阶段状态灯（调研 · 探索 · 原型 · 拆分 · 故事）+ 完成状态。
+- **需求漏斗**：需求侧 Epic 各阶段状态灯（调研 · 探索 · 原型 · 架构(OPT) · 拆分 · 故事 · 测试设计(MUST)）+ 完成状态。
 - **交付看板**：五列 Kanban（规划中 / 探索中 / 设计中 / 开发中 / 已归档近 N 天）。
 - **质量门禁**：最近归档变更的硬门禁表（规格校验 / 后端测试 / Python / 前端构建 / E2E / 结论）。
 - **归档历史**：更早归档折叠展示（查看更多）。

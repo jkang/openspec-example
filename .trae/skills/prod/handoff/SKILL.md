@@ -14,6 +14,8 @@ metadata:
 ## 输入
 
 - `openspec-requirements/epics/<epic-key>/stories/<story-key>/story.md`（已确认，业务面冻结交付物）
+- `openspec-requirements/epics/<epic-key>/stories/<story-key>/test-design.md`（已确认，分层测试设计；**交接强制前置**）
+- `openspec-requirements/epics/<epic-key>/architecture-impact.md`（若已跑 OPT，作 Impact 优先依据）
 
 ## 步骤
 
@@ -29,15 +31,21 @@ metadata:
    - **Capabilities** ← idea 的**候选 Capabilities**（按 capability 列出，新增 taxonomy 保留标注）
    - **Process Alignment** ← 治理映射的 L1/L2/L3 节点
    - **Service Blueprint Alignment** ← 治理映射的 SB-STAGE-*/SB-<LANE>-* 节点
-   - **Impact** ← idea 的架构影响分析
-   - 在 proposal 中链接需求侧 `story.md` 作为业务评审依据。
+   - **Impact** ← `architecture-impact.md`（若存在）优先，否则 idea 的架构影响分析
+   - 在 proposal 中链接需求侧 `story.md` 作为业务评审依据，并链接 `test-design.md` 作为测试设计依据。
 4. **开发侧 story 阶段跳过**：业务评审已在需求侧完成（story.md 等价于开发侧 story.md），开发侧不再生成 story.md。
 5. **登记 Epic 队列（若属 Epic）**：更新 `openspec/epic-<key>.story-list.json`，将对应 Story 置为 `in_progress` 并记录 `changeName`。
 6. **回填需求侧状态**：
    - 在需求侧 `epics/<epic-key>/stories/<story-key>/story.md` 的「交接状态」勾选"已交接"并记录 `changeName`。
    - 更新 `epics/<epic-key>/STATUS.md`：该 Story 状态置 `handoff`；若全部 Story 已交接，Epic 生命周期置 `all-handoff`。
    - 同步更新 `storymap.md`。
-7. **进入开发侧流程**：从 `proposal` 起步 → 按 capability 拆分生成行为规格 `specs/`（Story-specs，h3/h4 格式）→ design → tasks → apply → verify。
+7. **进入开发侧流程**：从 `proposal` 起步 → 按 capability 拆分生成行为规格 `specs/`（Story-specs，h3/h4 格式，`@unit/@api/@e2e` 标签与分层必须对齐 `test-design.md`）→ design → tasks → apply → verify。
+
+## 测试设计契约（强制）
+
+- `test-design.md` 是交接的**强制前置**：缺失或未 HITL 确认时禁止 `/req:handoff`。
+- 开发侧 `spec-design` 生成的每个 Gherkin Scenario 标签（`@unit/@api/@e2e`）与分层用例必须与 `test-design.md` 的追溯矩阵一致；`apply` 按该设计落地测试代码。
+- 若开发中发现测试设计缺口，回关需求侧 `test-design` skill 补齐，不擅自偏离。
 
 ## 交接策略（逐个 vs 批量）
 

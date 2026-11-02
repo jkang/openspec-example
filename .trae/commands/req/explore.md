@@ -18,6 +18,6 @@ tags: ["req-sdd", "explore", "idea"]
 3. 转化产出 idea.md：澄清业务意图 / **To-Be Process** / **To-Be Journey** / 产品设计思路 / 任务类型路由 / **候选 Capabilities**（对齐 domain_model）/ 治理映射 / 拆分建议 / 架构影响。
 4. **B/C 双端视角（强约束）**。
 5. 按 `openspec-requirements/templates/idea.md` 产出。
-6. **HITL**：产出后暂停确认，确认后才可进入 `/req:prototype`（若 UI）或 `/req:storymap`。
+6. **HITL**：产出后暂停确认，确认后才可进入 `/req:prototype`（若 UI）→ `/req:arch`（OPT）→ `/req:storymap`；跳过原型时直接进入 `/req:arch` 或 `/req:storymap`。idea.md 的架构影响章节作为 `/req:arch` 的输入草稿。
 
 **Guardrails**: 只写需求侧制品；候选 Capabilities 是强约束；产出后必须 HITL 确认。

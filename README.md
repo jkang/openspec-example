@@ -58,7 +58,7 @@
 > `docs/governance/delivery_board.html` 是上述四层的只读聚合视图，由 `python3 scripts/generate_delivery_board.py` 生成，不是新的规划源。
 
 ### 🔄 Working Loop (端到端大循环)
-流程遵循：`规划基线 -> 需求调研 (/req:research，识别 Epic) -> 探索 (/req:explore) -> 原型 (/req:prototype，涉及 UI 时、Epic 整体) -> 拆分 (/req:storymap) -> Story (/req:story) -> 交接 (/req:handoff，合成 proposal) -> 规格与设计 (/opsx:spec-design) -> 实施 (/opsx:apply) -> 验证 (/opsx:verify) -> Spec Sync (/opsx:sync，change 级) -> 归档 (/opsx:archive) -> Epic 收尾 Baseline Sync (/opsx:baseline/sync，Epic 级)`。
+流程遵循：`规划基线 -> 需求调研 (/req:research，识别 Epic) -> 探索 (/req:explore) -> 原型 (/req:prototype，涉及 UI 时、Epic 整体) -> 架构影响 (/req:arch，OPT) -> 拆分 (/req:storymap) -> Story (/req:story) -> 测试设计 (/req:test-design，MUST) -> 交接 (/req:handoff，合成 proposal) -> 规格与设计 (/opsx:spec-design) -> 实施 (/opsx:apply) -> 验证 (/opsx:verify) -> 产品验收 (/opsx:acceptance) -> 技术评审 (/opsx:review) -> Spec Sync (/opsx:sync，change 级) -> 归档 (/opsx:archive) -> Epic 收尾 Baseline Sync (/opsx:baseline/sync，Epic 级)`。
 
 - **大块 Epic**：走需求侧漏斗（`/req:` 命令空间），交付侧从 proposal 起步。
 - **Bug Fix / Tech Debt / 简单功能**：直走交付侧（`/opsx:propose` 起），不走需求漏斗。
@@ -100,14 +100,17 @@
 | 需求调研 | `research` | `/req:research` | 产出 `research.md`，识别 Epic 并创建目录 |
 | 需求探索 | `explore` | `/req:explore` | 产出 `idea.md` + To-Be + 候选 Capabilities |
 | Epic 原型 | `prototype` | `/req:prototype` | **涉及 UI 时**，拆分前完成 Epic 整体原型 |
+| 架构影响 | `arch-impact` | `/req:arch` | **OPT**，产出 `architecture-impact.md`；直走任务内联 proposal |
 | 需求拆分 | `storymap` | `/req:storymap` | 覆盖对账，拆出 Story |
 | Story | `story` | `/req:story` | 业务面冻结交付物 |
+| 测试设计 | `test-design` | `/req:test-design` | **MUST**，分层用例 + 追溯矩阵，交接强制前置 |
 | 交接 | `handoff` | `/req:handoff` | 合成 proposal + 登记 Epic 队列 |
 | 直走提案 | `propose` | `/opsx:propose` | Bug Fix / Tech Debt / 简单功能 |
 | 直走原型 | `prototype` | `/opsx:prototype` | 涉及 UI 时 |
 | 规格设计 | `spec-design` | `/opsx:spec-design` | 生成 specs / design / tasks |
 | 实施 | `apply-change` | `/opsx:apply` | 按 `tasks.md` 实施 |
 | 验证 | `verify` | `/opsx:verify` | 硬门禁 + E2E 证据写入 `verify.md` |
+| 产品验收 | `acceptance` | `/opsx:acceptance` | 用户可见结果的验收计划与证据（本地报告） |
 | 技术评审 | `reviewer` agent | `/opsx:review` | 五维审计，P0-P3 分级 + 修复计划写入 `review.md` |
 | 计划修订 | `update-change` | `/opsx:update` | 先改规格/设计，再继续实施 |
 | Spec Sync | `sync-specs` | `/opsx:sync` | change 级同步 |
@@ -230,12 +233,13 @@ openspec-requirements/archive/
 **需求侧（仅大块 Epic）**：
 
 ```text
-/req:research → /req:explore →（涉及 UI）/req:prototype → /req:storymap → /req:story → /req:handoff
+/req:research → /req:explore →（涉及 UI）/req:prototype → /req:arch（OPT）→ /req:storymap → /req:story → /req:test-design（MUST）→ /req:handoff
 ```
 
 - 每个阶段产物完成后必须经过 HITL 确认。
 - `research` 负责识别 Epic 并创建 `epics/<epic-key>/`；`storymap` 必须做覆盖对账。
-- `/req:handoff` 的动作：创建 `openspec/changes/<name>/`、**合成 `proposal.md`**、登记 `openspec/epic-<key>.story-list.json`、回填 `story.md` / `storymap.md` / `STATUS.md`。
+- `/req:arch` 为 OPT 架构影响分析（直走交付侧任务跳过，架构影响内联 proposal）；`/req:test-design` 为 MUST，产出分层测试用例 + 追溯矩阵，是交接强制前置。
+- `/req:handoff` 的动作：创建 `openspec/changes/<name>/`、**合成 `proposal.md`**、登记 `openspec/epic-<key>.story-list.json`、回填 `story.md` / `test-design.md` / `storymap.md` / `STATUS.md`。
 - **UI 门禁**：涉及 UI 的 Epic 没有已确认的 Epic 整体原型，禁止交接。
 
 **交付侧**：

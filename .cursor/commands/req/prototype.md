@@ -15,6 +15,6 @@ tags: ["req-sdd", "prototype", "ui"]
 2. 读 `epics/<epic-key>/idea.md`，确认涉及 UI。
 3. 严格遵循 `docs/FRONTEND.md`：无圆角 / 无阴影 / slate 色系 / 真实业务数据 / 全中文 / Vue 3 (CDN) + Tailwind CSS (CDN)。
 4. **产出后必须暂停征求用户确认（HITL）**。
-5. 确认后进入 `/req:storymap`（拆分出的 Story 共享此 Epic 整体原型）。
+5. 确认后进入 `/req:arch`（架构影响，OPT，推荐）再进入 `/req:storymap`；若跳过架构影响则直接进入 `/req:storymap`（拆分出的 Story 共享此 Epic 整体原型）。
 
 **Guardrails**: 只写需求侧原型（Epic 整体，不按 Story 拆散）；产出后必须 HITL 确认；未确认原型不得拆分/交接。

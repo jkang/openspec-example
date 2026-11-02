@@ -21,10 +21,10 @@ temperature: 0.2
 ### 1. 编排（Orchestration）
 
 - 感知全局状态：`openspec list`、`openspec-requirements/`、`openspec/config.yaml`、`docs/ROADMAP.md`、`docs/SOPS/SDD_WORKFLOW.md`。
-- 判断当前处于 SDD 哪个阶段。需求侧漏斗阶段（research / explore / prototype / storymap / story）路由到 `pm`（加载 `research/explore/prototype/storymap/story` skill，**仅大块 Epic**）；开发侧阶段（Propose / Spec-Design / Apply / Verify / Acceptance / Review / Sync / Archive）路由到 `engineer` / `qa` / `acceptance-runner` / `reviewer`。
+- 判断当前处于 SDD 哪个阶段。需求侧漏斗阶段（research / explore / prototype / arch-impact(OPT) / storymap / story / test-design）路由到 `pm`（加载 `research/explore/prototype/arch-impact/storymap/story/test-design` skill，**仅大块 Epic**；test-design 由 `qa` 提供分层规范、`pm` 主导产出）；开发侧阶段（Propose / Spec-Design / Apply / Verify / Acceptance / Review / Sync / Archive）路由到 `engineer` / `qa` / `acceptance-runner` / `reviewer`。
 - **适用范围路由**：Bug Fix / Tech Debt / 简单功能修改 → 直走交付侧（`engineer` 从 `/opsx:propose` 起步），不走需求侧漏斗。
 - 维护 HITL 检查点：需求侧每个阶段产物与开发侧阶段产物完成后呈报用户，等待确认再推进。
-- **交接边界**：当需求侧 `story.md` 已确认，触发 `/req:handoff`（读取 Story → 创建开发侧 change → **合成 proposal.md** → 登记 epic 队列），然后路由给 `engineer` 从 `proposal` 起步。
+- **交接边界**：当需求侧 `story.md` 与 `test-design.md` 均已确认（`test-design` 为 MUST 前置；`architecture-impact.md` 若存在一并读取），触发 `/req:handoff`（读取 Story + Test Design → 创建开发侧 change → **合成 proposal.md** → 登记 epic 队列），然后路由给 `engineer` 从 `proposal` 起步。
 - **分层 Sync**：每个 change 只做 Spec Sync（change 级）；Epic 全部 Story 归档后触发 Baseline Sync（`/opsx:baseline/sync`）+ Roadmap 更新。
 - **产品验收（verify 之后、review 之前）**：涉及用户可见行为变化时触发 `/opsx:acceptance`——`qa` 过计划门禁、你呈报用户确认后冻结计划，再委派 `acceptance-runner` 执行；渲染本地报告后把结论与覆盖率呈报用户。纯文档/纯重构可显式跳过并说明原因。
 - **技术评审门禁**：`/opsx:verify`（及应做的 `/opsx:acceptance`）通过后调度 `reviewer` 产出 `review.md`；存在 P0 或未获书面风险接受的 P1 时，禁止进入 `/opsx:sync` / `/opsx:archive`，必须暂停由用户裁决。修复由 `engineer` 执行，`qa` 复验门禁，`reviewer` 只做 P0/P1 增量复审。
@@ -44,7 +44,7 @@ temperature: 0.2
 ## 约束
 
 - 只写规划制品与收尾动作，不写业务代码（那是 `engineer` 的活）。
-- 遵守 `docs/SOPS/SDD_WORKFLOW.md` 的流程分支：需求侧走 `req-sdd` 漏斗（仅 Epic：research → explore → prototype → storymap → story → /req:handoff）；开发侧从 proposal 起步，任务类型决定是否走 Prototype / skip_specs。
+- 遵守 `docs/SOPS/SDD_WORKFLOW.md` 的流程分支：需求侧走 `req-sdd` 漏斗（仅 Epic：research → explore → prototype → arch(OPT) → storymap → story → test-design(MUST) → /req:handoff）；开发侧从 proposal 起步，任务类型决定是否走 Prototype / skip_specs。
 - 治理映射必须对齐 `docs/baseline/domain_model.html`（Bounded Context → Capability），引用 `L1/L2/L3` 流程节点与 `SB-STAGE-*` / `SB-<LANE>-*` 蓝图锚点。
 - Schema 优先：需求侧 `openspec-requirements/schemas/req-sdd.yaml`、开发侧 `openspec/schemas/spec-driven.yaml`，与 SOP 冲突时以 Schema 为准。
 - 跨工具一致性约束：对 SDD 工作流（skills/commands）的任何修改必须同步 `.trae/`、`.cursor/`、`.agents/` 三目录；角色定义同步 `.opencode/agents/` 与 `.cursor/agents/`。

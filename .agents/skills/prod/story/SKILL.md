@@ -19,7 +19,7 @@ Story 是需求侧**唯一冻结交付物（业务面）**。开发侧经 `/req:
 
 ## 步骤
 
-1. **读上下文**：读已确认的 `epics/<epic-key>/idea.md`、`epics/<epic-key>/storymap.md`、以及 `epics/<epic-key>/prototypes/*.html`（若 UI 且已确认）。
+1. **读上下文**：读已确认的 `epics/<epic-key>/idea.md`、`epics/<epic-key>/storymap.md`、`epics/<epic-key>/prototypes/*.html`（若 UI 且已确认）与 `epics/<epic-key>/architecture-impact.md`（若已跑 OPT）。
 2. **应用规则**：读 `openspec-requirements/config.yaml` 的 `rules.story`。
 3. **生成 story.md**：按 `openspec-requirements/templates/story.md` 产出（纯业务面）：
    - 用户场景（C 端 + B 端视角）/ 范围
@@ -30,7 +30,7 @@ Story 是需求侧**唯一冻结交付物（业务面）**。开发侧经 `/req:
 4. **可选分析增强（tools/）**：调用 `openspec-requirements/tools/story-narrative-generator/SKILL.md` 生成故事详述（角色画像/交互逻辑/AC/业务价值），产物 `epics/<key>/analysis/narrative/<story-key>/narrative.md`，story.md「分析制品索引」引用。仅作业务面质量增强，**不生成行为规格 specs**（由开发侧在 proposal 后产出）。
 5. **UI 门禁**：涉及 UI 的 Story，若无已确认的 Epic 整体原型 → **禁止**勾选「待开发交接」，提示先跑 `prototype`（Epic 整体）。
 6. **HITL**：产出后暂停确认。
-7. **交接**：确认后提示执行 `/req:handoff`（合成开发侧 proposal）。
+7. **测试设计前置**：确认后先执行 `/req:test-design`（MUST，分层测试用例 + 追溯矩阵）；test-design 经 HITL 确认后才可执行 `/req:handoff`（合成开发侧 proposal）。
 
 ## 明确不做的事
 

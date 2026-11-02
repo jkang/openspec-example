@@ -10,8 +10,10 @@
 | research（需求调研） | ✅ done | 2026-10-20 产出 `research.md` 并经 HITL 确认；Q1=A 新增 Phase 9「会员与复购」/ Q2=A 纯复购激励 / Q4=C 现结 `PAID`+账期 `Receipt` 后计发 / Q8=A 等级 Out of Scope |
 | explore（探索） | ⬜ | 待 Phase 9 登记 ROADMAP 后启动（research 已确认可进入） |
 | prototype（原型·Epic整体） | ⬜ | 涉及小程序/Web UI，待 explore 确认范围后执行 |
-| storymap（需求拆分） | ⬜ | 待 explore 与原型确认后执行 |
+| arch（架构影响·OPT） | ⬜ | 待原型确认后执行 `/req:arch`（OPT，也可显式 no-op 跳过） |
+| storymap（需求拆分） | ⬜ | 待 explore、原型与架构影响确认后执行 |
 | stories（Story 交付） | ⬜ | 待 storymap 产出 |
+| test-design（测试设计·MUST） | ⬜ | 各 Story 确认后、交接前执行 `/req:test-design` |
 
 ## Story 交付状态
 
@@ -28,6 +30,6 @@
 - [ ] **all-done**（全部 Story 开发侧已归档，`epic-<key>.story-list.json` 全 done）
 - [ ] **archived**（`epics/<epic-key>/` → `archive/YYYY-MM-DD-<epic-key>/`）
 
-> 状态 owner：需求侧 skill（research→done / explore→done / prototype→done / storymap→done / handoff→handoff）；开发侧归档后由 `lead` 回填 done/archived。
+> 状态 owner：需求侧 skill（research→done / explore→done / prototype→done / arch-impact→done|n/a / storymap→done / test-design→done / handoff→handoff）；开发侧归档后由 `lead` 回填 done/archived。
 >
 > 备注：`active` 仅表示需求侧工作目录已建立，**不代表规划层已批准**。ROADMAP 登记方式（Phase 9 / 并入 Phase 8 / 仅探索）未裁定前，本 Epic 不具备 handoff 条件。

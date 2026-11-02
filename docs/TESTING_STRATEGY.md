@@ -37,6 +37,14 @@ updated_at: 2026-08-23
 
 ## 2. SDD 工作流中的执行约束
 
+### 需求侧测试设计（上游输入）
+
+需求侧漏斗的 `/req:test-design`（skill: `test-design`）在 Story 确认后、`/req:handoff` 之前产出 `test-design.md`：按本策略的金字塔把每个 Story E2E 场景映射为 `@unit/@api/@e2e` 分层用例，并给出**追溯矩阵**（E2E 场景 → 用例 → 层 → 覆盖状态）。
+
+- `test-design.md` 是交接的**强制前置**（MUST）。
+- 开发侧 `spec-design` 为 Gherkin Scenario 打标签、`apply` 落地测试时，必须与该追溯矩阵一致。
+- 若开发中发现缺口，回关需求侧 `test-design` skill 补齐，不得擅自偏离。
+
 ### Propose 阶段的防腐 (Tagging)
 在 `/opsx:propose` 阶段，AI Agent 生成 `spec.md` 时，**必须主动评估每一个 Scenario 的验证成本**，并在其上方添加对应的 Cucumber 标签 (`@unit`, `@api`, 或 `@e2e`)。
 **严禁将底层业务逻辑判断推卸给 `@e2e` 层。**

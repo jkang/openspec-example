@@ -740,7 +740,7 @@
                     kind: 'review', title: '对抗审查', sub: 'Review + Acceptance', subSize: 8,
                     badge: 'MUST', badgeTone: 'must', gate: 'GATE', gateTone: 'gate',
                 },
-                skills: ['qa-review', 'acceptance'],
+                skills: ['qa · reviewer', 'acceptance'],
                 cmds: ['/opsx:review', '/opsx:acceptance'],
                 cmdSize: 8.5,
                 deliv: {
@@ -836,6 +836,7 @@
                     <span class="legend-group">HITL</span>
                     <div class="flex-1 text-amber-700 leading-tight">调研 → 探索 → 原型(IF UI) → 架构(OPT) → 故事 → 测试设计 → 设计冻结 → Baseline(Epic)</div>
                 </div>
+                <div class="text-[7.5px] text-slate-400 leading-tight">对抗审查 = qa 对抗审查(PASS/WARN/FAIL) + reviewer 技术评审(/opsx:review) + acceptance(/opsx:acceptance)</div>
                 <div class="text-[7.5px] text-slate-400 leading-tight">* /req:arch · /req:test-design · /opsx:acceptance · /opsx:review = Layer 04 建议新增</div>
             </div>
         </div>`;

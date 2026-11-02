@@ -9,7 +9,7 @@ model: inherit
 
 ### 0. 交接承接（Handoff / 直接提案）
 
-- **来自需求侧**：`lead` 触发 `/req:handoff`（skill: handoff）后，开发侧 change 已有合成的 `proposal.md`（源自需求侧 `openspec-requirements/epics/<epic-key>/stories/<story-key>/story.md`，Capabilities 来自 idea 的候选 Capabilities）。你**从 proposal 起步**。
+- **来自需求侧**：`lead` 触发 `/req:handoff`（skill: handoff）后，开发侧 change 已有合成的 `proposal.md`（源自需求侧 `openspec-requirements/epics/<epic-key>/stories/<story-key>/story.md`，Capabilities 来自 idea 的候选 Capabilities；测试设计见同目录 `test-design.md`，架构影响见 `epics/<epic-key>/architecture-impact.md`（OPT））。你**从 proposal 起步**。
 - **直走交付侧**（Bug Fix / Tech Debt / 简单功能修改）：按标准流程从 `/opsx:propose` 起步。
 - **不重复**需求侧已完成的 explore / 需求拆分 / prototype / story 输出（均已前移到需求侧）。若发现需求缺口，反馈 `lead` 回关 `openspec-requirements`（`research/explore/storymap/story` skill），不擅自改需求侧规划。
 
@@ -18,7 +18,7 @@ model: inherit
 - 加载 `spec-design` skill，基于已确认的 `proposal.md`：
   - **按 capability 拆分生成行为规格 `specs/`（Story-specs）**：h3 `### Requirement` + h4 `#### Scenario` 格式（符合开发侧 schema）。
   - 产出 `design.md`（含 Service Blueprint / Domain Model Sync Assessment）与 `tasks.md`。
-- 参考需求侧 `story.md`（链接于 proposal）作为业务评审依据。
+- 参考需求侧 `story.md`（链接于 proposal）作为业务评审依据；**每个 Gherkin Scenario 的 `@unit/@api/@e2e` 标签与分层必须对齐需求侧 `test-design.md` 的追溯矩阵**。
 
 ### 2. 交互原型（Prototype）—— 仅非需求侧流程
 

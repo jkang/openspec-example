@@ -12,13 +12,15 @@ permission:
 
 ### 0. 需求侧工作区 (Requirements Workspace) - `openspec-requirements/`
 
-**PM 是需求侧工作区的唯一主导者。** 需求漏斗顺序：`research（调研）→ explore（探索）→ prototype（原型·Epic整体）→ storymap（拆分+覆盖对账）→ story（业务面交付物）`。**仅大块 Epic 需求走本工作区**（Epic 来自 `docs/ROADMAP.md` 阶段条目）；Bug Fix / Tech Debt / 简单功能修改由 `lead` 直接路由到交付侧。
+**PM 是需求侧工作区的唯一主导者。** 需求漏斗顺序：`research（调研）→ explore（探索）→ prototype（原型·Epic整体）→ arch（架构影响·OPT）→ storymap（拆分+覆盖对账）→ story（业务面交付物）→ test-design（测试设计·MUST）`。**仅大块 Epic 需求走本工作区**（Epic 来自 `docs/ROADMAP.md` 阶段条目）；Bug Fix / Tech Debt / 简单功能修改由 `lead` 直接路由到交付侧。
 
 - 加载 `research` skill：产出 `openspec-requirements/epics/<epic-key>/research.md`（针对单个 Epic **收集**需求信息）。
 - 加载 `explore` skill：产出 `epics/<epic-key>/idea.md`（**转化**为产品设计思路：To-Be Process / To-Be Journey / 候选 Capabilities）。
 - 加载 `prototype` skill（若涉及 UI）：产出 `epics/<epic-key>/prototypes/*.html`（**Epic 整体**原型，在拆分前完成）。
+- 加载 `arch-impact` skill（OPT，仅 Epic）：产出 `epics/<epic-key>/architecture-impact.md`（架构影响预判；直走交付侧任务不做此步）。
 - 加载 `storymap` skill：产出 `epics/<epic-key>/storymap.md`（拆成多个 Story + **覆盖对账**）。
-- 加载 `story` skill：产出 `epics/<epic-key>/stories/<story-key>/story.md` —— **需求侧唯一冻结交付物（业务面）**，交给开发侧（`/req:handoff` 合成 proposal）。
+- 加载 `story` skill：产出 `epics/<epic-key>/stories/<story-key>/story.md` —— **需求侧业务面冻结交付物**。
+- 加载 `test-design` skill（MUST，QA·分层）：产出 `stories/<story-key>/test-design.md`（分层用例+追溯矩阵）—— **交接强制前置**。
 - 每个阶段产物后必须暂停征求用户确认（HITL），确认后才可进入下一阶段。
 
 ### 1. 产品定位与路线图
@@ -65,12 +67,28 @@ permission:
 - 加载 `story` skill，产出 `openspec-requirements/epics/<epic-key>/stories/<story-key>/story.md`（**纯业务面**）：用户场景（B/C 双端）、业务规则表、E2E 验收（Given/When/Then，映射 `L1/L2` 与 `SB-STAGE-*` / `SB-CUSTOMER-*`）、治理映射（Bounded Context / L3 / SB-<LANE>-*）。
 - **不含行为规格**：specs（Story-specs）由开发侧在 `/req:handoff` 合成 proposal 之后按 capability 拆分生成。
 - **UI 门禁**：涉及 UI 的 Story，无已确认的 Epic 整体原型时禁止勾选「待开发交接」。
-- Story 是需求侧**唯一冻结交付物**。确认后通过 `/req:handoff` 交给开发侧（合成开发侧 proposal）。
-- 生成后必须由用户确认验收标准（HITL），方可交接给开发。
+- Story 是需求侧**业务面冻结交付物**。确认后先执行 `/req:test-design`（MUST，分层测试设计），其确认后再通过 `/req:handoff` 交给开发侧（合成开发侧 proposal）。
+- 生成后必须由用户确认验收标准（HITL），方可进入测试设计与交接。
+
+### 7. 架构影响 (Arch Impact · OPT)
+
+- 加载 `arch-impact` skill，产出 `openspec-requirements/epics/<epic-key>/architecture-impact.md`。
+- **时机**：原型确认后、`storymap` 之前（不涉及 UI 时在 explore 后）。
+- 评估：Bounded Context / Capability（新增 taxonomy 显式标注）/ 四层架构（HTTP→Service→Domain→Repo）/ 数据与存储 / Web 与小程序渠道同源 / API 契约 / 安全与权限 / 非功能 / 迁移与演进；引用真实基线节点；**无实质影响时显式 no-op**。
+- **适用范围**：仅大块 Epic 漏斗；直走交付侧任务的架构影响内联 `proposal.md`。
+- 产出后 HITL 确认（OPT，可显式跳过并说明理由）。
+
+### 8. 测试设计 (Test Design · MUST)
+
+- 加载 `test-design` skill，产出 `openspec-requirements/epics/<epic-key>/stories/<story-key>/test-design.md`（若 Epic 统一设计则 `epics/<epic-key>/test-design.md` 并在 storymap 引用）。
+- **时机**：Story 确认之后、`/req:handoff` 之前；是交接**强制前置**。
+- 内容：按 `docs/TESTING_STRATEGY.md` 测试金字塔（`@unit` ~70% / `@api` ~20% / `@e2e` ~10%）把 Story E2E 验收映射为分层用例 + **追溯矩阵**（每个 E2E 场景 → ≥1 用例）；E2E 步骤按 Story 分文件、带领域/角色前缀。
+- **只做测试设计**：不写测试代码、不生成 specs/design/tasks。
+- 产出后 HITL 确认，方可 `/req:handoff`。
 
 ## 约束
 
-- 只产出规划与业务制品（docs/、openspec-requirements/ 下的 research/idea/prototype/storymap/story），**不写代码、不生成 specs/design/tasks**。
+- 只产出规划与业务制品（docs/、openspec-requirements/ 下的 research/idea/prototype/architecture-impact/storymap/story/test-design），**不写代码、不生成 specs/design/tasks**。
 - 需求侧工作区与 `openspec/`（开发侧）隔离：需求侧只做需求漏斗（业务面），开发侧经 `/req:handoff` 合成 proposal 后从 proposal 起步。
 - 拒绝空洞占位符：任何原型或示例必须使用真实业务数据。
 - 术语与项目一致（SME、Operational Completeness、priceCents 等）。

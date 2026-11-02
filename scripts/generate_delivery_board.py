@@ -6,7 +6,7 @@
 定位：团队需求管理平台的可视化核心（替代 Jira/Linear 等外部平台的看板视图）。
 数据源（唯一事实来源）：
   - docs/ROADMAP.md              规划层：阶段进度、当前阶段、规划中 Epic
-  - openspec-requirements/epics/ 需求侧：Epic 漏斗状态（research→explore→prototype→storymap→story）
+  - openspec-requirements/epics/ 需求侧：Epic 漏斗状态（research→explore→prototype→arch(OPT)→storymap→story→test-design(MUST)）
   - openspec/changes/ideas/      交付侧：想法池
   - openspec/changes/            交付侧：活跃变更（探索/设计/开发）
   - openspec/changes/archive/    交付侧：归档变更（最近 7 天 / 历史）
@@ -147,18 +147,25 @@ def scan_epics():
         text = read(status_path)
         stages = {}
         # 阶段制品映射：判断"有制品"即为进行中
+        stories_dir = os.path.join(epic_dir, "stories")
+        has_test_design = os.path.exists(os.path.join(epic_dir, "test-design.md")) or (
+            os.path.isdir(stories_dir)
+            and any(glob.glob(os.path.join(stories_dir, "*", "test-design.md")))
+        )
         artifact_map = {
             "research": os.path.exists(os.path.join(epic_dir, "research.md")),
             "explore": os.path.exists(os.path.join(epic_dir, "idea.md")),
             "prototype": os.path.isdir(os.path.join(epic_dir, "prototypes")),
+            "arch": os.path.exists(os.path.join(epic_dir, "architecture-impact.md")),
             "storymap": os.path.exists(os.path.join(epic_dir, "storymap.md")),
-            "stories": os.path.isdir(os.path.join(epic_dir, "stories")),
+            "stories": os.path.isdir(stories_dir),
+            "test-design": has_test_design,
         }
-        for m in re.finditer(r"\|\s*([a-z]+)（[^）]*）\s*\|\s*([^|]*?)\s*\|", text):
+        for m in re.finditer(r"\|\s*([a-z][a-z-]*)（[^）]*）\s*\|\s*([^|]*?)\s*\|", text):
             stage, cell = m.group(1).lower(), m.group(2).lower()
             if stage not in artifact_map:
                 continue
-            if "done" in cell:
+            if "done" in cell or "n/a" in cell:
                 stages[stage] = "done"
             elif artifact_map.get(stage):
                 stages[stage] = "active"
@@ -172,7 +179,7 @@ def scan_epics():
         result.append({
             "key": key, "stages": stages,
             "status": "done" if all_done else "active",
-            "stage_order": ["research", "explore", "prototype", "storymap", "stories"],
+            "stage_order": ["research", "explore", "prototype", "arch", "storymap", "stories", "test-design"],
         })
     return result
 
@@ -419,13 +426,13 @@ def render_html(data, refreshed):
             funnel_rows += (
                 f'<tr class="border-b border-slate-100">'
                 f'<td class="py-3 px-4 font-mono text-xs text-slate-900">{esc(ep["key"])}</td>'
-                f'<td class="py-3 px-4">{lights}<span class="text-[10px] text-slate-400 ml-1">调研 · 探索 · 原型 · 拆分 · 故事</span></td>'
+                f'<td class="py-3 px-4">{lights}<span class="text-[10px] text-slate-400 ml-1">调研 · 探索 · 原型 · 架构(OPT) · 拆分 · 故事 · 测试设计(MUST)</span></td>'
                 f'<td class="py-3 px-4 text-xs"><span class="{"text-slate-900 font-bold" if ep["status"] == "done" else "text-slate-500"}">{status_txt}</span></td></tr>'
             )
         funnel_html = (
             f'<div class="bg-white border border-slate-200 p-6 mb-8">'
             f'<h2 class="text-lg font-bold text-slate-900 mb-1 flex items-center"><span class="w-2 h-2 bg-slate-900 mr-2"></span>需求漏斗（需求侧工作区）</h2>'
-            f'<p class="text-[10px] text-slate-400 mb-4">来源：openspec-requirements/epics/*/STATUS.md · 大块需求以 Epic 为单位推进，业务面冻结交付物为 Story</p>'
+            f'<p class="text-[10px] text-slate-400 mb-4">来源：openspec-requirements/epics/*/STATUS.md · 大块需求以 Epic 为单位推进，业务面冻结交付物为 Story，交接前置为测试设计</p>'
             f'<table class="w-full text-left"><thead><tr class="bg-slate-50 border-b border-slate-200">'
             f'<th class="py-2 px-4 text-[10px] text-slate-500 font-bold uppercase">Epic</th>'
             f'<th class="py-2 px-4 text-[10px] text-slate-500 font-bold uppercase">漏斗阶段</th>'

@@ -10,8 +10,10 @@
 | research（需求调研） | ⬜ | researching / done（HITL 确认后置 done） |
 | explore（探索） | ⬜ | exploring / done（HITL 确认后置 done） |
 | prototype（原型·Epic整体） | ⬜ | prototyping / done（HITL 确认后置 done；不涉及 UI 记 n/a） |
+| arch（架构影响·OPT） | ⬜ | arching / done / n/a（OPT，HITL 确认或无影响 no-op 后置 done；跳过记 n/a） |
 | storymap（需求拆分） | ⬜ | splitting / done（HITL 确认后置 done） |
 | stories（Story 交付） | ⬜ | storying / 部分 done / all done |
+| test-design（测试设计·MUST） | ⬜ | test-designing / done（各 Story 交接前完成，HITL 确认后置 done） |
 
 ## Story 交付状态
 
@@ -29,4 +31,4 @@
 - [ ] **all-done**（全部 Story 开发侧已归档，`epic-<key>.story-list.json` 全 done）
 - [ ] **archived**（`epics/<epic-key>/` → `archive/YYYY-MM-DD-<epic-key>/`）
 
-> 状态 owner：需求侧 skill（research→done / explore→done / prototype→done / storymap→done / handoff→handoff）；开发侧归档后由 `lead` 回填 done/archived。
+> 状态 owner：需求侧 skill（research→done / explore→done / prototype→done / arch-impact→done|n/a / storymap→done / test-design→done / handoff→handoff）；开发侧归档后由 `lead` 回填 done/archived。

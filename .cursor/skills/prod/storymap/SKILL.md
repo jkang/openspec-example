@@ -9,7 +9,7 @@ metadata:
   version: "2.0"
 ---
 
-拆分是需求漏斗的**第 4 步**（原型之后）。一个 Epic idea 太大时，先拆成一个 **storymap**（多个 Story 的映射），再逐个深化为 story。
+拆分是需求漏斗的**第 5 步**（架构影响之后；原型之后）。一个 Epic idea 太大时，先拆成一个 **storymap**（多个 Story 的映射），再逐个深化为 story。
 
 ## 产物
 
@@ -19,6 +19,7 @@ metadata:
 
 - 已确认的 `epics/<epic-key>/idea.md`
 - 已确认的 `epics/<epic-key>/prototypes/*.html`（若涉及 UI，Epic 整体原型）
+- `epics/<epic-key>/architecture-impact.md`（若已跑 OPT 架构影响分析；作为拆分依赖/风险的输入）
 
 ## 拆分粒度原则
 
@@ -39,7 +40,7 @@ metadata:
 
 ## 步骤
 
-1. **读上下文**：读已确认的 `epics/<epic-key>/idea.md`、`epics/<epic-key>/research.md` 与 `epics/<epic-key>/prototypes/*.html`（若 UI）。
+1. **读上下文**：读已确认的 `epics/<epic-key>/idea.md`、`epics/<epic-key>/research.md`、`epics/<epic-key>/prototypes/*.html`（若 UI）与 `epics/<epic-key>/architecture-impact.md`（若已跑 OPT）。
 2. **应用规则**：读 `openspec-requirements/config.yaml` 的 `rules.storymap`。
 3. **生成 storymap.md**：按 `openspec-requirements/templates/storymap.md` 产出（拆分明细表 + 覆盖对账表 + 治理映射）。
 4. **可选分析增强（tools/）**：调用 `openspec-requirements/tools/story-map-generator/SKILL.md` 生成 4 层用户故事地图可视化（阶段-活动-接触点-用户故事 + must/should/could 优先级），产物 `epics/<key>/analysis/storymap/{storymap.yaml,storymap.html}`，storymap.md「分析制品索引」引用。**覆盖对账（承诺项→承接 Story）仍以 storymap.md 为唯一权威**，可视化仅作 HITL 审查辅助。

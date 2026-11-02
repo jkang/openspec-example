@@ -37,7 +37,7 @@ metadata:
      - `business-process-deep-analyzer` → `analysis/process/`（To-Be Process L1/L2 + 痛点热力）
      - `journey-map-generator` → `analysis/journey/`（To-Be Journey 可视化，mode: to-be）
      - 均为 **optional**：缺省不影响进入下一阶段；生成后纳入本次 HITL 确认范围。
-4. **HITL**：产出后暂停确认，确认后才可进入 prototype（若 UI）或 storymap。
+4. **HITL**：产出后暂停确认。确认后：涉及 UI 先进入 prototype；随后进入 `/req:arch`（架构影响，OPT，推荐）；最后进入 storymap。跳过原型时可直接进入 `/req:arch` 或 storymap。idea.md 的"架构影响"章节是 `/req:arch` 的输入草稿。
 
 ## Guardrails
 

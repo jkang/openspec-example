@@ -1,6 +1,6 @@
 name: req-sdd
-version: 5
-description: 需求侧工作流（仅用于大块 Epic 需求） - 需求调研 (research) → 探索 (explore) → 原型 (prototype，Epic 整体) → 需求拆分 (storymap) → 需求单元交付物 (story)。规划（roadmap·每阶段多 Epic）在起点 docs/ROADMAP.md 已有，需求侧直接消费。需求侧只产出业务面 story.md；行为规格（Story-specs，按 capability 拆分的 specs）由开发侧在 handoff 合成 proposal 之后生成。Bug Fix / Tech Debt / 简单功能修改不走本流程，直接进入交付侧。
+version: 6
+description: 需求侧工作流（仅用于大块 Epic 需求） - 需求调研 (research) → 探索 (explore) → 原型 (prototype，Epic 整体) → 架构影响 (arch-impact，OPT) → 需求拆分 (storymap) → 需求单元交付物 (story) → 测试设计 (test-design，MUST) → handoff。规划（roadmap·每阶段多 Epic）在起点 docs/ROADMAP.md 已有，需求侧直接消费。需求侧只产出业务面 story.md 与测试设计 test-design.md；行为规格（Story-specs，按 capability 拆分的 specs）由开发侧在 handoff 合成 proposal 之后生成。Bug Fix / Tech Debt / 简单功能修改不走本流程，直接进入交付侧。
 analysis:
   description: 需求分析工具箱（可选增强） - openspec-requirements/tools/ 下的 8 个 AI4PM 需求工程工具，为 explore/prototype/storymap/story 阶段提供可选的结构化分析与可视化产物。所有分析制品均为 optional，缺省不影响原漏斗 HITL 门禁。
   tools_path: openspec-requirements/tools/
@@ -192,6 +192,31 @@ artifacts:
     requires:
       - explore
 
+  - id: arch-impact
+    optional: true
+    generates: epics/<epic-key>/architecture-impact.md
+    description: （可选）架构影响分析（OPT），在原型后、拆分前评估 Bounded Context / Capability / 四层架构 / 数据 / 渠道 / API / 安全 / 非功能影响
+    template: architecture-impact.md
+    instruction: |
+      调用 `arch-impact` skill 生成架构影响分析（OPT）。
+
+      时机：原型确认之后、storymap 之前（涉及 UI 在原型后；不涉及 UI 在 explore 后）。
+
+      必须：
+      1. **Bounded Context / Capability**：受影响 BC 与 capability，新增 taxonomy 显式标注（对齐 `domain_model.html`）。
+      2. **四层架构**：`HTTP → Service → Domain → Repo` 影响点，Node / Python 双端一致性。
+      3. **数据与存储**：新增字段/实体、迁移兼容、FileStore/MemoryRepo 双实现。
+      4. **渠道同源**：Web 与小程序是否共用账户/API/数据。
+      5. **API 契约 / 安全权限 / 非功能 / 迁移演进**：逐维评估并引用真实基线节点。
+      6. **对后续阶段的输入**：给出对 storymap 拆分与 handoff proposal Impact 的结论。
+      7. **无影响时显式 no-op**：写明"无需架构变更"及理由，不得静默跳过。
+
+      产物：`epics/<epic-key>/architecture-impact.md`。
+
+      **HITL 强制门禁**：产出后必须暂停征求用户确认；未确认不得进入下一阶段（storymap）。
+    requires:
+      - explore
+
   - id: storymap
     generates: epics/<epic-key>/storymap.md
     description: 需求拆分（覆盖对账），把一个 Epic 拆成多个可独立交付的 Story
@@ -258,6 +283,28 @@ artifacts:
     requires:
       - storymap
 
+  - id: test-design
+    generates: epics/<epic-key>/stories/<story-key>/test-design.md（或 epics/<epic-key>/test-design.md 统一设计）
+    description: 测试设计（QA·分层，MUST）。把 Story E2E 验收映射为 @unit/@api/@e2e 分层用例与追溯矩阵，作为 handoff 与开发侧 spec-design 的输入
+    template: test-design.md
+    instruction: |
+      调用 `test-design` skill 生成测试设计（MUST）。
+
+      时机：Story 已确认之后、`/req:handoff` 之前。测试设计是交接的强制前置。
+
+      必须：
+      1. **分层遵循测试金字塔**（`docs/TESTING_STRATEGY.md`）：`@unit` ~70% / `@api` ~20% / `@e2e` ~10%；严禁把底层业务判断推给 `@e2e`。
+      2. **测试用例清单**：为每个 Story E2E 场景设计正常/异常/边界用例（Case ID / 层 / 关联 Story/Scenario / Given-When-Then 摘要）。
+      3. **追溯矩阵（强制）**：Story E2E 场景 → 分层用例 → 层 → 覆盖状态（✅/❌）；存在 ❌ 必须补用例或显式标注风险。
+      4. **E2E 命名空间**：步骤按 Story 分文件、文本带领域/角色前缀、测试后门统一前缀（防 ambiguous）。
+      5. **不做**：不写测试代码、不生成 specs/design/tasks（分别属 apply 与开发侧 spec-design）。
+
+      产物：`epics/<epic-key>/stories/<story-key>/test-design.md`（若 Epic 统一设计则 `epics/<epic-key>/test-design.md`，并在 storymap.md 引用）。
+
+      **HITL 强制门禁**：产出后必须暂停征求用户确认；未确认不得进入 handoff。
+    requires:
+      - story
+
   - id: analysis-narrative
     optional: true
     generates: epics/<epic-key>/analysis/narrative/<story-key>/narrative.md
@@ -283,13 +330,14 @@ artifacts:
       - storymap
 
 handoff:
-  requires: [story]
+  requires: [story, test-design]
   instruction: |
-    调用 `handoff` skill，读取 `epics/<epic-key>/stories/<story-key>/story.md`（业务面）：
+    调用 `handoff` skill，读取 `epics/<epic-key>/stories/<story-key>/story.md`（业务面）与 `test-design.md`（分层测试设计）：
     1. 在开发侧 `openspec new change "<name>"` 创建 change。
-    2. 从 Story 合成开发侧 `proposal.md`（Why ← 用户场景；What ← 范围；Capabilities ← idea 的候选 Capabilities；Process/Blueprint Alignment ← L1/L2/L3 与 SB-STAGE-*/SB-<LANE>-*；Impact ← 架构影响）。
+    2. 从 Story 合成开发侧 `proposal.md`（Why ← 用户场景；What ← 范围；Capabilities ← idea 的候选 Capabilities；Process/Blueprint Alignment ← L1/L2/L3 与 SB-STAGE-*/SB-<LANE>-*；Impact ← 架构影响，优先引用 `architecture-impact.md`（若存在））。
     3. 开发侧 story 阶段跳过（业务评审已在需求侧完成，proposal 链接需求侧 story.md）。
-    4. 若属 Epic，登记 `openspec/epic-<key>.story-list.json`（status=in_progress, changeName）。
-    5. 回填需求侧交接状态。
+    4. 将 `test-design.md` 作为开发侧 `spec-design` 的输入：behavior specs 的 `@unit/@api/@e2e` 标签与分层用例必须与之对齐。
+    5. 若属 Epic，登记 `openspec/epic-<key>.story-list.json`（status=in_progress, changeName）。
+    6. 回填需求侧交接状态。
     开发侧随后按 capability 拆分生成行为规格 specs（Story-specs）→ design → tasks → apply → verify。
     每个 change 只做 Spec Sync（K1）；Baseline Sync（K2）在 Epic 全部 Story 归档后由 /opsx:baseline/sync 统一执行。

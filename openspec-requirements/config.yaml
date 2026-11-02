@@ -5,7 +5,9 @@ schema: req-sdd
 context: |
   项目: ecommerce-mini - 一个展示 OpenSpec 规格驱动开发 (SDD) 的小型电商系统。
   需求侧工作区: openspec-requirements/ - 产品经理 (PM) 专属，仅用于大块 Epic 需求。
-  需求漏斗: research → explore → prototype(Epic整体) → storymap → story（业务面交付物）。
+  需求漏斗: research → explore → prototype(Epic整体) → arch(架构影响, OPT) → storymap → story（业务面交付物） → test-design（分层测试设计, MUST）。
+  架构影响: OPT 步骤（/req:arch，skill: arch-impact），产出 architecture-impact.md；仅 Epic 漏斗，直走交付侧任务内联 proposal。
+  测试设计: MUST 步骤（/req:test-design，skill: test-design），产出 test-design.md（分层用例+追溯矩阵）；是 handoff 强制前置。
   需求分析工具箱: openspec-requirements/tools/ - 8 个 AI4PM 需求工程工具（可选增强，产物在 epics/<key>/analysis/ 或 docs/baseline/design-system/）。
     工具映射: osm=osm-map-generator, process=business-process-deep-analyzer, journey=journey-map-generator,
     blueprint=blueprint-map-generator, design-system=brand-design-system, working-prototype=prototype-generator,
@@ -77,3 +79,17 @@ rules:
     - 若涉及 UI，必须引用已确认的 Epic 整体原型 epics/<epic-key>/prototypes/*.html；无已确认原型禁止勾选"待开发交接"
     - 拒绝空洞占位符，必须使用真实业务数据
     - 可选分析增强（tools/）：可调用 story-narrative-generator 生成故事详述（角色画像/交互逻辑/AC/业务价值），产物 epics/<key>/analysis/narrative/<story-key>/narrative.md，story.md「分析制品索引」引用
+  arch:
+    - 可选（OPT）步骤，仅大块 Epic 漏斗；直走交付侧任务不走本步骤（架构影响内联 proposal 的 Impact）
+    - 时机：原型确认后、storymap 之前（不涉及 UI 时在 explore 后）
+    - 必须评估：Bounded Context / Capability（新增 taxonomy 显式标注）/ 四层架构（HTTP→Service→Domain→Repo）/ 数据与存储 / Web 与小程序渠道同源 / API 契约 / 安全与权限 / 非功能（性能·可观测·并发幂等）/ 迁移与演进
+    - 必须引用真实基线节点（bc-* / cap-* / L1/L2/L3 / SB-*），无证据不写结论
+    - 无实质影响时必须显式记录 no-op 及理由，不得静默跳过
+    - 产出 epics/<epic-key>/architecture-impact.md；HITL 确认后方可进入 storymap
+  test-design:
+    - 必做（MUST）步骤，位于 story 确认之后、handoff 之前；是 handoff 的强制前置
+    - 分层必须遵循 docs/TESTING_STRATEGY.md：@unit ~70% / @api ~20% / @e2e ~10%；严禁把底层业务判断推给 @e2e
+    - 追溯矩阵（强制）：每个 Story E2E 场景 → ≥1 个分层用例 → 层 → 覆盖状态（✅/❌）；❌ 必须补用例或显式风险接受
+    - E2E 命名空间：步骤按 Story 分文件、文本带领域/角色前缀、测试后门统一前缀（防 ambiguous）
+    - 只做测试设计：不写测试代码、不生成 specs/design/tasks
+    - 产出 epics/<epic-key>/stories/<story-key>/test-design.md（或 epics/<epic-key>/test-design.md 统一设计）；HITL 确认后方可交接

@@ -23,6 +23,8 @@ permission:
 
 输出 **PASS / WARN / FAIL 分级报告**，附证据引用（文件/节点 ID）与修复建议。**不直接修改他人制品**，由 `lead` 呈报用户裁决。
 
+> 口径：Layer 04 的「对抗审查」= 本条 `qa` 对抗审查 + `reviewer` 技术评审（`/opsx:review`，五维 P0-P3）+ `acceptance` 产品验收（`/opsx:acceptance`）。三者不互相替代；不存在独立的 `qa-review` skill。
+
 ### 2. 验证门禁（Verification Gates）
 
 - 加载 `verify` skill，执行并写入 `<changeRoot>/verify.md`：
