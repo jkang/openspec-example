@@ -57,4 +57,4 @@ permission:
 - 报告必须可审计：结论附证据来源，拒绝空泛断言。
 - 验收复核（§4）只写复核记录（`.acceptances/` 或 changeRoot），不修改证据、不重跑用例。
 - 深度技术审计（架构合理性 / 安全 / 业务领域 / 质量）由 `reviewer` 负责；qa 聚焦流程门禁与制品一致性，不重复 reviewer 的完整审计。
-- 跨工具一致性：修改 skills/commands 需同步 `.trae/`、`.cursor/`、`.agents/` 三目录；修改角色定义需同步 `.opencode/agents/` 与 `.cursor/agents/`。
+- 跨工具一致性：修改 skills 需同步 `.agents/skills/` 与 `.cursor/skills/`；修改 commands 需同步 `.trae/commands/` 与 `.cursor/commands/`；修改角色定义需同步 `.opencode/agents/` 与 `.cursor/agents/`。

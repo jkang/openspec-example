@@ -87,7 +87,7 @@ After generating the proposal, recommend the next command:
       ```
    b. **Create `proposal.md`**:
       - 直接基于用户描述/当前需求创建提案（不依赖 `idea.md`）。
-      - Re-read `docs/baseline/domain_model.html`, `docs/baseline/business_process.html`, `docs/baseline/service_blueprint.html`, and `.trae/skills/baseline/blueprint/SKILL.md` as the governance source of truth.
+      - Re-read `docs/baseline/domain_model.html`, `docs/baseline/business_process.html`, `docs/baseline/service_blueprint.html`, and `.agents/skills/baseline/blueprint/SKILL.md` as the governance source of truth.
       - Follow the `template` and `instruction` from the JSON.
       - Ensure the proposal explicitly lists `Impacted Bounded Contexts`, aligns `Capabilities` to the `domain_model.html` mapping, and records `Process Alignment` node IDs.
       - Ensure the proposal includes `Service Blueprint Alignment`, explicitly citing impacted `SB-STAGE-*` and `SB-<LANE>-*` nodes and whether the change adds, modifies, or reuses existing blueprint structure.

@@ -1,0 +1,7 @@
+skill: acceptance
+outputs:
+  - artifact: acceptance-report
+    template: null
+    generates: .acceptances/<change>/report.html
+    required: true
+references: []

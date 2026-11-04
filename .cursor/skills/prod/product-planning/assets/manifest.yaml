@@ -1,0 +1,7 @@
+skill: product-planning
+outputs:
+  - artifact: roadmap
+    template: openspec-requirements/templates/roadmap.md
+    generates: docs/ROADMAP.md
+    required: true
+references: []

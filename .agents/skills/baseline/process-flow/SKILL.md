@@ -14,7 +14,7 @@ metadata:
 > - 本 Skill 的输出规范必须以 `docs/baseline/business_process.html` 的现有分层定义为准，不使用脱离业务基线的抽象模板。
 > - 每次执行必须给出双重结果：1) 直接回写 `business_process.html` 或输出显式 no-op；2) 输出结构化同步摘要，至少说明受影响的 L1/L2/L3 节点、规则变化与证据来源。
 > - 严禁回写 Markdown 中间层；严禁只改说明文字而不更新对应的节点、规则表或锚点。
-> - 若调整本 Skill 的规则或输出口径，必须同步更新 `.trae/`、`.cursor/`、`.agents/` 下对应的 Skill/Command 入口。
+> - 若调整本 Skill 的规则或输出口径，必须同步更新 `.agents/skills/` 与 `.cursor/skills/`；命令同步 `.trae/commands/` 与 `.cursor/commands/`。
 
 **目标**: 维护 `docs/baseline/business_process.html`，确保它反映系统核心业务流程的 L1 (端到端价值流)、L2 (价值段协同流) 和 L3 (关键业务环节规则流)。
 

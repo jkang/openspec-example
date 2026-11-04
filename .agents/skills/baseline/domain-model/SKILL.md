@@ -14,9 +14,11 @@ metadata:
 > - 本 Skill 的输出规范必须以 `docs/baseline/domain_model.html` 的现有 Event-Storming / DDD 定义为准，不使用脱离治理基线的抽象模板。
 > - 每次执行必须给出双重结果：1) 直接回写 `domain_model.html` 或输出显式 no-op；2) 输出结构化同步摘要，至少说明受影响的 Bounded Context、taxonomy、事件/命令/策略、对象关系与证据来源。
 > - 严禁把领域模型退化成纯数据库表结构；严禁只修改图或只修改清单，图、关系、状态机与映射表必须同步。
-> - 若调整本 Skill 的规则或输出口径，必须同步更新 `.trae/`、`.cursor/`、`.agents/` 下对应的 Skill/Command 入口。
+> - 若调整本 Skill 的规则或输出口径，必须同步更新 `.agents/skills/` 与 `.cursor/skills/`；命令同步 `.trae/commands/` 与 `.cursor/commands/`。
 
 **目标**: 维护 `docs/baseline/domain_model.html`，基于 Event-Storming 与 DDD 视角沉淀系统的领域模型基线。
+
+> **边界**: 统一语言（术语表）由 `prod/glossary` 维护 `docs/baseline/GLOSSARY.md`；架构决策记录（ADR）由 `lead`/`engineer` 维护。本 skill 只负责领域模型（BC / Capability / Event Storming），不重复维护术语表与 ADR。
 
 ## 唯一事实来源
 

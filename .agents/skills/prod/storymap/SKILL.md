@@ -1,12 +1,12 @@
 ---
 name: storymap
-description: 需求侧拆分（Storymap）。把大需求/复杂 idea 拆分为多个可独立交付的 Story，形成 storymap.md，并进行【覆盖对账】（Epic 每个承诺项都有 Story 承接）。使用场景：一个 Epic idea 需要拆成多个需求单元时。
+description: 需求侧拆分（Storymap）。用 Jeff Patton 主干（阶段→活动→触点→用户故事）建立业务骨架，再把大需求拆为多个可独立交付的 Story，形成 storymap.md 并做覆盖对账。使用场景：一个 Epic idea 需要拆成多个需求单元时。
 allowed-tools: Bash(git:*)
 license: MIT
 compatibility: 需求侧工作流 (req-sdd)
 metadata:
   author: sdd-team
-  version: "2.0"
+  version: "2.1"
 ---
 
 拆分是需求漏斗的**第 5 步**（架构影响之后；原型之后）。一个 Epic idea 太大时，先拆成一个 **storymap**（多个 Story 的映射），再逐个深化为 story。
@@ -14,6 +14,9 @@ metadata:
 ## 产物
 
 - `openspec-requirements/epics/<epic-key>/storymap.md`
+- 可选：`epics/<epic-key>/analysis/storymap/{storymap.yaml,storymap.html}`（可视化，仅审查辅助）
+
+输出契约见 `assets/manifest.yaml`（模板统一引用 `openspec-requirements/templates/`）。
 
 ## 输入
 
@@ -42,14 +45,16 @@ metadata:
 
 1. **读上下文**：读已确认的 `epics/<epic-key>/idea.md`、`epics/<epic-key>/research.md`、`epics/<epic-key>/prototypes/*.html`（若 UI）与 `epics/<epic-key>/architecture-impact.md`（若已跑 OPT）。
 2. **应用规则**：读 `openspec-requirements/config.yaml` 的 `rules.storymap`。
-3. **生成 storymap.md**：按 `openspec-requirements/templates/storymap.md` 产出（拆分明细表 + 覆盖对账表 + 治理映射）。
-4. **可选分析增强（tools/）**：调用 `openspec-requirements/tools/story-map-generator/SKILL.md` 生成 4 层用户故事地图可视化（阶段-活动-接触点-用户故事 + must/should/could 优先级），产物 `epics/<key>/analysis/storymap/{storymap.yaml,storymap.html}`，storymap.md「分析制品索引」引用。**覆盖对账（承诺项→承接 Story）仍以 storymap.md 为唯一权威**，可视化仅作 HITL 审查辅助。
-5. **HITL**：产出后暂停确认，确认后每个 Story 可进入 story。
+3. **建立主干**：按 `references/story-map-method.md` 先画「阶段 → 活动 → 触点」业务骨架与用户故事（must/should/could），再映射到交付 Story。粒度或依赖有争议时先加载 `grilling` skill 盘问。
+4. **生成 storymap.md**：按 `openspec-requirements/templates/storymap.md` 产出（业务主干 + 拆分明细表 + 覆盖对账表 + 治理映射）。
+5. **可选分析增强（tools/）**：调用 `openspec-requirements/tools/story-map-generator/SKILL.md` 生成 4 层用户故事地图可视化（阶段-活动-接触点-用户故事 + must/should/could 优先级），产物 `epics/<key>/analysis/storymap/{storymap.yaml,storymap.html}`，storymap.md「分析制品索引」引用。**覆盖对账（承诺项→承接 Story）仍以 storymap.md 为唯一权威**，可视化仅作 HITL 审查辅助。
+6. **HITL**：产出后暂停确认，确认后每个 Story 可进入 story。
 
 ## Guardrails
 
 - 只写需求侧拆分制品，不写代码。
 - 覆盖对账是强制步骤，禁止跳过后直接产出拆分明细。
-- 一个 Story 对应一个交付 change 为宜。
+- 故事地图的主干（阶段/活动/触点）与交付 Story 是两个粒度，不得混用。
+- 一个 Story 对应一个交付 change 为宜；优先垂直切片（tracer bullet）。
 - 分析制品（storymap 可视化）为 optional，不生成不影响进入下一阶段。
 - 产出后必须 HITL 确认；**未确认不得进入下一阶段（强制门禁）**。

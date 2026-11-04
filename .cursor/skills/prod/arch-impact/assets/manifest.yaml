@@ -1,0 +1,7 @@
+skill: arch-impact
+outputs:
+  - artifact: architecture-impact
+    template: openspec-requirements/templates/architecture-impact.md
+    generates: epics/<epic-key>/architecture-impact.md
+    required: false
+references: []

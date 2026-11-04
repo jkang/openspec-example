@@ -282,3 +282,14 @@ learning-sdd/openspec-v2.0-workflow-practice.md
 learning-sdd/openspec-v2.0-upgrade.md
 learning-sdd/harness-engineering-in-sdd.md
 dbg.mjs
+dsh-plugins/openspec-sdd-team/agents.data.json
+dsh-plugins/openspec-sdd-team/client.js
+dsh-plugins/openspec-sdd-team/cordis.patch.yml
+dsh-plugins/openspec-sdd-team/icon.svg
+dsh-plugins/openspec-sdd-team/index.js
+dsh-plugins/openspec-sdd-team/package.json
+dsh-plugins/openspec-sdd-team/README.md
+dsh-plugins/openspec-sdd-team/locale/en.json
+dsh-plugins/openspec-sdd-team/locale/zh.json
+dsh-plugins/openspec-sdd-team/scripts/client.template.js
+dsh-plugins/openspec-sdd-team/scripts/gen_plugin.py

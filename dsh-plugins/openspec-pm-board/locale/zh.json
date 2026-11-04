@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "PM 工作台",
+    "description": "在左侧边栏新增「PM 工作台」入口：只读聚合 OpenSpec-practice 的产品规划与需求侧进展——阶段进度、Epic 漏斗与 Story specs、业务知识资产复核、等待你确认的产出与数据健康告警，并可一键以 PM Agent 继续推进。"
+  }
+}

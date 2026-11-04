@@ -1,0 +1,16 @@
+# PM 工作台 bundle：Host 半身（同源只读路由 /openspec-pm-board/api + pm_board 工具）
+# + Client 半身（左侧边栏「PM 工作台」入口 + 主区看板面板）。
+#
+# 注意：Host 侧组合在 DSH 启动时生成；新增/修改本文件或 index.js 后需要**重启 DeepSeek Harness**。
+# Client 半身（client.js / locale）改动只需刷新页面。
+#
+# repoRoot：看板绑定本仓库；换仓库时改这里，不需要改代码。
+- insert:
+    - id: openspec-pm-board
+      name: '@local/dsh-openspec-pm-board'
+      config:
+        repoRoot: '/Users/superkkk/MyCoding/OpenSpec-practice'
+        # 归档「最近」窗口（天）；扫描器默认 7，这里显式传 30 与面板标签一致。
+        archiveDays: 30
+        cacheTtlMs: 15000
+        timeoutMs: 15000

@@ -1,0 +1,7 @@
+skill: process-flow
+outputs:
+  - artifact: business-process
+    template: null
+    generates: docs/baseline/business_process.html
+    required: true
+references: []

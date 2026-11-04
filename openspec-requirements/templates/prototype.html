@@ -6,32 +6,64 @@
   <title>页面名称 · Epic 名称 原型</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@700;800;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            background: '#08080E',
+            card: '#0F0F1C',
+            border: '#222238',
+            foreground: '#EFEFFA',
+            muted: '#8A8AA3',
+            primary: '#C8FF00',
+            accent: '#FF2D6B',
+            electric: '#3B6DFF',
+            warning: '#FF9A00',
+            success: '#00E5A0'
+          },
+          fontFamily: {
+            display: ['"Exo 2"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
   <style>
-    /* 极简 UI 规范：无圆角 / 无阴影 / slate 色系 / 1px 实线边框 */
     * { border-radius: 0 !important; box-shadow: none !important; }
-    body { background-color: #f8fafc; color: #0f172a; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
-    .border-slate-200 { border-color: #e2e8f0; }
-    input:focus, select:focus { outline: none; border-color: #0f172a; }
+    body { background-color: #08080E; color: #EFEFFA; font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; }
+    input:focus, select:focus, button:focus { outline: none; border-color: #C8FF00; }
   </style>
 </head>
-<body class="min-h-screen">
+<body class="min-h-screen bg-background text-foreground">
   <div id="app">
-    <!-- 页面头部：替换为真实业务内容 -->
-    <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-8">
-      <div class="flex items-center gap-2">
-        <div class="w-8 h-8 bg-slate-900 text-white flex items-center justify-center text-xs font-bold">M</div>
-        <h1 class="text-lg font-semibold">页面主标题</h1>
+    <header class="h-16 bg-card border-b border-border flex items-center justify-between px-8">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 bg-primary text-background flex items-center justify-center text-xs font-black">M</div>
+        <h1 class="font-display uppercase font-black tracking-wide text-lg">页面主标题</h1>
       </div>
+      <span class="font-mono text-xs uppercase tracking-widest text-muted">Epic 原型</span>
     </header>
 
-    <!-- 主内容区：替换为真实交互逻辑（真实中文数据，符合 docs/FRONTEND.md） -->
-    <main class="max-w-3xl mx-auto p-8">
-      <!-- 在此填充页面交互内容 -->
+    <main class="max-w-5xl mx-auto p-8">
+      <section class="bg-card border border-border p-6">
+        <h2 class="font-display uppercase font-black text-sm tracking-wide mb-4">业务区标题</h2>
+        <p class="text-sm text-muted">在此填充真实业务交互内容。</p>
+      </section>
     </main>
   </div>
 
   <script>
-    // 在此填充 Vue 交互逻辑（真实业务数据，全中文）
+    const { createApp, ref } = Vue
+    createApp({
+      setup() {
+        return {}
+      }
+    }).mount('#app')
   </script>
 </body>
 </html>

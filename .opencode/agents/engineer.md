@@ -52,4 +52,4 @@ permission:
 
 - 只写代码、specs/design/tasks 与原型，不修改需求侧 `openspec-requirements/` 的 phase-plan / epic / idea / storymap / story（那是 pm 的制品）。
 - 提交前自查：极简 UI 约束是否被破坏（圆角/阴影/占位符/非中文）？
-- 跨工具一致性：修改 skills/commands 需同步 `.trae/`、`.cursor/`、`.agents/` 三目录。
+- 跨工具一致性：修改 skills 需同步 `.agents/skills/` 与 `.cursor/skills/`；修改 commands 需同步 `.trae/commands/` 与 `.cursor/commands/`。

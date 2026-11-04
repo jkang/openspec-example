@@ -1,0 +1,7 @@
+skill: domain-model
+outputs:
+  - artifact: domain-model
+    template: null
+    generates: docs/baseline/domain_model.html
+    required: true
+references: []

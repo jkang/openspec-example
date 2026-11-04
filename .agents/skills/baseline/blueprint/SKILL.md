@@ -14,7 +14,7 @@ metadata:
 > - 本 Skill 的输出规范必须以 `docs/baseline/service_blueprint.html` 与当前 `SKILL.md` 为唯一事实来源，不使用脱离基线事实的抽象模板。
 > - 每次执行必须给出双重结果：1) 直接回写 `service_blueprint.html` 或输出显式 no-op；2) 输出结构化同步摘要，至少说明触发项、受影响锚点、capability 状态变化与证据来源。
 > - 严禁回写 Markdown 中间层；严禁只修改可视文案而不同步 capability 分布、cross-stage support 或 capability mapping table。
-> - 若调整本 Skill 的规则或输出口径，必须同步更新 `.trae/`、`.cursor/`、`.agents/` 下对应的 Skill/Command 入口。
+> - 若调整本 Skill 的规则或输出口径，必须同步更新 `.agents/skills/` 与 `.cursor/skills/`；命令同步 `.trae/commands/` 与 `.cursor/commands/`。
 
 **目标**: 维护 `docs/baseline/service_blueprint.html`，确保它准确展示阶段、泳道、capability 分布及其“已落地 / 规划中 / 横切支撑”状态。
 
@@ -180,7 +180,7 @@ Service Blueprint 中出现的 capability 必须遵循以下规则：
 约束：
 - 渲染管线是**可选增强**：缺省仍按既有"直接编辑 HTML"方式维护；仅在需要更新可视化表达时触发。
 - 若渲染产物与既有 HTML 结构（Header/Intro Grid/Board/Cross-stage/Capability Mapping Table）冲突，以本文件「最小结构要求」为准，必要时在渲染后手工补全结构。
-- 本增强同步到 `.trae/`、`.cursor/`、`.agents/` 三目录。
+- 本增强同步到 `.agents/skills/` 与 `.cursor/skills/`。
 
 ## 输出契约
 

@@ -1,0 +1,12 @@
+skill: story
+outputs:
+  - artifact: story
+    template: openspec-requirements/templates/story.md
+    generates: epics/<epic-key>/stories/<story-key>/story.md
+    required: true
+  - artifact: narrative
+    template: null
+    generates: epics/<epic-key>/analysis/narrative/<story-key>/narrative.md
+    required: false
+references:
+  - references/story-narrative.md

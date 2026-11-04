@@ -27,9 +27,15 @@ updated_at: 2026-08-28
 
 ```
 Research (research.md)              ← epics/<epic-key>/research.md  (先调研→识别 Epic→创建 epics/<key>/，HITL)
+   │  ├─ 可选: 访谈提纲（references/interview-outline.md）→ analysis/interview/outline.md
+   │  └─ 记录归位（references/record-integration.md）→ 内嵌 research.md
    │  ▼
 Explore (idea.md)                   ← epics/<epic-key>/idea.md  (调研→产品设计思路 + To-Be 设计 + 候选 Capabilities，HITL)
-   │  └─ 可选分析增强 (tools/): OSM 度量 / Process L1/L2 可视化 / Journey 可视化 → epics/<key>/analysis/
+   │  ├─ 可选: 问题定义 8 要素 → analysis/problem/
+   │  ├─ 可选: As-Is L1 价值流 → analysis/value-stream/
+   │  ├─ 可选: To-Be 泳道（人机分工 + HITL + 异常链路）→ analysis/to-be/
+   │  ├─ 可选: 竞品与参考案例（照搬/改造/差异化/放弃）→ analysis/competitor/
+   │  └─ 可选可视化 (tools/): OSM / Process(As-Is) / Journey → epics/<key>/analysis/
    │  ▼
 {涉及 UI?} ──是──▶ Prototype (Epic整体)  ← epics/<key>/prototypes/  (HITL)
    │   ├─ 前置(产品级): brand-design-system → docs/baseline/design-system/
@@ -39,7 +45,7 @@ Explore (idea.md)                   ← epics/<epic-key>/idea.md  (调研→产�
    ▼
 Arch Impact (architecture-impact.md · OPT)  ← epics/<key>/architecture-impact.md  (影响预判，HITL；仅 Epic)
    │  ▼
-Storymap (storymap.md)              ← epics/<key>/storymap.md  (覆盖对账·端到端粒度，HITL)
+Storymap (storymap.md)              ← epics/<key>/storymap.md  (业务主干 + 覆盖对账·端到端粒度，HITL)
    │  └─ 可选: story-map-generator 4 层可视化 → epics/<key>/analysis/storymap/
    │  ▼
 Story (story.md)                    ← epics/<key>/stories/<story-key>/  (业务面冻结交付物，HITL)
@@ -50,16 +56,20 @@ Test Design (test-design.md · MUST) ← epics/<key>/stories/<story-key>/test-de
 handoff                            ← 交接 → 合成开发侧 proposal → specs/design/tasks/apply/verify
 ```
 
-> **需求分析工具箱**：`openspec-requirements/tools/` 内置 8 个 AI4PM 需求工程工具（自包含），上述所有"可选分析增强"由阶段 skills 编排调用，产物落位 `epics/<key>/analysis/`（或 `docs/baseline/design-system/`）。**全部为 optional**：缺省不影响漏斗与 HITL 门禁；调用契约见 `tools/README.md`。
+> **需求分析方法与工具**：方法类技能（访谈提纲/记录归位/问题定义/价值流/To-Be/竞品/storymap 方法/story 叙事）写在 `prod/*/references/`；可视化工具在 `openspec-requirements/tools/`。上述所有"可选分析增强"由阶段 skills 编排调用，产物落位 `epics/<key>/analysis/`（或 `docs/baseline/design-system/`）。**全部为 optional**：缺省不影响漏斗与 HITL 门禁。
+>
+> **跨切面方法**：`prod/grilling`（设计树 + frontier 分轮盘问，不产文件）在需求含糊时由 research/explore/storymap/story/lead 加载；`prod/glossary` 维护 `docs/baseline/GLOSSARY.md`（统一语言，不含 ADR/领域模型）。
+>
+> **执行边界**：PM 为 `bash: deny`，可视化工具由 PM 产 YAML、`lead` 代跑 `python3 scripts/build_*.py`。
 
 ### 阶段产物与指令
 
-- **① 需求调研** `/req:research`）：产出 `epics/<epic-key>/research.md`。**research 先执行，据调研结果识别 Epic 并创建 `epics/<epic-key>/` 目录**。针对 `docs/ROADMAP.md` 中的单个 Epic 收集需求信息（背景/对象/原始反馈/约束/疑问/结论）。**只收集不转化**。产出后需 HITL 确认。
-- **② 探索** `/req:explore`）：产出 `epics/<epic-key>/idea.md`。把调研信息**转化**为产品设计思路：澄清意图 / **To-Be Process** / **To-Be Journey** / 产品设计思路 / 任务类型路由 / **候选 Capabilities**（对齐 `domain_model.html`）/ 治理映射 / 拆分建议 / 架构影响。**可选分析增强**：调用 `tools/` 下 `osm-map-generator`（OSM 度量）、`business-process-deep-analyzer`（Process L1/L2 可视化）、`journey-map-generator`（Journey 可视化），产物落位 `epics/<key>/analysis/`。产出后需 HITL 确认。
+- **① 需求调研** `/req:research`）：产出 `epics/<epic-key>/research.md`。**research 先执行，据调研结果识别 Epic 并创建 `epics/<epic-key>/` 目录**。针对 `docs/ROADMAP.md` 中的单个 Epic 收集需求信息（背景/对象/原始反馈/约束/疑问/结论）。**只收集不转化**。**可选**：按 `references/interview-outline.md` 设计三段访谈提纲（`analysis/interview/outline.md`）；有多源材料时按 `references/record-integration.md` 做事实归位（只记事实、未提及显式标注、专有名词入待澄清）。产出后需 HITL 确认。
+- **② 探索** `/req:explore`）：产出 `epics/<epic-key>/idea.md`。把调研信息**转化**为产品设计思路：澄清意图 / **To-Be Process** / **To-Be Journey** / 产品设计思路 / 任务类型路由 / **候选 Capabilities**（对齐 `domain_model.html`）/ 治理映射 / 拆分建议 / 架构影响。**可选方法增强（均不阻塞漏斗）**：问题定义 8 要素（`references/problem-definition.md`）、As-Is L1 价值流（`references/value-stream.md`）、To-Be 泳道（`references/to-be-process.md`）、竞品对标（`references/competitor-benchmark.md`）。**可选可视化**：`osm-map-generator`、`business-process-deep-analyzer`（As-Is）、`journey-map-generator`。**As-Is 与 To-Be 必须分清**。产出后需 HITL 确认。
 - **③ 原型（Epic 整体）** `/req:prototype`）：若涉及 UI，在拆分前对 **Epic 整体**产出原型，遵循 `docs/FRONTEND.md` 极简规范，产出后需 HITL 确认。**双分支**：分支 A（简单 UI）→ `epics/<key>/prototypes/*.html`（Vue3+Tailwind CDN）；分支 B（复杂业务：多角色/多流程/真实数据闭环）→ `prototype-generator`（tools/）可工作原型 `epics/<key>/prototypes/working/mvp-prototype/`。**前置**：首个涉及 UI 的 Epic 前用 `brand-design-system`（tools/）生成产品级 design system（`docs/baseline/design-system/`）。**UI 门禁**：涉及 UI 的 Epic 无已确认原型不得拆分/交接。
 - **④ 架构影响（OPT）** `/req:arch`）：产出 `epics/<epic-key>/architecture-impact.md`。**仅大块 Epic 漏斗**（直走交付侧任务的架构影响内联 proposal）。在原型后、拆分前评估：Bounded Context / Capability（新增 taxonomy 显式标注）/ 四层架构（HTTP→Service→Domain→Repo）/ 数据与存储 / Web 与小程序渠道同源 / API 契约 / 安全与权限 / 非功能（性能·可观测·并发幂等）/ 迁移与演进，引用真实基线节点；**无实质影响时必须显式记录 no-op 及理由**。产出后需 HITL 确认。
-- **⑤ 需求拆分** `/req:storymap`）：产出 `epics/<epic-key>/storymap.md`。**覆盖对账（强制）**：Epic 每个承诺项（In Scope / Exit Criteria / B 端承诺 / 候选 Capability）必须有 ≥1 个 Story 承接；粒度取**完整端到端功能**（不拆到行为/UI 细节级）。**可选**：`story-map-generator`（tools/）生成 4 层故事地图可视化（`analysis/storymap/`），覆盖对账仍以 storymap.md 为唯一权威。产出后需 HITL 确认。
-- **⑥ 需求单元** `/req:story`）：产出 `epics/<epic-key>/stories/<story-key>/story.md` = 需求侧唯一冻结交付物（**业务面**）。含用户场景（B/C 双端）、业务规则表、E2E 验收（Given/When/Then，映射 L1/L2 与 SB-STAGE-*/SB-CUSTOMER-*）、治理映射（Bounded Context / L3 / SB-<LANE>-*）。**可选**：`story-narrative-generator`（tools/）生成故事详述（`analysis/narrative/<story-key>/`）。**不含行为规格**（specs 由开发侧在 proposal 后按 capability 拆分生成）。产出后需 HITL 确认。
+- **⑤ 需求拆分** `/req:storymap`）：产出 `epics/<epic-key>/storymap.md`。先按 `references/story-map-method.md` 建业务主干（阶段 → 活动 → 触点 → 用户故事 must/should/could），再拆交付 Story。**覆盖对账（强制）**：Epic 每个承诺项（In Scope / Exit Criteria / B 端承诺 / 候选 Capability）必须有 ≥1 个 Story 承接；交付 Story 取**完整端到端功能**（可承接多个用户故事；不拆到行为/UI 细节级）；must→P0、should→P1、could→P2；优先垂直切片。**可选**：`story-map-generator` 4 层可视化（`analysis/storymap/`），覆盖对账仍以 storymap.md 为唯一权威。产出后需 HITL 确认。
+- **⑥ 需求单元** `/req:story`）：产出 `epics/<epic-key>/stories/<story-key>/story.md` = 需求侧唯一冻结交付物（**业务面**）。含用户场景（B/C 双端）、**叙事五段**（核心描述/角色画像/交互逻辑/验收标准/业务价值，`references/story-narrative.md`）、业务规则表、E2E 验收（Given/When/Then，映射 L1/L2 与 SB-STAGE-*/SB-CUSTOMER-*）、治理映射（Bounded Context / L3 / SB-<LANE>-*）。**可选**：`story-narrative-generator` 生成故事详述 HTML（`analysis/narrative/<story-key>/`）。**不含行为规格**（specs 由开发侧在 proposal 后按 capability 拆分生成）。**不新造 Story 级原型作为 UI SSOT**。产出后需 HITL 确认。
 - **⑦ 测试设计（MUST）** `/req:test-design`）：产出 `epics/<epic-key>/stories/<story-key>/test-design.md`（若 Epic 统一设计则 `epics/<epic-key>/test-design.md` 并在 storymap 引用）。把 Story E2E 验收映射为**分层测试用例 + 追溯矩阵**：严格遵循 `docs/TESTING_STRATEGY.md` 金字塔（`@unit` ~70% / `@api` ~20% / `@e2e` ~10%）；每个 Story E2E 场景 → ≥1 个分层用例，覆盖状态 ✅/❌；E2E 步骤按 Story 分文件、带领域/角色前缀（防 ambiguous）。**只做测试设计**（不写测试代码、不生成 specs）。**是 handoff 的强制前置**，产出后需 HITL 确认。
 
 ### 交接边界 (Handoff)
@@ -84,7 +94,7 @@ handoff                            ← 交接 → 合成开发侧 proposal → s
 
 ### 需求侧 Schema
 
-- **`req-sdd`**：定义于 `openspec-requirements/schemas/req-sdd.yaml`（version 6），是需求侧制品格式与生成指令的唯一事实来源。`openspec-requirements/config.yaml`（`schema: req-sdd`）为规则来源。v5 新增 7 个 **optional 分析制品**（analysis-osm / analysis-process / analysis-journey / design-system / working-prototype / analysis-storymap / analysis-narrative），对应 `openspec-requirements/tools/` 工具箱。**v6 新增 `arch-impact`（OPT，architecture-impact.md）与 `test-design`（MUST，test-design.md）两个制品**，需求漏斗由 5 步扩展为 7 步。
+- **`req-sdd`**：定义于 `openspec-requirements/schemas/req-sdd.yaml`（version 7），是需求侧制品格式与生成指令的唯一事实来源。`openspec-requirements/config.yaml`（`schema: req-sdd`）为规则来源。v5 新增 7 个 optional 分析制品；v6 新增 `arch-impact`（OPT）与 `test-design`（MUST）；**v7 新增 `analysis-interview-outline` / `analysis-problem` / `analysis-value-stream` / `analysis-to-be` / `analysis-competitor` 五个 optional 制品**，并把「问题定义 / 价值流 / To-Be 泳道 / 竞品 / storymap 方法 / story 叙事 / grilling / glossary」方法论写入各 skill `references/`。
 - Schema 优先：若 SOP 描述与 `req-sdd` schema 冲突，以 Schema 为准。
 - **验证兜底**：需求侧不受 `openspec` CLI validate 覆盖，制品质量由 QA 对抗审查兜底；涉及治理锚点必须真实引用 `docs/baseline/*.html`。
 
@@ -103,13 +113,14 @@ handoff                            ← 交接 → 合成开发侧 proposal → s
   - **指令**: `/opsx:baseline/sync` - 统一同步并回流所有业务基线文档 (Blueprint, Process Flow, Domain Model) 并刷新渲染。
   - **指令**: `/opsx:governance:delivery-board`（skill: `prod/delivery-board`）- 生成可视化交付看板 `docs/governance/delivery_board.html`。
 - **补充治理文档**:
-  - `.trae/skills/baseline/blueprint/SKILL.md` - 定义 `service_blueprint.html` 的稳定锚点、Planning 阶段引用方式、capability 口径与 Sync 触发/No-op 规则。
+  - `.agents/skills/baseline/blueprint/SKILL.md` - 定义 `service_blueprint.html` 的稳定锚点、Planning 阶段引用方式、capability 口径与 Sync 触发/No-op 规则。
 - **Skill 组织（按域子目录）**:
-  - `prod/`：产品/需求侧（research/explore/prototype/arch-impact/storymap/story/test-design/handoff + product-vision/product-planning/delivery-board）
+  - `prod/`：产品/需求侧（research/explore/prototype/arch-impact/storymap/story/test-design/handoff + product-vision/product-planning/delivery-board + grilling/glossary 跨切面方法）
   - `opsx/`：交付侧（propose/spec-design/apply-change/verify/sync-specs/archive-change/update-change/prototype）
   - `baseline/`：业务基线（blueprint / domain-model / process-flow / render，去 `openspec-baseline-` 前缀）
-  - `openspec-requirements/tools/`：需求分析工具箱（8 个 AI4PM 工具，自包含单份拷贝，被 `prod/*` 与 `baseline/blueprint` 引用；不三目录重复）
-  - 三目录同步：`.agents/`、`.trae/`、`.cursor/` 下 skills/ 结构一致。
+  - `openspec-requirements/tools/`：需求分析可视化工具箱（自包含单份拷贝，被 `prod/*` 与 `baseline/blueprint` 引用）
+  - **skill 结构规范**：每个 skill = `SKILL.md` + `assets/manifest.yaml`（声明引用的中央模板与产物路径）+ `references/`（方法铁律）；模板统一放 `openspec-requirements/templates/`
+  - 同步：`.agents/skills/`（权威）→ `.cursor/skills/`（镜像）；`.agents/commands/`（权威）→ `.trae/commands/` 与 `.cursor/commands/`。
 - **强制约束**:
   - 规划层产物是全局上下文，将自动注入所有后续指令。
   - 必须包含“未来 +1, +2 个月”的滚动预测。

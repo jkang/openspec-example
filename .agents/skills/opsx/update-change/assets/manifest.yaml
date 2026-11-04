@@ -1,0 +1,7 @@
+skill: update-change
+outputs:
+  - artifact: planning-artifacts
+    template: openspec/schemas/spec-driven.yaml
+    generates: openspec/changes/<change>/
+    required: true
+references: []

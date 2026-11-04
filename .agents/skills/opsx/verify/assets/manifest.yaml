@@ -1,0 +1,7 @@
+skill: verify
+outputs:
+  - artifact: verify
+    template: null
+    generates: openspec/changes/<change>/verify.md
+    required: true
+references: []

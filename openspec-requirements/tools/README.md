@@ -4,13 +4,17 @@
 
 > 来源：`~/MyCoding/Skills/myskills/ai4pm-skills`（AI4PM 技能库），本仓库为裁剪适配版。
 > 定位：所有工具均为**可选增强**，缺省不影响需求漏斗原有 HITL 门禁；产物一律输出到 `epics/<epic-key>/analysis/<type>/`（见下）。
+>
+> **方法 vs 工具**：访谈提纲/记录归位/问题定义/价值流/To-Be/竞品/storymap 方法/story 叙事等方法类技能，已写入 `.agents/skills/prod/*/references/`，不依赖 Python；本目录只保留需要编译的可视化工具。
+>
+> **执行边界**：`pm` 为 `bash: deny`，只产 YAML；`python3 scripts/build_*.py` 由 `lead` 代跑。
 
 ## 工具清单
 
 | 工具 | 调用阶段 | 作用 | 输出落位 |
 | --- | --- | --- | --- |
 | `osm-map-generator` | explore | Epic 目标-策略-度量（Exit Criteria 可度量锚点） | `epics/<key>/analysis/osm/{osm.yaml,osm.html}` |
-| `business-process-deep-analyzer` | explore | To-Be Process L1/L2 + 痛点热力 | `epics/<key>/analysis/process/{process.yaml,process.html}` |
+| `business-process-deep-analyzer` | explore | **As-Is** 业务流程 L1/L2 + 痛点热力 | `epics/<key>/analysis/process/{process.yaml,process.html}` |
 | `journey-map-generator` | explore | To-Be Journey 可视化（阶段/行为/触点/情绪/痛点） | `epics/<key>/analysis/journey/{journey.yaml,journey.html}` |
 | `blueprint-map-generator` | baseline/blueprint | 服务蓝图 YAML→HTML 渲染管线（增强 baseline skill） | `docs/baseline/service_blueprint.html` |
 | `brand-design-system` | prototype 前置 | 产品 design system（tokens/组件规格/CSS 变量） | `docs/baseline/design-system/` |

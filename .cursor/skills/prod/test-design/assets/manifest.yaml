@@ -1,0 +1,7 @@
+skill: test-design
+outputs:
+  - artifact: test-design
+    template: openspec-requirements/templates/test-design.md
+    generates: epics/<epic-key>/stories/<story-key>/test-design.md
+    required: true
+references: []

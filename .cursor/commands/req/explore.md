@@ -15,9 +15,11 @@ tags: ["req-sdd", "explore", "idea"]
 **步骤**
 1. 加载 `explore` skill。
 2. 读已确认的 `epics/<epic-key>/research.md`、`docs/ROADMAP.md`、`docs/baseline/*.html`、`openspec-requirements/config.yaml`。
-3. 转化产出 idea.md：澄清业务意图 / **To-Be Process** / **To-Be Journey** / 产品设计思路 / 任务类型路由 / **候选 Capabilities**（对齐 domain_model）/ 治理映射 / 拆分建议 / 架构影响。
-4. **B/C 双端视角（强约束）**。
-5. 按 `openspec-requirements/templates/idea.md` 产出。
-6. **HITL**：产出后暂停确认，确认后才可进入 `/req:prototype`（若 UI）→ `/req:arch`（OPT）→ `/req:storymap`；跳过原型时直接进入 `/req:arch` 或 `/req:storymap`。idea.md 的架构影响章节作为 `/req:arch` 的输入草稿。
+3. 含糊时加载 `grilling` skill 分轮盘问；术语不一致时加载 `glossary` skill 锁定。
+4. 转化产出 idea.md：澄清业务意图 / **To-Be Process** / **To-Be Journey** / 产品设计思路 / 任务类型路由 / **候选 Capabilities**（对齐 domain_model）/ 治理映射 / 拆分建议 / 架构影响。
+5. 可选方法增强（均不阻塞漏斗）：问题定义（`references/problem-definition.md`）、As-Is 价值流（`references/value-stream.md`）、To-Be 泳道（`references/to-be-process.md`）、竞品对标（`references/competitor-benchmark.md`）。
+6. **B/C 双端视角（强约束）**。
+7. 按 `openspec-requirements/templates/idea.md` 产出。
+8. **HITL**：产出后暂停确认，确认后才可进入 `/req:prototype`（若 UI）→ `/req:arch`（OPT）→ `/req:storymap`；跳过原型时直接进入 `/req:arch` 或 `/req:storymap`。idea.md 的架构影响章节作为 `/req:arch` 的输入草稿。
 
-**Guardrails**: 只写需求侧制品；候选 Capabilities 是强约束；产出后必须 HITL 确认。
+**Guardrails**: 只写需求侧制品；候选 Capabilities 是强约束；As-Is 与 To-Be 分清；可选增强不阻塞漏斗；产出后必须 HITL 确认。

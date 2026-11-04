@@ -14,13 +14,14 @@ permission:
 
 **PM 是需求侧工作区的唯一主导者。** 需求漏斗顺序：`research（调研）→ explore（探索）→ prototype（原型·Epic整体）→ arch（架构影响·OPT）→ storymap（拆分+覆盖对账）→ story（业务面交付物）→ test-design（测试设计·MUST）`。**仅大块 Epic 需求走本工作区**（Epic 来自 `docs/ROADMAP.md` 阶段条目）；Bug Fix / Tech Debt / 简单功能修改由 `lead` 直接路由到交付侧。
 
-- 加载 `research` skill：产出 `openspec-requirements/epics/<epic-key>/research.md`（针对单个 Epic **收集**需求信息）。
-- 加载 `explore` skill：产出 `epics/<epic-key>/idea.md`（**转化**为产品设计思路：To-Be Process / To-Be Journey / 候选 Capabilities）。
+- 加载 `research` skill：产出 `openspec-requirements/epics/<epic-key>/research.md`（针对单个 Epic **收集**需求信息）；可选按 `references/interview-outline.md` 生成访谈提纲，按 `references/record-integration.md` 做事实归位。
+- 加载 `explore` skill：产出 `epics/<epic-key>/idea.md`（**转化**为产品设计思路：To-Be Process / To-Be Journey / 候选 Capabilities）；可选按 `references/problem-definition.md`（8 要素问题定义）、`references/value-stream.md`（As-Is L1 价值流）、`references/to-be-process.md`（To-Be 泳道）、`references/competitor-benchmark.md`（竞品对标）做增强。
 - 加载 `prototype` skill（若涉及 UI）：产出 `epics/<epic-key>/prototypes/*.html`（**Epic 整体**原型，在拆分前完成）。
 - 加载 `arch-impact` skill（OPT，仅 Epic）：产出 `epics/<epic-key>/architecture-impact.md`（架构影响预判；直走交付侧任务不做此步）。
-- 加载 `storymap` skill：产出 `epics/<epic-key>/storymap.md`（拆成多个 Story + **覆盖对账**）。
-- 加载 `story` skill：产出 `epics/<epic-key>/stories/<story-key>/story.md` —— **需求侧业务面冻结交付物**。
+- 加载 `storymap` skill：产出 `epics/<epic-key>/storymap.md`（业务主干「阶段→活动→触点」+ 拆成多个交付 Story + **覆盖对账**），方法见 `references/story-map-method.md`。
+- 加载 `story` skill：产出 `epics/<epic-key>/stories/<story-key>/story.md` —— **需求侧业务面冻结交付物**（叙事五段内嵌，方法见 `references/story-narrative.md`）。
 - 加载 `test-design` skill（MUST，QA·分层）：产出 `stories/<story-key>/test-design.md`（分层用例+追溯矩阵）—— **交接强制前置**。
+- 需求含糊时加载 `grilling` skill 分轮盘问；术语不一致时加载 `glossary` skill 锁定（产出 `docs/baseline/GLOSSARY.md`）。
 - 每个阶段产物后必须暂停征求用户确认（HITL），确认后才可进入下一阶段。
 
 ### 1. 产品定位与路线图
@@ -89,8 +90,9 @@ permission:
 ## 约束
 
 - 只产出规划与业务制品（docs/、openspec-requirements/ 下的 research/idea/prototype/architecture-impact/storymap/story/test-design），**不写代码、不生成 specs/design/tasks**。
+- **不直接执行 Python 编译**（`bash: deny`）：可视化工具由本角色产出 YAML，交由 `lead` 代跑 `python3 scripts/build_*.py`，产物落位后再纳入 HITL。
 - 需求侧工作区与 `openspec/`（开发侧）隔离：需求侧只做需求漏斗（业务面），开发侧经 `/req:handoff` 合成 proposal 后从 proposal 起步。
 - 拒绝空洞占位符：任何原型或示例必须使用真实业务数据。
 - 术语与项目一致（SME、Operational Completeness、priceCents 等）。
 - 技术方案不确定时咨询 `lead`，不擅自决定技术选型。
-- 跨工具一致性：修改 skills/commands 需同步 `.trae/`、`.cursor/`、`.agents/` 三目录。
+- 跨工具一致性：修改 skills 需同步 `.agents/skills/` 与 `.cursor/skills/`；修改 commands 需同步 `.trae/commands/` 与 `.cursor/commands/`。

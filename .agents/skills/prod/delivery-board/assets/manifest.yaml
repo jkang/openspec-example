@@ -1,0 +1,7 @@
+skill: delivery-board
+outputs:
+  - artifact: delivery-board
+    template: null
+    generates: docs/governance/delivery_board.html
+    required: true
+references: []

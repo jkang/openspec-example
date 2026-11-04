@@ -6,11 +6,13 @@
 黄金法则：**不要依赖聊天上下文；必须以代码库作为“唯一事实来源”。**
 
 ### 🔄 跨工具一致性约束 (Cross-Tool Consistency)
-为了确保在 Trae、Cursor 和其他 Agent 系统中拥有统一的开发体验，**任何对 SDD 工作流（skills/commands）的修改必须同时同步应用到以下三个目录**：
-- `.trae/`: Trae 专属技能与指令。
-- `.cursor/`: Cursor IDE 的规则与指令。
-- `.agents/`: 通用 Agent 协作指令。
-*严禁仅修改其中之一，这会导致不同 AI 工具间的协作漂移。*
+为了减少重复占用，**技能只保留两份**：`.agents/skills/`（权威源）与 `.cursor/skills/`（Cursor 镜像）；Trae 不再保存技能目录，只保留 `.trae/commands/` 指令。
+**任何对 SDD 工作流（skills/commands）的修改必须同步到**：
+- `.agents/skills/`: 技能权威源。
+- `.cursor/skills/`: Cursor 技能镜像。
+- `.agents/commands/`: 命令权威源。
+- `.trae/commands/` 与 `.cursor/commands/`: 命令镜像。
+*严禁只改其中一处，会导致不同 AI 工具间的协作漂移。*
 
 ### 🧑💻 SDD 团队角色 (Team Roles)
 
@@ -33,7 +35,7 @@
 在编写任何代码或提出方案之前，你**必须**查阅相关的治理文档：
 
 - **[SDD 工作流 SOP](docs/SOPS/SDD_WORKFLOW.md)**: `/opsx:` 与 `/req:` 指令的使用规则（含规划层 `/opsx:planning:product-vision`、`/opsx:planning:product-planning`；需求侧 `/req:research → explore → prototype → arch(OPT) → storymap → story → test-design(MUST) → handoff`）、HITL（人机协同）检查点以及**任务类型 (Epic/Bug Fix/Tech Debt/简单功能) 的分支策略**与**分层同步 (Spec Sync change 级 / Baseline Sync Epic 级)** 机制。**开始任务前必读**。
-- **[Service Blueprint 标准](.trae/skills/baseline/blueprint/SKILL.md)**: `service_blueprint.html` 的稳定锚点、引用方式、capability 口径与 sync 触发规则。凡是 planning artifacts 或 sync 涉及服务蓝图，必须先参考此文档。
+- **[Service Blueprint 标准](.agents/skills/baseline/blueprint/SKILL.md)**: `service_blueprint.html` 的稳定锚点、引用方式、capability 口径与 sync 触发规则。凡是 planning artifacts 或 sync 涉及服务蓝图，必须先参考此文档。
 - **[业务基线治理]**: 包含 `service_blueprint.html` (Story 矩阵/服务蓝图)、`business_process.html` (流程图)、`domain_model.html` (Event-Storming 模型) 与 `design-system/` (ZAPP 权威设计系统)。**位于 `docs/baseline/`**。
 - **[治理映射约束]**: **核心准则**：`Bounded Contexts` (Baseline) 治理 `Capabilities` (Spec Layer)。在 Explore/Propose 阶段必须参考 `domain_model.html` 中的映射表来识别 Impact Capabilities。
 - **[交付看板]**: `docs/governance/delivery_board.html` - 使用 `/opsx:governance:delivery-board` 生成，展示系统当前的交付状态与健康度。
@@ -44,6 +46,24 @@
 - **[质量与评估标准](docs/QUALITY_SCORE.md)**: 端到端 (E2E) 验证要求以及“代码即规范”的质量底线。
 - **[自动化测试策略](docs/TESTING_STRATEGY.md)**: 分层测试金字塔与 Cucumber BDD 标签规范 (`@unit`, `@api`, `@e2e`)。
 
+## 🧱 Skill 结构规范 (Skill Anatomy)
+
+所有 `prod/`、`opsx/`、`baseline/` 技能统一采用：
+
+```
+<skill>/
+├── SKILL.md              # 触发 + 步骤 + 完成判据 + 护栏
+├── assets/manifest.yaml  # 输出契约：引用中央模板 + 产物路径
+├── references/           # 方法、铁律、分支细节
+├── scripts/              # 可选：编译/校验
+└── examples/             # 可选：脱敏样例
+```
+
+- 输出模板统一放 `openspec-requirements/templates/`，由 `assets/manifest.yaml` 引用，不在 skill 内重复。
+- `assets/` 只放输出契约；`references/` 放方法；模板不得包含过程性说明注释。
+- 跨切面方法：`prod/grilling`（需求盘问）、`prod/glossary`（统一语言）。
+- 变更技能/命令后运行 `./scripts/sync-skills.sh` 同步 `.agents/skills/` → `.cursor/skills/`、`.agents/commands/` → `.trae/commands/` 与 `.cursor/commands/`，并校验。
+
 ## 🗂️ 唯一事实来源 (Single Source of Truth)
 
 本项目由 OpenSpec (v2.0) 框架进行治理。
@@ -51,7 +71,7 @@
 
 - `docs/PRODUCT.md`: **[全局规划]** 定义产品定位、价值主张、痛点及竞争优势。
 - `docs/ROADMAP.md`: **[全局规划]** 定义滚动路线图、阶段边界及当前 Baseline（**唯一权威**，按阶段组织，每阶段条目即 Epic，需求侧只消费其 Epic 不扩范围）。
-- `docs/baseline/`: **[业务基线]** 包含 Blueprint, Process Flow 和 Event-Storming Domain Model。这是系统认知的核心沉淀。
+- `docs/baseline/`: **[业务基线]** 包含 Blueprint, Process Flow、Event-Storming Domain Model 与 `GLOSSARY.md`（统一语言）。这是系统认知的核心沉淀。
 - `openspec/schemas/spec-driven.yaml`: **[Schema 优先]** 定义了开发侧所有制品的生成指令和格式约束，是开发侧工作流的最底层事实来源。
 - `openspec-requirements/`: **[需求侧工作区]** 需求漏斗（仅大块 Epic），**以 Epic 为工作单元**：`epics/<epic-key>/research.md`（先调研→识别 Epic→创建目录）→ `idea.md` → `prototypes/` → `storymap.md` → `stories/<story-key>/story.md`（业务面冻结交付物）；Epic 完成后整个目录归档至 `archive/YYYY-MM-DD-<epic-key>/`。Schema 见 `openspec-requirements/schemas/req-sdd.yaml`，规则见 `openspec-requirements/config.yaml`。
 - **适用范围路由**：大块 Epic 走需求侧漏斗（`/req:research` → `/req:explore` → `/req:prototype`(UI, Epic整体) → `/req:arch`(OPT) → `/req:storymap` → `/req:story` → `/req:test-design`(MUST) → `/req:handoff`）；Bug Fix / Tech Debt / 简单功能修改**直走交付侧**（`/opsx:propose` 起，任务内的架构影响内联 proposal，不走 `/req:arch`）。

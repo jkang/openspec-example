@@ -1,12 +1,12 @@
 ---
 name: story
-description: 需求侧 Story 交付物（业务面）。把已确认的 Story 深化为冻结交付物 story.md（用户场景 + 业务规则 + E2E 验收 + 治理映射），作为 handoff 合成开发侧 proposal 的输入。使用场景：拆分出的 Story 深化为可交给开发的业务面交付物时。
+description: 需求侧 Story 交付物（业务面）。把已确认的 Story 深化为冻结交付物 story.md（叙事五段 + 业务规则 + E2E 验收 + 治理映射），作为 handoff 合成开发侧 proposal 的输入。使用场景：拆分出的 Story 深化为可交给开发的业务面交付物时。
 allowed-tools: Bash(git:*)
 license: MIT
 compatibility: 需求侧工作流 (req-sdd)
 metadata:
   author: sdd-team
-  version: "2.0"
+  version: "2.1"
 ---
 
 Story 是需求侧**唯一冻结交付物（业务面）**。开发侧经 `/req:handoff`（skill: handoff）以本 Story 为输入合成 `proposal.md`，随后按 capability 拆分生成行为规格 specs（Story-specs）。
@@ -16,13 +16,17 @@ Story 是需求侧**唯一冻结交付物（业务面）**。开发侧经 `/req:
 ## 产物
 
 - `openspec-requirements/epics/<epic-key>/stories/<story-key>/story.md`（业务面冻结交付物）
+- 可选：`epics/<epic-key>/analysis/narrative/<story-key>/narrative.md`（HTML 叙事，仅审查辅助）
+
+输出契约见 `assets/manifest.yaml`（模板统一引用 `openspec-requirements/templates/`）。
 
 ## 步骤
 
 1. **读上下文**：读已确认的 `epics/<epic-key>/idea.md`、`epics/<epic-key>/storymap.md`、`epics/<epic-key>/prototypes/*.html`（若 UI 且已确认）与 `epics/<epic-key>/architecture-impact.md`（若已跑 OPT）。
-2. **应用规则**：读 `openspec-requirements/config.yaml` 的 `rules.story`。
-3. **生成 story.md**：按 `openspec-requirements/templates/story.md` 产出（纯业务面）：
+2. **应用规则**：读 `openspec-requirements/config.yaml` 的 `rules.story`。业务规则或验收标准有歧义时，先加载 `grilling` skill 盘问；术语不一致时加载 `glossary` skill 锁定。
+3. **生成 story.md**：按 `openspec-requirements/templates/story.md` 与 `references/story-narrative.md` 产出（纯业务面）：
    - 用户场景（C 端 + B 端视角）/ 范围
+   - 叙事五段：核心描述 / 角色画像 / 交互逻辑 / 验收标准 / 业务价值（内嵌本文件，不另建）
    - 业务规则表
    - E2E 验收标准（Given/When/Then，映射 L1/L2 与 SB-STAGE-*/SB-CUSTOMER-*）
    - 治理映射对齐（Bounded Context / L3 / SB-<LANE>-*，新增 taxonomy 显式标注）
@@ -41,5 +45,7 @@ Story 是需求侧**唯一冻结交付物（业务面）**。开发侧经 `/req:
 
 - 只写需求侧业务面制品，不写代码。
 - Story 是需求侧冻结交付物，开发侧不重复 explore/prototype/story。
+- 叙事五段内嵌 `story.md`；独立 narrative 仅为 optional 审查辅助。
+- 不新造 Story 级原型作为 UI 事实来源；UI 以 Epic 整体原型为准。
 - 拒绝空洞占位符；真实业务数据、全中文。
 - 产出后必须 HITL 确认；**未确认不得进入下一阶段（强制门禁）**。

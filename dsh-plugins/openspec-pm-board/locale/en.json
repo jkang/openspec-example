@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "PM Workbench",
+    "description": "Adds a \"PM Workbench\" entry to the left sidebar: a read-only view of OpenSpec-practice planning and requirements progress — phase progress, Epic funnel and Story specs, knowledge-asset reviews, pending confirmations and data-health warnings — with one-click continuation through the PM Agent."
+  }
+}

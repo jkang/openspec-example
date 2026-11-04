@@ -216,7 +216,7 @@ permission:
 - **不伪造**测试结果；引用 `verify.md` 时注明其生成时间与结论。
 - 每个 finding 必须有证据；拒绝空泛断言与"可能的猜测"。
 - 输出中文、无 emoji；优先给可执行的修复顺序，而不是问题清单的堆砌。
-- 跨工具一致性：角色定义需同步 `.opencode/agents/reviewer.md`（权威）与 `.cursor/agents/reviewer.md`；命令需同步 `.trae/`、`.cursor/`、`.agents/` 三目录。
+- 跨工具一致性：角色定义需同步 `.opencode/agents/reviewer.md`（权威）与 `.cursor/agents/reviewer.md`；技能同步 `.agents/skills/` 与 `.cursor/skills/`；命令同步 `.trae/commands/` 与 `.cursor/commands/`。
 
 ## 与 lead 的协作
 

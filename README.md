@@ -126,7 +126,7 @@
 
 > **迁移原则**：只迁移「SDD 引擎」，不要把本仓库的电商示例产物（specs / changes / epics / baseline / design-system）一起搬走。
 >
-> **迁移前必读**：[`docs/SOPS/SDD_WORKFLOW.md`](./docs/SOPS/SDD_WORKFLOW.md)、[`openspec-requirements/README.md`](./openspec-requirements/README.md)、[`.trae/skills/baseline/blueprint/SKILL.md`](./.trae/skills/baseline/blueprint/SKILL.md)。
+> **迁移前必读**：[`docs/SOPS/SDD_WORKFLOW.md`](./docs/SOPS/SDD_WORKFLOW.md)、[`openspec-requirements/README.md`](./openspec-requirements/README.md)、[`.agents/skills/baseline/blueprint/SKILL.md`](./.agents/skills/baseline/blueprint/SKILL.md)。
 >
 > **可执行助手**：`./scripts/migrate-scaffold.sh <目标绝对路径>` 可完成「引擎复制 + 空目录初始化 + 项目级模板生成」；脚本不会替目标项目重写业务规则、AGENTS.md 与 `init.sh`，这些仍需按 4.3 / 4.4 完成。
 
@@ -340,7 +340,7 @@ story-list.json 归档 → lead 回填 STATUS.md（all-done）→ epics/<key>/ �
 - [SDD 工作流 SOP](./docs/SOPS/SDD_WORKFLOW.md)
 - [需求侧工作区说明](./openspec-requirements/README.md)
 - [需求分析工具箱](./openspec-requirements/tools/README.md)
-- [Service Blueprint 标准](./.trae/skills/baseline/blueprint/SKILL.md)
+- [Service Blueprint 标准](./.agents/skills/baseline/blueprint/SKILL.md)
 - [前端治理规范](./docs/FRONTEND.md) · [后端架构指南](./docs/ARCHITECTURE.md) · [测试策略](./docs/TESTING_STRATEGY.md) · [质量标准](./docs/QUALITY_SCORE.md)
 
 ---

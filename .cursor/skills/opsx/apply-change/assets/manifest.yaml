@@ -1,0 +1,7 @@
+skill: apply-change
+outputs:
+  - artifact: implementation
+    template: null
+    generates: 代码与测试（按 tasks.md）
+    required: true
+references: []

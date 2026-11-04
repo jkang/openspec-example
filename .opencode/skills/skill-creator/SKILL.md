@@ -90,6 +90,23 @@ command here
 1. ...
 ```
 
+## SDD 工作流 Skill 标准结构
+
+本仓库的 `prod/`、`opsx/`、`baseline/` 技能统一采用：
+
+```
+<skill>/
+├── SKILL.md              # 步骤 + 完成判据 + 护栏
+├── assets/manifest.yaml  # 声明引用的中央模板与产物路径
+├── references/           # 方法、铁律、分支细节
+├── scripts/              # 可选
+└── examples/             # 可选
+```
+
+- 输出模板统一放在 `openspec-requirements/templates/`，由 `assets/manifest.yaml` 引用，不在 skill 内重复。
+- `assets/` 只放输出契约；`references/` 放方法。交付模板不得包含过程性说明注释。
+- 写作规范见 [`references/skill-writing.md`](references/skill-writing.md)：信息层级、完成判据、上下文指针、引导词、修剪、正面表述。
+
 ## Notes from OpenCode docs
 
 - Skill folders live in `.opencode/skills/<name>/SKILL.md`.

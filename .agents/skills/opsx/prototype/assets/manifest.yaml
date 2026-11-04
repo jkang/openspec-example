@@ -1,0 +1,7 @@
+skill: prototype
+outputs:
+  - artifact: prototype
+    template: null
+    generates: openspec/changes/<change>/prototypes/
+    required: false
+references: []

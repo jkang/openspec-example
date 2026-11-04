@@ -1,0 +1,7 @@
+skill: render
+outputs:
+  - artifact: baseline-render
+    template: null
+    generates: docs/baseline/*.html
+    required: false
+references: []

@@ -22,6 +22,9 @@ model: inherit
 
 - 感知全局状态：`openspec list`、`openspec-requirements/`、`openspec/config.yaml`、`docs/ROADMAP.md`、`docs/SOPS/SDD_WORKFLOW.md`。
 - 判断当前处于 SDD 哪个阶段。需求侧漏斗阶段（research / explore / prototype / arch-impact(OPT) / storymap / story / test-design）路由到 `pm`（加载 `research/explore/prototype/arch-impact/storymap/story/test-design` skill，**仅大块 Epic**；test-design 由 `qa` 提供分层规范、`pm` 主导产出）；开发侧阶段（Propose / Spec-Design / Apply / Verify / Acceptance / Review / Sync / Archive）路由到 `engineer` / `qa` / `acceptance-runner` / `reviewer`。
+- **工具编译代跑**：`pm` 为 `bash: deny`，需求侧可视化工具（osm/process/journey/storymap 等）由 `pm` 产出 YAML 后，交由 `lead` 执行 `python3 scripts/build_*.py` 并回填产物。
+- **需求盘问**：任务类型路由、Epic 边界或方案分歧不确定时，加载 `grilling` skill 分轮盘问后再路由。
+- **术语与决策**：`glossary` skill 维护 `docs/baseline/GLOSSARY.md`（PM 主导）；难逆转的架构决策由 `lead`/`engineer` 记录到 `docs/adr/`。
 - **适用范围路由**：Bug Fix / Tech Debt / 简单功能修改 → 直走交付侧（`engineer` 从 `/opsx:propose` 起步），不走需求侧漏斗。
 - 维护 HITL 检查点：需求侧每个阶段产物与开发侧阶段产物完成后呈报用户，等待确认再推进。
 - **交接边界**：当需求侧 `story.md` 与 `test-design.md` 均已确认（`test-design` 为 MUST 前置；`architecture-impact.md` 若存在一并读取），触发 `/req:handoff`（读取 Story + Test Design → 创建开发侧 change → **合成 proposal.md** → 登记 epic 队列），然后路由给 `engineer` 从 `proposal` 起步。
@@ -39,7 +42,7 @@ model: inherit
 - 实施完成后执行 **Spec Sync**（加载 `sync-specs`，change 级）。
 - 归档变更并更新 epic 队列（加载 `archive-change` skill）；**Epic 末 Story 归档后触发 Baseline Sync**（`/opsx:baseline/sync` + `baseline/*` 四技能，含显式 no-op 判定）+ Roadmap 更新。
 - 刷新交付看板（加载 `delivery-board` skill）。
-- 执行跨工具一致性审计（对比 `.trae/` / `.cursor/` / `.agents/` 三目录的 skill 与命令是否同步，AGENTS.md 硬约束）。
+- 执行跨工具一致性审计（对比 `.agents/skills/` 与 `.cursor/skills/`、`.trae/commands/` 与 `.cursor/commands/` 是否同步，AGENTS.md 硬约束）。
 
 ## 约束
 
@@ -47,5 +50,5 @@ model: inherit
 - 遵守 `docs/SOPS/SDD_WORKFLOW.md` 的流程分支：需求侧走 `req-sdd` 漏斗（仅 Epic：research → explore → prototype → arch(OPT) → storymap → story → test-design(MUST) → /req:handoff）；开发侧从 proposal 起步，任务类型决定是否走 Prototype / skip_specs。
 - 治理映射必须对齐 `docs/baseline/domain_model.html`（Bounded Context → Capability），引用 `L1/L2/L3` 流程节点与 `SB-STAGE-*` / `SB-<LANE>-*` 蓝图锚点。
 - Schema 优先：需求侧 `openspec-requirements/schemas/req-sdd.yaml`、开发侧 `openspec/schemas/spec-driven.yaml`，与 SOP 冲突时以 Schema 为准。
-- 跨工具一致性约束：对 SDD 工作流（skills/commands）的任何修改必须同步 `.trae/`、`.cursor/`、`.agents/` 三目录；角色定义同步 `.opencode/agents/` 与 `.cursor/agents/`。
+- 跨工具一致性约束：对 SDD 工作流（skills/commands）的任何修改必须同步 `.agents/skills/` → `.cursor/skills/` 与 `.trae/commands/` → `.cursor/commands/`；角色定义同步 `.opencode/agents/` 与 `.cursor/agents/`。
 - 验收不发布：默认只渲染 `.acceptances/<change>/report.html`；发布到 LobeHub 必须用户本人登录并明确要求。

@@ -1,0 +1,7 @@
+skill: product-vision
+outputs:
+  - artifact: product
+    template: openspec-requirements/templates/product.md
+    generates: docs/PRODUCT.md
+    required: true
+references: []

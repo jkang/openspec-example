@@ -32,7 +32,7 @@ I'll create the following artifacts:
    Ensure `proposal.md` exists. 
    If the task type requires a prototype (Story/UI Bug Fix), ensure `prototype.html` exists and was approved.
    若为 handoff 场景，参考 proposal 中链接的需求侧 `story.md` 的 E2E 验收标准（开发侧不单独生成 story.md）。
-   Re-read `docs/baseline/domain_model.html`, `docs/baseline/business_process.html`, `docs/baseline/service_blueprint.html`, and `.trae/skills/baseline/blueprint/SKILL.md` before drafting artifacts.
+   Re-read `docs/baseline/domain_model.html`, `docs/baseline/business_process.html`, `docs/baseline/service_blueprint.html`, and `.agents/skills/baseline/blueprint/SKILL.md` before drafting artifacts.
 
 2. **Generate Specs, Design, and Tasks**
    

@@ -1,0 +1,23 @@
+skill: explore
+outputs:
+  - artifact: idea
+    template: openspec-requirements/templates/idea.md
+    generates: epics/<epic-key>/idea.md
+    required: true
+  - artifact: problem-definition
+    template: openspec-requirements/templates/problem-definition.md
+    generates: epics/<epic-key>/analysis/problem/problem-definition.md
+    required: false
+  - artifact: value-stream
+    template: openspec-requirements/templates/value-stream.md
+    generates: epics/<epic-key>/analysis/value-stream/value-stream.md
+    required: false
+  - artifact: competitor-benchmark
+    template: null
+    generates: epics/<epic-key>/analysis/competitor/competitor.md
+    required: false
+references:
+  - references/problem-definition.md
+  - references/value-stream.md
+  - references/to-be-process.md
+  - references/competitor-benchmark.md

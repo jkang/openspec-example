@@ -1,0 +1,7 @@
+skill: archive-change
+outputs:
+  - artifact: archive
+    template: null
+    generates: openspec/changes/archive/YYYY-MM-DD-<change>/
+    required: true
+references: []

@@ -16,8 +16,10 @@ tags: ["req-sdd", "research"]
 1. 加载 `research` skill。
 2. 从 `docs/ROADMAP.md`（唯一权威）确定要调研的 Epic（一句话描述，一阶段可多 Epic）。
 3. **创建 Epic 工作目录**：确认 Epic key 后创建 `openspec-requirements/epics/<epic-key>/`（该 Epic 所有产物内聚于此）。
-4. 与业务/用户沟通，收集：Epic 背景 / 调研对象 / 访谈原始记录 / 原始需求信息 / 业务约束线索 / 疑问待澄清项 / 调研结论。
-5. 按 `openspec-requirements/templates/research.md` 产出 `epics/<epic-key>/research.md`。
-6. **HITL**：产出后暂停征求用户确认，确认后才可进入 `/req:explore`。
+4. 可选：按 `research/references/interview-outline.md` 设计访谈提纲（产物 `analysis/interview/outline.md`）。
+5. 与业务/用户沟通，收集：Epic 背景 / 调研对象 / 访谈原始记录 / 原始需求信息 / 业务约束线索 / 疑问待澄清项 / 调研结论。
+6. 有多源材料时按 `research/references/record-integration.md` 做事实归位（只记事实、未提及显式标注、专有名词入待澄清）。
+7. 按 `openspec-requirements/templates/research.md` 产出 `epics/<epic-key>/research.md`。
+8. **HITL**：产出后暂停征求用户确认，确认后才可进入 `/req:explore`。
 
-**Guardrails**: 只收集不转化；产出后必须 HITL 确认。
+**Guardrails**: 只收集不转化；记录只做事实归位；产出后必须 HITL 确认。

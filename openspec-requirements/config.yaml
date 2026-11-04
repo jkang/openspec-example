@@ -8,11 +8,16 @@ context: |
   需求漏斗: research → explore → prototype(Epic整体) → arch(架构影响, OPT) → storymap → story（业务面交付物） → test-design（分层测试设计, MUST）。
   架构影响: OPT 步骤（/req:arch，skill: arch-impact），产出 architecture-impact.md；仅 Epic 漏斗，直走交付侧任务内联 proposal。
   测试设计: MUST 步骤（/req:test-design，skill: test-design），产出 test-design.md（分层用例+追溯矩阵）；是 handoff 强制前置。
-  需求分析工具箱: openspec-requirements/tools/ - 8 个 AI4PM 需求工程工具（可选增强，产物在 epics/<key>/analysis/ 或 docs/baseline/design-system/）。
-    工具映射: osm=osm-map-generator, process=business-process-deep-analyzer, journey=journey-map-generator,
+  需求分析工具箱: openspec-requirements/tools/ + 各 skill references/ - 方法论与可选可视化工具（产物在 epics/<key>/analysis/ 或 docs/baseline/）。
+    可视化工具映射: osm=osm-map-generator, process=business-process-deep-analyzer(As-Is), journey=journey-map-generator,
     blueprint=blueprint-map-generator, design-system=brand-design-system, working-prototype=prototype-generator,
     storymap-visual=story-map-generator, narrative=story-narrative-generator。
-    调用契约: LLM → YAML → Python/Jinja2 → HTML；工具 SKILL.md 为操作指南，references/*.md 为数据铁律。
+    方法映射: interview-outline=research/references/interview-outline.md, interview-record=research/references/record-integration.md,
+    problem=explore/references/problem-definition.md, value-stream=explore/references/value-stream.md,
+    to-be=explore/references/to-be-process.md, competitor=explore/references/competitor-benchmark.md,
+    storymap-method=storymap/references/story-map-method.md, story-narrative=story/references/story-narrative.md。
+    调用契约: 方法类技能写入 skill references/（不强制 Python）；可视化工具走 LLM → YAML → Python/Jinja2 → HTML。
+    PM 不直接执行 Python（bash: deny），编译由 lead 代跑。
   规划来源: docs/ROADMAP.md 是唯一权威（按阶段组织，每阶段条目即 Epic，一阶段可多 Epic）；需求侧不再产 roadmap。
   交接边界: 需求侧冻结交付物 story.md 通过 /req:handoff（skill: handoff）交给开发侧 openspec/changes/<name>/，
     由 handoff 合成 proposal.md 后开发侧从 proposal 起步；行为规格 specs（Story-specs）由开发侧在 proposal 后按 capability 拆分生成。
@@ -40,6 +45,9 @@ rules:
     - 针对单个 Epic（来自 docs/ROADMAP.md 阶段条目）做调研
     - 只负责收集：Epic 背景 / 调研对象 / **访谈原始记录（内嵌，每条含 对象/时间方式/原始摘录/关键信号）** / 原始需求信息 / 业务约束线索 / 疑问待澄清项 / 调研结论
     - 访谈原始记录是 research.md 的内嵌组成部分（不建独立文件），保留一手证据
+    - 可选：访谈提纲（references/interview-outline.md，产物 analysis/interview/outline.md）
+    - 有多源材料时按 references/record-integration.md 做事实归位：只记事实、未提及显式标注、专有名词入待澄清
+    - 范围或对象含糊时先加载 grilling skill 盘问
     - 不做产品设计转化（那是 explore 的职责）
     - 产出到 epics/<epic-key>/research.md（research 先执行，据调研结果识别 Epic 并创建 epics/<epic-key>/ 目录）
   explore:
@@ -50,7 +58,14 @@ rules:
     - 任务类型确认：Bug Fix / Tech Debt / 简单功能修改 → 直走交付侧，不继续需求漏斗
     - 治理映射对齐：domain_model (Bounded Context) / business_process (L1/L2/L3) / service_blueprint (SB-STAGE-*/SB-<LANE>-*)
     - 拒绝空洞占位符，必须使用真实业务数据
-    - 可选分析增强（tools/）：可调用 osm-map-generator（OSM 度量）、business-process-deep-analyzer（To-Be Process L1/L2 可视化）、journey-map-generator（To-Be Journey 可视化），产物落位 epics/<key>/analysis/{osm,process,journey}/，并在 idea.md「分析制品索引」引用；均为 optional，不强制
+    - 澄清方式：业务意图/规则/边界含糊时用 grilling skill 分轮盘问；术语不一致时用 glossary skill 锁定
+    - As-Is 与 To-Be 必须分清：value-stream / business-process-deep-analyzer 是 As-Is；to-be-process 是目标泳道，禁止混标
+    - 可选方法增强（均 optional，不阻塞漏斗）：
+      - 问题定义（8 要素）：explore/references/problem-definition.md → analysis/problem/
+      - L1 价值流：explore/references/value-stream.md → analysis/value-stream/
+      - To-Be 流程泳道：explore/references/to-be-process.md → analysis/to-be/
+      - 竞品与参考案例：explore/references/competitor-benchmark.md → analysis/competitor/
+    - 可选可视化（tools/）：osm-map-generator、business-process-deep-analyzer、journey-map-generator，产物落位 analysis/{osm,process,journey}/；PM 只产 YAML，编译由 lead 代跑
   prototype:
     - 在需求拆分（storymap）之前完成，针对 Epic 整体做原型（一次完成）
     - 必须严格遵循 docs/FRONTEND.md 的 UI 规范
@@ -65,20 +80,26 @@ rules:
     - 产出后必须等待用户确认 (HITL)
   storymap:
     - 仅用于大需求/复杂 idea 拆分为多个 Story
+    - 业务主干（Jeff Patton）：先画「阶段 → 活动 → 触点 → 用户故事（must/should/could）」，见 storymap/references/story-map-method.md
     - 覆盖对账（强制）：Epic 的每个 In Scope / Exit Criteria / B 端承诺项 / 候选 Capability 必须有 ≥1 个 Story 承接
-    - 粒度原则：每个 Story 是一个完整端到端功能（不拆到行为/UI 细节级），避免破坏上下文
+    - 粒度原则：交付 Story 是一个完整端到端功能（可承接多个用户故事；不拆到行为/UI 细节级）
     - 每个拆分出的 Story 必须有人物 (role)、价值 (value)、目标 (goal) 三要素
-    - 必须给出各 Story 的依赖关系与优先级 (P0/P1/P2)
-    - 可选分析增强（tools/）：可调用 story-map-generator 生成 4 层故事地图可视化（阶段-活动-接触点-用户故事 + must/should/could），产物 epics/<key>/analysis/storymap/；覆盖对账仍以 storymap.md 为唯一权威
+    - 优先级映射：must→P0、should→P1、could→P2；优先垂直切片（tracer bullet）
+    - 支撑需求（技术/数据/合规）单独列出，送交付侧，不占需求侧 Story
+    - 粒度或依赖有争议时先用 grilling skill 盘问
+    - 可选分析增强（tools/）：story-map-generator 生成 4 层故事地图可视化，产物 analysis/storymap/；覆盖对账仍以 storymap.md 为唯一权威
   story:
     - 需求侧唯一冻结交付物（业务面），交给开发侧作为 proposal 输入
     - 只含业务面：用户场景 / 范围 / 业务规则 / E2E 验收 / 治理映射
+    - 叙事五段内嵌 story.md：核心描述 / 角色画像 / 交互逻辑 / 验收标准 / 业务价值（见 story/references/story-narrative.md）
     - ⚠️ 不含行为规格：specs（Story-specs）由开发侧在 proposal 后按 capability 拆分生成
     - 验收标准必须覆盖端到端 (E2E) 旅程，使用 Given/When/Then，映射到 L1/L2/L3 流程节点
     - 验收标准必须同时映射到 service_blueprint.html 中的 SB-STAGE-* 与 SB-<LANE>-* 节点
     - 若涉及 UI，必须引用已确认的 Epic 整体原型 epics/<epic-key>/prototypes/*.html；无已确认原型禁止勾选"待开发交接"
+    - 不新造 Story 级原型作为 UI 事实来源
+    - 业务规则或验收标准有歧义时先用 grilling skill；术语不一致时用 glossary skill
     - 拒绝空洞占位符，必须使用真实业务数据
-    - 可选分析增强（tools/）：可调用 story-narrative-generator 生成故事详述（角色画像/交互逻辑/AC/业务价值），产物 epics/<key>/analysis/narrative/<story-key>/narrative.md，story.md「分析制品索引」引用
+    - 可选分析增强（tools/）：story-narrative-generator 生成故事详述 HTML，产物 analysis/narrative/<story-key>/narrative.md，story.md「分析制品索引」引用
   arch:
     - 可选（OPT）步骤，仅大块 Epic 漏斗；直走交付侧任务不走本步骤（架构影响内联 proposal 的 Impact）
     - 时机：原型确认后、storymap 之前（不涉及 UI 时在 explore 后）

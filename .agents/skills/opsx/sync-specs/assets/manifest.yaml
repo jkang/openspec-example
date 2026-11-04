@@ -1,0 +1,7 @@
+skill: sync-specs
+outputs:
+  - artifact: main-specs
+    template: null
+    generates: openspec/specs/
+    required: true
+references: []

@@ -1,0 +1,8 @@
+skill: glossary
+outputs:
+  - artifact: glossary
+    template: openspec-requirements/templates/glossary.md
+    generates: docs/baseline/GLOSSARY.md
+    required: true
+references:
+  - references/glossary-format.md

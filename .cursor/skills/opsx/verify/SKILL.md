@@ -121,4 +121,4 @@ Soft Gates:
 
 - 任何 Hard Gate FAIL 必须停止并报告，不得放行进入 sync/archive。
 - 所有结果必须落盘 verify.md，作为可审计证据（"代码即规范"的质量底线）。
-- 跨工具一致性: 修改本 Skill 规则时，必须同步更新 `.trae/`、`.cursor/`、`.agents/` 三目录下的对应入口。
+- 跨工具一致性: 修改本 Skill 规则时，必须同步更新 `.agents/skills/` 与 `.cursor/skills/`；命令同步 `.trae/commands/` 与 `.cursor/commands/`。

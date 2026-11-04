@@ -1,0 +1,7 @@
+skill: blueprint
+outputs:
+  - artifact: service-blueprint
+    template: null
+    generates: docs/baseline/service_blueprint.html
+    required: true
+references: []

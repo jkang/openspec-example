@@ -1,0 +1,7 @@
+skill: propose
+outputs:
+  - artifact: proposal
+    template: openspec/schemas/spec-driven.yaml
+    generates: openspec/changes/<change>/proposal.md
+    required: true
+references: []

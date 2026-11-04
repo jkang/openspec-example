@@ -1,0 +1,15 @@
+skill: spec-design
+outputs:
+  - artifact: specs
+    template: openspec/schemas/spec-driven.yaml
+    generates: openspec/changes/<change>/specs/
+    required: true
+  - artifact: design
+    template: openspec/schemas/spec-driven.yaml
+    generates: openspec/changes/<change>/design.md
+    required: true
+  - artifact: tasks
+    template: openspec/schemas/spec-driven.yaml
+    generates: openspec/changes/<change>/tasks.md
+    required: true
+references: []

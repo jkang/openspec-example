@@ -1,0 +1,35 @@
+{
+  "name": "@local/dsh-openspec-pm-board",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "PM 工作台：左侧边栏入口 + OpenSpec-practice 产品规划/需求分析看板（实时只读），Epic 漏斗、Story spec 待办、业务知识资产复核与 AI/待确认状态，一键以 PM Agent 继续",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "scripts/pm_board_scan.py",
+    "API.md"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-sidebar"
+      ]
+    }
+  }
+}

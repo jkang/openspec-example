@@ -1,0 +1,13 @@
+skill: research
+outputs:
+  - artifact: research
+    template: openspec-requirements/templates/research.md
+    generates: epics/<epic-key>/research.md
+    required: true
+  - artifact: interview-outline
+    template: openspec-requirements/templates/interview-outline.md
+    generates: epics/<epic-key>/analysis/interview/outline.md
+    required: false
+references:
+  - references/interview-outline.md
+  - references/record-integration.md

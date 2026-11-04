@@ -1,0 +1,12 @@
+skill: storymap
+outputs:
+  - artifact: storymap
+    template: openspec-requirements/templates/storymap.md
+    generates: epics/<epic-key>/storymap.md
+    required: true
+  - artifact: storymap-visual
+    template: null
+    generates: epics/<epic-key>/analysis/storymap/{storymap.yaml,storymap.html}
+    required: false
+references:
+  - references/story-map-method.md

@@ -1,0 +1,11 @@
+skill: prototype
+outputs:
+  - artifact: prototype
+    template: openspec-requirements/templates/prototype.html
+    generates: epics/<epic-key>/prototypes/<page>.html
+    required: false
+  - artifact: working-prototype
+    template: null
+    generates: epics/<epic-key>/prototypes/working/mvp-prototype/
+    required: false
+references: []
